@@ -187,6 +187,22 @@ button {
   }
 }
 
+.form-error {
+  height: 0;
+}
+
+.form-error--active {
+  background-color: #ffe8e8;
+  padding: $unit;
+  height: auto;
+}
+
+.form-error__message {
+  max-width: $form-width;
+  margin: 0 auto;
+  color: #ee3333;
+}
+
 .form__fields {
   margin: $double-unit 0;
 }

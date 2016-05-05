@@ -7,9 +7,24 @@ const PASSWORD = 'pbc';
 
 // Schemas
 
+const sessionSchema = Schema({
+  email: String,
+  lastLogin: Date,
+  token: String
+});
+export const Session = mongoose.model('Session', sessionSchema);
+
 const userSchema = Schema({
-  name: String,
-  email: String
+  administrator: Boolean,
+  avatar: {
+    data: String,
+    name: String,
+    size: Number,
+    mimeType: String // can't use 'type' since Mongoose reserves that
+  },
+  email: String,
+  encryptedPassword: String,
+  name: String
 }, { strict: false });
 
 mongoose.model('User', userSchema);

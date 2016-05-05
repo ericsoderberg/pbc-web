@@ -1,17 +1,45 @@
 "use strict";
-import React, { Component } from 'react';
-import MainNav from './MainNav';
+import { Component, createElement } from 'react';
+import { getState, dispatch, subscribe } from '../store';
 
-export default class App extends Component {
+export default function (Wrapped, mapper) {
 
-  render () {
-    return (
-      <div className="app">
-        <MainNav className="app__nav" />
-        <section className="app__content">
-          {this.props.children}
-        </section>
-      </div>
-    );
-  }
-};
+  return class Stored extends Component {
+
+    constructor (props) {
+      super(props);
+      this._onChange = this._onChange.bind(this);
+      this.state = { props: { ...props, dispatch: dispatch }};
+    }
+
+    componentDidMount () {
+      this._unsubscribe = subscribe(this._onChange);
+    }
+
+    componentWillReceiveProps (nextProps) {
+      if (mapper) {
+        const mappedProps = mapper(getState(), nextProps);
+        this.setState({ props: { ...this.props, ...mappedProps,
+          dispatch: dispatch }});
+      }
+    }
+
+    componentWillUnmount () {
+      this._unsubscribe();
+    }
+
+    _onChange (state) {
+      let mappedProps = {};
+      if (mapper) {
+        mappedProps = mapper(getState(), this.props);
+      }
+      this.setState({ props: { ...this.props, ...mappedProps,
+        dispatch: dispatch }});
+    }
+
+    render () {
+      return createElement(Wrapped, this.state.props, this.props.children);
+    }
+  };
+
+}

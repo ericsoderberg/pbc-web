@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { postSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
+import FormError from '../../components/FormError';
 
 export default class SignIn extends Component {
 
@@ -34,7 +35,7 @@ export default class SignIn extends Component {
   }
 
   render () {
-    const { session, errors } = this.state;
+    const { session, error } = this.state;
     const cancelControl = (
       <button className="button--header" type="button" onClick={this._onCancel}>
         Cancel
@@ -43,7 +44,7 @@ export default class SignIn extends Component {
     return (
       <form className="form" action="/api/sessions" onSubmit={this._onSignIn}>
         <PageHeader title="Sign In" actions={cancelControl} />
-        {errors}
+        <FormError message={error} />
         <fieldset className="form__fields">
           <FormField name="email" label="Email">
             <input name="email" value={session.email || ''}

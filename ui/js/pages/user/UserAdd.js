@@ -22,7 +22,7 @@ export default class UserAdd extends Component {
       <UserForm title="Add User" submitLabel="Add"
         action={`/api/users`} user={this.state.user}
         onSubmit={this._onAdd}
-        errors={this.state.errors} />
+        error={this.state.error} />
     );
   }
 };

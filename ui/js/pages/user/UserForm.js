@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
+import FormError from '../../components/FormError';
 
 export default class UserForm extends Component {
 
@@ -9,6 +10,7 @@ export default class UserForm extends Component {
     super();
     this._onCancel = this._onCancel.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
+    this._onRemove = this._onRemove.bind(this);
     this._onChange = this._onChange.bind(this);
     this._onToggle = this._onToggle.bind(this);
     this.state = { user: {} };
@@ -25,6 +27,11 @@ export default class UserForm extends Component {
   _onSubmit (event) {
     event.preventDefault();
     this.props.onSubmit(this.state.user);
+  }
+
+  _onRemove (event) {
+    event.preventDefault();
+    this.props.onRemove();
   }
 
   _onChange (propertyName) {
@@ -45,22 +52,18 @@ export default class UserForm extends Component {
 
   _onFile (propertyName) {
     return (event => {
-      console.log('!!! _onFile');
       const files = event.target.files;
       let fileData;
       if (files && files[0]) {
-        console.log('!!! _onFile A');
         const file = files[0];
         const reader = new FileReader();
         reader.addEventListener("load", () => {
-          console.log('!!! _onFile B');
           fileData = {
             data: reader.result,
             name: file.name,
             size: file.size,
-            type: file.type
+            mimeType: file.type
           };
-          console.log('!!! fileData', fileData);
           let user = { ...this.state.user };
           user[propertyName] = fileData;
           this.setState({ user: user });
@@ -71,9 +74,8 @@ export default class UserForm extends Component {
   }
 
   render () {
-    const { title, action, submitLabel, onRemove, errors } = this.props;
+    const { title, action, submitLabel, onRemove, error } = this.props;
     const { user } = this.state;
-    console.log('!!! render', user);
 
     const cancelControl = (
       <button className="button--header" type="button" onClick={this._onCancel}>
@@ -87,7 +89,7 @@ export default class UserForm extends Component {
     return (
       <form className="form" action={action} onSubmit={this._onSubmit}>
         <PageHeader title={title} actions={cancelControl} />
-        {errors}
+        <FormError message={error} />
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input name="name" value={user.name || ''}
@@ -96,6 +98,10 @@ export default class UserForm extends Component {
           <FormField name="email" label="Email">
             <input name="email" value={user.email || ''}
               onChange={this._onChange('email')}/>
+          </FormField>
+          <FormField name="password" label="Password">
+            <input name="password" type="password" value={user.password || ''}
+              onChange={this._onChange('password')}/>
           </FormField>
           <FormField name="avatar" label="Avatar">
             <div>
@@ -123,7 +129,7 @@ export default class UserForm extends Component {
 
 UserForm.propTypes = {
   action: PropTypes.string,
-  errors: PropTypes.node,
+  error: PropTypes.object,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string.isRequired,

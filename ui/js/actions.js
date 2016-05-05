@@ -1,19 +1,29 @@
 "use strict";
-import store from './store';
+import { dispatch } from './store';
 
-const HEADERS = {
+let _headers = {
   'Accept': 'application/json',
   'Content-Type': 'application/json'
+};
+
+const processStatus = (response) => {
+  if (response.ok) {
+    return Promise.resolve(response);
+  } else {
+    return response.json().then(json => Promise.reject(json || response.statusText));
+  }
 };
 
 // Session
 
 export function postSession (session) {
   return fetch('/api/sessions', {
-    method: 'POST', headers: HEADERS, body: JSON.stringify(session) })
+    method: 'POST', headers: _headers, body: JSON.stringify(session) })
+    .then(processStatus)
     .then(response => response.json())
     .then(response => {
-      store.set('sessionUser', response);
+      _headers.Authorization = `Token token=${response.token}`;
+      dispatch(state => ({ session: response }));
       return response;
     });
 }
@@ -23,29 +33,32 @@ export function postSession (session) {
 export function getUsers (searchText) {
   const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
   return fetch(`/api/users${q}`, {
-    method: 'GET', headers: HEADERS })
+    method: 'GET', headers: _headers })
     .then(response => response.json());
 }
 
 export function postUser (user) {
   return fetch('/api/users', {
-    method: 'POST', headers: HEADERS, body: JSON.stringify(user) })
+    method: 'POST', headers: _headers, body: JSON.stringify(user) })
+    .then(processStatus)
     .then(response => response.json());
 }
 
 export function getUser (id) {
   return fetch(`/api/users/${encodeURIComponent(id)}`, {
-    method: 'GET', headers: HEADERS })
+    method: 'GET', headers: _headers })
     .then(response => response.json());
 }
 
 export function putUser (user) {
   return fetch(`/api/users/${encodeURIComponent(user._id)}`, {
-    method: 'PUT', headers: HEADERS, body: JSON.stringify(user) })
+    method: 'PUT', headers: _headers, body: JSON.stringify(user) })
+    .then(processStatus)
     .then(response => response.json());
 }
 
 export function deleteUser (id) {
   return fetch(`/api/users/${encodeURIComponent(id)}`, {
-    method: 'DELETE', headers: HEADERS });
+    method: 'DELETE', headers: _headers })
+    .then(processStatus);
 }

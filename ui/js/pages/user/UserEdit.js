@@ -20,12 +20,12 @@ export default class UserEdit extends Component {
   _onUpdate (user) {
     putUser(user)
       .then(response => this.context.router.goBack())
-      .catch(error => this.setState({ errors: error }));
+      .catch(error => this.setState({ error: error }));
   }
 
   _onRemove () {
     deleteUser(this.props.params.id)
-      .then(response => this.context.router.goBack())
+      .then(response => this.context.router.go(-2))
       .catch(error => this.setState({ error: error }));
   }
 
@@ -34,7 +34,7 @@ export default class UserEdit extends Component {
       <UserForm title="Edit User" submitLabel="Update"
         action={`/api/users/${this.props.params.id}`} user={this.state.user}
         onSubmit={this._onUpdate} onRemove={this._onRemove}
-        errors={this.state.errors} />
+        error={this.state.error} />
     );
   }
 };

@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
+import Stored from './Stored';
 
 const MAIN_ROUTES = [
   { label: 'Home', path: '/' },
@@ -11,11 +12,10 @@ const MAIN_ROUTES = [
   { label: 'Messages', path: '/messages' },
   { label: 'Users', path: '/users' },
   { label: 'Resources', path: '/resources' },
-  { label: 'Site', path: '/site' },
-  { label: 'Sign In', path: '/sign-in' }
+  { label: 'Site', path: '/site' }
 ];
 
-export default class MainNav extends Component {
+class MainNav extends Component {
 
   render () {
     const links = MAIN_ROUTES.map(route => {
@@ -29,11 +29,20 @@ export default class MainNav extends Component {
         </li>
       );
     });
+
+    let session;
+    if (this.props.session) {
+      session = <div>{this.props.session.name}</div>;
+    } else {
+      session = <Link to="/sign-in" >Sign In</Link>;
+    }
+
     return (
       <nav className={`main-nav ${this.props.className}`}>
         <ul className="main-nav__items">
           {links}
         </ul>
+        {session}
       </nav>
     );
   }
@@ -42,3 +51,9 @@ export default class MainNav extends Component {
 MainNav.contextTypes = {
   router: PropTypes.any
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(MainNav, select);
