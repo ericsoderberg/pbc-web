@@ -1,5 +1,6 @@
 import App from './components/App';
 import SignIn from './pages/session/SignIn';
+import SignUp from './pages/user/SignUp';
 import Users from './pages/user/Users';
 import UserAdd from './pages/user/UserAdd';
 import User from './pages/user/User';
@@ -9,6 +10,7 @@ export default {
   path: '/',
   component: App,
   childRoutes: [
+    { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },
     { path: 'users/add', component: UserAdd },
     { path: 'users/:id', component: User },

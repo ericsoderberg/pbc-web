@@ -36,7 +36,6 @@ router.delete('/sessions/:id', (req, res) => {
   authorize(req, res)
   .then(session => {
     const id = req.params.id;
-    console.log('!!! delete session', session._id, id);
     if (session._id == id) { /// === doesn't seem to work
       session.remove()
       .then(() => res.status(200).send());
@@ -68,6 +67,19 @@ function authorize (req, res) {
 }
 
 // User
+
+router.post('/users/sign-up', (req, res) => {
+  const User = mongoose.model('User');
+  let userData = req.body;
+  if (userData.password) {
+    userData.encryptedPassword = bcrypt.hashSync(userData.password, 10);
+    delete userData.password;
+  }
+  const user = new User(userData);
+  user.save()
+  .then(user => res.status(200).json(user))
+  .catch(error => res.status(400).json({ error: error }));
+});
 
 router.get('/users/:id', (req, res) => {
   const id = req.params.id;
@@ -135,7 +147,6 @@ router.post('/users', (req, res) => {
     if (userData.password) {
       userData.encryptedPassword = bcrypt.hashSync(userData.password, 10);
       delete userData.password;
-      console.log('!!! post user', userData);
     }
     const user = new User(userData);
     user.save()

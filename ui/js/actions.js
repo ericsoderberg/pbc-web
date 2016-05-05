@@ -44,6 +44,13 @@ export function deleteSession () {
 
 // User
 
+export function postSignUp (user) {
+  return fetch('/api/users/sign-up', {
+    method: 'POST', headers: _headers, body: JSON.stringify(user) })
+  .then(processStatus)
+  .then(response => response.json());
+}
+
 export function getUsers (searchText) {
   const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
   return fetch(`/api/users${q}`, {
