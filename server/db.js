@@ -10,6 +10,7 @@ const PASSWORD = 'pbc';
 const sessionSchema = Schema({
   email: String,
   lastLogin: Date,
+  name: String,
   token: String
 });
 export const Session = mongoose.model('Session', sessionSchema);

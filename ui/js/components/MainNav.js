@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
+import { deleteSession } from '../actions';
 import Stored from './Stored';
 
 const MAIN_ROUTES = [
@@ -17,6 +18,15 @@ const MAIN_ROUTES = [
 
 class MainNav extends Component {
 
+  constructor () {
+    super();
+    this._signOut = this._signOut.bind(this);
+  }
+
+  _signOut () {
+    deleteSession();
+  }
+
   render () {
     const links = MAIN_ROUTES.map(route => {
       let classes = ["main-nav__link"];
@@ -32,9 +42,12 @@ class MainNav extends Component {
 
     let session;
     if (this.props.session) {
-      session = <div>{this.props.session.name}</div>;
+      session = [
+        <div key="name" className="main-nav__session-name">{this.props.session.name}</div>,
+        <a key="control" className="main-nav__link" onClick={this._signOut}>Sign Out</a>
+      ];
     } else {
-      session = <Link to="/sign-in" >Sign In</Link>;
+      session = <Link className="main-nav__link" to="/sign-in" >Sign In</Link>;
     }
 
     return (
@@ -42,7 +55,9 @@ class MainNav extends Component {
         <ul className="main-nav__items">
           {links}
         </ul>
-        {session}
+        <div className="main-nav__session">
+          {session}
+        </div>
       </nav>
     );
   }

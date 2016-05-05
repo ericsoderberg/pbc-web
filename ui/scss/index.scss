@@ -81,12 +81,15 @@ button {
 
 .main-nav {
   font-family: 'Lucide Grande', sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-nav__items {
   list-style-type: none;
   margin: 0;
   padding: 0;
+  flex: 1;
 }
 
 .main-nav__link {
@@ -102,6 +105,15 @@ button {
 
 .main-nav__link--active {
   background-color: #555;
+}
+
+.main-nav__session {
+  flex: 0 0 auto;
+}
+
+.main-nav__session-name {
+  display: block;
+  padding: $half-unit $unit;
 }
 
 .page-header {

@@ -15,6 +15,10 @@ export default class SignIn extends Component {
     this.state = { session: { email: '', password: '' } };
   }
 
+  componentDidMount () {
+    this.refs.email.focus();
+  }
+
   _onCancel () {
     this.context.router.goBack();
   }
@@ -47,7 +51,7 @@ export default class SignIn extends Component {
         <FormError message={error} />
         <fieldset className="form__fields">
           <FormField name="email" label="Email">
-            <input name="email" value={session.email || ''}
+            <input ref="email" name="email" value={session.email || ''}
               onChange={this._onChange('email')}/>
           </FormField>
           <FormField name="password" label="Password">
