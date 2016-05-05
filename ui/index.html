@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>PBC</title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="shortcut icon" type="image/png" href="img/shortcut-icon.png" />
+  <link rel="shortcut icon" sizes="196x196" type="image/png" href="img/mobile-app-icon.png">
+  <link rel="apple-touch-icon" href="img/mobile-app-icon.png">
+</head>
+<style>
+  body.loading {margin: 0px; width: 100vw; height: 100vh;
+    animation: draw 3s infinite linear alternate;
+  }
+  body.loading #content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  body.loading #logo {
+    position: absolute; display: block; width: 96px; height: 96px;
+    top: calc(50vh - 48px); left: calc(50vw - 48px);
+  }
+  body.loading #logo circle {
+    stroke-dasharray: 260px 260px;
+    stroke-dashoffset: 0;
+    animation: draw 3s infinite linear alternate;
+  }
+  @keyframes draw {
+    0%, 5% { stroke-dashoffset: 260px; }
+    90%, 100% { stroke-dashoffset: 0; }
+  }
+</style>
+<body class="loading">
+  <div id="content">
+    <svg id="logo" width="96px" height="96px" viewBox="0 0 96 96" version="1.1">
+      <g stroke="#cccccc" stroke-width="6" fill="none" fill-rule="evenodd">
+        <circle cx="48" cy="48" r="40" />
+      </g>
+    </svg>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>
