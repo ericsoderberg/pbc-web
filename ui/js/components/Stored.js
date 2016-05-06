@@ -9,7 +9,11 @@ export default function (Wrapped, mapper) {
     constructor (props) {
       super(props);
       this._onChange = this._onChange.bind(this);
-      this.state = { props: { ...props, dispatch: dispatch }};
+      let mappedProps = {};
+      if (mapper) {
+        mappedProps = mapper(getState(), props);
+      }
+      this.state = { props: { ...props, ...mappedProps, dispatch: dispatch }};
     }
 
     componentDidMount () {

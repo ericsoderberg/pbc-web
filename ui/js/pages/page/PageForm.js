@@ -13,7 +13,7 @@ export default class PageForm extends Component {
     this._onRemove = this._onRemove.bind(this);
     this._onChange = this._onChange.bind(this);
     this._onToggle = this._onToggle.bind(this);
-    this.state = { page: props.page };
+    this.state = { page: props.item };
   }
 
   componentDidMount () {
@@ -21,7 +21,7 @@ export default class PageForm extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ page: nextProps.page });
+    this.setState({ page: nextProps.item });
   }
 
   _onCancel () {
@@ -112,11 +112,11 @@ export default class PageForm extends Component {
 PageForm.propTypes = {
   action: PropTypes.string,
   error: PropTypes.object,
+  item: PropTypes.object.isRequired,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  page: PropTypes.object.isRequired
+  title: PropTypes.string.isRequired
 };
 
 PageForm.contextTypes = {

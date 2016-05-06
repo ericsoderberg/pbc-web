@@ -15,31 +15,51 @@ const processStatus = (response) => {
   }
 };
 
+const setSession = (session) => {
+  _sessionId = session._id;
+  _headers.Authorization = `Token token=${session.token}`;
+  dispatch(state => ({ session: session }));
+  localStorage.sessionToken = session.token;
+  localStorage.sessionName = session.name;
+  localStorage.sessionId = session._id;
+  return session;
+};
+
+const clearSession = (object) => {
+  _sessionId = undefined;
+  delete _headers.Authorization;
+  dispatch(state => ({ session: undefined }));
+  localStorage.removeItem('sessionToken');
+  localStorage.removeItem('sessionName');
+  localStorage.removeItem('sessionId');
+  return object;
+};
+
 // Session
+
+export function initialize () {
+  if (localStorage.sessionToken) {
+    setSession({
+      _id: localStorage.sessionId,
+      name: localStorage.sessionName,
+      token: localStorage.sessionToken
+    });
+  }
+}
 
 export function postSession (session) {
   return fetch('/api/sessions', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
   .then(processStatus)
   .then(response => response.json())
-  .then(response => {
-    _sessionId = response._id;
-    _headers.Authorization = `Token token=${response.token}`;
-    dispatch(state => ({ session: response }));
-    return response;
-  });
+  .then(setSession);
 }
 
 export function deleteSession () {
   return fetch(`/api/sessions/${_sessionId}`, {
     method: 'DELETE', headers: _headers })
   .then(processStatus)
-  .then(response => {
-    _sessionId = undefined;
-    delete _headers.Authorization;
-    dispatch(state => ({ session: undefined }));
-    return response;
-  });
+  .then(clearSession);
 }
 
 // Generic

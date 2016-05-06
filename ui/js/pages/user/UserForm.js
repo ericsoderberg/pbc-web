@@ -13,7 +13,7 @@ export default class UserForm extends Component {
     this._onRemove = this._onRemove.bind(this);
     this._onChange = this._onChange.bind(this);
     this._onToggle = this._onToggle.bind(this);
-    this.state = { user: props.user };
+    this.state = { user: props.item };
   }
 
   componentDidMount () {
@@ -21,7 +21,7 @@ export default class UserForm extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ user: nextProps.user });
+    this.setState({ user: nextProps.item });
   }
 
   _onCancel () {
@@ -134,11 +134,11 @@ export default class UserForm extends Component {
 UserForm.propTypes = {
   action: PropTypes.string,
   error: PropTypes.object,
+  item: PropTypes.object.isRequired,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  user: PropTypes.object.isRequired
+  title: PropTypes.string.isRequired
 };
 
 UserForm.contextTypes = {
