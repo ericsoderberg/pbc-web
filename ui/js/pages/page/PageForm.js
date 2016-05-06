@@ -4,7 +4,7 @@ import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
 
-export default class UserForm extends Component {
+export default class PageForm extends Component {
 
   constructor (props) {
     super(props);
@@ -13,7 +13,7 @@ export default class UserForm extends Component {
     this._onRemove = this._onRemove.bind(this);
     this._onChange = this._onChange.bind(this);
     this._onToggle = this._onToggle.bind(this);
-    this.state = { user: props.user };
+    this.state = { page: props.page };
   }
 
   componentDidMount () {
@@ -21,7 +21,7 @@ export default class UserForm extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ user: nextProps.user });
+    this.setState({ page: nextProps.page });
   }
 
   _onCancel () {
@@ -30,7 +30,7 @@ export default class UserForm extends Component {
 
   _onSubmit (event) {
     event.preventDefault();
-    this.props.onSubmit(this.state.user);
+    this.props.onSubmit(this.state.page);
   }
 
   _onRemove (event) {
@@ -40,17 +40,17 @@ export default class UserForm extends Component {
 
   _onChange (propertyName) {
     return (event => {
-      let user = { ...this.state.user };
-      user[propertyName] = event.target.value;
-      this.setState({ user: user });
+      let page = { ...this.state.page };
+      page[propertyName] = event.target.value;
+      this.setState({ page: page });
     });
   }
 
   _onToggle (propertyName) {
     return (event => {
-      let user = { ...this.state.user };
-      user[propertyName] = ! user[propertyName];
-      this.setState({ user: user });
+      let page = { ...this.state.page };
+      page[propertyName] = ! page[propertyName];
+      this.setState({ page: page });
     });
   }
 
@@ -68,9 +68,9 @@ export default class UserForm extends Component {
             size: file.size,
             mimeType: file.type
           };
-          let user = { ...this.state.user };
-          user[propertyName] = fileData;
-          this.setState({ user: user });
+          let page = { ...this.state.page };
+          page[propertyName] = fileData;
+          this.setState({ page: page });
         });
         reader.readAsDataURL(file);
       }
@@ -79,7 +79,7 @@ export default class UserForm extends Component {
 
   render () {
     const { title, action, submitLabel, onRemove, error } = this.props;
-    const { user } = this.state;
+    const { page } = this.state;
 
     const cancelControl = (
       <button className="button--header" type="button" onClick={this._onCancel}>
@@ -96,30 +96,8 @@ export default class UserForm extends Component {
         <FormError message={error} />
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
-            <input ref="name" name="name" value={user.name || ''}
+            <input ref="name" name="name" value={page.name || ''}
               onChange={this._onChange('name')}/>
-          </FormField>
-          <FormField name="email" label="Email">
-            <input name="email" value={user.email || ''}
-              onChange={this._onChange('email')}/>
-          </FormField>
-          <FormField name="password" label="Password">
-            <input name="password" type="password" value={user.password || ''}
-              onChange={this._onChange('password')}/>
-          </FormField>
-          <FormField name="avatar" label="Avatar">
-            <div>
-              <img className="avatar"
-                src={user.avatar ? user.avatar.data : ''} alt="avatar" />
-            </div>
-            <input name="avatar" type="file"
-              onChange={this._onFile('avatar')}/>
-          </FormField>
-          <FormField>
-            <input name="administrator" type="checkbox"
-              checked={user.administrator || false}
-              onChange={this._onToggle('administrator')}/>
-            <label htmlFor="administrator">Administrator</label>
           </FormField>
         </fieldset>
         <footer className="form__footer">
@@ -131,16 +109,16 @@ export default class UserForm extends Component {
   }
 };
 
-UserForm.propTypes = {
+PageForm.propTypes = {
   action: PropTypes.string,
   error: PropTypes.object,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  user: PropTypes.object.isRequired
+  page: PropTypes.object.isRequired
 };
 
-UserForm.contextTypes = {
+PageForm.contextTypes = {
   router: PropTypes.any
 };

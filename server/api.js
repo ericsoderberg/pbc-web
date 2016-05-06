@@ -66,6 +66,82 @@ function authorize (req, res) {
   }
 }
 
+// Generic
+
+const register = (category, modelName, transforms={}) => {
+
+  router.get(`/${category}/:id`, (req, res) => {
+    const id = req.params.id;
+    const Doc = mongoose.model(modelName);
+    Doc.findById(id)
+    .exec()
+    .then(doc => res.json(doc))
+    .catch(error => res.status(400).json({ error: error }));
+  });
+
+  router.put(`/${category}/:id`, (req, res) => {
+    authorize(req, res)
+    .then(session => {
+      const id = req.params.id;
+      const Doc = mongoose.model(modelName);
+      let data = req.body;
+      if (transforms.put) {
+        data = transforms.put(data);
+      }
+      Doc.findOneAndUpdate({ _id: id }, data)
+      .exec()
+      .then(doc => res.status(200).json(doc))
+      .catch(error => res.status(400).json({ error: error }));
+    });
+  });
+
+  router.delete(`/${category}/:id`, (req, res) => {
+    authorize(req, res)
+    .then(session => {
+      const id = req.params.id;
+      const Doc = mongoose.model(modelName);
+      Doc.findById(id)
+      .exec()
+      .then(doc => {
+        doc.remove()
+          .then(doc => res.status(200).send());
+      })
+      .catch(error => res.status(400).json({ error: error }));
+    });
+  });
+
+  router.get(`/${category}`, (req, res) => {
+    const Doc = mongoose.model(modelName);
+    let query = Doc.find();
+    if (req.query.q) {
+      const searchText = req.query.q;
+      const exp = new RegExp(searchText, 'i');
+      query = query.or([
+        { 'name': exp }
+      ]);
+    }
+    query.limit(20)
+    .exec()
+    .then(docs => res.json(docs))
+    .catch(error => res.status(400).json({ error: error }));
+  });
+
+  router.post(`/${category}`, (req, res) => {
+    authorize(req, res)
+    .then(session => {
+      const Doc = mongoose.model(modelName);
+      let data = req.body;
+      if (transforms.post) {
+        data = transforms.post(data);
+      }
+      const doc = new Doc(data);
+      doc.save()
+      .then(doc => res.status(200).json(doc))
+      .catch(error => res.status(400).json({ error: error }));
+    });
+  });
+};
+
 // User
 
 router.post('/users/sign-up', (req, res) => {
@@ -75,84 +151,92 @@ router.post('/users/sign-up', (req, res) => {
     userData.encryptedPassword = bcrypt.hashSync(userData.password, 10);
     delete userData.password;
   }
-  const user = new User(userData);
-  user.save()
-  .then(user => res.status(200).json(user))
+  const doc = new User(userData);
+  doc.save()
+  .then(doc => res.status(200).json(doc))
   .catch(error => res.status(400).json({ error: error }));
 });
 
-router.get('/users/:id', (req, res) => {
-  const id = req.params.id;
-  const User = mongoose.model('User');
-  User.findById(id)
-  .exec()
-  .then(user => res.json(user))
-  .catch(error => res.status(400).json({ error: error }));
-});
-
-router.put('/users/:id', (req, res) => {
-  authorize(req, res)
-  .then(session => {
-    const id = req.params.id;
-    const User = mongoose.model('User');
-    let userData = req.body;
-    if (userData.password) {
-      userData.encryptedPassword = bcrypt.hashSync(userData.password, 10);
-      delete userData.password;
-    }
-    User.findOneAndUpdate({ _id: id }, userData)
-    .exec()
-    .then(user => res.status(200).json(user))
-    .catch(error => res.status(400).json({ error: error }));
-  });
-});
-
-router.delete('/users/:id', (req, res) => {
-  authorize(req, res)
-  .then(session => {
-    const id = req.params.id;
-    const User = mongoose.model('User');
-    User.findById(id)
-    .exec()
-    .then(user => {
-      user.remove()
-        .then(user => res.status(200).send());
-    })
-    .catch(error => res.status(400).json({ error: error }));
-  });
-});
-
-router.get('/users', (req, res) => {
-  const User = mongoose.model('User');
-  let query = User.find();
-  if (req.query.q) {
-    const searchText = req.query.q;
-    const exp = new RegExp(searchText, 'i');
-    query = query.or([
-      { 'name': exp },
-      { 'email': exp }
-    ]);
+const encryptPassword = (data) => {
+  if (data.password) {
+    data.encryptedPassword = bcrypt.hashSync(data.password, 10);
+    delete data.password;
   }
-  query.limit(20)
-  .exec()
-  .then(docs => res.json(docs))
-  .catch(error => res.status(400).json({ error: error }));
+  return data;
+};
+
+register('users', 'User', {
+  put: encryptPassword,
+  post: encryptPassword
 });
 
-router.post('/users', (req, res) => {
-  authorize(req, res)
-  .then(session => {
-    const User = mongoose.model('User');
-    let userData = req.body;
-    if (userData.password) {
-      userData.encryptedPassword = bcrypt.hashSync(userData.password, 10);
-      delete userData.password;
-    }
-    const user = new User(userData);
-    user.save()
-    .then(user => res.status(200).json(user))
-    .catch(error => res.status(400).json({ error: error }));
-  });
-});
+// Page
+
+register('pages', 'Page');
+
+// router.get('/pages/:id', (req, res) => {
+//   const id = req.params.id;
+//   const Page = mongoose.model('Page');
+//   Page.findById(id)
+//   .exec()
+//   .then(doc => res.json(doc))
+//   .catch(error => res.status(400).json({ error: error }));
+// });
+//
+// router.put('/pages/:id', (req, res) => {
+//   authorize(req, res)
+//   .then(session => {
+//     const id = req.params.id;
+//     const Page = mongoose.model('Page');
+//     let data = req.body;
+//     Page.findOneAndUpdate({ _id: id }, data)
+//     .exec()
+//     .then(doc => res.status(200).json(doc))
+//     .catch(error => res.status(400).json({ error: error }));
+//   });
+// });
+//
+// router.delete('/pages/:id', (req, res) => {
+//   authorize(req, res)
+//   .then(session => {
+//     const id = req.params.id;
+//     const Page = mongoose.model('Page');
+//     Page.findById(id)
+//     .exec()
+//     .then(doc => {
+//       page.remove()
+//         .then(doc => res.status(200).send());
+//     })
+//     .catch(error => res.status(400).json({ error: error }));
+//   });
+// });
+//
+// router.get('/pages', (req, res) => {
+//   const Page = mongoose.model('Page');
+//   let query = Page.find();
+//   if (req.query.q) {
+//     const searchText = req.query.q;
+//     const exp = new RegExp(searchText, 'i');
+//     query = query.or([
+//       { 'name': exp }
+//     ]);
+//   }
+//   query.limit(20)
+//   .exec()
+//   .then(docs => res.json(docs))
+//   .catch(error => res.status(400).json({ error: error }));
+// });
+//
+// router.post('/pages', (req, res) => {
+//   authorize(req, res)
+//   .then(session => {
+//     const Page = mongoose.model('Page');
+//     let data = req.body;
+//     const doc = new Page(data);
+//     doc.save()
+//     .then(doc => res.status(200).json(doc))
+//     .catch(error => res.status(400).json({ error: error }));
+//   });
+// });
 
 module.exports = router;

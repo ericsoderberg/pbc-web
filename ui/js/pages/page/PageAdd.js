@@ -1,32 +1,32 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { postItem } from '../../actions';
-import UserForm from './UserForm';
+import PageForm from './PageForm';
 
-export default class UserAdd extends Component {
+export default class PageAdd extends Component {
 
   constructor (props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
-    this.state = { user: { name: '', email: '' } };
+    this.state = { page: { name: '' } };
   }
 
-  _onAdd (user) {
-    postItem('users', user)
+  _onAdd (page) {
+    postItem('pages', page)
       .then(response => this.context.router.goBack())
       .catch(error => this.setState({ error: error }));
   }
 
   render () {
     return (
-      <UserForm title="Add User" submitLabel="Add"
-        action={`/api/users`} user={this.state.user}
+      <PageForm title="Add Page" submitLabel="Add"
+        action={`/api/pages`} page={this.state.page}
         onSubmit={this._onAdd}
         error={this.state.error} />
     );
   }
 };
 
-UserAdd.contextTypes = {
+PageAdd.contextTypes = {
   router: PropTypes.any
 };

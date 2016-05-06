@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getUser } from '../../actions';
+import { getItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 
 export default class User extends Component {
@@ -12,7 +12,7 @@ export default class User extends Component {
   }
 
   componentDidMount () {
-    getUser(this.props.params.id)
+    getItem('users', this.props.params.id)
       .then(response => this.setState({ user: response }));
   }
 

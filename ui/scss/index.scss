@@ -185,18 +185,22 @@ button {
   padding: 0;
 }
 
-.item {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: $unit;
+a.items__item {
+  display: block;
   text-decoration: none;
   color: inherit;
 
   &:hover {
     background-color: #f2f2f2;
   }
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: $unit;
 }
 
 .form-error {
