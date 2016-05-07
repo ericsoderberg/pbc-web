@@ -1,6 +1,6 @@
 "use strict";
 import React from 'react';
-import Items from '../../components/Items';
+import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: form } = props;
@@ -11,7 +11,7 @@ const Item = (props) => {
   );
 };
 
-export default class Forms extends Items {};
+export default class Forms extends List {};
 
 Forms.defaultProps = {
   category: 'forms',

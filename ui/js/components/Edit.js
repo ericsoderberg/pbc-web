@@ -40,9 +40,12 @@ export default class Edit extends Component {
 };
 
 Edit.propTypes = {
-  category: PropTypes.string,
-  Form: PropTypes.func,
-  title: PropTypes.string
+  category: PropTypes.string.isRequired,
+  Form: PropTypes.func.isRequired,
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired
+  }).isRequired,
+  title: PropTypes.string.isRequired
 };
 
 Edit.contextTypes = {

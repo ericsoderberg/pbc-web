@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { getItems } from '../actions';
 import PageHeader from './PageHeader';
 
-export default class Items extends Component {
+export default class List extends Component {
 
   constructor () {
     super();
@@ -33,7 +33,7 @@ export default class Items extends Component {
     const items = this.state.items.map(item => {
       return (
         <li key={item._id} >
-          <Link className="items__item" to={`${path}/${item._id}`}>
+          <Link className="list__item" to={`${path}/${item._id}`}>
             <Item className="item" item={item} />
           </Link>
         </li>
@@ -47,7 +47,7 @@ export default class Items extends Component {
         <PageHeader title={title}
           searchText={searchText} onSearch={this._onSearch}
           actions={addControl} />
-        <ul className="items">
+        <ul className="list">
           {items}
         </ul>
       </main>
@@ -55,7 +55,7 @@ export default class Items extends Component {
   }
 };
 
-Items.propTypes = {
+List.propTypes = {
   category: PropTypes.string,
   Item: PropTypes.func.isRequired,
   path: PropTypes.string,

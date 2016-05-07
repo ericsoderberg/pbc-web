@@ -1,36 +1,18 @@
 "use strict";
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
-import { getItem } from '../../actions';
-import PageHeader from '../../components/PageHeader';
+import React from 'react';
+import Show from '../../components/Show';
 
-export default class User extends Component {
-
-  constructor () {
-    super();
-    this.state = { user: {} };
-  }
-
-  componentDidMount () {
-    getItem('users', this.props.params.id)
-      .then(response => this.setState({ user: response }));
-  }
-
-  render () {
-    const { user } = this.state;
-    const editControl = (
-      <Link to={`/users/${user._id}/edit`} className="a--header">Edit</Link>
-    );
+export default class User extends Show {
+  _renderContents (user) {
     return (
-      <main>
-        <PageHeader title={user.name || '-'} back={true} actions={editControl} />
+      <div>
         <img className="avatar" src={user.avatar ? user.avatar.data : ''} />
         {user.email}
-      </main>
+      </div>
     );
   }
 };
 
-User.contextTypes = {
-  router: PropTypes.any
+User.defaultProps = {
+  category: 'users'
 };

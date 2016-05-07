@@ -1,6 +1,6 @@
 "use strict";
 import React from 'react';
-import Items from '../../components/Items';
+import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: page } = props;
@@ -11,7 +11,7 @@ const Item = (props) => {
   );
 };
 
-export default class Pages extends Items {};
+export default class Pages extends List {};
 
 Pages.defaultProps = {
   category: 'pages',
