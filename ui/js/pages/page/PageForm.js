@@ -1,18 +1,15 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import PageHeader from '../../components/PageHeader';
+import Form from '../../components/Form';
 import FormField from '../../components/FormField';
-import FormError from '../../components/FormError';
 import FormEvents from '../../utils/FormEvents';
-import ConfirmRemove from '../../components/ConfirmRemove';
 
 export default class PageForm extends Component {
 
   constructor (props) {
     super(props);
-    this._onCancel = this._onCancel.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
-    this._onRemove = this._onRemove.bind(this);
+    this._onAddSection = this._onAddSection.bind(this);
     this.state = { page: props.item };
   }
 
@@ -24,18 +21,11 @@ export default class PageForm extends Component {
     this.setState({ page: nextProps.item });
   }
 
-  _onCancel () {
-    this.context.router.goBack();
-  }
-
-  _onSubmit (event) {
-    event.preventDefault();
+  _onSubmit () {
     this.props.onSubmit(this.state.page);
   }
 
-  _onRemove (event) {
-    event.preventDefault();
-    this.props.onRemove();
+  _onAddSection (type) {
   }
 
   render () {
@@ -43,30 +33,22 @@ export default class PageForm extends Component {
     const { page } = this.state;
     const formEvents = new FormEvents(page, (page) => this.setState({ page: page}));
 
-    const cancelControl = (
-      <button className="button--header" type="button" onClick={this._onCancel}>
-        Cancel
-      </button>
-    );
-    let removeControl;
-    if (onRemove) {
-      removeControl = <ConfirmRemove onConfirm={this._onRemove} />;
-    }
     return (
-      <form className="form" action={action} onSubmit={this._onSubmit}>
-        <PageHeader title={title} actions={cancelControl} />
-        <FormError message={error} />
+      <Form title={title} submitLabel={submitLabel} action={action}
+        onSubmit={this._onSubmit} onRemove={onRemove} error={error}>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input ref="name" name="name" value={page.name || ''}
               onChange={formEvents.change('name')}/>
           </FormField>
         </fieldset>
-        <footer className="form__footer">
-          <button type="submit" onClick={this._onSubmit}>{submitLabel}</button>
-          {removeControl}
-        </footer>
-      </form>
+        <fieldset>
+          <FormField label="Add section">
+            <button onClick={this._onAddSection.bind(this, 'text')}>Text</button>
+            <button onClick={this._onAddSection.bind(this, 'image')}>Image</button>
+          </FormField>
+        </fieldset>
+      </Form>
     );
   }
 };

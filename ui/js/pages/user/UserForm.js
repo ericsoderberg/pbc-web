@@ -1,18 +1,14 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import PageHeader from '../../components/PageHeader';
+import Form from '../../components/Form';
 import FormField from '../../components/FormField';
-import FormError from '../../components/FormError';
 import FormEvents from '../../utils/FormEvents';
-import ConfirmRemove from '../../components/ConfirmRemove';
 
 export default class UserForm extends Component {
 
   constructor (props) {
     super(props);
-    this._onCancel = this._onCancel.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
-    this._onRemove = this._onRemove.bind(this);
     this.state = { user: props.item };
   }
 
@@ -24,18 +20,8 @@ export default class UserForm extends Component {
     this.setState({ user: nextProps.item });
   }
 
-  _onCancel () {
-    this.context.router.goBack();
-  }
-
-  _onSubmit (event) {
-    event.preventDefault();
+  _onSubmit () {
     this.props.onSubmit(this.state.user);
-  }
-
-  _onRemove (event) {
-    event.preventDefault();
-    this.props.onRemove();
   }
 
   render () {
@@ -43,19 +29,9 @@ export default class UserForm extends Component {
     const { user } = this.state;
     const formEvents = new FormEvents(user, (user) => this.setState({ user: user}));
 
-    const cancelControl = (
-      <button className="button--header" type="button" onClick={this._onCancel}>
-        Cancel
-      </button>
-    );
-    let removeControl;
-    if (onRemove) {
-      removeControl = <ConfirmRemove onConfirm={this._onRemove} />;
-    }
     return (
-      <form className="form" action={action} onSubmit={this._onSubmit}>
-        <PageHeader title={title} actions={cancelControl} />
-        <FormError message={error} />
+      <Form title={title} submitLabel={submitLabel} action={action}
+        onSubmit={this._onSubmit} onRemove={onRemove} error={error}>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input ref="name" name="name" value={user.name || ''}
@@ -84,11 +60,7 @@ export default class UserForm extends Component {
             <label htmlFor="administrator">Administrator</label>
           </FormField>
         </fieldset>
-        <footer className="form__footer">
-          <button type="submit" onClick={this._onSubmit}>{submitLabel}</button>
-          {removeControl}
-        </footer>
-      </form>
+      </Form>
     );
   }
 };
