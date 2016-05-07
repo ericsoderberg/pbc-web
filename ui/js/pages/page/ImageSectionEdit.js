@@ -21,6 +21,12 @@ const ImageSectionEdit = (props) => {
         <input name="image" type="file"
           onChange={formEvents.changeFile('image')}/>
       </FormField>
+      <FormField>
+        <input name="full" type="checkbox"
+          checked={section.full || false}
+          onChange={formEvents.toggle('full')}/>
+        <label htmlFor="full">Edge to edge</label>
+      </FormField>
     </fieldset>
   );
 };
