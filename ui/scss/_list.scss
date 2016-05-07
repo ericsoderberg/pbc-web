@@ -1,0 +1,34 @@
+
+.list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+a.list__item {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    background-color: #f2f2f2;
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: $unit;
+}
+
+.box--row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  > *:not(:last-child) {
+    margin-right: $half-unit;
+  }
+}

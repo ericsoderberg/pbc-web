@@ -12,10 +12,17 @@ export default class FormField extends Component {
         </label>
       );
     }
+
+    let help;
+    if (this.props.help) {
+      help = <span className="form-field__help">{this.props.help}</span>;
+    }
+
     let error;
     if (this.props.error) {
       error = <span className="form-field__error">{this.props.error}</span>;
     }
+
     let children = Children.map(this.props.children, child => {
       let result = child;
       if (child) {
@@ -24,11 +31,15 @@ export default class FormField extends Component {
       }
       return result;
     });
+
     return (
       <div className="form-field">
         <div className="form-field__labels">
           {label}
-          {error}
+          <div>
+            {help}
+            {error}
+          </div>
         </div>
         {children}
       </div>
@@ -38,6 +49,7 @@ export default class FormField extends Component {
 
 FormField.propTypes = {
   error: PropTypes.string,
+  help: PropTypes.node,
   label: PropTypes.string,
   name: PropTypes.string
 };

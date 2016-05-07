@@ -1,7 +1,7 @@
 "use strict";
 
 export default class FormEvents {
-  
+
   constructor (object, onChange) {
     this._object = object;
     this._onChange = onChange;
@@ -36,7 +36,7 @@ export default class FormEvents {
             data: reader.result,
             name: file.name,
             size: file.size,
-            mimeType: file.type
+            type: file.type
           };
 
           let object = { ...this._object };

@@ -1,0 +1,93 @@
+
+.form-error {
+  height: 0;
+}
+
+.form-error--active {
+  background-color: #ffe8e8;
+  padding: $unit;
+  height: auto;
+}
+
+.form-error__message {
+  max-width: $form-width;
+  margin: 0 auto;
+  color: #ee3333;
+}
+
+.form__fields {
+  margin: $double-unit 0;
+}
+
+.form__fields-header {
+  max-width: $form-width;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: - $double-unit;
+}
+
+.form-field {
+  border: 1px solid #ccc;
+  max-width: $form-width;
+  margin: 0 auto;
+  margin-bottom: -1px;
+}
+
+.form-field__labels {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: $half-unit $half-unit 0;
+  color: #666;
+}
+
+.form-field__input:not([type="checkbox"]):not(.form-field__image) {
+  width: 100%;
+  border: none;
+  padding: $half-unit;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.form-field__input[type="checkbox"] {
+  margin: $half-unit;
+}
+
+.form-field__image {
+  padding-top: $half-unit;
+  max-width: $form-width;
+}
+
+.form__footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  max-width: $form-width;
+  margin: $unit auto;
+}
+
+.confirm-remove {
+  position: relative;
+}
+
+.confirm-remove__confirm {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  flex-direction: column;
+  display: none;
+}
+
+.confirm-remove--confirming {
+  .confirm-remove__remove {
+    visibility: hidden;
+  }
+
+  .confirm-remove__confirm {
+    display: flex;
+  }
+}

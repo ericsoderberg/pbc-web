@@ -12,7 +12,7 @@ const imageSchema = Schema({
   data: String,
   name: String,
   size: Number,
-  mimeType: String // can't use 'type' since Mongoose reserves that
+  type: { type: String }
 });
 
 const sessionSchema = Schema({
@@ -33,17 +33,20 @@ const userSchema = Schema({
 
 mongoose.model('User', userSchema);
 
-const pageElementSchema = Schema({
-  contentType: String,
+const pageSectionSchema = Schema({
+  type: { type: String,
+    enum: ['text', 'image', 'event', 'library', 'form']
+  },
   color: String,
-  elementId: ObjectId, // event type
   full: Boolean,
   image: imageSchema, // image type
+  name: String,       // library type
+  objectId: ObjectId, // event, form types
   text: String        // text type
 });
 
 const pageSchema = Schema({
-  elements: [pageElementSchema],
+  sections: [pageSectionSchema],
   name: String,
   url: String
 });
