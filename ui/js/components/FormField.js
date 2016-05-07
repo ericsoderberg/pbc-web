@@ -3,7 +3,42 @@ import React, { Component, PropTypes, Children } from 'react';
 
 export default class FormField extends Component {
 
+  constructor () {
+    super();
+    this._onDragEnter = this._onDragEnter.bind(this);
+    this._onDragOver = this._onDragOver.bind(this);
+    this._onDragLeave = this._onDragLeave.bind(this);
+    this._onDrop = this._onDrop.bind(this);
+    this.state = {};
+  }
+
+  _onDragOver (event) {
+    event.preventDefault();
+  }
+
+  _onDragEnter (event) {
+    event.preventDefault();
+    this.setState({ dragging: true });
+  }
+
+  _onDragLeave (event) {
+    event.preventDefault();
+    this.setState({ dragging: false });
+  }
+
+  _onDrop (event) {
+    event.preventDefault();
+    this.props.onDrop(event);
+    this.setState({ dragging: false });
+  }
+
   render () {
+    let classNames = ['form-field'];
+
+    if (this.state.dragging) {
+      classNames.push('form-field--dragging');
+    }
+
     let label;
     if (this.props.label) {
       label = (
@@ -32,8 +67,18 @@ export default class FormField extends Component {
       return result;
     });
 
+    let onDragEnter, onDragOver, onDragLeave, onDrop;
+    if (this.props.onDrop) {
+      onDragEnter = this._onDragEnter;
+      onDragOver = this.onDragOver;
+      onDragLeave = this._onDragLeave;
+      onDrop = this._onDrop;
+    }
+
     return (
-      <div className="form-field">
+      <div className={classNames.join(' ')}
+        onDragEnter={onDragEnter} onDragOver={onDragOver}
+        onDragLeave={onDragLeave} onDrop={onDrop} >
         <div className="form-field__labels">
           {label}
           <div>
@@ -51,5 +96,6 @@ FormField.propTypes = {
   error: PropTypes.string,
   help: PropTypes.node,
   label: PropTypes.string,
-  name: PropTypes.string
+  name: PropTypes.string,
+  onDrop: PropTypes.func
 };

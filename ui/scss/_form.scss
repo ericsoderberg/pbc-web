@@ -1,6 +1,7 @@
 .form__container {
   display: flex;
   flex-direction: row;
+  min-height: 100vh;
 }
 
 .form {
@@ -39,11 +40,16 @@
 }
 
 .form-field {
+  position: relative;
   background-color: #fff;
   border: 1px solid #ccc;
   max-width: $form-width;
   margin: 0 auto;
   margin-bottom: -1px;
+}
+
+.form-field--dragging {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .form-field__labels {

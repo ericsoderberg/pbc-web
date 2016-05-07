@@ -9,7 +9,11 @@ export default class UserForm extends Component {
   constructor (props) {
     super(props);
     this._onSubmit = this._onSubmit.bind(this);
-    this.state = { user: props.item };
+    this._setUser = this._setUser.bind(this);
+    this.state = {
+      formEvents: new FormEvents(props.item, this._setUser),
+      user: props.item
+    };
   }
 
   componentDidMount () {
@@ -17,7 +21,12 @@ export default class UserForm extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ user: nextProps.item });
+    this._setUser(nextProps.item);
+  }
+
+  _setUser (user) {
+    this.state.formEvents.set(user);
+    this.setState({ user: user});
   }
 
   _onSubmit () {
@@ -26,14 +35,13 @@ export default class UserForm extends Component {
 
   render () {
     const { title, action, submitLabel, onRemove, error } = this.props;
-    const { user } = this.state;
-    const formEvents = new FormEvents(user, (user) => this.setState({ user: user}));
+    const { user, formEvents } = this.state;
 
     return (
       <Form title={title} submitLabel={submitLabel} action={action}
         onSubmit={this._onSubmit} onRemove={onRemove} error={error}>
         <fieldset className="form__fields">
-          <FormField name="name" label="Name">
+          <FormField label="Name">
             <input ref="name" name="name" value={user.name || ''}
               onChange={formEvents.change('name')}/>
           </FormField>
@@ -45,7 +53,8 @@ export default class UserForm extends Component {
             <input name="password" type="password" value={user.password || ''}
               onChange={formEvents.change('password')}/>
           </FormField>
-          <FormField name="avatar" label="Avatar">
+          <FormField name="avatar" label="Avatar"
+            onDrop={this.state.formEvents.dropFile('avatar')}>
             <div>
               <img className="avatar"
                 src={user.avatar ? user.avatar.data : ''} />

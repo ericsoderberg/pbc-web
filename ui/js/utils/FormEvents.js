@@ -7,6 +7,10 @@ export default class FormEvents {
     this._onChange = onChange;
   }
 
+  set (object) {
+    this._object = object;
+  }
+
   change (propertyName) {
     return (event => {
       let object = { ...this._object };
@@ -23,29 +27,40 @@ export default class FormEvents {
     });
   }
 
+  _processFiles (files, propertyName) {
+    if (files && files[0]) {
+      const file = files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener("load", () => {
+        const fileData = {
+          data: reader.result,
+          name: file.name,
+          size: file.size,
+          type: file.type
+        };
+
+        let nextObject = { ...this._object };
+        nextObject[propertyName] = fileData;
+        this._onChange(nextObject);
+      });
+
+      reader.readAsDataURL(file);
+    }
+  }
+
   changeFile (propertyName) {
     return (event => {
       const files = event.target.files;
-      let fileData;
-      if (files && files[0]) {
-        const file = files[0];
-        const reader = new FileReader();
+      this._processFiles(files, propertyName);
+    });
+  }
 
-        reader.addEventListener("load", () => {
-          fileData = {
-            data: reader.result,
-            name: file.name,
-            size: file.size,
-            type: file.type
-          };
-
-          let object = { ...this._object };
-          object[propertyName] = fileData;
-          this._onChange(object);
-        });
-
-        reader.readAsDataURL(file);
-      }
+  dropFile (propertyName) {
+    return (event => {
+      event.preventDefault();
+      const files = event.dataTransfer.files;
+      this._processFiles(files, propertyName);
     });
   }
 }
