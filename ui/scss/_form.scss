@@ -1,3 +1,12 @@
+.form__container {
+  display: flex;
+  flex-direction: row;
+}
+
+.form {
+  flex: 1 0 $form-width;
+  background-color: #f8f8f8;
+}
 
 .form-error {
   height: 0;
@@ -16,7 +25,7 @@
 }
 
 .form__fields {
-  margin: $double-unit 0;
+  margin: $double-unit $unit;
 }
 
 .form__fields-header {
@@ -25,10 +34,12 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  padding-right: $unit;
   margin-bottom: - $double-unit;
 }
 
 .form-field {
+  background-color: #fff;
   border: 1px solid #ccc;
   max-width: $form-width;
   margin: 0 auto;
@@ -59,7 +70,7 @@
 
 .form-field__image {
   padding-top: $half-unit;
-  max-width: $form-width;
+  max-width: $form-width - $double-unit;
 }
 
 .form__footer {

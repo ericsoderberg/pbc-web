@@ -1,11 +1,17 @@
 
-.page__text {
+.page-text__container,
+.page-image__container {
+  padding: 0 $unit;
+}
+
+.page-text {
   max-width: $page-width;
   margin: 0 auto;
 }
 
-.page__image {
+.page-image {
   display: block;
+  width: 100%;
   max-width: $page-width;
-  margin: 0 auto;
+  margin: $unit auto;
 }

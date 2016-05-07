@@ -28,7 +28,7 @@ export default class Form extends Component {
   }
 
   render () {
-    const { title, action, submitLabel, onRemove, error } = this.props;
+    const { title, action, submitLabel, onRemove, error, preview } = this.props;
 
     const cancelControl = (
       <button className="button--header" type="button" onClick={this._onCancel}>
@@ -42,15 +42,18 @@ export default class Form extends Component {
     }
 
     return (
-      <form className="form" action={action} onSubmit={this._onSubmit}>
-        <PageHeader title={title} actions={cancelControl} />
-        <FormError message={error} />
-        {this.props.children}
-        <footer className="form__footer">
-          <button type="submit" onClick={this._onSubmit}>{submitLabel}</button>
-          {removeControl}
-        </footer>
-      </form>
+      <div className="form__container">
+        <form className="form" action={action} onSubmit={this._onSubmit}>
+          <PageHeader title={title} actions={cancelControl} />
+          <FormError message={error} />
+          {this.props.children}
+          <footer className="form__footer">
+            <button type="submit" onClick={this._onSubmit}>{submitLabel}</button>
+            {removeControl}
+          </footer>
+        </form>
+        {preview}
+      </div>
     );
   }
 };
@@ -60,6 +63,7 @@ Form.propTypes = {
   error: PropTypes.object,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
+  preview: PropTypes.node,
   submitLabel: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired
 };

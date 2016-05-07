@@ -5,8 +5,10 @@ import markdownToJSX from 'markdown-to-jsx';
 const TextSection = (props) => {
   const { section } = props;
   return (
-    <div className="page__text">
-      {markdownToJSX(section.text)}
+    <div className="page-text__container">
+      <div className="page-text">
+        {markdownToJSX(section.text || '')}
+      </div>
     </div>
   );
 };

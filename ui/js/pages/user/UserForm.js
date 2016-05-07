@@ -48,7 +48,7 @@ export default class UserForm extends Component {
           <FormField name="avatar" label="Avatar">
             <div>
               <img className="avatar"
-                src={user.avatar ? user.avatar.data : ''} alt="avatar" />
+                src={user.avatar ? user.avatar.data : ''} />
             </div>
             <input name="avatar" type="file"
               onChange={formEvents.changeFile('avatar')}/>

@@ -5,6 +5,7 @@ import FormField from '../../components/FormField';
 import FormEvents from '../../utils/FormEvents';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
+import PagePreview from './PagePreview';
 
 const SECTIONS = {
   image: ImageSectionEdit,
@@ -93,7 +94,8 @@ export default class PageForm extends Component {
           <div className="form__fields-header">
             {raise}
             {lower}
-            <button type="button" onClick={this._onRemoveSection}>remove</button>
+            <button type="button" onClick={
+                this._onRemoveSection.bind(this, index)}>remove</button>
           </div>
           <Section section={section}
             onChange={(nextSection) => this._onChangeSection(nextSection, index)} />
@@ -109,7 +111,8 @@ export default class PageForm extends Component {
 
     return (
       <Form title={title} submitLabel={submitLabel} action={action}
-        onSubmit={this._onSubmit} onRemove={onRemove} error={error}>
+        onSubmit={this._onSubmit} onRemove={onRemove} error={error}
+        preview={<PagePreview page={page} />}>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input ref="name" name="name" value={page.name || ''}
