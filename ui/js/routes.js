@@ -1,5 +1,6 @@
 import App from './components/App';
 import Home from './pages/home/Home';
+import Calendar from './pages/calendar/Calendar';
 import Events from './pages/event/Events';
 import EventAdd from './pages/event/EventAdd';
 import Event from './pages/event/Event';
@@ -26,6 +27,7 @@ export default {
   component: App,
   indexRoute: { component: Home },
   childRoutes: [
+    { path: 'calendar', component: Calendar },
     { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },
     { path: 'users/add', component: UserAdd },

@@ -3,6 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
+import moment from 'moment';
 import db from './db';
 
 const router = express.Router();
@@ -196,6 +197,35 @@ router.post('/site', (req, res) => {
     .then(doc => res.status(200).json(doc))
     .catch(error => res.status(400).json({ error: error }));
   });
+});
+
+// Calendar
+
+router.get('/calendar', (req, res) => {
+  const date = moment(req.query.date || undefined);
+  const start = moment(date).startOf('month').startOf('week');
+  const end = moment(date).endOf('month').endOf('week');
+  const previous = moment(date).subtract(1, 'month');
+  const next = moment(date).add(1, 'month');
+  // find all events withing the time window
+  const Doc = mongoose.model('Event');
+  Doc.find({
+    stop: { $gte: start.toDate() },
+    start: { $lt: end.toDate() }
+  })
+  .sort('start')
+  .exec()
+  .then(docs => {
+    res.status(200).json({
+      date: date,
+      end: end,
+      events: docs,
+      next: next,
+      previous: previous,
+      start: start
+    });
+  })
+  .catch(error => res.status(400).json({ error: error }));
 });
 
 module.exports = router;

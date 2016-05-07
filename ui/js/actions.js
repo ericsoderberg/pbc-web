@@ -120,3 +120,12 @@ export function postSite (site) {
   .then(processStatus)
   .then(response => response.json());
 }
+
+// Calendar
+export function getCalendar(date, searchText) {
+  // const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
+  const q = date ? `?date=${encodeURIComponent(date.toISOString())}` : '';
+  return fetch(`/api/calendar${q}`, {
+    method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
