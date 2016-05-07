@@ -150,6 +150,18 @@ const messageSchema = Schema({
 
 mongoose.model('Message', messageSchema);
 
+const siteSchema = Schema({
+  address: String,
+  copyright: String,
+  email: String,
+  homePageId: ObjectId,
+  name: String,
+  logo: imageSchema,
+  phone: String
+});
+
+mongoose.model('Site', siteSchema);
+
 // Connection
 
 const opts = { user: USER, pass: PASSWORD,  auth: { authdb: 'admin' } };

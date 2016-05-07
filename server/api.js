@@ -174,69 +174,27 @@ register('users', 'User', {
 
 register('pages', 'Page');
 
-// router.get('/pages/:id', (req, res) => {
-//   const id = req.params.id;
-//   const Page = mongoose.model('Page');
-//   Page.findById(id)
-//   .exec()
-//   .then(doc => res.json(doc))
-//   .catch(error => res.status(400).json({ error: error }));
-// });
-//
-// router.put('/pages/:id', (req, res) => {
-//   authorize(req, res)
-//   .then(session => {
-//     const id = req.params.id;
-//     const Page = mongoose.model('Page');
-//     let data = req.body;
-//     Page.findOneAndUpdate({ _id: id }, data)
-//     .exec()
-//     .then(doc => res.status(200).json(doc))
-//     .catch(error => res.status(400).json({ error: error }));
-//   });
-// });
-//
-// router.delete('/pages/:id', (req, res) => {
-//   authorize(req, res)
-//   .then(session => {
-//     const id = req.params.id;
-//     const Page = mongoose.model('Page');
-//     Page.findById(id)
-//     .exec()
-//     .then(doc => {
-//       page.remove()
-//         .then(doc => res.status(200).send());
-//     })
-//     .catch(error => res.status(400).json({ error: error }));
-//   });
-// });
-//
-// router.get('/pages', (req, res) => {
-//   const Page = mongoose.model('Page');
-//   let query = Page.find();
-//   if (req.query.q) {
-//     const searchText = req.query.q;
-//     const exp = new RegExp(searchText, 'i');
-//     query = query.or([
-//       { 'name': exp }
-//     ]);
-//   }
-//   query.limit(20)
-//   .exec()
-//   .then(docs => res.json(docs))
-//   .catch(error => res.status(400).json({ error: error }));
-// });
-//
-// router.post('/pages', (req, res) => {
-//   authorize(req, res)
-//   .then(session => {
-//     const Page = mongoose.model('Page');
-//     let data = req.body;
-//     const doc = new Page(data);
-//     doc.save()
-//     .then(doc => res.status(200).json(doc))
-//     .catch(error => res.status(400).json({ error: error }));
-//   });
-// });
+// Site
+
+router.get('/site', (req, res) => {
+  const Doc = mongoose.model('Site');
+  Doc.findOne({})
+  .exec()
+  .then(doc => res.json(doc))
+  .catch(error => res.status(400).json({ error: error }));
+});
+
+router.post('/site', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    const Doc = mongoose.model('Site');
+    const doc = new Doc(req.body);
+    Doc.remove({})
+    .exec()
+    .then(() => doc.save())
+    .then(doc => res.status(200).json(doc))
+    .catch(error => res.status(400).json({ error: error }));
+  });
+});
 
 module.exports = router;

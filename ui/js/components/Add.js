@@ -12,8 +12,8 @@ export default class Add extends Component {
 
   _onAdd (item) {
     postItem(this.props.category, item)
-      .then(response => this.context.router.goBack())
-      .catch(error => this.setState({ error: error }));
+    .then(response => this.context.router.goBack())
+    .catch(error => this.setState({ error: error }));
   }
 
   render () {

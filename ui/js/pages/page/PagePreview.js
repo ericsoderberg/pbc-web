@@ -20,7 +20,7 @@ export default class PagePreview extends Component {
     });
 
     return (
-      <main>
+      <main className="page-preview">
         <PageHeader title={page.name || ''} />
         {sections}
       </main>

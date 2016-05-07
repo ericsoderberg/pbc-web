@@ -13,19 +13,19 @@ export default class Edit extends Component {
 
   componentDidMount () {
     getItem(this.props.category, this.props.params.id)
-      .then(response => this.setState({ item: response }));
+    .then(response => this.setState({ item: response }));
   }
 
   _onUpdate (item) {
     putItem(this.props.category, item)
-      .then(response => this.context.router.goBack())
-      .catch(error => this.setState({ error: error }));
+    .then(response => this.context.router.goBack())
+    .catch(error => this.setState({ error: error }));
   }
 
   _onRemove () {
     deleteItem(this.props.category, this.props.params.id)
-      .then(response => this.context.router.go(-2))
-      .catch(error => this.setState({ error: error }));
+    .then(response => this.context.router.go(-2))
+    .catch(error => this.setState({ error: error }));
   }
 
   render () {

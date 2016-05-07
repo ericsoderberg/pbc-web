@@ -15,6 +15,8 @@ const processStatus = (response) => {
   }
 };
 
+// Session
+
 const setSession = (session) => {
   _sessionId = session._id;
   _headers.Authorization = `Token token=${session.token}`;
@@ -34,8 +36,6 @@ const clearSession = (object) => {
   localStorage.removeItem('sessionId');
   return object;
 };
-
-// Session
 
 export function initialize () {
   if (localStorage.sessionToken) {
@@ -106,70 +106,17 @@ export function postSignUp (user) {
   .then(response => response.json());
 }
 
-// export function getUsers (searchText) {
-//   const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
-//   return fetch(`/api/users${q}`, {
-//     method: 'GET', headers: _headers })
-//   .then(response => response.json());
-// }
-//
-// export function postUser (user) {
-//   return fetch('/api/users', {
-//     method: 'POST', headers: _headers, body: JSON.stringify(user) })
-//   .then(processStatus)
-//   .then(response => response.json());
-// }
-//
-// export function getUser (id) {
-//   return fetch(`/api/users/${encodeURIComponent(id)}`, {
-//     method: 'GET', headers: _headers })
-//   .then(response => response.json());
-// }
-//
-// export function putUser (user) {
-//   return fetch(`/api/users/${encodeURIComponent(user._id)}`, {
-//     method: 'PUT', headers: _headers, body: JSON.stringify(user) })
-//   .then(processStatus)
-//   .then(response => response.json());
-// }
-//
-// export function deleteUser (id) {
-//   return fetch(`/api/users/${encodeURIComponent(id)}`, {
-//     method: 'DELETE', headers: _headers })
-//   .then(processStatus);
-// }
+// Site
 
-// Page
+export function getSite () {
+  return fetch('/api/site', {
+    method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
 
-// export function getPages (searchText) {
-//   const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
-//   return fetch(`/api/pages${q}`, {
-//     method: 'GET', headers: _headers })
-//   .then(response => response.json());
-// }
-//
-// export function postPage (page) {
-//   return fetch('/api/pages', {
-//     method: 'POST', headers: _headers, body: JSON.stringify(user) })
-//   .then(processStatus)
-//   .then(response => response.json());
-// }
-//
-// export function getUser (id) {
-//   return fetch(`/api/users/${encodeURIComponent(id)}`, {
-//     method: 'GET', headers: _headers })
-//   .then(response => response.json());
-// }
-//
-// export function putUser (user) {
-//   return fetch(`/api/users/${encodeURIComponent(user._id)}`, {
-//     method: 'PUT', headers: _headers, body: JSON.stringify(user) })
-//   .then(processStatus)
-//   .then(response => response.json());
-// }
-//
-// export function deleteUser (id) {
-//   return fetch(`/api/users/${encodeURIComponent(id)}`, {
-//     method: 'DELETE', headers: _headers })
-//   .then(processStatus);
-// }
+export function postSite (site) {
+  return fetch('/api/site', {
+    method: 'POST', headers: _headers, body: JSON.stringify(site) })
+  .then(processStatus)
+  .then(response => response.json());
+}

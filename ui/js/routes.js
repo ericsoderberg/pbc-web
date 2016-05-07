@@ -15,6 +15,7 @@ import Users from './pages/user/Users';
 import UserAdd from './pages/user/UserAdd';
 import User from './pages/user/User';
 import UserEdit from './pages/user/UserEdit';
+import SiteEdit from './pages/site/SiteEdit';
 
 export default {
   path: '/',
@@ -26,6 +27,7 @@ export default {
     { path: 'users/:id', component: User },
     { path: 'users/:id/edit', component: UserEdit },
     { path: 'users', component: Users },
+    { path: 'site', component: SiteEdit },
     { path: 'pages/add', component: PageAdd },
     { path: 'pages/:id', component: Page },
     { path: 'pages/:id/edit', component: PageEdit },

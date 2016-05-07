@@ -14,7 +14,7 @@ export default class List extends Component {
 
   componentDidMount () {
     getItems(this.props.category)
-      .then(response => this.setState({ items: response }));
+    .then(response => this.setState({ items: response }));
   }
 
   _onSearch (event) {
@@ -22,7 +22,7 @@ export default class List extends Component {
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(() => {
       getItems(this.props.category, searchText)
-        .then(response => this.setState({ items: response }));
+      .then(response => this.setState({ items: response }));
     }, 100);
     this.setState({ searchText: searchText });
   }
