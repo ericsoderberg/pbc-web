@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
+import FormEvents from '../../utils/FormEvents';
 import ConfirmRemove from '../../components/ConfirmRemove';
 
 export default class UserForm extends Component {
@@ -12,8 +13,6 @@ export default class UserForm extends Component {
     this._onCancel = this._onCancel.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
     this._onRemove = this._onRemove.bind(this);
-    this._onChange = this._onChange.bind(this);
-    this._onToggle = this._onToggle.bind(this);
     this.state = { user: props.item };
   }
 
@@ -39,48 +38,10 @@ export default class UserForm extends Component {
     this.props.onRemove();
   }
 
-  _onChange (propertyName) {
-    return (event => {
-      let user = { ...this.state.user };
-      user[propertyName] = event.target.value;
-      this.setState({ user: user });
-    });
-  }
-
-  _onToggle (propertyName) {
-    return (event => {
-      let user = { ...this.state.user };
-      user[propertyName] = ! user[propertyName];
-      this.setState({ user: user });
-    });
-  }
-
-  _onFile (propertyName) {
-    return (event => {
-      const files = event.target.files;
-      let fileData;
-      if (files && files[0]) {
-        const file = files[0];
-        const reader = new FileReader();
-        reader.addEventListener("load", () => {
-          fileData = {
-            data: reader.result,
-            name: file.name,
-            size: file.size,
-            mimeType: file.type
-          };
-          let user = { ...this.state.user };
-          user[propertyName] = fileData;
-          this.setState({ user: user });
-        });
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-
   render () {
     const { title, action, submitLabel, onRemove, error } = this.props;
     const { user } = this.state;
+    const formEvents = new FormEvents(user, (user) => this.setState({ user: user}));
 
     const cancelControl = (
       <button className="button--header" type="button" onClick={this._onCancel}>
@@ -98,15 +59,15 @@ export default class UserForm extends Component {
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input ref="name" name="name" value={user.name || ''}
-              onChange={this._onChange('name')}/>
+              onChange={formEvents.change('name')}/>
           </FormField>
           <FormField name="email" label="Email">
             <input name="email" value={user.email || ''}
-              onChange={this._onChange('email')}/>
+              onChange={formEvents.change('email')}/>
           </FormField>
           <FormField name="password" label="Password">
             <input name="password" type="password" value={user.password || ''}
-              onChange={this._onChange('password')}/>
+              onChange={formEvents.change('password')}/>
           </FormField>
           <FormField name="avatar" label="Avatar">
             <div>
@@ -114,12 +75,12 @@ export default class UserForm extends Component {
                 src={user.avatar ? user.avatar.data : ''} alt="avatar" />
             </div>
             <input name="avatar" type="file"
-              onChange={this._onFile('avatar')}/>
+              onChange={formEvents.changeFile('avatar')}/>
           </FormField>
           <FormField>
             <input name="administrator" type="checkbox"
               checked={user.administrator || false}
-              onChange={this._onToggle('administrator')}/>
+              onChange={formEvents.toggle('administrator')}/>
             <label htmlFor="administrator">Administrator</label>
           </FormField>
         </fieldset>
