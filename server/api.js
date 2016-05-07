@@ -170,9 +170,10 @@ register('users', 'User', {
   post: encryptPassword
 });
 
-// Page
+// other
 
 register('pages', 'Page');
+register('events', 'Event');
 
 // Site
 

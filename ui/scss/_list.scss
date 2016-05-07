@@ -21,6 +21,8 @@ a.list__item {
   justify-content: space-between;
   align-items: center;
   padding: $unit;
+  max-width: $page-width;
+  margin: 0 auto;
 }
 
 .box--row {

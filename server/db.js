@@ -62,8 +62,10 @@ const eventSchema = Schema({
   calendar: String,
   location: String,
   name: String,
-  text: String,
-  dates: [datesSchema]
+  recurrence: [datesSchema],
+  start: Date,
+  stop: Date,
+  text: String
 });
 
 mongoose.model('Event', eventSchema);

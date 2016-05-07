@@ -1,6 +1,9 @@
 import App from './components/App';
 import Home from './pages/home/Home';
 import Events from './pages/event/Events';
+import EventAdd from './pages/event/EventAdd';
+import Event from './pages/event/Event';
+import EventEdit from './pages/event/EventEdit';
 import Forms from './pages/form/Forms';
 import FormTemplates from './pages/formTemplate/FormTemplates';
 import Messages from './pages/message/Messages';
@@ -34,6 +37,9 @@ export default {
     { path: 'pages/:id', component: Page },
     { path: 'pages/:id/edit', component: PageEdit },
     { path: 'pages', component: Pages },
+    { path: 'events/add', component: EventAdd },
+    { path: 'events/:id', component: Event },
+    { path: 'events/:id/edit', component: EventEdit },
     { path: 'events', component: Events },
     { path: 'resources', component: Resources },
     { path: 'forms', component: Forms },
