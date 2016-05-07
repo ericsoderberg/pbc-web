@@ -25,7 +25,6 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
-  flex: 1;
 }
 
 .main-nav__link {
@@ -44,6 +43,7 @@
 }
 
 .main-nav__session {
+  margin-top: $double-unit;
   flex: 0 0 auto;
 }
 

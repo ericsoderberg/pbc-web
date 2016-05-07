@@ -38,3 +38,18 @@
     margin: 0;
   }
 }
+
+.page-footer__container {
+  padding: 0 $unit;
+}
+
+.page-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: $double-unit 0;
+  max-width: $page-width;
+  margin: 0 auto;
+  color: #666;
+  font-size: 14px;
+}

@@ -51,6 +51,7 @@ export default class PageHeader extends Component {
 PageHeader.propTypes = {
   actions: PropTypes.node,
   back: PropTypes.bool,
+  color: PropTypes.string,
   form: PropTypes.bool,
   onSearch: PropTypes.func,
   searchText: PropTypes.string,

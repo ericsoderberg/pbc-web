@@ -1,4 +1,5 @@
 import App from './components/App';
+import Home from './pages/home/Home';
 import Events from './pages/event/Events';
 import Forms from './pages/form/Forms';
 import FormTemplates from './pages/formTemplate/FormTemplates';
@@ -20,6 +21,7 @@ import SiteEdit from './pages/site/SiteEdit';
 export default {
   path: '/',
   component: App,
+  indexRoute: { component: Home },
   childRoutes: [
     { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },
