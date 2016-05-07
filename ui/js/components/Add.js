@@ -30,9 +30,6 @@ export default class Add extends Component {
 Add.propTypes = {
   category: PropTypes.string.isRequired,
   Form: PropTypes.func.isRequired,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }).isRequired,
   title: PropTypes.string.isRequired
 };
 

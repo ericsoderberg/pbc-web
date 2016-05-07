@@ -260,6 +260,28 @@ a.list__item {
   margin: $unit auto;
 }
 
+.confirm-remove {
+  position: relative;
+}
+
+.confirm-remove__confirm {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  flex-direction: column;
+  display: none;
+}
+
+.confirm-remove--confirming {
+  .confirm-remove__remove {
+    visibility: hidden;
+  }
+
+  .confirm-remove__confirm {
+    display: flex;
+  }
+}
+
 .box--row {
   display: flex;
   flex-direction: row;

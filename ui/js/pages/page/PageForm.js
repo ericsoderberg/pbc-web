@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
+import ConfirmRemove from '../../components/ConfirmRemove';
 
 export default class PageForm extends Component {
 
@@ -88,7 +89,7 @@ export default class PageForm extends Component {
     );
     let removeControl;
     if (onRemove) {
-      removeControl = <button onClick={this._onRemove}>Remove</button>;
+      removeControl = <ConfirmRemove onConfirm={this._onRemove} />;
     }
     return (
       <form className="form" action={action} onSubmit={this._onSubmit}>
