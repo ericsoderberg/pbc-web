@@ -8,6 +8,9 @@ import EventEdit from './pages/event/EventEdit';
 import Forms from './pages/form/Forms';
 import FormTemplates from './pages/formTemplate/FormTemplates';
 import Messages from './pages/message/Messages';
+import MessageAdd from './pages/message/MessageAdd';
+import Message from './pages/message/Message';
+import MessageEdit from './pages/message/MessageEdit';
 import Newsletters from './pages/newsletter/Newsletters';
 import Pages from './pages/page/Pages';
 import PageAdd from './pages/page/PageAdd';
@@ -52,6 +55,9 @@ export default {
     { path: 'resources', component: Resources },
     { path: 'forms', component: Forms },
     { path: 'form-templates', component: FormTemplates },
+    { path: 'messages/add', component: MessageAdd },
+    { path: 'messages/:id', component: Message },
+    { path: 'messages/:id/edit', component: MessageEdit },
     { path: 'messages', component: Messages },
     { path: 'newsletters', component: Newsletters }
   ]

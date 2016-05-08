@@ -1,14 +1,10 @@
 "use strict";
-import React from 'react';
 import Show from '../../components/Show';
 import PageContents from './PageContents';
 
-export default class Page extends Show {
-  _renderContents (item) {
-    return <PageContents page={item} />;
-  }
-};
+export default class Page extends Show {};
 
 Page.defaultProps = {
-  category: 'pages'
+  category: 'pages',
+  Contents: PageContents
 };

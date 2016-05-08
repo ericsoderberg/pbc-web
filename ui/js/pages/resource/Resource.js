@@ -2,15 +2,15 @@
 import React from 'react';
 import Show from '../../components/Show';
 
-export default class Resource extends Show {
-  _renderContents (user) {
-    return (
-      <div>
-      </div>
-    );
-  }
+const ResourceContents = (props) => {
+  return (
+    <div>TBD</div>
+  );
 };
 
+export default class Resource extends Show {};
+
 Resource.defaultProps = {
-  category: 'resources'
+  category: 'resources',
+  Contents: ResourceContents
 };

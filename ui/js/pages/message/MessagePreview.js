@@ -1,22 +1,23 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
-import PageContents from './PageContents';
+import MessageContents from './MessageContents';
 
-export default class PagePreview extends Component {
+export default class MessagePreview extends Component {
 
   render () {
     const { item } = this.props;
-    const page = item;
+    const message = item;
+
     return (
       <main className="page-preview">
-        <PageHeader title={page.name || ''} />
-        <PageContents item={page} />
+        <PageHeader title={message.name || ''} />
+        <MessageContents item={message} />
       </main>
     );
   }
 };
 
-PagePreview.propTypes = {
+MessagePreview.propTypes = {
   item: PropTypes.object.isRequired
 };

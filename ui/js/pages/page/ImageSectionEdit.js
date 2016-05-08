@@ -18,7 +18,7 @@ export default class ImageSectionEdit extends Component {
   render () {
     const { formState } = this.state;
     const section = formState.object;
-    const help = (
+    const imageHelp = (
       <span>
         {"Don't forget to "}
         <a href="https://tinyjpg.com" target="_blank">optimize</a>!
@@ -27,7 +27,7 @@ export default class ImageSectionEdit extends Component {
 
     return (
       <fieldset className="form__fields">
-        <FormField name="image" label="Image" help={help}
+        <FormField name="image" label="Image" help={imageHelp}
           onDrop={formState.dropFile('image')}>
           <img className="form-field__image"
             src={section.image ? section.image.data : ''} />

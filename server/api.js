@@ -177,6 +177,7 @@ register('users', 'User', {
 register('pages', 'Page');
 register('events', 'Event');
 register('resources', 'Resource');
+register('messages', 'Message');
 
 // Site
 

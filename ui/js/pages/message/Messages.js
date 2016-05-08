@@ -1,5 +1,6 @@
 "use strict";
 import React from 'react';
+import moment from 'moment';
 import List from '../../components/List';
 
 const Item = (props) => {
@@ -7,6 +8,10 @@ const Item = (props) => {
   return (
     <div className={className}>
       <span>{message.name}</span>
+      <span className="box--row">
+        <span>{message.verses}</span>
+        <span>{moment(message.date).format('M/D/YYYY')}</span>
+      </span>
     </div>
   );
 };

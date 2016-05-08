@@ -16,12 +16,8 @@ export default class Show extends Component {
       .then(response => this.setState({ item: response }));
   }
 
-  _renderContents (item) {
-    // override
-  }
-
   render () {
-    const { category } = this.props;
+    const { category, Contents } = this.props;
     const { item } = this.state;
     const editControl = (
       <Link to={`/${category}/${item._id}/edit`} className="a--header">Edit</Link>
@@ -29,7 +25,7 @@ export default class Show extends Component {
     return (
       <main>
         <PageHeader title={item.name || '-'} back={true} actions={editControl} />
-        {this._renderContents(item)}
+        <Contents item={item} />
       </main>
     );
   }
@@ -37,6 +33,7 @@ export default class Show extends Component {
 
 Show.propTypes = {
   category: PropTypes.string.isRequired,
+  Contents: PropTypes.func.isRequired,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
   }).isRequired

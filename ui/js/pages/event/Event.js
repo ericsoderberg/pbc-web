@@ -2,15 +2,15 @@
 import React from 'react';
 import Show from '../../components/Show';
 
-export default class Event extends Show {
-  _renderContents (user) {
-    return (
-      <div>
-      </div>
-    );
-  }
+const EventContents = (props) => {
+  return (
+    <div>TBD</div>
+  );
 };
 
+export default class Event extends Show {};
+
 Event.defaultProps = {
-  category: 'events'
+  category: 'events',
+  Contents: EventContents
 };

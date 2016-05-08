@@ -25,7 +25,7 @@ export default class Home extends Component {
     return (
       <main>
         <PageHeader title={site.name || '-'} />
-        <PageContents page={page} />
+        <PageContents item={page} />
         <div className="page-footer__container">
           <footer className="page-footer">
             <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>

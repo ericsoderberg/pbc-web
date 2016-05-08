@@ -9,7 +9,8 @@ const SECTIONS = {
 };
 
 const PageContents = (props) => {
-  const sections = (props.page.sections || []).map((section, index) => {
+  const page = props.item;
+  const sections = (page.sections || []).map((section, index) => {
     const Section = SECTIONS[section.type];
     return <Section key={index} section={section} />;
   });
@@ -17,7 +18,7 @@ const PageContents = (props) => {
 };
 
 PageContents.PropTypes = {
-  page: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired
 };
 
 export default PageContents;
