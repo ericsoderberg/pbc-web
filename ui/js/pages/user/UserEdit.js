@@ -1,11 +1,11 @@
 "use strict";
 import Edit from '../../components/Edit';
-import UserForm from './UserForm';
+import UserFormContents from './UserFormContents';
 
 export default class UserEdit extends Edit {};
 
 UserEdit.defaultProps = {
   category: 'users',
-  Form: UserForm,
+  FormContents: UserFormContents,
   title: 'Edit User'
 };

@@ -1,23 +1,23 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
-import FormEvents from '../../utils/FormEvents';
+import FormState from '../../utils/FormState';
 
 export default class TextSectionEdit extends Component {
 
   constructor (props) {
     super(props);
     const { section, onChange } = props;
-    this.state = { formEvents: new FormEvents(section, onChange) };
+    this.state = { formState: new FormState(section, onChange) };
   }
 
   componentWillReceiveProps (nextProps) {
-    this.state.formEvents.set(nextProps.section);
+    this.setState({ formState: new FormState(nextProps.section, nextProps.onChange) });
   }
 
   render () {
-    const { section } = this.props;
-    const { formEvents } = this.state;
+    const { formState } = this.state;
+    const section = formState.object;
     const help = (
       <a href="http://daringfireball.net/projects/markdown/syntax"
         target="_blank">Markdown syntax</a>
@@ -27,11 +27,11 @@ export default class TextSectionEdit extends Component {
       <fieldset className="form__fields">
         <FormField name="text" label="Text" help={help}>
           <textarea ref="text" name="text" value={section.text || ''} rows={8}
-            onChange={formEvents.change('text')}/>
+            onChange={formState.change('text')}/>
         </FormField>
         <FormField label="Background color">
           <input ref="color" name="color" value={section.color || ''}
-            onChange={formEvents.change('color')}/>
+            onChange={formState.change('color')}/>
         </FormField>
       </fieldset>
     );
@@ -42,5 +42,3 @@ TextSectionEdit.defaultProps = {
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
 };
-
-export default TextSectionEdit;

@@ -1,11 +1,13 @@
 "use strict";
 import Add from '../../components/Add';
-import PageForm from './PageForm';
+import PageFormContents from './PageFormContents';
+import PagePreview from './PagePreview';
 
 export default class PageAdd extends Add {};
 
 PageAdd.defaultProps = {
   category: 'pages',
-  Form: PageForm,
+  FormContents: PageFormContents,
+  Preview: PagePreview,
   title: 'Add Page'
 };

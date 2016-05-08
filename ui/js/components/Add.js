@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { postItem } from '../actions';
+import Form from './Form';
 
 export default class Add extends Component {
 
@@ -17,19 +18,21 @@ export default class Add extends Component {
   }
 
   render () {
-    const { category, Form, title } = this.props;
+    const { category, FormContents, Preview, title } = this.props;
+    const { item, error } = this.state;
     return (
       <Form title={title} submitLabel="Add"
-        action={`/api/${category}`} item={this.state.item}
-        onSubmit={this._onAdd}
-        error={this.state.error} />
+        action={`/api/${category}`}
+        FormContents={FormContents} Preview={Preview} item={item}
+        onSubmit={this._onAdd} error={error} />
     );
   }
 };
 
 Add.propTypes = {
   category: PropTypes.string.isRequired,
-  Form: PropTypes.func.isRequired,
+  FormContents: PropTypes.func.isRequired,
+  Preview: PropTypes.func,
   title: PropTypes.string.isRequired
 };
 

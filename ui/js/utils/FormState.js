@@ -1,29 +1,29 @@
 "use strict";
 
-export default class FormEvents {
+export default class FormState {
 
   constructor (object, onChange) {
-    this._object = object;
+    this.object = object;
     this._onChange = onChange;
   }
 
-  set (object) {
-    this._object = object;
+  _update (propertyName, value) {
+    let nextObject = { ...this.object };
+    nextObject[propertyName] = value;
+    this._onChange(nextObject);
   }
 
   change (propertyName) {
     return (event => {
-      let object = { ...this._object };
-      object[propertyName] = event.target.value;
-      this._onChange(object);
+      // handle DateChange onChange which just sends the value, not an event
+      const value = (event.target ? event.target.value : event);
+      this._update(propertyName, value);
     });
   }
 
   toggle (propertyName) {
     return (event => {
-      let object = { ...this._object };
-      object[propertyName] = ! object[propertyName];
-      this._onChange(object);
+      this._update(propertyName, ! this.object[propertyName]);
     });
   }
 
@@ -40,9 +40,7 @@ export default class FormEvents {
           type: file.type
         };
 
-        let nextObject = { ...this._object };
-        nextObject[propertyName] = fileData;
-        this._onChange(nextObject);
+        this._update(propertyName, fileData);
       });
 
       reader.readAsDataURL(file);

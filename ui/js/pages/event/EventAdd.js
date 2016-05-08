@@ -1,11 +1,11 @@
 "use strict";
 import Add from '../../components/Add';
-import EventForm from './EventForm';
+import EventFormContents from './EventFormContents';
 
 export default class EventAdd extends Add {};
 
 EventAdd.defaultProps = {
   category: 'events',
-  Form: EventForm,
+  FormContents: EventFormContents,
   title: 'Add Event'
 };

@@ -12,7 +12,8 @@ const SECTIONS = {
 export default class PagePreview extends Component {
 
   render () {
-    const { page } = this.props;
+    const { item } = this.props;
+    const page = item;
 
     const sections = (page.sections || []).map((section, index) => {
       const Section = SECTIONS[section.type];
@@ -29,5 +30,5 @@ export default class PagePreview extends Component {
 };
 
 PagePreview.propTypes = {
-  page: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired
 };

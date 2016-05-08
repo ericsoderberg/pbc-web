@@ -14,6 +14,9 @@ import PageAdd from './pages/page/PageAdd';
 import Page from './pages/page/Page';
 import PageEdit from './pages/page/PageEdit';
 import Resources from './pages/resource/Resources';
+import ResourceAdd from './pages/resource/ResourceAdd';
+import Resource from './pages/resource/Resource';
+import ResourceEdit from './pages/resource/ResourceEdit';
 import SignIn from './pages/session/SignIn';
 import SignUp from './pages/user/SignUp';
 import Users from './pages/user/Users';
@@ -43,6 +46,9 @@ export default {
     { path: 'events/:id', component: Event },
     { path: 'events/:id/edit', component: EventEdit },
     { path: 'events', component: Events },
+    { path: 'resources/add', component: ResourceAdd },
+    { path: 'resources/:id', component: Resource },
+    { path: 'resources/:id/edit', component: ResourceEdit },
     { path: 'resources', component: Resources },
     { path: 'forms', component: Forms },
     { path: 'form-templates', component: FormTemplates },

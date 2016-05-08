@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import PageHeader from './PageHeader';
 import FormError from './FormError';
+import FormState from '../utils/FormState';
 import ConfirmRemove from './ConfirmRemove';
 
 export default class Form extends Component {
@@ -11,6 +12,14 @@ export default class Form extends Component {
     this._onCancel = this._onCancel.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
     this._onRemove = this._onRemove.bind(this);
+    this._setItem = this._setItem.bind(this);
+    this.state = {
+      formState: new FormState(props.item, this._setItem)
+    };
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.setState({ formState: new FormState(nextProps.item, this._setItem) });
   }
 
   _onCancel () {
@@ -19,7 +28,7 @@ export default class Form extends Component {
 
   _onSubmit (event) {
     event.preventDefault();
-    this.props.onSubmit();
+    this.props.onSubmit(this.state.formState.object);
   }
 
   _onRemove (event) {
@@ -27,8 +36,13 @@ export default class Form extends Component {
     this.props.onRemove();
   }
 
+  _setItem (item) {
+    this.setState({ formState: new FormState(item, this._setItem) });
+  }
+
   render () {
-    const { title, action, submitLabel, onRemove, error, preview } = this.props;
+    const { title, action, submitLabel, onRemove, error, Preview, FormContents } = this.props;
+    const { formState } = this.state;
 
     const cancelControl = (
       <button className="button--header" type="button" onClick={this._onCancel}>
@@ -41,12 +55,17 @@ export default class Form extends Component {
       removeControl = <ConfirmRemove onConfirm={this._onRemove} />;
     }
 
+    let preview;
+    if (Preview) {
+      preview = <Preview item={formState.object} />;
+    }
+
     return (
       <div className="form__container">
         <form className="form" action={action} onSubmit={this._onSubmit}>
           <PageHeader title={title} actions={cancelControl} />
           <FormError message={error} />
-          {this.props.children}
+          <FormContents formState={this.state.formState} />
           <footer className="form__footer">
             <button type="submit" onClick={this._onSubmit}>{submitLabel}</button>
             {removeControl}
@@ -61,9 +80,11 @@ export default class Form extends Component {
 Form.propTypes = {
   action: PropTypes.string,
   error: PropTypes.object,
+  FormContents: PropTypes.func.isRequired,
+  item: PropTypes.object.isRequired,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
-  preview: PropTypes.node,
+  Preview: PropTypes.func,
   submitLabel: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired
 };

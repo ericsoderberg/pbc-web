@@ -1,83 +1,61 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import Form from '../../components/Form';
 import FormField from '../../components/FormField';
-import FormEvents from '../../utils/FormEvents';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
-import PagePreview from './PagePreview';
+// import PagePreview from './PagePreview';
 
 const SECTIONS = {
   image: ImageSectionEdit,
   text: TextSectionEdit
 };
 
-export default class PageForm extends Component {
+export default class PageFormContents extends Component {
 
   constructor (props) {
     super(props);
-    this._onSubmit = this._onSubmit.bind(this);
-    this._setPage = this._setPage.bind(this);
     this._onAddSection = this._onAddSection.bind(this);
     this._onChangeSection = this._onChangeSection.bind(this);
     this._onSwapSection = this._onSwapSection.bind(this);
     this._onRemoveSection = this._onRemoveSection.bind(this);
-    this.state = { page: props.item };
   }
 
   componentDidMount () {
     this.refs.name.focus();
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.setState({ page: nextProps.item });
-  }
-
-  _onSubmit () {
-    this.props.onSubmit(this.state.page);
-  }
-
-  _setPage (page) {
-    this.setState({ page: page});
-  }
-
   _onAddSection (type) {
-    let page = { ...this.state.page };
-    if (! page.sections) {
-      page.sections = [];
-    }
-    page.sections.push({
-      type: type
-    });
-    this._setPage(page);
+    const { formState } = this.props;
+    let sections = (formState.object.sections || []).slice(0);
+    sections.push({ type: type });
+    formState.change('sections')(sections);
   }
 
   _onChangeSection (section, index) {
-    let page = { ...this.state.page };
-    page.sections = page.sections.slice(0);
-    page.sections[index] = section;
-    this._setPage(page);
+    const { formState } = this.props;
+    let sections = formState.object.sections.slice(0);
+    sections[index] = section;
+    formState.change('sections')(sections);
   }
 
   _onSwapSection (section, index, nextIndex) {
-    let page = { ...this.state.page };
-    page.sections = page.sections.slice(0);
-    page.sections[index] = page.sections[nextIndex];
-    page.sections[nextIndex] = section;
-    this._setPage(page);
+    const { formState } = this.props;
+    let sections = formState.object.sections.slice(0);
+    sections[index] = sections[nextIndex];
+    sections[nextIndex] = section;
+    formState.change('sections')(sections);
   }
 
   _onRemoveSection (index) {
-    let page = { ...this.state.page };
-    page.sections = page.sections.slice(0);
-    page.sections.splice(index, 1);
-    this._setPage(page);
+    const { formState } = this.props;
+    let sections = formState.object.sections.slice(0);
+    sections.splice(index, 1);
+    formState.change('sections')(sections);
   }
 
   render () {
-    const { title, action, submitLabel, onRemove, error } = this.props;
-    const { page } = this.state;
-    const formEvents = new FormEvents(page, this._setPage);
+    const { formState } = this.props;
+    const page = formState.object;
 
     const sections = (page.sections || []).map((section, index) => {
       const Section = SECTIONS[section.type];
@@ -110,13 +88,11 @@ export default class PageForm extends Component {
     ));
 
     return (
-      <Form title={title} submitLabel={submitLabel} action={action}
-        onSubmit={this._onSubmit} onRemove={onRemove} error={error}
-        preview={<PagePreview page={page} />}>
+      <div>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input ref="name" name="name" value={page.name || ''}
-              onChange={formEvents.change('name')}/>
+              onChange={formState.change('name')}/>
           </FormField>
         </fieldset>
         {sections}
@@ -125,21 +101,11 @@ export default class PageForm extends Component {
             {addControls}
           </FormField>
         </fieldset>
-      </Form>
+      </div>
     );
   }
 };
 
-PageForm.propTypes = {
-  action: PropTypes.string,
-  error: PropTypes.object,
-  item: PropTypes.object.isRequired,
-  onRemove: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired,
-  submitLabel: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired
-};
-
-PageForm.contextTypes = {
-  router: PropTypes.any
+PageFormContents.propTypes = {
+  formState: PropTypes.object.isRequired
 };

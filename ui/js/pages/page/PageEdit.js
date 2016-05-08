@@ -1,13 +1,13 @@
 "use strict";
 import Edit from '../../components/Edit';
-import PageForm from './PageForm';
+import PageFormContents from './PageFormContents';
 import PagePreview from './PagePreview';
 
 export default class PageEdit extends Edit {};
 
 PageEdit.defaultProps = {
   category: 'pages',
-  Form: PageForm,
+  FormContents: PageFormContents,
   Preview: PagePreview,
   title: 'Edit Page'
 };

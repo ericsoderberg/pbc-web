@@ -1,11 +1,11 @@
 "use strict";
 import Edit from '../../components/Edit';
-import EventForm from './EventForm';
+import EventFormContents from './EventFormContents';
 
 export default class EventEdit extends Edit {};
 
 EventEdit.defaultProps = {
   category: 'events',
-  Form: EventForm,
+  FormContents: EventFormContents,
   title: 'Edit Event'
 };
