@@ -12,6 +12,11 @@ export default class UserFormContents extends Component {
     const { formState } = this.props;
     const user = formState.object;
 
+    const textHelp = (
+      <a href="http://daringfireball.net/projects/markdown/syntax"
+        target="_blank">Markdown syntax</a>
+    );
+
     return (
       <fieldset className="form__fields">
         <FormField label="Name">
@@ -34,6 +39,10 @@ export default class UserFormContents extends Component {
           </div>
           <input name="avatar" type="file"
             onChange={formState.changeFile('avatar')}/>
+        </FormField>
+        <FormField name="text" label="Text" help={textHelp}>
+          <textarea ref="text" name="text" value={user.text || ''} rows={8}
+            onChange={formState.change('text')}/>
         </FormField>
         <FormField>
           <input name="administrator" type="checkbox"

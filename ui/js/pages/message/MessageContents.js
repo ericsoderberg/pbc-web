@@ -1,5 +1,6 @@
 "use strict";
 import React, { PropTypes } from 'react';
+import moment from 'moment';
 import TextSection from '../page/TextSection';
 import ImageSection from '../page/ImageSection';
 
@@ -22,6 +23,11 @@ const MessageContents = (props) => {
     <div>
       {image}
       {text}
+      <dl className="page-attributes">
+        <dt>Verses</dt><dd>{message.verses}</dd>
+        <dt>Author</dt><dd>{message.author}</dd>
+        <dt>Date</dt><dd>{moment(message.date).format('M/D/YYYY')}</dd>
+      </dl>
     </div>
   );
 };

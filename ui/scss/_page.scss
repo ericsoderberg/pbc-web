@@ -39,6 +39,11 @@
   }
 }
 
+.page-attributes {
+  max-width: $page-width;
+  margin: 0 auto;
+}
+
 .page-footer__container {
   padding: 0 $unit;
 }

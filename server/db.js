@@ -29,7 +29,8 @@ const userSchema = Schema({
   avatar: imageSchema,
   email: String,
   encryptedPassword: String,
-  name: String
+  name: String,
+  text: String
 });
 
 mongoose.model('User', userSchema);

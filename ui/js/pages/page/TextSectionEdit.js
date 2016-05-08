@@ -18,14 +18,15 @@ export default class TextSectionEdit extends Component {
   render () {
     const { formState } = this.state;
     const section = formState.object;
-    const help = (
+
+    const textHelp = (
       <a href="http://daringfireball.net/projects/markdown/syntax"
         target="_blank">Markdown syntax</a>
     );
 
     return (
       <fieldset className="form__fields">
-        <FormField name="text" label="Text" help={help}>
+        <FormField name="text" label="Text" help={textHelp}>
           <textarea ref="text" name="text" value={section.text || ''} rows={8}
             onChange={formState.change('text')}/>
         </FormField>
