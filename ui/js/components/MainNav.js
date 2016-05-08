@@ -6,7 +6,10 @@ import Stored from './Stored';
 
 const MAIN_ROUTES = [
   { label: 'Home', path: '/' },
-  { label: 'Calendar', path: '/calendar' },
+  { label: 'Calendar', path: '/calendar' }
+];
+
+const ADMIN_ROUTES = [
   { label: 'Pages', path: '/pages' },
   { label: 'Events', path: '/events' },
   { label: 'Newsletters', path: '/newsletters' },
@@ -28,8 +31,8 @@ class MainNav extends Component {
     deleteSession();
   }
 
-  render () {
-    const links = MAIN_ROUTES.map(route => {
+  _renderLinks(routes) {
+    const links = routes.map(route => {
       let classes = ["main-nav__link"];
       if (this.context.router.isActive(route.path, true)) {
         classes.push("main-nav__link--active");
@@ -41,21 +44,33 @@ class MainNav extends Component {
       );
     });
 
-    let session;
+    return (
+      <ul className="main-nav__items">
+        {links}
+      </ul>
+    );
+  }
+
+  render () {
+    const mainLinks = this._renderLinks(MAIN_ROUTES);
+
+    let session, adminLinks;
     if (this.props.session) {
       session = [
         <div key="name" className="main-nav__session-name">{this.props.session.name}</div>,
         <a key="control" className="main-nav__link" onClick={this._signOut}>Sign Out</a>
       ];
+      if (this.props.session.administrator) {
+        adminLinks = this._renderLinks(ADMIN_ROUTES);
+      }
     } else {
       session = <Link className="main-nav__link" to="/sign-in" >Sign In</Link>;
     }
 
     return (
       <nav className={`main-nav ${this.props.className}`}>
-        <ul className="main-nav__items">
-          {links}
-        </ul>
+        {mainLinks}
+        {adminLinks}
         <div className="main-nav__session">
           {session}
         </div>

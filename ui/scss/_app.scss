@@ -23,7 +23,7 @@
 
 .main-nav__items {
   list-style-type: none;
-  margin: 0;
+  margin: 0 0 $double-unit;
   padding: 0;
 }
 
@@ -43,7 +43,6 @@
 }
 
 .main-nav__session {
-  margin-top: $double-unit;
   flex: 0 0 auto;
 }
 

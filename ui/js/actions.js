@@ -21,9 +21,7 @@ const setSession = (session) => {
   _sessionId = session._id;
   _headers.Authorization = `Token token=${session.token}`;
   dispatch(state => ({ session: session }));
-  localStorage.sessionToken = session.token;
-  localStorage.sessionName = session.name;
-  localStorage.sessionId = session._id;
+  localStorage.session = JSON.stringify(session);
   return session;
 };
 
@@ -31,19 +29,14 @@ const clearSession = (object) => {
   _sessionId = undefined;
   delete _headers.Authorization;
   dispatch(state => ({ session: undefined }));
-  localStorage.removeItem('sessionToken');
-  localStorage.removeItem('sessionName');
-  localStorage.removeItem('sessionId');
+  localStorage.removeItem('session');
   return object;
 };
 
 export function initialize () {
-  if (localStorage.sessionToken) {
-    setSession({
-      _id: localStorage.sessionId,
-      name: localStorage.sessionName,
-      token: localStorage.sessionToken
-    });
+  if (localStorage.session) {
+    const session = JSON.parse(localStorage.session);
+    setSession(session);
   }
 }
 

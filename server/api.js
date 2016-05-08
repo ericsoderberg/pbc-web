@@ -19,8 +19,9 @@ router.post('/sessions', (req, res) => {
   .then(user => {
     if (user && bcrypt.compareSync(password, user.encryptedPassword)) {
       const session = new Session({
+        administrator: user.administrator,
         email: email,
-        lastLogin: new Date(),
+        loginAt: new Date(),
         name: user.name,
         token: hat() // better to encrypt this before storing it, someday
       });
@@ -175,6 +176,7 @@ register('users', 'User', {
 
 register('pages', 'Page');
 register('events', 'Event');
+register('resources', 'Resource');
 
 // Site
 

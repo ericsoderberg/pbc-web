@@ -16,8 +16,9 @@ const imageSchema = Schema({
 });
 
 const sessionSchema = Schema({
+  administrator: Boolean,
   email: String,
-  lastLogin: Date,
+  loginAt: Date,
   name: String,
   token: String
 });
