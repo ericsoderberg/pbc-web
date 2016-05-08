@@ -165,6 +165,16 @@ const siteSchema = Schema({
 
 mongoose.model('Site', siteSchema);
 
+const newsletterSchema = Schema({
+  addresses: String,
+  date: Date,
+  name: String,
+  // TODO: references to events, pages, etc.
+  text: String
+});
+
+mongoose.model('Newsletter', newsletterSchema);
+
 // Connection
 
 const opts = { user: USER, pass: PASSWORD,  auth: { authdb: 'admin' } };

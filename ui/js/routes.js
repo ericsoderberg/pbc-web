@@ -7,11 +7,17 @@ import Event from './pages/event/Event';
 import EventEdit from './pages/event/EventEdit';
 import Forms from './pages/form/Forms';
 import FormTemplates from './pages/formTemplate/FormTemplates';
+import FormTemplateAdd from './pages/formTemplate/FormTemplateAdd';
+import FormTemplate from './pages/formTemplate/FormTemplate';
+import FormTemplateEdit from './pages/formTemplate/FormTemplateEdit';
 import Messages from './pages/message/Messages';
 import MessageAdd from './pages/message/MessageAdd';
 import Message from './pages/message/Message';
 import MessageEdit from './pages/message/MessageEdit';
 import Newsletters from './pages/newsletter/Newsletters';
+import NewsletterAdd from './pages/newsletter/NewsletterAdd';
+import Newsletter from './pages/newsletter/Newsletter';
+import NewsletterEdit from './pages/newsletter/NewsletterEdit';
 import Pages from './pages/page/Pages';
 import PageAdd from './pages/page/PageAdd';
 import Page from './pages/page/Page';
@@ -54,11 +60,17 @@ export default {
     { path: 'resources/:id/edit', component: ResourceEdit },
     { path: 'resources', component: Resources },
     { path: 'forms', component: Forms },
+    { path: 'form-templates/add', component:  FormTemplateAdd },
+    { path: 'form-templates/:id', component:  FormTemplate },
+    { path: 'form-templates/:id/edit', component:  FormTemplateEdit },
     { path: 'form-templates', component: FormTemplates },
     { path: 'messages/add', component: MessageAdd },
     { path: 'messages/:id', component: Message },
     { path: 'messages/:id/edit', component: MessageEdit },
     { path: 'messages', component: Messages },
+    { path: 'newsletters/add', component: NewsletterAdd },
+    { path: 'newsletters/:id', component: Newsletter },
+    { path: 'newsletters/:id/edit', component: NewsletterEdit },
     { path: 'newsletters', component: Newsletters }
   ]
 };

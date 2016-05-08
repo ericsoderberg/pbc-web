@@ -178,6 +178,9 @@ register('pages', 'Page');
 register('events', 'Event');
 register('resources', 'Resource');
 register('messages', 'Message');
+register('newsletters', 'Newsletter');
+register('form-templates', 'FormTemplate');
+register('forms', 'Forms');
 
 // Site
 
