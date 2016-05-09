@@ -2,24 +2,25 @@
 import React, { PropTypes } from 'react';
 import markdownToJSX from 'markdown-to-jsx';
 
-const TextSection = (props) => {
-  const { section } = props;
+const Text = (props) => {
+  const { color, text } = props;
   let classNames = ['page-text__container'];
   let style;
-  if (section.color) {
-    style = { backgroundColor: section.color, color: '#fff' };
+  if (color) {
+    style = { backgroundColor: color, color: '#fff' };
   }
   return (
     <div className={classNames.join(' ')} style={style}>
       <div className="page-text">
-        {markdownToJSX(section.text || '')}
+        {markdownToJSX(text || '')}
       </div>
     </div>
   );
 };
 
-TextSection.defaultProps = {
-  section: PropTypes.object.isRequired
+Text.propTypes = {
+  color: PropTypes.string,
+  text: PropTypes.string
 };
 
-export default TextSection;
+export default Text;

@@ -4,7 +4,9 @@
 }
 
 .page-text__container,
-.page-image__container {
+.page-image__container,
+.page-map__container,
+.page-footer__container {
   padding: 0 $unit;
 }
 
@@ -39,13 +41,17 @@
   }
 }
 
-.page-attributes {
+.page-map {
+  position: relative;
   max-width: $page-width;
+  height: 50vh;
+  min-height: $quadruple-unit;
   margin: 0 auto;
 }
 
-.page-footer__container {
-  padding: 0 $unit;
+.page-attributes {
+  max-width: $page-width;
+  margin: 0 auto;
 }
 
 .page-footer {

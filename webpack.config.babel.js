@@ -44,12 +44,20 @@ const config = {
         loader: 'file-loader?mimetype=image/jpg'
       },
       {
+        test: /\.png$/,
+        loader: 'file-loader?mimetype=image/png'
+      },
+      {
         test: /\.woff$/,
         loader: 'file-loader?mimetype=application/font-woff'
       },
       {
         test: /\.scss$/,
         loaders: ["style", "css", "sass"]
+      },
+      {
+        test: /\.css$/,
+        loaders: ["style", "css"]
       }
     ]
   },

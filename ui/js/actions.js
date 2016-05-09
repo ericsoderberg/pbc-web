@@ -115,10 +115,19 @@ export function postSite (site) {
 }
 
 // Calendar
-export function getCalendar(date, searchText) {
+
+export function getCalendar (date, searchText) {
   // const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
   const q = date ? `?date=${encodeURIComponent(date.toISOString())}` : '';
   return fetch(`/api/calendar${q}`, {
     method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
+
+// Map
+
+export function getGeocode (address) {
+  return fetch(`http://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`, {
+    method: 'GET', headers: { ..._headers, Authorization: undefined }})
   .then(response => response.json());
 }

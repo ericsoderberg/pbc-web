@@ -61,8 +61,9 @@ const datesSchema = Schema({
 });
 
 const eventSchema = Schema({
+  address: String,
   calendar: String,
-  location: String, // address
+  location: String, // room
   name: String,
   recurrence: [datesSchema],
   start: Date,

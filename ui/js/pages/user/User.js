@@ -1,22 +1,20 @@
 "use strict";
 import React from 'react';
 import Show from '../../components/Show';
-import TextSection from '../page/TextSection';
-import ImageSection from '../page/ImageSection';
+import Text from '../../components/Text';
+import Image from '../../components/Image';
 
 const UserContents = (props) => {
   const user = props.item;
 
   let text;
   if (user.text) {
-    const section = { text: user.text };
-    text = <TextSection section={section} />;
+    text = <Text text={user.text} />;
   }
 
   let image;
   if (user.avatar) {
-    const section = { image: user.avatar, full: false };
-    image = <ImageSection section={section} />;
+    image = <Image image={user.avatar} />;
   }
 
   return (

@@ -1,22 +1,25 @@
 "use strict";
 import React, { PropTypes } from 'react';
 
-const ImageSection = (props) => {
-  const { section } = props;
+const Image = (props) => {
+  const { full, image } = props;
   let classNames = ['page-image__container'];
-  if (section.full) {
+  if (full) {
     classNames.push('page-image__container--full');
   }
   return (
     <div className={classNames.join(' ')}>
       <img className="page-image"
-        src={section.image ? section.image.data : ''} />
+        src={image ? image.data : ''} />
     </div>
   );
 };
 
-ImageSection.defaultProps = {
-  section: PropTypes.object.isRequired
+Image.propTypes = {
+  full: PropTypes.bool,
+  image: PropTypes.shape({
+    data: PropTypes.string.isRequired
+  })
 };
 
-export default ImageSection;
+export default Image;

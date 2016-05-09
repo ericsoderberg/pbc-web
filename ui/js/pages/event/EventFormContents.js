@@ -37,6 +37,10 @@ export default class EventFormContents extends Component {
           <input name="location" value={event.location || ''}
             onChange={formState.change('location')}/>
         </FormField>
+        <FormField label="Address">
+          <input name="address" value={event.address || ''}
+            onChange={formState.change('address')}/>
+        </FormField>
         <FormField name="text" label="Text">
           <textarea ref="text" name="text" value={event.text || ''} rows={4}
             onChange={formState.change('text')}/>
