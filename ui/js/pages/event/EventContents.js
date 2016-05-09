@@ -20,8 +20,8 @@ const EventContents = (props) => {
   return (
     <div>
       {text}
-      <div className="page-text__container">
-        <div className="page-text">
+      <div className="text__container">
+        <div className="text">
           <h2>{moment(event.start).format('MMMM Do YYYY @ h:mm a')}</h2>
         </div>
       </div>

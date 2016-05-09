@@ -3,9 +3,10 @@ import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
-// import PagePreview from './PagePreview';
+import EventSectionEdit from './EventSectionEdit';
 
 const SECTIONS = {
+  event: EventSectionEdit,
   image: ImageSectionEdit,
   text: TextSectionEdit
 };
@@ -81,7 +82,7 @@ export default class PageFormContents extends Component {
       );
     });
 
-    const addControls = ['text', 'image'].map(type => (
+    const addControls = ['text', 'image', 'event'].map(type => (
       <button key={type} type="button" onClick={this._onAddSection.bind(this, type)}>
         {type}
       </button>

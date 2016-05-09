@@ -42,15 +42,15 @@ export default class Map extends Component {
   _renderPopup () {
     const { address, title } = this.props;
     const { mergedAddress } = this.state;
+    const header = title ? `<h5>${title}</h5>` : '';
     return `<div className="map__tip">
-        <h5>${title}</h5>
+        ${header}
         <a href="maps://?daddr=${encodeURIComponent(mergedAddress)}">${address}</a>
       </div>`;
   }
 
   _setMap (mapSize) {
     const { map, lat, lon } = this.state;
-    console.log('!!! _setMap', lat, lon);
     map.setView([lat, lon], 14);
     Leaflet.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
       attribution: '&copy;OpenStreetMap, &copy;CartoDB'
@@ -63,8 +63,7 @@ export default class Map extends Component {
     circle.bindPopup(this._renderPopup()).openPopup();
   }
 
-  _parseAddress () {
-    const { address } = this.props;
+  _parseAddress (address) {
     return address.split(',').map(p => p.trim());
   }
 
@@ -93,11 +92,8 @@ export default class Map extends Component {
   }
 
   render () {
-    const { full } = this.props;
-    let classNames = ['page-map__container'];
-    if (full) {
-      classNames.push('page-map__container--full');
-    }
+    const { full, plain } = this.props;
+
     let address;
     if (! this.state.busy && ! this.state.lat) {
       address = (
@@ -106,13 +102,27 @@ export default class Map extends Component {
         </div>
       );
     }
-    return (
-      <div className={classNames.join(' ')}>
-        <div ref="map" id="map" className="page-map">
-          {address}
-        </div>
+
+    let result = (
+      <div ref="map" id="map" className="map">
+        {address}
       </div>
     );
+
+    if (! plain) {
+      let classNames = ['map__container'];
+      if (full) {
+        classNames.push('map__container--full');
+      }
+
+      result = (
+        <div className={classNames.join(' ')}>
+          {result}
+        </div>
+      );
+    }
+
+    return result;
   }
 
 };
@@ -123,6 +133,7 @@ Map.propTypes = {
   full: PropTypes.bool,
   latitude: PropTypes.string,
   longitude: PropTypes.string,
+  plain: PropTypes.bool,
   title: PropTypes.string
 };
 
