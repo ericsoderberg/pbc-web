@@ -23,5 +23,5 @@ Users.defaultProps = {
   category: 'users',
   Item: Item,
   path: '/users',
-  title: 'Users'
+  title: 'People'
 };

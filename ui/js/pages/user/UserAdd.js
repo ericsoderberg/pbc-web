@@ -7,5 +7,5 @@ export default class UserAdd extends Add {};
 UserAdd.defaultProps = {
   category: 'users',
   FormContents: UserFormContents,
-  title: 'Add User'
+  title: 'Add Person'
 };
