@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component } from 'react';
-// import { Link } from 'react-router';
+import { Link } from 'react-router';
 import moment from 'moment';
 import { getCalendar } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -61,8 +61,10 @@ export default class Calendar extends Component {
       }
       result.push(
         <li key={event._id} className="calendar__event">
-          {time}
-          {event.name}
+          <Link to={`/events/${event._id}`}>
+            {time}
+            {event.name}
+          </Link>
         </li>
       );
     }
@@ -72,6 +74,7 @@ export default class Calendar extends Component {
   _renderWeeks () {
     const { calendar } = this.state;
     let weeks = [];
+    let now = moment();
     let date = moment(calendar.start);
     let end = moment(calendar.end);
     let events = calendar.events.slice(0);
@@ -87,8 +90,13 @@ export default class Calendar extends Component {
       }
       const dayEvents = this._renderEvents(date, events);
 
+      let classNames = ['calendar__day'];
+      if (date.isSame(now, 'date')) {
+        classNames.push('calendar__day--today');
+      }
+
       days.push(
-        <div key={date.valueOf()} className="calendar__day">
+        <div key={date.valueOf()} className={classNames.join(' ')}>
           <div className="calendar__day-date">
             {date.format('D')}
           </div>

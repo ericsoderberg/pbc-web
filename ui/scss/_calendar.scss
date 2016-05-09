@@ -74,6 +74,13 @@
   text-align: left;
 }
 
+.calendar__day--today {
+  .calendar__day-date {
+    background-color: #555;
+    color: #fff;
+  }
+}
+
 .calendar__day-date {
   padding: $quarter-unit;
   text-align: right;
@@ -111,16 +118,16 @@
 }
 
 .calendar__events {
-  margin: $quarter-unit $quarter-unit $unit;
+  margin: 0 0 $unit;
   padding: 0;
   list-style-type: none;
 }
 
 .calendar__event {
-  text-indent: - $half-unit;
-  padding-left: $half-unit;
-
   a {
+    text-indent: - $half-unit;
+    padding: $quarter-unit $quarter-unit $quarter-unit ($half-unit + $quarter-unit);
+    display: block;
     color: #333;
   }
 }
