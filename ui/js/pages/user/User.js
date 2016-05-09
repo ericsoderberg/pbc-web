@@ -21,8 +21,8 @@ const UserContents = (props) => {
     <div>
       {image}
       {text}
-      <div className="page-text__container">
-        <div className="page-text">
+      <div className="text__container">
+        <div className="text">
           <h2>Email</h2>
           <a href={`mailto:${user.email}`}>{user.email}</a>
         </div>

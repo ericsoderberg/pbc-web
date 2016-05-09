@@ -57,8 +57,15 @@ export function deleteSession () {
 
 // Generic
 
-export function getItems (category, searchText) {
-  const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
+export function getItems (category, searchText, query) {
+  const params = [];
+  if (searchText) {
+    params.push(`search=${encodeURIComponent(searchText)}`);
+  }
+  if (query) {
+    params.push(`q=${encodeURIComponent(JSON.stringify(query))}`);
+  }
+  const q = params.length > 0 ?  `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })
   .then(response => response.json());

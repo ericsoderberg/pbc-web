@@ -1,19 +1,23 @@
 "use strict";
 import React from 'react';
+import { Link } from 'react-router';
 import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: user } = props;
+  let classNames = ['item__container', className];
   const admin = user.administrator ? ' *' : undefined;
   return (
-    <div className={className}>
-      <span className="box--row">
-        <img className="avatar" src={user.avatar ? user.avatar.data : ''} />
-        <span>{user.name}</span>
-        <span>{admin}</span>
-      </span>
-      <span>{user.email}</span>
-    </div>
+    <Link className={classNames.join(' ')} to={`/users/${user._id}`}>
+      <div className="item">
+        <span className="box--row">
+          <img className="avatar" src={user.avatar ? user.avatar.data : ''} />
+          <span>{user.name}</span>
+          <span>{admin}</span>
+        </span>
+        <span>{user.email}</span>
+      </div>
+    </Link>
   );
 };
 

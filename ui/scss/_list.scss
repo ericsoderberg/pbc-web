@@ -5,7 +5,7 @@
   padding: 0;
 }
 
-a.list__item {
+a.item__container {
   display: block;
   text-decoration: none;
   color: inherit;
@@ -20,7 +20,7 @@ a.list__item {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: $unit;
+  padding: $unit 0;
   max-width: $page-width;
   margin: 0 auto;
 }

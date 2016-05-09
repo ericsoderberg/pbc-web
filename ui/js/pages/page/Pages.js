@@ -1,13 +1,17 @@
 "use strict";
 import React from 'react';
+import { Link } from 'react-router';
 import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: page } = props;
+  let classNames = ['item__container', className];
   return (
-    <div className={className}>
-      <span>{page.name}</span>
-    </div>
+    <Link className={classNames.join(' ')} to={`/pages/${page._id}`}>
+      <div className="item">
+        <span>{page.name}</span>
+      </div>
+    </Link>
   );
 };
 

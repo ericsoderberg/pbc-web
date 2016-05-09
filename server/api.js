@@ -115,12 +115,15 @@ const register = (category, modelName, transforms={}) => {
   router.get(`/${category}`, (req, res) => {
     const Doc = mongoose.model(modelName);
     let query = Doc.find();
-    if (req.query.q) {
-      const searchText = req.query.q;
-      const exp = new RegExp(searchText, 'i');
+    if (req.query.search) {
+      const exp = new RegExp(req.query.search, 'i');
       query = query.or([
         { 'name': exp }
       ]);
+    }
+    if (req.query.q) {
+      const q = JSON.parse(req.query.q);
+      query.find(q);
     }
     query.limit(20)
     .exec()

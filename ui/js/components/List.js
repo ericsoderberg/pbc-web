@@ -14,7 +14,8 @@ export default class List extends Component {
 
   componentDidMount () {
     getItems(this.props.category)
-    .then(response => this.setState({ items: response }));
+    .then(response => this.setState({ items: response }))
+    .catch(error => console.log('!!! List catch', error));
   }
 
   _onSearch (event) {
@@ -22,7 +23,8 @@ export default class List extends Component {
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(() => {
       getItems(this.props.category, searchText)
-      .then(response => this.setState({ items: response }));
+      .then(response => this.setState({ items: response }))
+      .catch(error => console.log('!!! List catch', error));
     }, 100);
     this.setState({ searchText: searchText });
   }
@@ -33,9 +35,7 @@ export default class List extends Component {
     const items = this.state.items.map(item => {
       return (
         <li key={item._id} >
-          <Link className="list__item" to={`${path}/${item._id}`}>
-            <Item className="item" item={item} />
-          </Link>
+          <Item className="list__item" item={item} />
         </li>
       );
     });

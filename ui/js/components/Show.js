@@ -12,7 +12,18 @@ export default class Show extends Component {
   }
 
   componentDidMount () {
-    getItem(this.props.category, this.props.params.id)
+    this._load(this.props);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.category !== this.props.category ||
+      nextProps.params.id !== this.props.params.id) {
+      this._load(nextProps);
+    }
+  }
+
+  _load (props) {
+    getItem(props.category, props.params.id)
       .then(response => this.setState({ item: response }));
   }
 
