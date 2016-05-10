@@ -17,6 +17,28 @@ export default class UserFormContents extends Component {
         target="_blank">Markdown syntax</a>
     );
 
+    let avatarField;
+    if (user.avatar) {
+      avatarField = (
+        <FormField name="avatar" label="Avatar">
+          <img className="avatar"
+            src={user.avatar.data} />
+          <input name="avatarRemove" type="checkbox"
+            checked={user.avatar || false}
+            onChange={() => formState.set('avatar', false)}/>
+          <label htmlFor="avatarRemove">Clear</label>
+        </FormField>
+      );
+    } else {
+      avatarField = (
+        <FormField name="avatar" label="Avatar"
+          onDrop={formState.dropFile('avatar')}>
+          <input name="avatar" type="file"
+            onChange={formState.changeFile('avatar')}/>
+        </FormField>
+      );
+    }
+
     return (
       <fieldset className="form__fields">
         <FormField label="Name">
@@ -31,15 +53,7 @@ export default class UserFormContents extends Component {
           <input name="password" type="password" value={user.password || ''}
             onChange={formState.change('password')}/>
         </FormField>
-        <FormField name="avatar" label="Avatar"
-          onDrop={formState.dropFile('avatar')}>
-          <div>
-            <img className="avatar"
-              src={user.avatar ? user.avatar.data : ''} />
-          </div>
-          <input name="avatar" type="file"
-            onChange={formState.changeFile('avatar')}/>
-        </FormField>
+        {avatarField}
         <FormField name="text" label="Text" help={textHelp}>
           <textarea ref="text" name="text" value={user.text || ''} rows={8}
             onChange={formState.change('text')}/>

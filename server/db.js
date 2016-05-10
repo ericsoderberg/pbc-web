@@ -8,12 +8,12 @@ const PASSWORD = 'pbc';
 
 // Schemas
 
-const imageSchema = Schema({
+const image = {
   data: String,
   name: String,
   size: Number,
   type: { type: String }
-});
+};
 
 const sessionSchema = Schema({
   administrator: Boolean,
@@ -26,7 +26,7 @@ export const Session = mongoose.model('Session', sessionSchema);
 
 const userSchema = Schema({
   administrator: Boolean,
-  avatar: imageSchema,
+  avatar: image,
   email: String,
   encryptedPassword: String,
   name: String,
@@ -41,7 +41,7 @@ const pageSectionSchema = Schema({
   },
   color: String,
   full: Boolean,
-  image: imageSchema, // image type
+  image: image, // image type
   name: String,       // library type
   objectId: ObjectId, // event, form types
   text: String        // text type
@@ -138,12 +138,7 @@ mongoose.model('Payment', paymentSchema);
 const messageSchema = Schema({
   author: String,
   date: Date,
-  image: {
-    data: String,
-    name: String,
-    size: Number,
-    mimeType: String // can't use 'type' since Mongoose reserves that
-  },
+  image: image,
   library: String,
   name: String,
   series: Boolean,
@@ -161,7 +156,7 @@ const siteSchema = Schema({
   email: String,
   homePageId: ObjectId,
   name: String,
-  logo: imageSchema,
+  logo: image,
   phone: String
 });
 

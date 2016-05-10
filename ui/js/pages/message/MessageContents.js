@@ -56,7 +56,7 @@ export default class MessageContents extends Component {
     let seriesMessages;
     if (this.state.seriesMessages) {
       const messages = this.state.seriesMessages.map(message => (
-        <MessageItem item={message} />
+        <MessageItem key={message._id} item={message} />
       ));
       seriesMessages = [
         <Text key="header" text="## Messages" />,

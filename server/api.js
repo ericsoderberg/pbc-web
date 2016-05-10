@@ -77,6 +77,7 @@ const register = (category, modelName, transforms={}) => {
     const Doc = mongoose.model(modelName);
     Doc.findById(id)
     .exec()
+    .then(doc => (transforms.get ? transforms.get(doc) : doc))
     .then(doc => res.json(doc))
     .catch(error => res.status(400).json({ error: error }));
   });
@@ -87,9 +88,7 @@ const register = (category, modelName, transforms={}) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
       let data = req.body;
-      if (transforms.put) {
-        data = transforms.put(data);
-      }
+      data = (transforms.put ? transforms.put(data) : data);
       Doc.findOneAndUpdate({ _id: id }, data)
       .exec()
       .then(doc => res.status(200).json(doc))
@@ -139,9 +138,7 @@ const register = (category, modelName, transforms={}) => {
     .then(session => {
       const Doc = mongoose.model(modelName);
       let data = req.body;
-      if (transforms.post) {
-        data = transforms.post(data);
-      }
+      data = (transforms.post ? transforms.post(data) : data);
       const doc = new Doc(data);
       doc.save()
       .then(doc => res.status(200).json(doc))
@@ -174,6 +171,11 @@ const encryptPassword = (data) => {
 };
 
 register('users', 'User', {
+  get: (user) => {
+    user = user.toObject();
+    delete user.encryptedPassword;
+    return user;
+  },
   put: encryptPassword,
   post: encryptPassword
 });

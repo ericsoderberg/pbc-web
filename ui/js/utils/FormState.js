@@ -7,7 +7,7 @@ export default class FormState {
     this._onChange = onChange;
   }
 
-  _update (propertyName, value) {
+  set (propertyName, value) {
     let nextObject = { ...this.object };
     nextObject[propertyName] = value;
     this._onChange(nextObject);
@@ -17,13 +17,13 @@ export default class FormState {
     return (event => {
       // handle DateChange onChange which just sends the value, not an event
       const value = (event.target ? event.target.value : event);
-      this._update(propertyName, value);
+      this.set(propertyName, value);
     });
   }
 
   toggle (propertyName) {
     return (event => {
-      this._update(propertyName, ! this.object[propertyName]);
+      this.set(propertyName, ! this.object[propertyName]);
     });
   }
 
@@ -40,7 +40,7 @@ export default class FormState {
           type: file.type
         };
 
-        this._update(propertyName, fileData);
+        this.set(propertyName, fileData);
       });
 
       reader.readAsDataURL(file);

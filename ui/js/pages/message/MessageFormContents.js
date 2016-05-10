@@ -34,6 +34,28 @@ export default class MessageFormContents extends Component {
       </span>
     );
 
+    let imageField;
+    if (message.image) {
+      imageField = (
+        <FormField name="image" label="Image">
+          <img className="form-field__image"
+            src={message.image.data} />
+          <input name="imageRemove" type="checkbox"
+            checked={message.image || false}
+            onChange={() => formState.set('image', false)}/>
+          <label htmlFor="imageRemove">Clear</label>
+        </FormField>
+      );
+    } else {
+      imageField = (
+        <FormField name="image" label="Image" help={imageHelp}
+          onDrop={formState.dropFile('image')}>
+          <input name="image" type="file"
+            onChange={formState.changeFile('image')}/>
+        </FormField>
+      );
+    }
+
     const series = this.state.series.map(message => (
       <option key={message._id} label={message.name} value={message._id} />
     ));
@@ -58,13 +80,7 @@ export default class MessageFormContents extends Component {
           <input name="verses" value={message.verses || ''}
             onChange={formState.change('verses')}/>
         </FormField>
-        <FormField name="image" label="Image" help={imageHelp}
-          onDrop={formState.dropFile('image')}>
-          <img className="form-field__image"
-            src={message.image ? message.image.data : ''} />
-          <input name="image" type="file"
-            onChange={formState.changeFile('image')}/>
-        </FormField>
+        {imageField}
         <FormField name="text" label="Text" help={textHelp}>
           <textarea ref="text" name="text" value={message.text || ''} rows={4}
             onChange={formState.change('text')}/>
