@@ -14,6 +14,7 @@ const Item = (props) => {
 export default class FormTemplates extends List {};
 
 FormTemplates.defaultProps = {
+  ...List.defaultProps,
   category: 'form-templates',
   Item: Item,
   path: '/form-templates',

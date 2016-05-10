@@ -22,8 +22,10 @@ const Item = (props) => {
 export default class Events extends List {};
 
 Events.defaultProps = {
+  ...List.defaultProps,
   category: 'events',
   Item: Item,
   path: '/events',
+  sort: '-start',
   title: 'Events'
 };

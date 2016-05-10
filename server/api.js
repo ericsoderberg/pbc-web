@@ -125,6 +125,9 @@ const register = (category, modelName, transforms={}) => {
       const q = JSON.parse(req.query.q);
       query.find(q);
     }
+    if (req.query.s) {
+      query.sort(req.query.s);
+    }
     query.limit(20)
     .exec()
     .then(docs => res.json(docs))

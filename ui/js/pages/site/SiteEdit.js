@@ -14,7 +14,8 @@ export default class SiteEdit extends Component {
 
   componentDidMount () {
     getSite()
-    .then(response => this.setState({ site: response }))
+    // allow for no site existing yet
+    .then(site => this.setState({ site: site || {} }))
     .catch(error => console.log('!!! SiteEdit catch', error));
   }
 

@@ -29,10 +29,6 @@ export default class EventFormContents extends Component {
             value={event.stop || ''}
             onChange={formState.change('stop')} />
         </FormField>
-        <FormField label="Calendar">
-          <input name="calendar" value={event.calendar || ''}
-            onChange={formState.change('calendar')}/>
-        </FormField>
         <FormField label="Location">
           <input name="location" value={event.location || ''}
             onChange={formState.change('location')}/>
@@ -44,6 +40,10 @@ export default class EventFormContents extends Component {
         <FormField name="text" label="Text">
           <textarea ref="text" name="text" value={event.text || ''} rows={4}
             onChange={formState.change('text')}/>
+        </FormField>
+        <FormField label="Calendar">
+          <input name="calendar" value={event.calendar || ''}
+            onChange={formState.change('calendar')}/>
         </FormField>
       </fieldset>
     );

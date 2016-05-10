@@ -23,6 +23,7 @@ export default class SiteFormContents extends Component {
     const pages = this.state.pages.map(page => (
       <option key={page._id} label={page.name} value={page._id} />
     ));
+    pages.unshift(<option key={0} />);
 
     return (
       <fieldset className="form__fields">

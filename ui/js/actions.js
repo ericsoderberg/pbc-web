@@ -57,15 +57,18 @@ export function deleteSession () {
 
 // Generic
 
-export function getItems (category, searchText, query) {
+export function getItems (category, options={}) {
   const params = [];
-  if (searchText) {
-    params.push(`search=${encodeURIComponent(searchText)}`);
+  if (options.search) {
+    params.push(`search=${encodeURIComponent(options.search)}`);
   }
-  if (query) {
-    params.push(`q=${encodeURIComponent(JSON.stringify(query))}`);
+  if (options.query) {
+    params.push(`q=${encodeURIComponent(JSON.stringify(options.query))}`);
   }
-  const q = params.length > 0 ?  `?${params.join('&')}`: '';
+  if (options.sort) {
+    params.push(`s=${encodeURIComponent(options.sort)}`);
+  }
+  const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })
   .then(response => response.json());
@@ -109,8 +112,7 @@ export function postSignUp (user) {
 // Site
 
 export function getSite () {
-  return fetch('/api/site', {
-    method: 'GET', headers: _headers })
+  return fetch('/api/site', { method: 'GET', headers: _headers })
   .then(response => response.json());
 }
 

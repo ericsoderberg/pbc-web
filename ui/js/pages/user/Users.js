@@ -24,6 +24,7 @@ const Item = (props) => {
 export default class Users extends List {};
 
 Users.defaultProps = {
+  ...List.defaultProps,
   category: 'users',
   Item: Item,
   path: '/users',

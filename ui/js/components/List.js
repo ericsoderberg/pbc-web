@@ -6,14 +6,14 @@ import PageHeader from './PageHeader';
 
 export default class List extends Component {
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this._onSearch = this._onSearch.bind(this);
     this.state = { items: [], searchText: '' };
   }
 
   componentDidMount () {
-    getItems(this.props.category)
+    getItems(this.props.category, { sort: this.props.sort })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
   }
@@ -22,7 +22,8 @@ export default class List extends Component {
     const searchText = event.target.value;
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(() => {
-      getItems(this.props.category, searchText)
+      getItems(this.props.category,
+        { sort: this.props.sort, search: searchText })
       .then(response => this.setState({ items: response }))
       .catch(error => console.log('!!! List catch', error));
     }, 100);
@@ -59,5 +60,10 @@ List.propTypes = {
   category: PropTypes.string,
   Item: PropTypes.func.isRequired,
   path: PropTypes.string,
+  sort: PropTypes.string,
   title: PropTypes.string
+};
+
+List.defaultProps = {
+  sort: 'name'
 };

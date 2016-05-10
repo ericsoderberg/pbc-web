@@ -18,6 +18,7 @@ const Item = (props) => {
 export default class Newsletters extends List {};
 
 Newsletters.defaultProps = {
+  ...List.defaultProps,
   category: 'newsletters',
   Item: Item,
   path: '/newsletters',

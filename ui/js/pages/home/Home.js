@@ -15,7 +15,11 @@ export default class Home extends Component {
     getSite()
     .then(site => {
       this.setState({ site: site });
-      return getItem('pages', site.homePageId);
+      if (site.homePageId) {
+        return getItem('pages', site.homePageId);
+      } else {
+        return Promise.reject();
+      }
     })
     .then(response => this.setState({ page: response }));
   }

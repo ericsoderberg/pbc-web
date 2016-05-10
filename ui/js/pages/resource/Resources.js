@@ -18,6 +18,7 @@ const Item = (props) => {
 export default class Resources extends List {};
 
 Resources.defaultProps = {
+  ...List.defaultProps,
   category: 'resources',
   Item: Item,
   path: '/resources',
