@@ -6,6 +6,7 @@
 .text__container,
 .image__container,
 .map__container,
+.video__container,
 .event-summary__container,
 .page-footer__container {
   padding: 0 $unit;
@@ -38,6 +39,14 @@
   max-width: $page-width;
   height: 50vh;
   min-height: $quadruple-unit;
+  margin: 0 auto;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  max-width: $page-width;
+  height: 540px;
   margin: 0 auto;
 }
 

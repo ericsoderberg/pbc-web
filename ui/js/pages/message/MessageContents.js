@@ -45,6 +45,23 @@ export default class MessageContents extends Component {
   render () {
     const message = this.props.item;
 
+    let video;
+    if (message.videoUrl) {
+      // TOOD: Handle YouTube vs. Vimeo
+      const regexp = /vimeo\.com\/(\d+)/;
+      const match = message.videoUrl.match(regexp);
+      if (match) {
+        video = (
+          <div className="video__container">
+            <iframe className="video vimeo-player" type="text/html" width="960" height="540"
+              src={`https://player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
+              frameBorder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen>
+            </iframe>
+          </div>
+        );
+      }
+    }
+
     let text;
     if (message.text) {
       text = <Text text={message.text} />;
@@ -81,6 +98,7 @@ export default class MessageContents extends Component {
 
     return (
       <div>
+        {video}
         {image}
         {text}
         <div className="text-container">

@@ -80,6 +80,10 @@ export default class MessageFormContents extends Component {
           <input name="verses" value={message.verses || ''}
             onChange={formState.change('verses')}/>
         </FormField>
+        <FormField label="Video URL">
+          <input name="videoUrl" value={message.videoUrl || ''}
+            onChange={formState.change('videoUrl')}/>
+        </FormField>
         {imageField}
         <FormField name="text" label="Text" help={textHelp}>
           <textarea ref="text" name="text" value={message.text || ''} rows={4}

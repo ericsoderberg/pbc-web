@@ -144,8 +144,9 @@ const messageSchema = Schema({
   series: Boolean,
   seriesId: ObjectId,
   text: String,
+  videoUrl: String,
   verses: String,
-  files: [String] // TODO: GridFS
+  fileUrls: [String]
 });
 
 mongoose.model('Message', messageSchema);
