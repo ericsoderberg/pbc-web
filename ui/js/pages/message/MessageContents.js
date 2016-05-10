@@ -19,7 +19,9 @@ export default class MessageContents extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this._loadSeriesMessages(nextProps);
+    if (this.props.item._id !== nextProps.item._id) {
+      this._loadSeriesMessages(nextProps);
+    }
   }
 
   _loadSeriesMessages (props) {
@@ -85,7 +87,7 @@ export default class MessageContents extends Component {
           <dl className="page-attributes">
             <dt>Verses</dt><dd>{message.verses}</dd>
             <dt>Author</dt><dd>{message.author}</dd>
-            <dt>Date</dt><dd>{moment(message.date).format('M/D/YYYY')}</dd>
+            <dt>Date</dt><dd>{moment(message.date).format('MMMM Do YYYY')}</dd>
             {series}
           </dl>
         </div>
