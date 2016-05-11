@@ -15,8 +15,7 @@
 
 .text {
   max-width: $page-width;
-  margin: 0 auto;
-  padding: $unit 0;
+  margin: $double-unit auto;
 }
 
 .image {
@@ -48,7 +47,7 @@
   width: 100%;
   max-width: $page-width;
   height: 540px;
-  margin: 0 auto;
+  margin: $double-unit auto;
 }
 
 .audio {
@@ -74,14 +73,6 @@
 
   &[type=range]:focus {
     outline: none; // Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though.
-  }
-
-  &[type=range]::-ms-track {
-    width: 100%;
-    cursor: pointer;
-    background: transparent; // Hides the slider so custom styles can be added
-    border-color: transparent;
-    color: transparent;
   }
 
   // Thumb
@@ -202,7 +193,7 @@
 
 .page-attributes {
   max-width: $page-width;
-  margin: 0 auto;
+  margin: $double-unit auto;
 }
 
 .page-footer {

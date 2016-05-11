@@ -79,12 +79,21 @@ export default class MessageContents extends Component {
       const path = `/api/files/${file._id}`;
       if (! file.type.match(/audio/)) {
         files.push(
-          <div key={file._id}><a href={path}>{file.name}</a></div>
+          <a className="item__container" href={path}>
+            <div className="item">{file.name}</div>
+          </a>
         );
       } else {
         audio = <Audio file={file} />;
       }
     });
+    if (files.length > 0) {
+      files = (
+        <div className="list">
+          {files}
+        </div>
+      );
+    }
 
     let seriesMessages;
     if (this.state.seriesMessages) {
