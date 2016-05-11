@@ -135,7 +135,7 @@ select.form-field__input {
   display: block;
   width: 100%;
   border: none;
-  padding: $half-unit 0;
+  // padding: $half-unit 0;
 
   // Disable IE's clear icon
   &::-ms-clear {
@@ -148,7 +148,7 @@ select.form-field__input {
 }
 
 .date-time__details {
-  margin-top: $half-unit;
+  margin-top: $unit;
   text-align: center;
 }
 

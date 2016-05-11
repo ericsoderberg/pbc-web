@@ -146,7 +146,12 @@ const messageSchema = Schema({
   text: String,
   videoUrl: String,
   verses: String,
-  fileUrls: [String]
+  files: [{
+    _id: String,
+    name: String,
+    size: Number,
+    type: { type: String }
+  }]
 });
 
 mongoose.model('Message', messageSchema);

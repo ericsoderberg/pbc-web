@@ -4,7 +4,11 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import moment from 'moment';
-import db from './db';
+import fs from 'fs';
+import rmdir from 'rimraf';
+import './db';
+
+const FILES_PATH = 'public/files';
 
 const router = express.Router();
 
@@ -240,6 +244,75 @@ router.get('/calendar', (req, res) => {
     });
   })
   .catch(error => res.status(400).json({ error: error }));
+});
+
+// Files
+
+router.get('/files/:id/:name', (req, res) => {
+  const { id, name } = req.params;
+  res.download(`${FILES_PATH}/${id}/${name}`);
+});
+
+router.get('/files/:id', (req, res) => {
+  const id = req.params.id;
+  fs.readdir(`${FILES_PATH}/${id}`, (err, files) => {
+    if (err) {
+      res.status(400).json({ error: error });
+    } else {
+      console.log('!!! get', files);
+      res.download(`${FILES_PATH}/${id}/${files[0]}`);
+    }
+  });
+});
+
+router.delete('/files/:id', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    const id = req.params.id;
+    console.log('!!! delete', id);
+    rmdir(`${FILES_PATH}/${id}`, (error) => {
+      if (error) {
+        res.status(400).json({ error: error });
+      } else {
+        res.status(200).send();
+      }
+    });
+  });
+});
+
+router.get('/files', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    fs.readdir(`${FILES_PATH}`, (error, files) => {
+      if (error) {
+        res.status(400).json({ error: error });
+      } else {
+        files = files.map(id => ({ _id: id }));
+        res.status(200).json(files);
+      }
+    });
+  });
+});
+
+router.post('/files', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    const id = new mongoose.Types.ObjectId();
+    console.log('!!! post new file', id);
+    let fstream;
+    req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+      const dir = `${FILES_PATH}/${id}`;
+      fs.mkdir(dir, () => {
+        console.log("Uploading: " + filename);
+        fstream = fs.createWriteStream(`${dir}/${filename}`);
+        file.pipe(fstream);
+        fstream.on('close', function () {
+          res.json({ _id: id, name: filename, type: mimetype });
+        });
+      });
+    });
+    req.pipe(req.busboy);
+  });
 });
 
 module.exports = router;

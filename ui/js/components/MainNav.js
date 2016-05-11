@@ -17,6 +17,7 @@ const ADMIN_ROUTES = [
   { label: 'Messages', path: '/messages' },
   { label: 'People', path: '/users' },
   { label: 'Resources', path: '/resources' },
+  { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' }
 ];
 

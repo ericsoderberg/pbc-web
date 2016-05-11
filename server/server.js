@@ -4,6 +4,7 @@ import express from 'express';
 import http from "http";
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
+import busboy from 'connect-busboy';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import api from './api';
@@ -16,6 +17,7 @@ app.use(compression())
   .use(cookieParser())
   .use(morgan('tiny'))
   .use(bodyParser.json({limit: '16mb'})) // allow for embedded images
+  .use(busboy())
   .use('', router)
   .use('/api', api)
   .use('/', express.static(path.join(__dirname, '/../dist')))

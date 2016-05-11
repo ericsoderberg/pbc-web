@@ -5,6 +5,7 @@ import { getItems, getItem } from '../../actions';
 import moment from 'moment';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
+import Audio from '../../components/Audio';
 import MessageItem from './MessageItem';
 
 export default class MessageContents extends Component {
@@ -72,6 +73,19 @@ export default class MessageContents extends Component {
       image = <Image image={message.image} full={true} />;
     }
 
+    let audio;
+    let files = [];
+    (message.files || []).forEach(file => {
+      const path = `/api/files/${file._id}`;
+      if (! file.type.match(/audio/)) {
+        files.push(
+          <div key={file._id}><a href={path}>{file.name}</a></div>
+        );
+      } else {
+        audio = <Audio file={file} />;
+      }
+    });
+
     let seriesMessages;
     if (this.state.seriesMessages) {
       const messages = this.state.seriesMessages.map(message => (
@@ -99,8 +113,10 @@ export default class MessageContents extends Component {
     return (
       <div>
         {video}
+        {audio}
         {image}
         {text}
+        {files}
         <div className="text-container">
           <dl className="page-attributes">
             <dt>Verses</dt><dd>{message.verses}</dd>

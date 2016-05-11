@@ -7,6 +7,7 @@
 .image__container,
 .map__container,
 .video__container,
+.audio__container,
 .event-summary__container,
 .page-footer__container {
   padding: 0 $unit;
@@ -20,7 +21,7 @@
 
 .image {
   display: block;
-  width: 100%;
+  // width: 100%;
   max-width: $page-width;
   margin: 0 auto;
 }
@@ -50,6 +51,120 @@
   margin: 0 auto;
 }
 
+.audio {
+  display: flex;
+  width: 100%;
+  max-width: $page-width;
+  height: $double-unit;
+  margin: $double-unit auto;
+}
+
+.audio__control {
+  flex: 0 0 $quadruple-unit;
+}
+
+.audio__position {
+  flex: 1;
+
+  // Reset
+  &[type=range] {
+    -webkit-appearance: none; // Hides the slider so that custom slider can be made
+    width: 100%; // Specific width is required for Firefox.
+  }
+
+  &[type=range]:focus {
+    outline: none; // Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though.
+  }
+
+  &[type=range]::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    background: transparent; // Hides the slider so custom styles can be added
+    border-color: transparent;
+    color: transparent;
+  }
+
+  // Thumb
+
+  &[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: $double-unit;
+    width: $quarter-unit;
+    background: #999;
+    border: none;
+    cursor: pointer;
+    // margin-top: -14px; // You need to specify a margin in Chrome, but in Firefox and IE it is automatic
+  }
+
+  &[type=range]::-moz-range-thumb {
+    height: $double-unit;
+    width: $quarter-unit;
+    background: #999;
+    cursor: pointer;
+  }
+
+  &[type=range]::-ms-thumb {
+    height: $double-unit;
+    width: $quarter-unit;
+    background: #999;
+    cursor: pointer;
+  }
+
+  // Track
+
+  &[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: $double-unit;
+    cursor: pointer;
+    background: #eee;
+    border: none;
+  }
+
+  &[type=range]:focus::-webkit-slider-runnable-track {
+    background: #eee;
+    border: none;
+  }
+
+  &[type=range]::-moz-range-track {
+    width: 100%;
+    height: $double-unit;
+    cursor: pointer;
+    background: #eee;
+  }
+
+  &[type=range]::-ms-track {
+    width: 100%;
+    height: $double-unit;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    border-width: 16px 0;
+    color: transparent;
+  }
+
+  &[type=range]::-ms-fill-lower {
+    background: #eee;
+  }
+
+  &[type=range]:focus::-ms-fill-lower {
+    background: #eee;
+  }
+
+  &[type=range]::-ms-fill-upper {
+    background: #eee;
+  }
+
+  &[type=range]:focus::-ms-fill-upper {
+    background: #eee;
+  }
+}
+
+.audio__volume {
+  writing-mode: bt-lr; // IE
+  -webkit-appearance: slider-vertical; // WebKit
+  width: $unit;
+}
+
 .event-summary {
   max-width: $page-width;
   margin: 0 auto;
@@ -68,7 +183,7 @@
   align-items: center;
 
   h2 {
-    margin-top: 0
+    margin-top: 0;
   }
 }
 

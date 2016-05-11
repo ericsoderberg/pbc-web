@@ -24,7 +24,8 @@ export default class Show extends Component {
 
   _load (props) {
     getItem(props.category, props.params.id)
-      .then(response => this.setState({ item: response }));
+    .then(response => this.setState({ item: response }))
+    .catch(error => console.log('!!! Show catch', error));
   }
 
   render () {

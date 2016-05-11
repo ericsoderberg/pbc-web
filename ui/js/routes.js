@@ -5,6 +5,7 @@ import Events from './pages/event/Events';
 import EventAdd from './pages/event/EventAdd';
 import Event from './pages/event/Event';
 import EventEdit from './pages/event/EventEdit';
+import Files from './pages/file/Files';
 import Forms from './pages/form/Forms';
 import FormTemplates from './pages/formTemplate/FormTemplates';
 import FormTemplateAdd from './pages/formTemplate/FormTemplateAdd';
@@ -71,6 +72,7 @@ export default {
     { path: 'newsletters/add', component: NewsletterAdd },
     { path: 'newsletters/:id', component: Newsletter },
     { path: 'newsletters/:id/edit', component: NewsletterEdit },
-    { path: 'newsletters', component: Newsletters }
+    { path: 'newsletters', component: Newsletters },
+    { path: 'files', component: Files }
   ]
 };

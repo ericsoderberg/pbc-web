@@ -71,6 +71,7 @@ export function getItems (category, options={}) {
   const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })
+  .then(processStatus)
   .then(response => response.json());
 }
 
@@ -88,6 +89,7 @@ export function getItem (category, id) {
 }
 
 export function putItem (category, item) {
+  console.log('!!! putItem', item);
   return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
     method: 'PUT', headers: _headers, body: JSON.stringify(item) })
   .then(processStatus)
@@ -139,4 +141,21 @@ export function getGeocode (address) {
   return fetch(`http://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`, {
     method: 'GET', headers: { ..._headers, Authorization: undefined }})
   .then(response => response.json());
+}
+
+// Files
+
+export function postFile (data) {
+  console.log('!!! postFile', data);
+  let headers = {..._headers};
+  delete headers['Content-Type'];
+  return fetch('/api/files', { method: 'POST', headers: headers, body: data })
+  .then(processStatus)
+  .then(response => response.json());
+}
+
+export function deleteFile (id) {
+  return fetch(`/api/files/${id}`, {
+    method: 'DELETE', headers: _headers })
+  .then(processStatus);
 }
