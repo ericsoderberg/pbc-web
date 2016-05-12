@@ -16,7 +16,7 @@ export default class MessageFormContents extends Component {
 
   componentDidMount () {
     this.refs.name.focus();
-    getItems('messages', { query: { series: true } })
+    getItems('messages', { filter: { series: true } })
     .then(series => this.setState({ series: series }))
     .catch(error => console.log('!!! MessageFormContents catch', error));
   }

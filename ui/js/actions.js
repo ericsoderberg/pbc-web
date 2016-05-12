@@ -62,11 +62,11 @@ export function getItems (category, options={}) {
   if (options.search) {
     params.push(`search=${encodeURIComponent(options.search)}`);
   }
-  if (options.query) {
-    params.push(`q=${encodeURIComponent(JSON.stringify(options.query))}`);
+  if (options.filter) {
+    params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
   }
   if (options.sort) {
-    params.push(`s=${encodeURIComponent(options.sort)}`);
+    params.push(`sort=${encodeURIComponent(options.sort)}`);
   }
   const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {

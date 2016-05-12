@@ -124,12 +124,11 @@ const register = (category, modelName, transforms={}) => {
         { 'name': exp }
       ]);
     }
-    if (req.query.q) {
-      const q = JSON.parse(req.query.q);
-      query.find(q);
+    if (req.query.filter) {
+      query.find(JSON.parse(req.query.filter));
     }
-    if (req.query.s) {
-      query.sort(req.query.s);
+    if (req.query.sort) {
+      query.sort(req.query.sort);
     }
     query.limit(20)
     .exec()

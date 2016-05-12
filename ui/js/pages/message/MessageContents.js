@@ -28,7 +28,7 @@ export default class MessageContents extends Component {
   _loadSeriesMessages (props) {
     const message = props.item;
     if (message.series) {
-      getItems('messages', { query: { seriesId: message._id } })
+      getItems('messages', { filter: { seriesId: message._id } })
       .then(seriesMessages => this.setState({ seriesMessages: seriesMessages }))
       .catch(error => console.log('!!! MessageContents messages catch', error));
     } else {
