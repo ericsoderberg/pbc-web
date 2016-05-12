@@ -10,6 +10,8 @@ $text-width: round($unit * 30); // 690px
 $page-width: round($unit * 40); // 960px
 $header-background-color: #eee;
 
+$small-drop-caret: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAOhJREFUSA3tksENgzAMRUmrrlApuTAAxxw6QvfojYmYKtw6QpUDI1Rq6o8MStsAMT1UlbAUcMB+33FcFJttHfifDlhrT7QO31YMBlgDZw8HH5RSF3JLY0zrvX8MAZI3F1gT66y17ohz2zGgDSFc6UdF+5oDJWwUidMDXoFFfgtAfwJUjMppX7KI6CQJeOOcu48CcNaKzMFfBNaILME/BCQiOfCkQI5ILhwshceUpUAcG0/LeKEpzqwAEhIiRTSKs3Dk92MKZ8rep4vgR57zRTiYiwIIikVo29HKgiNXZGgXt0yUtwX/tgNPQqatJ1aBLFMAAAAASUVORK5CYII=);
+
 @import 'base';
 @import 'app';
 @import 'form';

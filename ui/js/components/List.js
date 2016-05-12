@@ -9,11 +9,30 @@ export default class List extends Component {
   constructor (props) {
     super(props);
     this._onSearch = this._onSearch.bind(this);
+    this._onFilter = this._onFilter.bind(this);
     this.state = { items: [], searchText: '' };
   }
 
   componentDidMount () {
     getItems(this.props.category, { sort: this.props.sort })
+    .then(response => this.setState({ items: response }))
+    .catch(error => console.log('!!! List catch', error));
+
+    if (this.props.filter) {
+      getItems(this.props.category, { distinct: this.props.filter })
+      .then(response => this.setState({ filterValues: response }))
+      .catch(error => console.log('!!! List filter catch', error));
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const filterValue = nextProps.location.query[nextProps.filter];
+    let filter;
+    if (filterValue) {
+      filter = {};
+      filter[this.props.filter] = filterValue;
+    }
+    getItems(this.props.category, { sort: this.props.sort, filter: filter })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
   }
@@ -30,8 +49,15 @@ export default class List extends Component {
     this.setState({ searchText: searchText });
   }
 
+  _onFilter (event) {
+    const value = event.target.value;
+    this.context.router.replace({ pathname: window.location.pathname,
+      query: { library: value } });
+  }
+
   render () {
-    const { Item, path, searchText, title } = this.props;
+    const { filter, Item, path, title } = this.props;
+    const { filterValues, searchText } = this.state;
 
     const items = this.state.items.map(item => {
       return (
@@ -41,13 +67,28 @@ export default class List extends Component {
       );
     });
 
-    const addControl = <Link to={`${path}/add`} className="a--header">Add</Link>;
+    const addControl = (
+      <Link key="add" to={`${path}/add`} className="a--header">Add</Link>
+    );
+
+    let filterControl;
+    if (filter && filterValues) {
+      let options = (filterValues || []).map(value => (
+        <option key={value}>{value}</option>
+      ));
+      options.unshift(<option key="_all"></option>);
+      filterControl = (
+        <select key="filter" className="select--header" onChange={this._onFilter}>
+          {options}
+        </select>
+      );
+    }
 
     return (
       <main>
         <PageHeader title={title}
           searchText={searchText} onSearch={this._onSearch}
-          actions={addControl} />
+          actions={[filterControl, addControl]} />
         <ul className="list">
           {items}
         </ul>
@@ -58,6 +99,7 @@ export default class List extends Component {
 
 List.propTypes = {
   category: PropTypes.string,
+  filter: PropTypes.string,
   Item: PropTypes.func.isRequired,
   path: PropTypes.string,
   sort: PropTypes.string,
@@ -66,4 +108,8 @@ List.propTypes = {
 
 List.defaultProps = {
   sort: 'name'
+};
+
+List.contextTypes = {
+  router: PropTypes.any
 };

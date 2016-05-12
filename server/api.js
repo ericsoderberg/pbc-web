@@ -130,8 +130,12 @@ const register = (category, modelName, transforms={}) => {
     if (req.query.sort) {
       query.sort(req.query.sort);
     }
-    query.limit(20)
-    .exec()
+    if (req.query.distinct) {
+      query.distinct(req.query.distinct);
+    } else {
+      query.limit(20);
+    }
+    query.exec()
     .then(docs => res.json(docs))
     .catch(error => res.status(400).json({ error: error }));
   });
@@ -226,11 +230,19 @@ router.get('/calendar', (req, res) => {
   const next = moment(date).add(1, 'month');
   // find all events withing the time window
   const Doc = mongoose.model('Event');
-  Doc.find({
+  let q = {
     stop: { $gte: start.toDate() },
     start: { $lt: end.toDate() }
-  })
-  .sort('start')
+  };
+  if (req.query.search) {
+    const exp = new RegExp(req.query.search, 'i');
+    q.name = exp;
+  }
+  if (req.query.filter) {
+    q = { ...q, ...JSON.parse(req.query.filter) };
+  }
+  let query = Doc.find(q);
+  query.sort('start')
   .exec()
   .then(docs => {
     res.status(200).json({

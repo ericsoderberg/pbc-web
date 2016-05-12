@@ -99,7 +99,8 @@
 }
 
 .a--header,
-.button--header {
+.button--header,
+.select--header {
   text-decoration: none;
   background-color: #eee;
   color: inherit;
@@ -111,5 +112,19 @@
   &:hover {
     background-color: #333;
     color: #fff;
+  }
+}
+
+.select--header {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  border-radius: 0;
+  padding-right: $double-unit;
+  background: $small-drop-caret no-repeat center right $half-unit;
+  cursor: pointer;
+
+  &::-moz-focus-inner {
+    border: none;
   }
 }

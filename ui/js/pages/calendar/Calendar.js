@@ -1,8 +1,8 @@
 "use strict";
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
-import { getCalendar } from '../../actions';
+import { getCalendar, getItems } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 
 export default class Calendar extends Component {
@@ -10,19 +10,51 @@ export default class Calendar extends Component {
   constructor () {
     super();
     this._changeDate = this._changeDate.bind(this);
-    this.state = { calendar: { events: [] } };
+    this._onSearch = this._onSearch.bind(this);
+    this._onFilter = this._onFilter.bind(this);
+    this.state = { calendar: { events: [] }, searchText: '' };
   }
 
   componentDidMount () {
     getCalendar()
     .then(response => this.setState({ calendar: response }));
+
+    getItems('events', { distinct: 'calendar' })
+    .then(response => this.setState({ filterValues: response }))
+    .catch(error => console.log('!!! Calendar filter catch', error));
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const filterValue = nextProps.location.query.calendar;
+    let filter = (filterValue ? { calendar: filterValue } : undefined);
+    this.setState({ filter: filter }, this._get);
+  }
+
+  _get () {
+    getCalendar({ date: this.state.date, searchText: this.state.searchText,
+      filter: this.state.filter})
+    .then(response => this.setState({ calendar: response }));
   }
 
   _changeDate (date) {
     return (event) => {
-      getCalendar(date)
-      .then(response => this.setState({ calendar: response }));
+      this.setState({ date: date }, this._get);
     };
+  }
+
+  _onSearch (event) {
+    const searchText = event.target.value;
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(() => {
+      this._get();
+    }, 100);
+    this.setState({ searchText: searchText });
+  }
+
+  _onFilter (event) {
+    const value = event.target.value;
+    this.context.router.replace({ pathname: window.location.pathname,
+      query: { calendar: value } });
   }
 
   _renderDaysOfWeek () {
@@ -117,13 +149,28 @@ export default class Calendar extends Component {
   }
 
   render () {
-    const { calendar } = this.state;
+    const { calendar, filterValues, searchText } = this.state;
     const daysOfWeek = this._renderDaysOfWeek();
     const weeks = this._renderWeeks();
 
+    let filterControl;
+    if (filterValues) {
+      let options = (filterValues || []).map(value => (
+        <option key={value}>{value}</option>
+      ));
+      options.unshift(<option key="_all"></option>);
+      filterControl = (
+        <select key="filter" className="select--header" onChange={this._onFilter}>
+          {options}
+        </select>
+      );
+    }
+
     return (
       <main>
-        <PageHeader title="Calendar" />
+        <PageHeader title="Calendar"
+          searchText={searchText} onSearch={this._onSearch}
+          actions={filterControl} />
         <div className="calendar">
           <div className="calendar__header">
             <a onClick={this._changeDate(moment(calendar.previous))}>
@@ -147,4 +194,8 @@ export default class Calendar extends Component {
       </main>
     );
   }
+};
+
+Calendar.contextTypes = {
+  router: PropTypes.any
 };

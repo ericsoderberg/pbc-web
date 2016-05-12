@@ -68,6 +68,9 @@ export function getItems (category, options={}) {
   if (options.sort) {
     params.push(`sort=${encodeURIComponent(options.sort)}`);
   }
+  if (options.distinct) {
+    params.push(`distinct=${encodeURIComponent(options.distinct)}`);
+  }
   const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })
@@ -89,7 +92,6 @@ export function getItem (category, id) {
 }
 
 export function putItem (category, item) {
-  console.log('!!! putItem', item);
   return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
     method: 'PUT', headers: _headers, body: JSON.stringify(item) })
   .then(processStatus)
@@ -127,9 +129,18 @@ export function postSite (site) {
 
 // Calendar
 
-export function getCalendar (date, searchText) {
-  // const q = searchText ? `?q=${encodeURIComponent(searchText)}` : '';
-  const q = date ? `?date=${encodeURIComponent(date.toISOString())}` : '';
+export function getCalendar (options={}) {
+  let params = [];
+  if (options.searchText) {
+    params.push(`search=${encodeURIComponent(options.searchText)}`);
+  }
+  if (options.date) {
+    params.push(`date=${encodeURIComponent(options.date.toISOString())}`);
+  }
+  if (options.filter) {
+    params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
+  }
+  const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/calendar${q}`, {
     method: 'GET', headers: _headers })
   .then(response => response.json());

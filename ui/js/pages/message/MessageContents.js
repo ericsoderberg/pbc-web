@@ -145,6 +145,7 @@ export default class MessageContents extends Component {
             <dt>Author</dt><dd>{message.author}</dd>
             <dt>Date</dt><dd>{date}</dd>
             {series}
+            <dt>Library</dt><dd>{message.library}</dd>
           </dl>
         </div>
         {seriesMessages}

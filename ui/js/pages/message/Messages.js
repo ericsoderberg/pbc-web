@@ -7,6 +7,7 @@ export default class Messages extends List {};
 Messages.defaultProps = {
   ...List.defaultProps,
   category: 'messages',
+  filter: 'library',
   Item: MessageItem,
   path: '/messages',
   sort: '-date',
