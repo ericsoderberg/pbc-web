@@ -55,9 +55,17 @@ export default class DateTime extends Component {
     this._activation(false);
   }
 
+  _convertIfISO8601 (value) {
+    if (value && typeof value === 'string' && value.match(/.+T.+Z/)) {
+      value = moment(value);
+    }
+    return value;
+  }
+
   _stateFromProps (props) {
-    const { value, format } = props;
+    let { value, format } = props;
     let result = { current: undefined };
+    value = this._convertIfISO8601(value);
     const date = moment(value, format);
     if (date.isValid()) {
       result.current = date;
@@ -207,9 +215,7 @@ export default class DateTime extends Component {
     if (className) {
       classes.push(className);
     }
-    if (typeof value === 'string') {
-      value = moment(value);
-    }
+    value = this._convertIfISO8601(value);
     if (typeof value === 'object') {
       value = value.format(format);
     }

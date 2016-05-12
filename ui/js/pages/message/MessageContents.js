@@ -119,6 +119,19 @@ export default class MessageContents extends Component {
       ];
     }
 
+    // The date could be a partial string, a moment object, or an ISO-8601 string
+    let date = message.date;
+    if (typeof date === 'string') {
+      if (date.match(/.+T.+Z/)) {
+        date = moment(date);
+      } else {
+        date = moment(date, 'M/D/YYYY'); // match MessageFormContents
+      }
+    }
+    if (date) {
+      date = date.format('MMMM Do YYYY');
+    }
+
     return (
       <div>
         {video}
@@ -126,11 +139,11 @@ export default class MessageContents extends Component {
         {image}
         {text}
         {files}
-        <div className="section-container">
+        <div className="section__container">
           <dl className="page-attributes section">
             <dt>Verses</dt><dd>{message.verses}</dd>
             <dt>Author</dt><dd>{message.author}</dd>
-            <dt>Date</dt><dd>{moment(message.date).format('MMMM Do YYYY')}</dd>
+            <dt>Date</dt><dd>{date}</dd>
             {series}
           </dl>
         </div>
