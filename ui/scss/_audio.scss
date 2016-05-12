@@ -1,0 +1,103 @@
+.audio {
+  display: flex;
+  width: 100%;
+  height: $double-unit;
+}
+
+.audio__control {
+  flex: 0 0 $quadruple-unit;
+}
+
+.audio__position {
+  flex: 1;
+
+  // Reset
+  &[type=range] {
+    -webkit-appearance: none; // Hides the slider so that custom slider can be made
+    width: 100%; // Specific width is required for Firefox.
+  }
+
+  &[type=range]:focus {
+    outline: none; // Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though.
+  }
+
+  // Thumb
+
+  &[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: $double-unit;
+    width: $quarter-unit;
+    background: #999;
+    border: none;
+    cursor: pointer;
+    // margin-top: -14px; // You need to specify a margin in Chrome, but in Firefox and IE it is automatic
+  }
+
+  &[type=range]::-moz-range-thumb {
+    height: $double-unit;
+    width: $quarter-unit;
+    background: #999;
+    cursor: pointer;
+  }
+
+  &[type=range]::-ms-thumb {
+    height: $double-unit;
+    width: $quarter-unit;
+    background: #999;
+    cursor: pointer;
+  }
+
+  // Track
+
+  &[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: $double-unit;
+    cursor: pointer;
+    background: #eee;
+    border: none;
+  }
+
+  &[type=range]:focus::-webkit-slider-runnable-track {
+    background: #eee;
+    border: none;
+  }
+
+  &[type=range]::-moz-range-track {
+    width: 100%;
+    height: $double-unit;
+    cursor: pointer;
+    background: #eee;
+  }
+
+  &[type=range]::-ms-track {
+    width: 100%;
+    height: $double-unit;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    border-width: 16px 0;
+    color: transparent;
+  }
+
+  &[type=range]::-ms-fill-lower {
+    background: #eee;
+  }
+
+  &[type=range]:focus::-ms-fill-lower {
+    background: #eee;
+  }
+
+  &[type=range]::-ms-fill-upper {
+    background: #eee;
+  }
+
+  &[type=range]:focus::-ms-fill-upper {
+    background: #eee;
+  }
+}
+
+.audio__volume {
+  writing-mode: bt-lr; // IE
+  -webkit-appearance: slider-vertical; // WebKit
+  width: $unit;
+}

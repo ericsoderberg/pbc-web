@@ -146,7 +146,6 @@ export function getGeocode (address) {
 // Files
 
 export function postFile (data) {
-  console.log('!!! postFile', data);
   let headers = {..._headers};
   delete headers['Content-Type'];
   return fetch('/api/files', { method: 'POST', headers: headers, body: data })

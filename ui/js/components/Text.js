@@ -4,14 +4,15 @@ import markdownToJSX from 'markdown-to-jsx';
 
 const Text = (props) => {
   const { color, text } = props;
-  let classNames = ['text__container'];
+  let classNames = ['section__container'];
   let style;
   if (color) {
     style = { backgroundColor: color, color: '#fff' };
+    classNames.push('section__container--full');
   }
   return (
     <div className={classNames.join(' ')} style={style}>
-      <div className="text">
+      <div className="text section">
         {markdownToJSX(text || '')}
       </div>
     </div>

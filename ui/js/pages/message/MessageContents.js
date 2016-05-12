@@ -53,8 +53,8 @@ export default class MessageContents extends Component {
       const match = message.videoUrl.match(regexp);
       if (match) {
         video = (
-          <div className="video__container">
-            <iframe className="video vimeo-player" type="text/html" width="960" height="540"
+          <div className="section__container">
+            <iframe className="video vimeo-player section" type="text/html" width="960" height="540"
               src={`https://player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
               frameBorder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen>
             </iframe>
@@ -126,8 +126,8 @@ export default class MessageContents extends Component {
         {image}
         {text}
         {files}
-        <div className="text-container">
-          <dl className="page-attributes">
+        <div className="section-container">
+          <dl className="page-attributes section">
             <dt>Verses</dt><dd>{message.verses}</dd>
             <dt>Author</dt><dd>{message.author}</dd>
             <dt>Date</dt><dd>{moment(message.date).format('MMMM Do YYYY')}</dd>

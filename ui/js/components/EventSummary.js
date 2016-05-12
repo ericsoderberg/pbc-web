@@ -21,8 +21,8 @@ export default class EventSummary extends Component {
   render () {
     const { event } = this.state;
     return (
-      <div className="event-summary__container">
-        <div className="event-summary">
+      <div className="section__container">
+        <div className="event-summary section">
           <Link to={`/events/${event._id}`} className="event-summary__summary">
             <h2>{event.name}</h2>
             <span className="event-summary__date">

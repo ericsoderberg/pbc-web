@@ -84,8 +84,8 @@ export default class Audio extends Component {
     const label = playing ? 'Pause' : 'Listen';
     const onClick = playing ? this._onPause : this._onPlay;
     return (
-      <div className="audio__container">
-        <div className="audio">
+      <div className="section__container">
+        <div className="audio section">
           <button className="audio__control" type="button" onClick={onClick}>{label}</button>
           <input className="audio__position" type="range" min={start} max={end}
             value={at} onChange={this._onSeek} />

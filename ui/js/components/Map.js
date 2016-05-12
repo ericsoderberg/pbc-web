@@ -103,21 +103,24 @@ export default class Map extends Component {
       );
     }
 
-    let result = (
-      <div ref="map" id="map" className="map">
-        {address}
-      </div>
-    );
-
+    let result;
     if (! plain) {
-      let classNames = ['map__container'];
+      let classNames = ['section__container'];
       if (full) {
-        classNames.push('map__container--full');
+        classNames.push('section__container--full');
       }
 
       result = (
         <div className={classNames.join(' ')}>
-          {result}
+          <div ref="map" id="map" className="map section">
+            {address}
+          </div>
+        </div>
+      );
+    } else {
+      result = (
+        <div ref="map" id="map" className="map">
+          {address}
         </div>
       );
     }

@@ -3,13 +3,13 @@ import React, { PropTypes } from 'react';
 
 const Image = (props) => {
   const { full, image } = props;
-  let classNames = ['image__container'];
+  let classNames = ['section__container'];
   if (full) {
-    classNames.push('image__container--full');
+    classNames.push('section__container--full');
   }
   return (
     <div className={classNames.join(' ')}>
-      <img className="image" src={image ? image.data : ''} />
+      <img className="image section" src={image ? image.data : ''} />
     </div>
   );
 };
