@@ -31,7 +31,7 @@ export default class Home extends Component {
         <PageHeader title={site.name || '-'} />
         <PageContents item={page} />
         <div className="section__container">
-          <footer className="page-footer section">
+          <footer className="footer">
             <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
             <a href={`tel:${site.phone}`}>{site.phone}</a>
             <span>{site.copyright}</span>

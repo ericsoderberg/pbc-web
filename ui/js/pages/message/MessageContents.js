@@ -1,7 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getItems, getItem } from '../../actions';
 import moment from 'moment';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
@@ -15,32 +14,13 @@ export default class MessageContents extends Component {
     this.state = {};
   }
 
-  componentDidMount () {
-    this._loadSeriesMessages(this.props);
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (this.props.item._id !== nextProps.item._id) {
-      this._loadSeriesMessages(nextProps);
-    }
-  }
-
-  _loadSeriesMessages (props) {
-    const message = props.item;
-    if (message.series) {
-      getItems('messages', { filter: { seriesId: message._id } })
-      .then(seriesMessages => this.setState({ seriesMessages: seriesMessages }))
-      .catch(error => console.log('!!! MessageContents messages catch', error));
-    } else {
-      this.setState({ seriesMessages: undefined });
-    }
-    if (message.seriesId) {
-      getItem('messages', message.seriesId)
-      .then(series => this.setState({ series: series }))
-      .catch(error => console.log('!!! MessageContents series catch', error));
-    } else {
-      this.setState({ series: undefined });
-    }
+  _renderMessageNav (message, type) {
+    return (
+      <Link className={`message__nav-${type}`} to={`/messages/${message._id}`}>
+        <div className="message__nav-name">{message.name}</div>
+        <div className="message__nav-verses">{message.verses}</div>
+      </Link>
+    );
   }
 
   render () {
@@ -96,8 +76,8 @@ export default class MessageContents extends Component {
     }
 
     let seriesMessages;
-    if (this.state.seriesMessages) {
-      const messages = this.state.seriesMessages.map(message => (
+    if (message.seriesMessages && message.seriesMessages.length > 0) {
+      const messages = message.seriesMessages.map(message => (
         <MessageItem key={message._id} item={message} />
       ));
       seriesMessages = [
@@ -109,14 +89,29 @@ export default class MessageContents extends Component {
     }
 
     let series;
-    if (this.state.series) {
-      const seriesMessage = this.state.series;
+    if (message.seriesId) {
       series = [
         <dt key="t">Series</dt>,
         <dd key="d">
-          <Link to={`/messages/${seriesMessage._id}`}>{seriesMessage.name}</Link>
+          <Link to={`/messages/${message.seriesId._id}`}>
+            {message.seriesId.name}
+          </Link>
         </dd>
       ];
+    }
+
+    let nextMessage;
+    if (message.nextMessage) {
+      nextMessage = this._renderMessageNav(message.nextMessage, 'next');
+    } else {
+      nextMessage = <span></span>;
+    }
+
+    let previousMessage;
+    if (message.previousMessage) {
+      previousMessage = this._renderMessageNav(message.previousMessage, 'previous');
+    } else {
+      previousMessage = <span></span>;
     }
 
     // The date could be a partial string, a moment object, or an ISO-8601 string
@@ -147,6 +142,12 @@ export default class MessageContents extends Component {
             {series}
             <dt>Library</dt><dd>{message.library}</dd>
           </dl>
+        </div>
+        <div className="section__container">
+          <div className="message__nav footer">
+            {previousMessage}
+            {nextMessage}
+          </div>
         </div>
         {seriesMessages}
       </div>

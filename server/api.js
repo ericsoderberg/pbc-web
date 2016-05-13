@@ -74,17 +74,23 @@ function authorize (req, res) {
 
 // Generic
 
-const register = (category, modelName, transforms={}) => {
+const register = (category, modelName, options={}) => {
+  const transform = options.transform || {};
 
-  router.get(`/${category}/:id`, (req, res) => {
-    const id = req.params.id;
-    const Doc = mongoose.model(modelName);
-    Doc.findById(id)
-    .exec()
-    .then(doc => (transforms.get ? transforms.get(doc) : doc))
-    .then(doc => res.json(doc))
-    .catch(error => res.status(400).json({ error: error }));
-  });
+  if ('get' !== options.except) {
+    router.get(`/${category}/:id`, (req, res) => {
+      const id = req.params.id;
+      const Doc = mongoose.model(modelName);
+      let query = Doc.findById(id);
+      if (options.populate) {
+        query = query.populate(options.populate);
+      }
+      query.exec()
+      .then(doc => (transform.get ? transform.get(doc) : doc))
+      .then(doc => res.json(doc))
+      .catch(error => res.status(400).json({ error: error }));
+    });
+  }
 
   router.put(`/${category}/:id`, (req, res) => {
     authorize(req, res)
@@ -92,7 +98,7 @@ const register = (category, modelName, transforms={}) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
       let data = req.body;
-      data = (transforms.put ? transforms.put(data) : data);
+      data = (transform.put ? transform.put(data) : data);
       Doc.findOneAndUpdate({ _id: id }, data)
       .exec()
       .then(doc => res.status(200).json(doc))
@@ -145,7 +151,7 @@ const register = (category, modelName, transforms={}) => {
     .then(session => {
       const Doc = mongoose.model(modelName);
       let data = req.body;
-      data = (transforms.post ? transforms.post(data) : data);
+      data = (transform.post ? transform.post(data) : data);
       const doc = new Doc(data);
       doc.save()
       .then(doc => res.status(200).json(doc))
@@ -178,13 +184,15 @@ const encryptPassword = (data) => {
 };
 
 register('users', 'User', {
-  get: (user) => {
-    user = user.toObject();
-    delete user.encryptedPassword;
-    return user;
-  },
-  put: encryptPassword,
-  post: encryptPassword
+  transform: {
+    get: (user) => {
+      user = user.toObject();
+      delete user.encryptedPassword;
+      return user;
+    },
+    put: encryptPassword,
+    post: encryptPassword
+  }
 });
 
 // other
@@ -192,7 +200,68 @@ register('users', 'User', {
 register('pages', 'Page');
 register('events', 'Event');
 register('resources', 'Resource');
-register('messages', 'Message');
+register('messages', 'Message', { except: 'get' });
+
+function messageCompleter (property, value, results, res) {
+  if (! results.sent) {
+    if ('error' === property) {
+      res.status(400).json({ error: value });
+      results.sent = true;
+    } else {
+      results[property] = value;
+      results.remaining -= 1;
+      if (0 === results.remaining) {
+        const message = results.message.toObject();
+        message.nextMessage = results.nextMessage;
+        message.previousMessage = results.previousMessage;
+        message.seriesMessages = results.seriesMessages;
+        res.json(message);
+        results.sent = true;
+      }
+    }
+  }
+}
+
+router.get('/messages/:id', (req, res) => {
+  const id = req.params.id;
+  const Doc = mongoose.model('Message');
+  let results = { remaining: 4 };
+  let errors = [];
+
+  // message
+  Doc.findById(id).populate({ path: 'seriesId', select: 'name' }).exec()
+  .then(message => {
+
+    // nextMessage
+    Doc.find({
+      library: message.library,
+      date: { $gt: message.date },
+      series: { $ne: true }
+    })
+    .sort('date').limit(1).select('name verses').exec()
+    .then(doc => messageCompleter('nextMessage', doc[0], results, res))
+    .catch(error => messageCompleter('error', error, results, res));
+
+    // previousMessage
+    Doc.find({
+      library: message.library,
+      date: { $lt: message.date },
+      series: { $ne: true }
+    })
+    .sort('-date').limit(1).select('name verses').exec()
+    .then(doc => messageCompleter('previousMessage', doc[0], results, res))
+    .catch(error => messageCompleter('error', error, results, res));
+
+    messageCompleter('message', message, results, errors, res);
+  })
+  .catch(error => messageCompleter('error', error, results, res));
+
+  // seriesMessages
+  Doc.find({ seriesId: id }).select('name').exec()
+  .then(doc => messageCompleter('seriesMessages', doc, results, res))
+  .catch(error => messageCompleter('error', error, results, res));
+});
+
 register('newsletters', 'Newsletter');
 register('form-templates', 'FormTemplate');
 register('forms', 'Forms');

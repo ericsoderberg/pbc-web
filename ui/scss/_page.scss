@@ -76,13 +76,71 @@
 
 @import 'audio';
 
-.page-footer {
+.footer {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  // padding: $double-unit 0;
-  // max-width: $page-width;
-  // margin: 0 auto;
+  align-items: center;
+  max-width: $page-width;
+  margin: 0 auto;
   color: #666;
   font-size: 14px;
+
+  a {
+    padding: $unit;
+  }
+}
+
+.message__nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.message__nav-next,
+.message__nav-previous {
+  position: relative;
+  text-decoration: none;
+  padding: $unit;
+  background-color: #eee;
+  z-index: 1;
+}
+
+.message__nav-next {
+  text-align: right;
+
+  &:after {
+    content: '';
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+    right: - $unit;
+    z-index: -1;
+    width: $unit;
+    height: 100%;
+    border-color: transparent transparent transparent #eee;
+    border-style: solid;
+    border-width: ($unit + 18) 0 ($unit + 18) $unit;
+  }
+}
+
+.message__nav-previous {
+
+  &:before {
+    content: '';
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+    left: - $unit;
+    z-index: -1;
+    width: $unit;
+    height: 100%;
+    border-color: transparent #eee transparent transparent;
+    border-style: solid;
+    border-width: ($unit + 18) $unit ($unit + 18) 0;
+  }
+}
+
+.message__nav-verses {
+  color: #999;
 }
