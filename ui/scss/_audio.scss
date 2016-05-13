@@ -2,6 +2,11 @@
   display: flex;
   width: 100%;
   height: $double-unit;
+
+  audio {
+    position: absolute;
+    height: 0;
+  }
 }
 
 .audio__control {

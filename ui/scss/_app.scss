@@ -8,7 +8,7 @@
 .app__nav {
   flex: 0 0 $sidebar-width;
   background-color: #666;
-  color: #fff;
+  color: $active-color;
 }
 
 .app__content {
@@ -31,15 +31,15 @@
   display: block;
   padding: $half-unit $unit;
   text-decoration: none;
-  color: #fff;
+  color: $active-color;
 
   &:hover {
-    background-color: #333;
+    background-color: $control-hover-background;
   }
 }
 
 .main-nav__link--active {
-  background-color: #555;
+  background-color: $control-active-background;
 }
 
 .main-nav__session {
@@ -110,8 +110,8 @@
   height: 100%;
 
   &:hover {
-    background-color: #333;
-    color: #fff;
+    background-color: $control-hover-background;
+    color: $active-color;
   }
 }
 

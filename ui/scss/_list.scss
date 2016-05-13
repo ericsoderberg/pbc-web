@@ -6,7 +6,7 @@
 }
 
 .list__marker {
-  background-color: #f2f2f2;
+  background-color: $hover-background;
 }
 
 .marker {
@@ -17,7 +17,7 @@
   max-width: $page-width;
   margin: 0 auto;
   padding: $quarter-unit $unit;
-  color: #999;
+  color: $tertiary-color;
 }
 
 a.item__container {
@@ -26,7 +26,7 @@ a.item__container {
   color: inherit;
 
   &:hover {
-    background-color: #f2f2f2;
+    background-color: $hover-background;
   }
 }
 

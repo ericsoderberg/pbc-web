@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItem } from '../actions';
+import Section from './Section';
 import Map from './Map';
 
 export default class EventSummary extends Component {
@@ -19,10 +20,11 @@ export default class EventSummary extends Component {
   }
 
   render () {
+    const { color, full, plain } = this.props;
     const { event } = this.state;
     return (
-      <div className="section__container">
-        <div className="event-summary section">
+      <Section color={color} full={full} plain={plain}>
+        <div className="event-summary">
           <Link to={`/events/${event._id}`} className="event-summary__summary">
             <h2>{event.name}</h2>
             <span className="event-summary__date">
@@ -33,11 +35,12 @@ export default class EventSummary extends Component {
             <Map address={event.address || ''} plain={true} />
           </div>
         </div>
-      </div>
+      </Section>
     );
   }
 };
 
 EventSummary.propTypes = {
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
+  ...Section.propTypes
 };

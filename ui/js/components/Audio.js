@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import Section from './Section';
 
 export default class Audio extends Component {
 
@@ -78,33 +79,36 @@ export default class Audio extends Component {
   }
 
   render () {
-    const { file } = this.props;
+    const { file, color, full, plain } = this.props;
     const { playing, volume, start, end, at } = this.state;
     const path = `/api/files/${file._id}/${file.name}`;
     const label = playing ? 'Pause' : 'Listen';
     const onClick = playing ? this._onPause : this._onPlay;
+
     return (
-      <div className="section__container">
-        <div className="audio section">
+      <Section color={color} full={full} plain={plain}>
+        <div className="audio">
           <button className="audio__control" type="button" onClick={onClick}>{label}</button>
           <input className="audio__position" type="range" min={start} max={end}
             value={at} onChange={this._onSeek} />
           <input className="audio__volume" type="range" min={0} max={1} step={0.1}
             value={volume} onChange={this._onVolume} />
+          <audio ref="audio" preload="metadata">
+            <source src={path} type={file.type} />
+            No audio with this browser
+          </audio>
         </div>
-        <audio ref="audio" preload="metadata">
-          <source src={path} type={file.type} />
-          No audio with this browser
-        </audio>
-      </div>
+      </Section>
     );
   }
 };
 
 Audio.propTypes = {
+  full: PropTypes.bool,
   file: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired
-  })
+  }),
+  ...Section.propTypes
 };

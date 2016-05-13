@@ -3,6 +3,7 @@ import React, { PropTypes } from 'react';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
 import EventSummary from '../../components/EventSummary';
+import Library from '../../components/Library';
 
 const PageContents = (props) => {
   const page = props.item;
@@ -12,7 +13,9 @@ const PageContents = (props) => {
     } else if ('image' === section.type) {
       return <Image key={index} full={section.full} image={section.image} />;
     } else if ('event' === section.type) {
-      return <EventSummary key={index} id={section.objectId} />;
+      return <EventSummary key={index} full={section.full} id={section.objectId} />;
+    } else if ('library' === section.type) {
+      return <Library key={index} full={section.full} name={section.name} />;
     } else {
       return 'TBD';
     }

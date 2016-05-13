@@ -4,17 +4,17 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
 
-export default class EventSectionEdit extends Component {
+export default class LibrarySectionEdit extends Component {
 
   constructor (props) {
     super(props);
     const { section, onChange } = props;
-    this.state = { formState: new FormState(section, onChange), events: [] };
+    this.state = { formState: new FormState(section, onChange), libraries: [] };
   }
 
   componentDidMount () {
-    getItems('events')
-    .then(response => this.setState({ events: response }));
+    getItems('messages', { distinct: 'library' })
+    .then(response => this.setState({ libraries: response }));
   }
 
   componentWillReceiveProps (nextProps) {
@@ -25,16 +25,16 @@ export default class EventSectionEdit extends Component {
     const { formState } = this.state;
     const section = formState.object;
 
-    const events = this.state.events.map(event => (
-      <option key={event._id} label={event.name} value={event._id} />
+    const libraries = this.state.libraries.map(library => (
+      <option key={library} label={library} value={library} />
     ));
 
     return (
       <fieldset className="form__fields">
-        <FormField name="event" label="Event">
-          <select name="objectId" value={section.objectId || ''}
-            onChange={formState.change('objectId')}>
-            {events}
+        <FormField name="library" label="Library">
+          <select name="objectId" value={section.name || ''}
+            onChange={formState.change('name')}>
+            {libraries}
           </select>
         </FormField>
         <FormField>
@@ -48,7 +48,7 @@ export default class EventSectionEdit extends Component {
   }
 };
 
-EventSectionEdit.defaultProps = {
+LibrarySectionEdit.defaultProps = {
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
 };

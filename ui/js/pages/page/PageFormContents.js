@@ -4,10 +4,12 @@ import FormField from '../../components/FormField';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
 import EventSectionEdit from './EventSectionEdit';
+import LibrarySectionEdit from './LibrarySectionEdit';
 
 const SECTIONS = {
   event: EventSectionEdit,
   image: ImageSectionEdit,
+  library: LibrarySectionEdit,
   text: TextSectionEdit
 };
 
@@ -82,7 +84,7 @@ export default class PageFormContents extends Component {
       );
     });
 
-    const addControls = ['text', 'image', 'event'].map(type => (
+    const addControls = ['text', 'image', 'event', 'library'].map(type => (
       <button key={type} type="button" onClick={this._onAddSection.bind(this, type)}>
         {type}
       </button>

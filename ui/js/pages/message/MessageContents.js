@@ -5,6 +5,7 @@ import moment from 'moment';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
 import Audio from '../../components/Audio';
+import Video from '../../components/Video';
 import MessageItem from './MessageItem';
 
 export default class MessageContents extends Component {
@@ -28,19 +29,7 @@ export default class MessageContents extends Component {
 
     let video;
     if (message.videoUrl) {
-      // TOOD: Handle YouTube vs. Vimeo
-      const regexp = /vimeo\.com\/(\d+)/;
-      const match = message.videoUrl.match(regexp);
-      if (match) {
-        video = (
-          <div className="section__container">
-            <iframe className="video vimeo-player section" type="text/html" width="960" height="540"
-              src={`https://player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
-              frameBorder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen>
-            </iframe>
-          </div>
-        );
-      }
+      video = <Video url={message.videoUrl} full={true} />;
     }
 
     let text;
@@ -59,12 +48,12 @@ export default class MessageContents extends Component {
       const path = `/api/files/${file._id}`;
       if (! file.type.match(/audio/)) {
         files.push(
-          <a className="item__container" href={path}>
+          <a key={file._id} className="item__container" href={path}>
             <div className="item">{file.name}</div>
           </a>
         );
       } else {
-        audio = <Audio file={file} />;
+        audio = <Audio file={file} full={true} />;
       }
     });
     if (files.length > 0) {
@@ -143,7 +132,7 @@ export default class MessageContents extends Component {
             <dt>Library</dt><dd>{message.library}</dd>
           </dl>
         </div>
-        <div className="section__container">
+        <div className="section__container section__container--full">
           <div className="message__nav footer">
             {previousMessage}
             {nextMessage}
