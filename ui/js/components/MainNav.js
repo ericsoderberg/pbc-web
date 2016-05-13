@@ -6,7 +6,7 @@ import Stored from './Stored';
 
 const MAIN_ROUTES = [
   { label: 'Home', path: '/' },
-  { label: 'Calendar', path: '/calendar' }
+  { label: 'Calendar', path: '/calendar/Main' }
 ];
 
 const ADMIN_ROUTES = [

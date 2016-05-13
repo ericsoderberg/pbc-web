@@ -5,6 +5,21 @@
   padding: 0;
 }
 
+.list__marker {
+  background-color: #f2f2f2;
+}
+
+.marker {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: $page-width;
+  margin: 0 auto;
+  padding: $quarter-unit $unit;
+  color: #999;
+}
+
 a.item__container {
   display: block;
   text-decoration: none;

@@ -16,8 +16,9 @@ export default class Calendar extends Component {
   }
 
   componentDidMount () {
-    getCalendar()
-    .then(response => this.setState({ calendar: response }));
+    const filterValue = this.props.params.calendar;
+    let filter = (filterValue ? { calendar: filterValue } : undefined);
+    this.setState({ filter: filter }, this._get);
 
     getItems('events', { distinct: 'calendar' })
     .then(response => this.setState({ filterValues: response }))
@@ -25,7 +26,7 @@ export default class Calendar extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const filterValue = nextProps.location.query.calendar;
+    const filterValue = nextProps.params.calendar;
     let filter = (filterValue ? { calendar: filterValue } : undefined);
     this.setState({ filter: filter }, this._get);
   }
@@ -53,8 +54,8 @@ export default class Calendar extends Component {
 
   _onFilter (event) {
     const value = event.target.value;
-    this.context.router.replace({ pathname: window.location.pathname,
-      query: { calendar: value } });
+    const path = value ? `/calendar/${value}` : '/calendar';
+    this.context.router.replace({ pathname: path });
   }
 
   _renderDaysOfWeek () {
@@ -149,7 +150,7 @@ export default class Calendar extends Component {
   }
 
   render () {
-    const { calendar, filterValues, searchText } = this.state;
+    const { calendar, filterValues, searchText, filter } = this.state;
     const daysOfWeek = this._renderDaysOfWeek();
     const weeks = this._renderWeeks();
 
@@ -160,7 +161,8 @@ export default class Calendar extends Component {
       ));
       options.unshift(<option key="_all"></option>);
       filterControl = (
-        <select key="filter" className="select--header" onChange={this._onFilter}>
+        <select key="filter" className="select--header"
+          value={filter.calendar} onChange={this._onFilter}>
           {options}
         </select>
       );
@@ -194,6 +196,12 @@ export default class Calendar extends Component {
       </main>
     );
   }
+};
+
+Calendar.propTypes = {
+  params: PropTypes.shape({
+    calendar: PropTypes.string
+  })
 };
 
 Calendar.contextTypes = {

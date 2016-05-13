@@ -44,7 +44,7 @@ export default class List extends Component {
       getItems(this.props.category,
         { sort: this.props.sort, search: searchText })
       .then(response => this.setState({ items: response }))
-      .catch(error => console.log('!!! List catch', error));
+      .catch(error => console.log('!!! List search catch', error));
     }, 100);
     this.setState({ searchText: searchText });
   }
@@ -56,16 +56,36 @@ export default class List extends Component {
   }
 
   render () {
-    const { filter, Item, path, title } = this.props;
+    const { filter, Item, path, title, marker, sort } = this.props;
     const { filterValues, searchText } = this.state;
 
-    const items = this.state.items.map(item => {
+    const descending = (sort && sort[0] === '-');
+    let markerIndex = -1;
+    let items = this.state.items.map((item, index) => {
+
+      if (marker && markerIndex === -1) {
+        const value = item[marker.property];
+        if ((descending && value < marker.value) ||
+          (! descending && value < marker.value)) {
+          markerIndex = index;
+        }
+      }
+
       return (
         <li key={item._id} >
-          <Item className="list__item" item={item} />
+          <Item item={item} />
         </li>
       );
     });
+    if (-1 !== markerIndex) {
+      items.splice(markerIndex, 0, (
+        <li key="marker">
+          <div className="list__marker">
+            {marker.label}
+          </div>
+        </li>
+      ));
+    }
 
     const addControl = (
       <Link key="add" to={`${path}/add`} className="a--header">Add</Link>
@@ -101,6 +121,11 @@ List.propTypes = {
   category: PropTypes.string,
   filter: PropTypes.string,
   Item: PropTypes.func.isRequired,
+  marker: PropTypes.shape({
+    label: PropTypes.node,
+    property: PropTypes.string,
+    value: PropTypes.any
+  }),
   path: PropTypes.string,
   sort: PropTypes.string,
   title: PropTypes.string

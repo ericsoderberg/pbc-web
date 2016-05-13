@@ -12,7 +12,7 @@
     "url": "https://github.com/ericsoderberg/pbc-web.git"
   },
   "scripts": {
-    "dev": "./node_modules/.bin/webpack-dev-server --content-base dist/",
+    "dev": "./node_modules/.bin/webpack-dev-server --content-base dist/ --history-api-fallback --hot --open",
     "start": "babel-node ./server/server.js"
   },
   "dependencies": {

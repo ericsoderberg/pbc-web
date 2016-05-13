@@ -40,6 +40,7 @@ export default {
   component: App,
   indexRoute: { component: Home },
   childRoutes: [
+    { path: 'calendar/:calendar', component: Calendar },
     { path: 'calendar', component: Calendar },
     { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },
