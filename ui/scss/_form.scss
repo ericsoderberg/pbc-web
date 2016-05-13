@@ -41,7 +41,7 @@
 
 .form-field {
   position: relative;
-  background-color: #fff;
+  background-color: $background-color;
   border: 1px solid #ccc;
   max-width: $form-width;
   margin: 0 auto;
@@ -57,7 +57,7 @@
   flex-direction: row;
   justify-content: space-between;
   padding: $half-unit $half-unit 0;
-  color: #666;
+  color: $tertiary-color;
 }
 
 .form-field__input:not([type="checkbox"]):not(.form-field__image) {
@@ -96,7 +96,7 @@ select.form-field__input {
   flex-direction: row;
   justify-content: space-between;
   max-width: $form-width;
-  margin: $unit auto;
+  margin: $unit auto 0;
 }
 
 // confirm-remove

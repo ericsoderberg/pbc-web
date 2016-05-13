@@ -21,8 +21,10 @@ export default class UserFormContents extends Component {
     if (user.avatar) {
       avatarField = (
         <FormField name="avatar" label="Avatar">
-          <img className="avatar"
-            src={user.avatar.data} />
+          <div>
+            <img className="avatar"
+              src={user.avatar.data} />
+          </div>
           <input name="avatarRemove" type="checkbox"
             checked={user.avatar || false}
             onChange={() => formState.set('avatar', false)}/>
