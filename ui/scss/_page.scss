@@ -46,7 +46,6 @@
 }
 
 .event-summary {
-  // padding: $unit 0;
   display: flex;
   flex-direction: row;
 }
@@ -54,11 +53,12 @@
 .event-summary__summary {
   display: flex;
   flex-direction: column;
-  flex: 0 0 50%;
+  flex: 1 0 50%;
   text-decoration: none;
   text-align: center;
   justify-content: center;
   align-items: center;
+  padding: $unit 0;
 
   h2 {
     margin-top: 0;

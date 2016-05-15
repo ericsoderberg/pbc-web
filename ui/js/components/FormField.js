@@ -1,5 +1,5 @@
 "use strict";
-import React, { Component, PropTypes, Children } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 export default class FormField extends Component {
 
@@ -58,15 +58,6 @@ export default class FormField extends Component {
       error = <span className="form-field__error">{this.props.error}</span>;
     }
 
-    let children = Children.map(this.props.children, child => {
-      let result = child;
-      if (child) {
-        const classes = [child.props.className, 'form-field__input'];
-        result = React.cloneElement(child, { className: classes.join(' ') });
-      }
-      return result;
-    });
-
     let onDragEnter, onDragOver, onDragLeave, onDrop;
     if (this.props.onDrop) {
       onDragEnter = this._onDragEnter;
@@ -86,7 +77,7 @@ export default class FormField extends Component {
             {error}
           </div>
         </div>
-        {children}
+        {this.props.children}
       </div>
     );
   }

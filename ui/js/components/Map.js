@@ -82,14 +82,13 @@ export default class Map extends Component {
   }
 
   _getGeocode () {
-    // TODO: uncomment when out of airplane
-    // const { mergedAddress } = this.state;
-    // getGeocode(mergedAddress)
-    // .then(places => {
-    //   const place = places[0];
-    //   this.setState({ lat: place.lat, lon: place.lon }, this._setMap);
-    // })
-    // .catch(error => console.log('!!! getGeocode catch', error));
+    const { mergedAddress } = this.state;
+    getGeocode(mergedAddress)
+    .then(places => {
+      const place = places[0];
+      this.setState({ lat: place.lat, lon: place.lon }, this._setMap);
+    })
+    .catch(error => console.log('!!! getGeocode catch', error));
   }
 
   render () {

@@ -107,7 +107,8 @@ export default class Calendar extends Component {
   _renderWeeks () {
     const { calendar } = this.state;
     let weeks = [];
-    let now = moment();
+    let today = moment();
+    let focus = moment(calendar.date);
     let date = moment(calendar.start);
     let end = moment(calendar.end);
     let events = calendar.events.slice(0);
@@ -124,8 +125,11 @@ export default class Calendar extends Component {
       const dayEvents = this._renderEvents(date, events);
 
       let classNames = ['calendar__day'];
-      if (date.isSame(now, 'date')) {
+      if (date.isSame(today, 'date')) {
         classNames.push('calendar__day--today');
+      }
+      if (date.month() !== focus.month()) {
+        classNames.push('calendar__day--alternate');
       }
 
       days.push(

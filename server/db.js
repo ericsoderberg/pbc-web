@@ -55,20 +55,21 @@ const pageSchema = Schema({
 
 mongoose.model('Page', pageSchema);
 
-const datesSchema = Schema({
-  start: Date,
-  stop: Date
-});
-
 const eventSchema = Schema({
-  address: String,
+  address: String, // mappable
   calendar: String,
-  location: String, // room
+  primaryEventId: ObjectId, // set in on-off cases
+  location: String, // room, house owner's name, etc.
   name: String,
-  recurrence: [datesSchema],
+  dates: [Date],
+  reservations: [ObjectId], // resources
   start: Date,
   stop: Date,
-  text: String
+  text: String,
+  times: [{
+    start: Date,
+    stop: Date
+  }]
 });
 
 mongoose.model('Event', eventSchema);

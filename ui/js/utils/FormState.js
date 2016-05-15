@@ -27,6 +27,20 @@ export default class FormState {
     });
   }
 
+  toggleIn (propertyName, value) {
+    return (event => {
+      value = value || (event.target ? event.target.value : event);
+      let array = this.object[propertyName].slice(0);
+      const index = array.indexOf(value);
+      if (-1 === index) {
+        array.push(value);
+      } else {
+        array.splice(index, 1);
+      }
+      this.set(propertyName, array);
+    });
+  }
+
   _processFiles (files, propertyName) {
     if (files && files[0]) {
       const file = files[0];

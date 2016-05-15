@@ -99,7 +99,7 @@ export default class PageFormContents extends Component {
           </FormField>
         </fieldset>
         {sections}
-        <fieldset>
+        <fieldset className="form__fields">
           <FormField label="Add section">
             {addControls}
           </FormField>

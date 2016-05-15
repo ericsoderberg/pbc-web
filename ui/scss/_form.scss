@@ -46,6 +46,34 @@
   max-width: $form-width;
   margin: 0 auto;
   margin-bottom: -1px;
+
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    width: 100%;
+    border: none;
+    padding: $half-unit;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    margin: $half-unit;
+  }
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: $small-drop-caret no-repeat center right $half-unit;
+    cursor: pointer;
+
+    &::-moz-focus-inner {
+      border: none;
+    }
+  }
 }
 
 .form-field--dragging {
@@ -60,35 +88,21 @@
   color: $tertiary-color;
 }
 
-.form-field__input:not([type="checkbox"]):not(.form-field__image) {
-  width: 100%;
-  border: none;
-  padding: $half-unit;
-
-  &:focus {
-    outline: none;
-  }
-}
-
-select.form-field__input {
-  border: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: $small-drop-caret no-repeat center right $half-unit;
-  cursor: pointer;
-
-  &::-moz-focus-inner {
-    border: none;
-  }
-}
-
-.form-field__input[type="checkbox"] {
-  margin: $half-unit;
-}
-
 .form-field__image {
   padding-top: $half-unit;
   max-width: $form-width - $double-unit;
+}
+
+.form__tabs {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  max-width: $form-width;
+  margin: 0 auto;
+
+  > * {
+    flex: 1;
+  }
 }
 
 .form__footer {

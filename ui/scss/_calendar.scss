@@ -83,18 +83,22 @@
 .calendar__day-date {
   padding: $quarter-unit;
   text-align: right;
-  background-color: #eee;
-  border-right: 2px solid #fff;
+  background-color: $header-background-color;
+  border-right: 2px solid $background-color;
   margin-bottom: 2px;
 
-  // .form__field & {
-  //   text-align: left;
-  //   height: 100%;
-  // }
+  input {
+    float: left;
+  }
 }
 
-.calendar__day-date--alternate {
-  background-color: #f2f2f2;
+.calendar__day--alternate {
+  background-color: $secondary-background-color;
+
+  .calendar__day-date {
+    background-color: $secondary-background-color;
+    font-weight: 100;
+  }
 }
 
 .calendar__day-date-month,

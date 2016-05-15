@@ -1,17 +1,43 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DateTime from '../../components/DateTime';
+import EventDates from './EventDates';
+import EventResources from './EventResources';
 
-export default class EventFormContents extends Component {
+class EventFormFields extends Component {
+
+  constructor () {
+    super();
+    this.state = { events: [] };
+  }
 
   componentDidMount () {
-    this.refs.name.focus();
+    // this.refs.name.focus();
+    getItems('events', { dates: { $gt: {} } })
+    .then(response => this.setState({ events: response }));
   }
 
   render () {
     const { formState } = this.props;
     const event = formState.object;
+
+    let primaryEvent;
+    if (! event.dates || event.dates.length === 0) {
+      let events = this.state.events.map(event => (
+        <option key={event._id} label={event.name} value={event._id} />
+      ));
+      events.unshift(<option key={0} />);
+      primaryEvent = (
+        <FormField label="Primary event" help="For recurring event on-offs">
+          <select name="primaryEventId" value={event.primaryEventId || ''}
+            onChange={formState.change('primaryEventId')}>
+            {events}
+          </select>
+        </FormField>
+      );
+    }
 
     return (
       <fieldset className="form__fields">
@@ -45,7 +71,51 @@ export default class EventFormContents extends Component {
           <input name="calendar" value={event.calendar || ''}
             onChange={formState.change('calendar')}/>
         </FormField>
+        {primaryEvent}
       </fieldset>
+    );
+  }
+}
+
+EventFormFields.propTypes = {
+  formState: PropTypes.object.isRequired
+};
+
+const VIEWS = {
+  fields: EventFormFields,
+  dates: EventDates,
+  resources: EventResources
+};
+
+export default class EventFormContents extends Component {
+
+  constructor () {
+    super();
+    this._onView = this._onView.bind(this);
+    this.state = { view: 'fields' };
+  }
+
+  _onView (view) {
+    this.setState({ view: view });
+  }
+
+  render () {
+    const View = VIEWS[this.state.view];
+    return (
+      <div>
+        <View formState={this.props.formState} />
+        <div className="form__tabs">
+          <button type="button" onClick={this._onView.bind(this, 'fields')}>
+            Fields
+          </button>
+          <button type="button" onClick={this._onView.bind(this, 'resources')}>
+            Resources
+          </button>
+          <button type="button" onClick={this._onView.bind(this, 'dates')}>
+            Dates
+          </button>
+        </div>
+      </div>
     );
   }
 };

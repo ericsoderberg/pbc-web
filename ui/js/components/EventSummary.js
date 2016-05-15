@@ -22,6 +22,15 @@ export default class EventSummary extends Component {
   render () {
     const { color, full, plain } = this.props;
     const { event } = this.state;
+
+    let map;
+    if (event.address) {
+      map = (
+        <div className="event-summary__map">
+          <Map address={event.address} plain={true} />
+        </div>
+      );
+    }
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="event-summary">
@@ -31,9 +40,7 @@ export default class EventSummary extends Component {
               {moment(event.start).format('MMMM Do YYYY @ h:mm a')}
             </span>
           </Link>
-          <div className="event-summary__map">
-            <Map address={event.address || ''} plain={true} />
-          </div>
+          {map}
         </div>
       </Section>
     );
