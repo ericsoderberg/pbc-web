@@ -58,17 +58,17 @@ mongoose.model('Page', pageSchema);
 const eventSchema = Schema({
   address: String, // mappable
   calendar: String,
+  end: Date,
   primaryEventId: ObjectId, // set in on-off cases
   location: String, // room, house owner's name, etc.
   name: String,
   dates: [Date],
   reservations: [ObjectId], // resources
   start: Date,
-  stop: Date,
   text: String,
   times: [{
-    start: Date,
-    stop: Date
+    end: Date,
+    start: Date
   }]
 });
 

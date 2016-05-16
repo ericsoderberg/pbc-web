@@ -18,7 +18,9 @@ export default class EventSectionEdit extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ formState: new FormState(nextProps.section, nextProps.onChange) });
+    this.setState({
+      formState: new FormState(nextProps.section, nextProps.onChange)
+    });
   }
 
   render () {
@@ -28,6 +30,7 @@ export default class EventSectionEdit extends Component {
     const events = this.state.events.map(event => (
       <option key={event._id} label={event.name} value={event._id} />
     ));
+    events.unshift(<option key={0} />);
 
     return (
       <fieldset className="form__fields">

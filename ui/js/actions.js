@@ -88,6 +88,7 @@ export function postItem (category, item) {
 export function getItem (category, id) {
   return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
     method: 'GET', headers: _headers })
+  .then(processStatus)
   .then(response => response.json());
 }
 

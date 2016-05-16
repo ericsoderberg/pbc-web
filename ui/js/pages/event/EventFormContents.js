@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import moment from 'moment';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DateTime from '../../components/DateTime';
@@ -10,13 +11,30 @@ class EventFormFields extends Component {
 
   constructor () {
     super();
+    this._onStartChange = this._onStartChange.bind(this);
     this.state = { events: [] };
   }
 
   componentDidMount () {
     // this.refs.name.focus();
     getItems('events', { dates: { $gt: {} } })
-    .then(response => this.setState({ events: response }));
+    .then(response => this.setState({ events: response }))
+    .catch(error => console.log('EventFormFields catch', error));
+  }
+
+  _onStartChange (start) {
+    const { formState } = this.props;
+    const event = formState.object;
+    let props = {};
+    // Set end date to match if unset or earlier
+    if (moment.isMoment(start)) {
+      if (! event.end || start.isAfter(event.end)) {
+        props.end = moment(start).add(1, 'hour').toISOString();
+      }
+      start = start.toISOString();
+    }
+    props.start = start;
+    formState.set(props);
   }
 
   render () {
@@ -48,12 +66,12 @@ class EventFormFields extends Component {
         <FormField label="Starts">
           <DateTime format="M/D/YYYY h:mm a" name="start" step={15}
             value={event.start || ''}
-            onChange={formState.change('start')} />
+            onChange={this._onStartChange} />
         </FormField>
         <FormField label="Ends">
-          <DateTime format="M/D/YYYY h:mm a" name="stop" step={15}
-            value={event.stop || ''}
-            onChange={formState.change('stop')} />
+          <DateTime format="M/D/YYYY h:mm a" name="end" step={15}
+            value={event.end || ''}
+            onChange={formState.change('end')} />
         </FormField>
         <FormField label="Location">
           <input name="location" value={event.location || ''}

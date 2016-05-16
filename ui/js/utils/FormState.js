@@ -1,4 +1,5 @@
 "use strict";
+import moment from 'moment';
 
 export default class FormState {
 
@@ -9,14 +10,21 @@ export default class FormState {
 
   set (propertyName, value) {
     let nextObject = { ...this.object };
-    nextObject[propertyName] = value;
+    if (typeof propertyName === 'object') {
+      nextObject = { ...nextObject, ...propertyName };
+    } else {
+      nextObject[propertyName] = value;
+    }
     this._onChange(nextObject);
   }
 
   change (propertyName) {
     return (event => {
       // handle DateChange onChange which just sends the value, not an event
-      const value = (event.target ? event.target.value : event);
+      let value = (event.target ? event.target.value : event);
+      if (moment.isMoment(value)) {
+        value = value.toISOString();
+      }
       this.set(propertyName, value);
     });
   }
@@ -30,7 +38,7 @@ export default class FormState {
   toggleIn (propertyName, value) {
     return (event => {
       value = value || (event.target ? event.target.value : event);
-      let array = this.object[propertyName].slice(0);
+      let array = (this.object[propertyName] || []).slice(0);
       const index = array.indexOf(value);
       if (-1 === index) {
         array.push(value);

@@ -25,6 +25,15 @@ Events.defaultProps = {
   ...List.defaultProps,
   category: 'events',
   Item: Item,
+  marker: {
+    property: 'start',
+    value: (new Date()).toISOString(),
+    label: (
+      <div className="marker">
+        <span>Today</span><span>{moment().format('MMM Do YYYY')}</span>
+      </div>
+    )
+  },
   path: '/events',
   sort: '-start',
   title: 'Events'

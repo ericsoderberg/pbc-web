@@ -44,7 +44,7 @@ export default class EventDates extends Component {
         classNames.push('calendar__day--alternate');
       }
 
-      const checked = event.dates.some(date2 => {
+      const checked = (event.dates || []).some(date2 => {
         return moment(date2).isSame(date, 'day');
       }) || moment(event.start).isSame(date, 'day');
 

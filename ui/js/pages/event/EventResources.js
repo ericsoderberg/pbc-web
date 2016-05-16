@@ -21,7 +21,7 @@ export default class EventResources extends Component {
     const event = formState.object;
 
     const resources = this.state.resources.map(resource => {
-      const checked = event.resources.some(resourceId => {
+      const checked = (event.resources || []).some(resourceId => {
         return resourceId === resource._id;
       });
       return (

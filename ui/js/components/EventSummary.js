@@ -8,15 +8,28 @@ import Map from './Map';
 
 export default class EventSummary extends Component {
 
-  constructor () {
-    super();
-    this.state = { event: {} };
+  constructor (props) {
+    super(props);
+    this.state = { event: props.event || {} };
   }
 
   componentDidMount () {
-    getItem('events', this.props.id)
-    .then(event => this.setState({ event: event }))
-    .catch(error => console.log('!!! EventSummary catch', error));
+    this._load(this.props);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.id !== this.props.id) {
+      this._load(nextProps);
+    }
+  }
+
+  _load (props) {
+    const { event, id } = props;
+    if (id && ! event) {
+      getItem('events', id)
+      .then(event => this.setState({ event: event }))
+      .catch(error => console.log('!!! EventSummary catch', error));
+    }
   }
 
   render () {
@@ -48,6 +61,7 @@ export default class EventSummary extends Component {
 };
 
 EventSummary.propTypes = {
-  id: PropTypes.string.isRequired,
+  event: PropTypes.string,
+  id: PropTypes.string,
   ...Section.propTypes
 };
