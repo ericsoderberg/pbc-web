@@ -23,6 +23,10 @@ a,
   background-color: transparent;
   font-size: inherit;
   padding: 0;
+
+  &:hover {
+    background-color: $secondary-background-color;
+  }
 }
 
 input,

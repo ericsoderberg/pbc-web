@@ -1,6 +1,6 @@
 "use strict";
 import React, { PropTypes } from 'react';
-import moment from 'moment';
+import { friendlyTimes } from '../../utils/EventTimes';
 import Text from '../../components/Text';
 import Map from '../../components/Map';
 
@@ -22,7 +22,7 @@ const EventContents = (props) => {
       {text}
       <div className="section__container">
         <div className="text section">
-          <h2>{moment(event.start).format('MMMM Do YYYY @ h:mm a')}</h2>
+          <h2>{friendlyTimes(event)}</h2>
         </div>
       </div>
       {map}

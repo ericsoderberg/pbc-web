@@ -36,7 +36,7 @@
 
 .map {
   position: relative;
-  height: 50vh;
+  height: 40vh;
   min-height: $quadruple-unit;
 }
 
@@ -74,7 +74,7 @@
   flex: 0 0 50%;
 
   .map {
-    height: $unit * 8;
+    height: 128px; // 100%;
   }
 }
 

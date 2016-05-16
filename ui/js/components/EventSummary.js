@@ -1,8 +1,8 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import moment from 'moment';
 import { getItem } from '../actions';
+import { friendlyTimes } from '../utils/EventTimes';
 import Section from './Section';
 import Map from './Map';
 
@@ -36,6 +36,8 @@ export default class EventSummary extends Component {
     const { color, full, plain } = this.props;
     const { event } = this.state;
 
+    let times = friendlyTimes(event);
+
     let map;
     if (event.address) {
       map = (
@@ -49,9 +51,7 @@ export default class EventSummary extends Component {
         <div className="event-summary">
           <Link to={`/events/${event._id}`} className="event-summary__summary">
             <h2>{event.name}</h2>
-            <span className="event-summary__date">
-              {moment(event.start).format('MMMM Do YYYY @ h:mm a')}
-            </span>
+            <span className="event-summary__date">{times}</span>
           </Link>
           {map}
         </div>
@@ -61,7 +61,7 @@ export default class EventSummary extends Component {
 };
 
 EventSummary.propTypes = {
-  event: PropTypes.string,
+  event: PropTypes.object,
   id: PropTypes.string,
   ...Section.propTypes
 };

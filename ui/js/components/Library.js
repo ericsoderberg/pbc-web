@@ -8,22 +8,32 @@ import Image from './Image';
 
 export default class Library extends Component {
 
-  constructor () {
-    super();
-    this.state = { message: {} };
+  constructor (props) {
+    super(props);
+    this.state = { message: props.library || {} };
   }
 
   componentDidMount () {
-    let date = moment().subtract(1, 'day');
-    getItems('messages', {
-      filter: {
-        library: this.props.name,
-        date: { $gt: date.toString() }
-      },
-      limit: 1
-    })
-    .then(messages => this.setState({ message: messages[0] }))
-    .catch(error => console.log('!!! Library catch', error));
+    this._load(this.props);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this._load(nextProps);
+  }
+
+  _load (props) {
+    if (props.name) {
+      let date = moment().subtract(1, 'day');
+      getItems('messages', {
+        filter: {
+          library: props.name,
+          date: { $gt: date.toString() }
+        },
+        limit: 1
+      })
+      .then(messages => this.setState({ message: messages[0] }))
+      .catch(error => console.log('!!! Library catch', error));
+    }
   }
 
   render () {
@@ -56,6 +66,7 @@ export default class Library extends Component {
 };
 
 Library.propTypes = {
-  name: PropTypes.string.isRequired,
+  library: PropTypes.object,
+  name: PropTypes.string,
   ...Section.propTypes
 };
