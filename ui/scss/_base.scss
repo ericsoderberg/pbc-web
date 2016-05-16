@@ -15,13 +15,14 @@ body,
   min-height: 100vh;
 }
 
-a {
+a,
+.button--link {
   color: #000;
   transition: all 0.2s;
-
-  &:hover {
-    background-color: #eee;
-  }
+  text-decoration: underline;
+  background-color: transparent;
+  font-size: inherit;
+  padding: 0;
 }
 
 input,
@@ -59,15 +60,18 @@ button {
   border-radius: 0;
   border: none;
   margin: 0;
-  padding: $half-unit $unit;
-  background-color: $control-background-color;
-  color: $control-color;
-  font-size: 18px;
   cursor: pointer;
 
-  &:hover {
-    background-color: $control-hover-background;
-    color: $active-color;
+  &:not(.button--link) {
+    padding: $half-unit $unit;
+    background-color: $control-background-color;
+    color: $control-color;
+    font-size: 18px;
+
+    &:hover {
+      background-color: $control-hover-background;
+      color: $active-color;
+    }
   }
 }
 
