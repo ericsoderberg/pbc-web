@@ -203,7 +203,8 @@ register('pages', 'Page');
 register('resources', 'Resource');
 register('newsletters', 'Newsletter');
 register('form-templates', 'FormTemplate');
-register('forms', 'Forms');
+register('forms', 'Form');
+register('email-lists', 'EmailList');
 
 // Messages
 

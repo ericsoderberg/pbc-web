@@ -16,6 +16,7 @@ const ADMIN_ROUTES = [
   { label: 'Form Templates', path: '/form-templates' },
   { label: 'Messages', path: '/messages' },
   { label: 'People', path: '/users' },
+  { label: 'Email Lists', path: '/email-lists' },
   { label: 'Resources', path: '/resources' },
   { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' }

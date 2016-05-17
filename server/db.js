@@ -179,6 +179,14 @@ const newsletterSchema = Schema({
 
 mongoose.model('Newsletter', newsletterSchema);
 
+const emailListSchema = Schema({
+  addresses: [String],
+  name: String,
+  text: String
+});
+
+mongoose.model('EmailList', emailListSchema);
+
 // Connection
 
 const opts = { user: USER, pass: PASSWORD,  auth: { authdb: 'admin' } };
