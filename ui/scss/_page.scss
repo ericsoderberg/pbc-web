@@ -116,6 +116,30 @@
   color: $secondary-color;
 }
 
+.user-summary {
+  display: flex;
+  flex-direction: row;
+}
+
+.user-summary__summary {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 50%;
+  text-decoration: none;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  padding: $unit 0;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.user-summary__avatar {
+  flex: 0 0 20%;
+}
+
 .footer {
   display: flex;
   flex-direction: row;

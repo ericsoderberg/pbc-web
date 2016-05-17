@@ -4,10 +4,14 @@ import Section from './Section';
 
 const Image = (props) => {
   const { image, full, plain } = props;
+  let classNames = ['image'];
+  if (props.className) {
+    classNames.push(props.className);
+  }
 
   return (
     <Section full={full} plain={plain}>
-      <img className="image" src={image ? image.data : ''} />
+      <img className={classNames.join(' ')} src={image ? image.data : ''} />
     </Section>
   );
 };

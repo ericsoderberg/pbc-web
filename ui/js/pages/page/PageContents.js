@@ -4,6 +4,7 @@ import Text from '../../components/Text';
 import Image from '../../components/Image';
 import EventSummary from '../../components/EventSummary';
 import Library from '../../components/Library';
+import UserSummary from '../../components/UserSummary';
 
 const PageContents = (props) => {
   const page = props.item;
@@ -16,6 +17,8 @@ const PageContents = (props) => {
       return <EventSummary key={index} full={section.full} id={section.objectId} />;
     } else if ('library' === section.type) {
       return <Library key={index} full={section.full} name={section.name} />;
+    } else if ('user' === section.type) {
+      return <UserSummary key={index} full={section.full} id={section.objectId} />;
     } else {
       return 'TBD';
     }

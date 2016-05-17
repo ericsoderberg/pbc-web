@@ -4,17 +4,17 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
 
-export default class EventSectionEdit extends Component {
+export default class UserSectionEdit extends Component {
 
   constructor (props) {
     super(props);
     const { section, onChange } = props;
-    this.state = { formState: new FormState(section, onChange), events: [] };
+    this.state = { formState: new FormState(section, onChange), users: [] };
   }
 
   componentDidMount () {
-    getItems('events')
-    .then(events => this.setState({ events: events }));
+    getItems('users')
+    .then(users => this.setState({ users: users }));
   }
 
   componentWillReceiveProps (nextProps) {
@@ -27,17 +27,17 @@ export default class EventSectionEdit extends Component {
     const { formState } = this.state;
     const section = formState.object;
 
-    const events = this.state.events.map(event => (
-      <option key={event._id} label={event.name} value={event._id} />
+    const users = this.state.users.map(user => (
+      <option key={user._id} label={user.name} value={user._id} />
     ));
-    events.unshift(<option key={0} />);
+    users.unshift(<option key={0} />);
 
     return (
       <fieldset className="form__fields">
-        <FormField name="event" label="Event">
+        <FormField name="user" label="User">
           <select name="objectId" value={section.objectId || ''}
             onChange={formState.change('objectId')}>
-            {events}
+            {users}
           </select>
         </FormField>
         <FormField>
@@ -51,7 +51,7 @@ export default class EventSectionEdit extends Component {
   }
 };
 
-EventSectionEdit.defaultProps = {
+UserSectionEdit.defaultProps = {
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
 };

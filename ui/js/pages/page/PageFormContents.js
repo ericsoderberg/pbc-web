@@ -5,12 +5,14 @@ import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
 import EventSectionEdit from './EventSectionEdit';
 import LibrarySectionEdit from './LibrarySectionEdit';
+import UserSectionEdit from './UserSectionEdit';
 
 const SECTIONS = {
   event: EventSectionEdit,
   image: ImageSectionEdit,
   library: LibrarySectionEdit,
-  text: TextSectionEdit
+  text: TextSectionEdit,
+  user: UserSectionEdit
 };
 
 export default class PageFormContents extends Component {
@@ -84,7 +86,7 @@ export default class PageFormContents extends Component {
       );
     });
 
-    const addControls = ['text', 'image', 'event', 'library'].map(type => (
+    const addControls = ['text', 'image', 'event', 'library', 'user'].map(type => (
       <button key={type} type="button" onClick={this._onAddSection.bind(this, type)}>
         {type}
       </button>

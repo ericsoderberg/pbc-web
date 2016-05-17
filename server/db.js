@@ -37,7 +37,7 @@ mongoose.model('User', userSchema);
 
 const pageSectionSchema = Schema({
   type: { type: String,
-    enum: ['text', 'image', 'event', 'library', 'form']
+    enum: ['text', 'image', 'event', 'library', 'form', 'user']
   },
   color: String,
   full: Boolean,
