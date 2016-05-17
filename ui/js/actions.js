@@ -147,6 +147,20 @@ export function getCalendar (options={}) {
   .then(response => response.json());
 }
 
+// Events
+
+export function getResources (event) {
+  return fetch('/api/events/resources', {
+    method: 'POST', headers: _headers, body: JSON.stringify(event) })
+  .then(response => response.json());
+}
+
+export function getUnavailableDates (event) {
+  return fetch('/api/events/unavailable-dates', {
+    method: 'POST', headers: _headers, body: JSON.stringify(event) })
+  .then(response => response.json());
+}
+
 // Map
 
 export function getGeocode (address) {

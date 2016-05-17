@@ -59,11 +59,11 @@ const eventSchema = Schema({
   address: String, // mappable
   calendar: String,
   end: Date,
-  primaryEventId: ObjectId, // set in on-off cases
+  primaryEventId: ObjectId, // set in one-off cases
   location: String, // room, house owner's name, etc.
   name: String,
   dates: [Date],
-  reservations: [ObjectId], // resources
+  resourceIds: [ObjectId], // resources
   start: Date,
   text: String,
   times: [{

@@ -159,7 +159,7 @@ EventFormFields.propTypes = {
 };
 
 const VIEWS = {
-  fields: EventFormFields,
+  details: EventFormFields,
   dates: EventDates,
   resources: EventResources
 };
@@ -169,7 +169,7 @@ export default class EventFormContents extends Component {
   constructor () {
     super();
     this._onView = this._onView.bind(this);
-    this.state = { view: 'fields' };
+    this.state = { view: 'details' };
   }
 
   _onView (view) {
@@ -182,8 +182,8 @@ export default class EventFormContents extends Component {
       <div>
         <View formState={this.props.formState} />
         <div className="form__tabs">
-          <button type="button" onClick={this._onView.bind(this, 'fields')}>
-            Fields
+          <button type="button" onClick={this._onView.bind(this, 'details')}>
+            Details
           </button>
           <button type="button" onClick={this._onView.bind(this, 'resources')}>
             Resources

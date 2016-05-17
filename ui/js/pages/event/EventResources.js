@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { getResources } from '../../actions';
 import FormField from '../../components/FormField';
 
 export default class EventResources extends Component {
@@ -11,7 +11,8 @@ export default class EventResources extends Component {
   }
 
   componentDidMount () {
-    getItems('resources')
+    const event = this.props.formState.object;
+    getResources(event)
     .then(resources => this.setState({ resources: resources }))
     .catch(error => console.log('!!! EventResources catch', error));
   }
@@ -21,14 +22,24 @@ export default class EventResources extends Component {
     const event = formState.object;
 
     const resources = this.state.resources.map(resource => {
-      const checked = (event.resources || []).some(resourceId => {
+      let classNames = ['choice'];
+      const checked = (event.resourceIds || []).some(resourceId => {
         return resourceId === resource._id;
       });
+      let usedBy;
+      if (resource.events) {
+        classNames.push("choice--disabled");
+        const events = resource.events.map(event => (
+          <a key={event._id} href={`/events/${event._id}`}>{event.name}</a>
+        ));
+        usedBy = <span className="used-by">Used by {events}</span>;
+      }
       return (
-        <div key={resource._id}>
-          <input type="checkbox" checked={checked}
-            onChange={formState.toggleIn('resources', resource._id)}/>
+        <div key={resource._id} className={classNames.join(' ')}>
+          <input type="checkbox" checked={checked} disabled={resource.events}
+            onChange={formState.toggleIn('resourceIds', resource._id)}/>
           <label>{resource.name}</label>
+          {usedBy}
         </div>
       );
     });

@@ -239,3 +239,12 @@
 .date-time__time-element {
   margin: $quarter-unit 0;
 }
+
+.choice--disabled {
+  background-color: $secondary-background-color;
+  color: $tertiary-color;
+}
+
+.used-by {
+  margin-left: $half-unit;
+}

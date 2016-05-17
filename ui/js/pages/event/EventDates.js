@@ -1,8 +1,24 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
+import { getUnavailableDates } from '../../actions';
 
 export default class EventDates extends Component {
+
+  constructor () {
+    super();
+    this.state = { unavailableDates: [] };
+  }
+
+  componentDidMount () {
+    const event = this.props.formState.object;
+    if (event.resourceIds && event.resourceIds.length > 0) {
+      getUnavailableDates(event)
+      .then(unavailableDates => unavailableDates.map(date => moment(date)))
+      .then(unavailableDates => this.setState({ unavailableDates: unavailableDates }))
+      .catch(error => console.log('!!! EventDates catch', error));
+    }
+  }
 
   _renderHeader () {
     let days = [];
@@ -48,10 +64,13 @@ export default class EventDates extends Component {
         return moment(date2).isSame(date, 'day');
       }) || moment(event.start).isSame(date, 'day');
 
+      const disabled = this.state.unavailableDates.some(date2 => (
+        date2.isSame(date, 'day')));
+
       days.push(
         <div key={name} className={classNames.join(' ')}>
           <div className="calendar__day-date">
-            <input type="checkbox" checked={checked}
+            <input type="checkbox" checked={checked} disabled={disabled}
               onChange={formState.toggleIn('dates', date.toISOString())} />
             <label>{name}</label>
           </div>
