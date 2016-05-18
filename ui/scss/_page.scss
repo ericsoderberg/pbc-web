@@ -28,7 +28,7 @@
   }
 
   .text {
-    padding: $unit 0;
+    padding: $double-unit 0;
     margin: 0 auto;
   }
 }
@@ -68,7 +68,7 @@
   text-align: center;
   justify-content: center;
   align-items: center;
-  padding: $unit 0;
+  padding: $double-unit 0;
 
   h2 {
     margin-top: 0;
@@ -84,7 +84,7 @@
   flex: 0 0 50%;
 
   .map {
-    height: 128px; // 100%;
+    height: 176px; // 100%;
   }
 }
 
@@ -103,7 +103,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: $unit 0;
+  padding: $unit 0 $double-unit;
 
   label {
     font-size: 32px;
