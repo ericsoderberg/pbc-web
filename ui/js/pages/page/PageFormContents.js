@@ -7,6 +7,7 @@ import EventSectionEdit from './EventSectionEdit';
 import LibrarySectionEdit from './LibrarySectionEdit';
 import UserSectionEdit from './UserSectionEdit';
 import PagesSectionEdit from './PagesSectionEdit';
+import VideoSectionEdit from './VideoSectionEdit';
 
 const SECTIONS = {
   event: EventSectionEdit,
@@ -14,7 +15,8 @@ const SECTIONS = {
   library: LibrarySectionEdit,
   pages: PagesSectionEdit,
   text: TextSectionEdit,
-  user: UserSectionEdit
+  user: UserSectionEdit,
+  video: VideoSectionEdit
 };
 
 export default class PageFormContents extends Component {
@@ -88,7 +90,7 @@ export default class PageFormContents extends Component {
       );
     });
 
-    const addControls = ['text', 'image', 'event', 'library', 'user', 'pages'].map(type => (
+    const addControls = ['text', 'image', 'event', 'library', 'user', 'pages', 'video'].map(type => (
       <button key={type} type="button" onClick={this._onAddSection.bind(this, type)}>
         {type}
       </button>

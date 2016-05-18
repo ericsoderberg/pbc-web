@@ -8,15 +8,16 @@ export default class Video extends Component {
 
   render () {
     const { url, full, plain } = this.props;
+    console.log('!!! Video', window.location);
 
-    let iframe;
+    let iframe = <span>Unknown type</span>;
     if (url) {
       // TOOD: Handle YouTube vs. Vimeo
       const match = url.match(VIMEO_REGEXP);
       if (match) {
         iframe = (
           <iframe className="video vimeo-player section" type="text/html" width="960" height="540"
-            src={`https://player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
+            src={`${window.location.protocol}//player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
             frameBorder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen>
           </iframe>
         );

@@ -6,6 +6,7 @@ import EventSummary from '../../components/EventSummary';
 import Library from '../../components/Library';
 import PageSummaries from '../../components/PageSummaries';
 import UserSummary from '../../components/UserSummary';
+import Video from '../../components/Video';
 
 const PageContents = (props) => {
   const page = props.item;
@@ -33,6 +34,11 @@ const PageContents = (props) => {
       return (
         <PageSummaries key={index} full={section.full} color={section.color}
           pageSummaries={section.pages} />
+      );
+    } else if ('video' === section.type) {
+      return (
+        <Video key={index} full={section.full} color={section.color}
+          url={section.url} />
       );
     } else {
       return 'TBD';
