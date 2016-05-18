@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
+import ImageField from '../../components/ImageField';
 
 export default class SiteFormContents extends Component {
 
@@ -31,15 +32,8 @@ export default class SiteFormContents extends Component {
           <input ref="name" name="name" value={site.name || ''}
             onChange={formState.change('name')}/>
         </FormField>
-        <FormField name="logo" label="Logo"
-          onDrop={formState.dropFile('logo')}>
-          <div>
-            <img className="logo"
-              src={site.logo ? site.logo.data : ''} />
-          </div>
-          <input name="logo" type="file"
-            onChange={formState.changeFile('logo')}/>
-        </FormField>
+        <ImageField label="Logo" name="logo"
+          formState={formState} property="logo" />
         <FormField label="Home page">
           <select name="homePageId" value={site.homePageId || ''}
             onChange={formState.change('homePageId')}>

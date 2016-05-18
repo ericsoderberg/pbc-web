@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems, postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
+import ImageField from '../../components/ImageField';
 import DateTime from '../../components/DateTime';
 import ConfirmRemove from '../../components/ConfirmRemove';
 
@@ -57,39 +58,6 @@ export default class MessageFormContents extends Component {
     };
   }
 
-  _renderImageField () {
-    const { formState } = this.props;
-    const message = formState.object;
-    let field;
-    if (message.image) {
-      field = (
-        <FormField name="image" label="Image">
-          <img className="form-field__image"
-            src={message.image.data} />
-          <input name="imageRemove" type="checkbox"
-            checked={message.image || false}
-            onChange={() => formState.set('image', false)}/>
-          <label htmlFor="imageRemove">Clear</label>
-        </FormField>
-      );
-    } else {
-      const imageHelp = (
-        <span>
-          {"Don't forget to "}
-          <a href="https://tinyjpg.com" target="_blank">optimize</a>!
-        </span>
-      );
-      field = (
-        <FormField name="image" label="Image" help={imageHelp}
-          onDrop={formState.dropFile('image')}>
-          <input name="image" type="file"
-            onChange={formState.changeFile('image')}/>
-        </FormField>
-      );
-    }
-    return field;
-  }
-
   _renderFileField (file, index) {
     let field;
     if (file._id) {
@@ -120,8 +88,6 @@ export default class MessageFormContents extends Component {
       <a href="http://daringfireball.net/projects/markdown/syntax"
         target="_blank">Markdown syntax</a>
     );
-
-    let imageField = this._renderImageField();
 
     let files;
     if (message.files) {
@@ -155,7 +121,8 @@ export default class MessageFormContents extends Component {
           </FormField>
         </fieldset>
         <fieldset className="form__fields">
-          {imageField}
+          <ImageField label="Image" name="image"
+            formState={formState} property="image" />
           <FormField name="text" label="Text" help={textHelp}>
             <textarea ref="text" name="text" value={message.text || ''} rows={4}
               onChange={formState.change('text')}/>

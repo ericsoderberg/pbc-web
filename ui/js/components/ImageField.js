@@ -10,6 +10,7 @@ export default class ImageField extends Component {
 
     let result;
     if (image) {
+      
       result = (
         <FormField label={label}>
           <div>
@@ -21,9 +22,18 @@ export default class ImageField extends Component {
           <label htmlFor={name}>Clear</label>
         </FormField>
       );
+
     } else {
+
+      const imageHelp = (
+        <span>
+          {"Don't forget to "}
+          <a href="https://tinyjpg.com" target="_blank">optimize</a>!
+        </span>
+      );
+
       result = (
-        <FormField label={label}
+        <FormField label={label} help={imageHelp}
           onDrop={formState.dropFile(property)}>
           <input name={name} type="file"
             onChange={formState.changeFile(property)}/>

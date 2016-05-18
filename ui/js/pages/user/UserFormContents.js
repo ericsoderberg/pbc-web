@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import ImageField from '../../components/ImageField';
 
 export default class UserFormContents extends Component {
 
@@ -17,30 +18,6 @@ export default class UserFormContents extends Component {
         target="_blank">Markdown syntax</a>
     );
 
-    let avatarField;
-    if (user.avatar) {
-      avatarField = (
-        <FormField name="avatar" label="Avatar">
-          <div>
-            <img className="avatar"
-              src={user.avatar.data} />
-          </div>
-          <input name="avatarRemove" type="checkbox"
-            checked={user.avatar || false}
-            onChange={() => formState.set('avatar', false)}/>
-          <label htmlFor="avatarRemove">Clear</label>
-        </FormField>
-      );
-    } else {
-      avatarField = (
-        <FormField name="avatar" label="Avatar"
-          onDrop={formState.dropFile('avatar')}>
-          <input name="avatar" type="file"
-            onChange={formState.changeFile('avatar')}/>
-        </FormField>
-      );
-    }
-
     return (
       <fieldset className="form__fields">
         <FormField label="Name">
@@ -55,7 +32,8 @@ export default class UserFormContents extends Component {
           <input name="password" type="password" value={user.password || ''}
             onChange={formState.change('password')}/>
         </FormField>
-        {avatarField}
+        <ImageField label="Photo" name="avatar"
+          formState={formState} property="avatar" />
         <FormField name="text" label="Text" help={textHelp}>
           <textarea ref="text" name="text" value={user.text || ''} rows={8}
             onChange={formState.change('text')}/>
