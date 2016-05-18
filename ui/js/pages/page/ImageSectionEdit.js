@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
+import SectionFields from './SectionFields';
 
 export default class ImageSectionEdit extends Component {
 
@@ -34,12 +35,7 @@ export default class ImageSectionEdit extends Component {
           <input name="image" type="file"
             onChange={formState.changeFile('image')}/>
         </FormField>
-        <FormField>
-          <input name="full" type="checkbox"
-            checked={section.full || false}
-            onChange={formState.toggle('full')}/>
-          <label htmlFor="full">Edge to edge</label>
-        </FormField>
+        <SectionFields formState={formState} />
       </fieldset>
     );
   }

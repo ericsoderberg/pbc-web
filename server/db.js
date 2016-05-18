@@ -38,13 +38,20 @@ mongoose.model('User', userSchema);
 
 const pageSectionSchema = Schema({
   type: { type: String,
-    enum: ['text', 'image', 'event', 'library', 'form', 'user']
+    enum: ['text', 'image', 'event', 'library', 'form', 'user', 'pages']
   },
   color: String,
   full: Boolean,
   image: image, // image type
   name: String,       // library type
-  objectId: ObjectId, // event, form types
+  eventId: ObjectId, // event type
+  formId: ObjectId, // form type
+  pages: [{
+    id: ObjectId,
+    image: image,
+    text: String,
+    tile: image
+  }], // pages type
   text: String        // text type
 });
 

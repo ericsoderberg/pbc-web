@@ -27,6 +27,10 @@
 
 .form__fields {
   margin: $double-unit $unit;
+
+  legend {
+    margin: $quarter-unit;
+  }
 }
 
 .form__fields-header {
@@ -97,11 +101,12 @@
   display: flex;
   flex-direction: row;
   justify-content: stretch;
+  flex-wrap: wrap;
   max-width: $form-width;
   margin: 0 auto;
 
   > * {
-    flex: 1;
+    flex: 1 0 auto;
   }
 }
 
@@ -247,4 +252,8 @@
 
 .used-by {
   margin-left: $half-unit;
+}
+
+.image-field__image {
+  max-width: 100%;
 }

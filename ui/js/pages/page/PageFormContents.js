@@ -6,11 +6,13 @@ import ImageSectionEdit from './ImageSectionEdit';
 import EventSectionEdit from './EventSectionEdit';
 import LibrarySectionEdit from './LibrarySectionEdit';
 import UserSectionEdit from './UserSectionEdit';
+import PagesSectionEdit from './PagesSectionEdit';
 
 const SECTIONS = {
   event: EventSectionEdit,
   image: ImageSectionEdit,
   library: LibrarySectionEdit,
+  pages: PagesSectionEdit,
   text: TextSectionEdit,
   user: UserSectionEdit
 };
@@ -86,7 +88,7 @@ export default class PageFormContents extends Component {
       );
     });
 
-    const addControls = ['text', 'image', 'event', 'library', 'user'].map(type => (
+    const addControls = ['text', 'image', 'event', 'library', 'user', 'pages'].map(type => (
       <button key={type} type="button" onClick={this._onAddSection.bind(this, type)}>
         {type}
       </button>
@@ -99,15 +101,17 @@ export default class PageFormContents extends Component {
             <input ref="name" name="name" value={page.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
+          <FormField name="path" label="Path">
+            <input name="path" value={page.path || ''}
+              onChange={formState.change('path')}/>
+          </FormField>
         </fieldset>
         {sections}
         <fieldset className="form__fields">
           <FormField label="Add section">
-            {addControls}
-          </FormField>
-          <FormField name="path" label="Path">
-            <input name="path" value={page.path || ''}
-              onChange={formState.change('path')}/>
+            <div className="form__tabs">
+              {addControls}
+            </div>
           </FormField>
         </fieldset>
       </div>

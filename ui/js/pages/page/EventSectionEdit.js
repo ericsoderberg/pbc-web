@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
+import SectionFields from './SectionFields';
 
 export default class EventSectionEdit extends Component {
 
@@ -34,22 +35,13 @@ export default class EventSectionEdit extends Component {
 
     return (
       <fieldset className="form__fields">
-        <FormField name="event" label="Event">
-          <select name="objectId" value={section.objectId || ''}
-            onChange={formState.change('objectId')}>
+        <FormField name="eventId" label="Event">
+          <select name="eventId" value={section.eventId || ''}
+            onChange={formState.change('eventId')}>
             {events}
           </select>
         </FormField>
-        <FormField>
-          <input name="full" type="checkbox"
-            checked={section.full || false}
-            onChange={formState.toggle('full')}/>
-          <label htmlFor="full">Edge to edge</label>
-        </FormField>
-        <FormField label="Background color">
-          <input ref="color" name="color" value={section.color || ''}
-            onChange={formState.change('color')}/>
-        </FormField>
+        <SectionFields formState={formState} />
       </fieldset>
     );
   }

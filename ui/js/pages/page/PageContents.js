@@ -4,6 +4,7 @@ import Text from '../../components/Text';
 import Image from '../../components/Image';
 import EventSummary from '../../components/EventSummary';
 import Library from '../../components/Library';
+import PageSummaries from '../../components/PageSummaries';
 import UserSummary from '../../components/UserSummary';
 
 const PageContents = (props) => {
@@ -27,6 +28,11 @@ const PageContents = (props) => {
       return (
         <UserSummary key={index} full={section.full} color={section.color}
           id={section.objectId} />
+      );
+    } else if ('pages' === section.type) {
+      return (
+        <PageSummaries key={index} full={section.full} color={section.color}
+          pageSummaries={section.pages} />
       );
     } else {
       return 'TBD';

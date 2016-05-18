@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
+import SectionFields from './SectionFields';
 
 export default class TextSectionEdit extends Component {
 
@@ -30,10 +31,7 @@ export default class TextSectionEdit extends Component {
           <textarea ref="text" name="text" value={section.text || ''} rows={8}
             onChange={formState.change('text')}/>
         </FormField>
-        <FormField label="Background color">
-          <input ref="color" name="color" value={section.color || ''}
-            onChange={formState.change('color')}/>
-        </FormField>
+        <SectionFields formState={formState} />
       </fieldset>
     );
   }
