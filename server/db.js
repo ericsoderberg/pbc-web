@@ -53,7 +53,8 @@ const pageSectionSchema = Schema({
     tile: image
   }],
   text: String,       // text type
-  url: String         // video type
+  url: String,        // video type
+  userId: ObjectId    // user type
 });
 
 const pageSchema = Schema({

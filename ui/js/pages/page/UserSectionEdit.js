@@ -36,8 +36,8 @@ export default class UserSectionEdit extends Component {
     return (
       <fieldset className="form__fields">
         <FormField name="user" label="User">
-          <select name="objectId" value={section.objectId || ''}
-            onChange={formState.change('objectId')}>
+          <select name="objectId" value={section.userId || ''}
+            onChange={formState.change('userId')}>
             {users}
           </select>
         </FormField>

@@ -18,7 +18,7 @@ const PageContents = (props) => {
     } else if ('event' === section.type) {
       return (
         <EventSummary key={index} full={section.full} color={section.color}
-          id={section.objectId} />
+          id={section.eventId} />
       );
     } else if ('library' === section.type) {
       return (
@@ -28,7 +28,7 @@ const PageContents = (props) => {
     } else if ('user' === section.type) {
       return (
         <UserSummary key={index} full={section.full} color={section.color}
-          id={section.objectId} />
+          id={section.userId} />
       );
     } else if ('pages' === section.type) {
       return (
