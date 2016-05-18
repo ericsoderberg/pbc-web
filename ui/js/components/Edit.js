@@ -13,8 +13,9 @@ export default class Edit extends Component {
   }
 
   componentDidMount () {
+    document.title = this.props.title;
     getItem(this.props.category, this.props.params.id)
-    .then(response => this.setState({ item: response }))
+    .then(item => this.setState({ item: item }))
     .catch(error => console.log("!!! Edit catch", error));;
   }
 

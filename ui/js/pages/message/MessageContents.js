@@ -17,7 +17,8 @@ export default class MessageContents extends Component {
 
   _renderMessageNav (message, type) {
     return (
-      <Link className={`message__nav-${type}`} to={`/messages/${message._id}`}>
+      <Link className={`message__nav-${type}`}
+        to={`/messages/${message.path || message._id}`}>
         <div className="message__nav-name">{message.name}</div>
         <div className="message__nav-verses">{message.verses}</div>
       </Link>

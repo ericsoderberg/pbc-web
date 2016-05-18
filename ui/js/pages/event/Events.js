@@ -8,7 +8,8 @@ const Item = (props) => {
   const { className, item: event } = props;
   let classNames = ['item__container', className];
   return (
-    <Link className={classNames.join(' ')} to={`/events/${event._id}`}>
+    <Link className={classNames.join(' ')}
+      to={`/events/${event.path || event._id}`}>
       <div className="item">
         <span>{event.name}</span>
         <span className="box--row">

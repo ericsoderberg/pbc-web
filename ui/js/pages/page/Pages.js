@@ -7,7 +7,8 @@ const Item = (props) => {
   const { className, item: page } = props;
   let classNames = ['item__container', className];
   return (
-    <Link className={classNames.join(' ')} to={`/pages/${page._id}`}>
+    <Link className={classNames.join(' ')}
+      to={page.path || `/pages/${page._id}`}>
       <div className="item">
         <span>{page.name}</span>
       </div>

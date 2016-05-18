@@ -105,6 +105,10 @@ export default class PageFormContents extends Component {
           <FormField label="Add section">
             {addControls}
           </FormField>
+          <FormField name="path" label="Path">
+            <input name="path" value={page.path || ''}
+              onChange={formState.change('path')}/>
+          </FormField>
         </fieldset>
       </div>
     );

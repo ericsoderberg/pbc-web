@@ -184,6 +184,10 @@ export default class MessageFormContents extends Component {
             <input name="library" value={message.library || ''}
               onChange={formState.change('library')}/>
           </FormField>
+          <FormField name="path" label="Path">
+            <input name="path" value={message.path || ''}
+              onChange={formState.change('path')}/>
+          </FormField>
         </fieldset>
       </div>
     );

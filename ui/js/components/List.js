@@ -14,6 +14,8 @@ export default class List extends Component {
   }
 
   componentDidMount () {
+    document.title = this.props.title;
+
     getItems(this.props.category, { sort: this.props.sort })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));

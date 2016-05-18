@@ -16,6 +16,7 @@ export default class Calendar extends Component {
   }
 
   componentDidMount () {
+    document.title = 'Calendar';
     const filterValue = this.props.params.calendar;
     let filter = (filterValue ? { calendar: filterValue } : undefined);
     this.setState({ filter: filter }, this._get);

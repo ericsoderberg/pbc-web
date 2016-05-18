@@ -11,6 +11,10 @@ export default class Add extends Component {
     this.state = { item: {} };
   }
 
+  componentDidMount () {
+    document.title = this.props.title;
+  }
+
   _onAdd (item) {
     postItem(this.props.category, item)
     .then(response => this.context.router.goBack())

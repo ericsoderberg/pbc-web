@@ -140,6 +140,10 @@ class EventFormFields extends Component {
           <input name="calendar" value={event.calendar || ''}
             onChange={formState.change('calendar')}/>
         </FormField>
+        <FormField name="path" label="Path">
+          <input name="path" value={event.path || ''}
+            onChange={formState.change('path')}/>
+        </FormField>
         {primaryEvent}
         {additionalTimes}
         <FormField>

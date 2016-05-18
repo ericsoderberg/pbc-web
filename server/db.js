@@ -30,6 +30,7 @@ const userSchema = Schema({
   email: String,
   encryptedPassword: String,
   name: String,
+  path: String,
   text: String
 });
 
@@ -50,7 +51,7 @@ const pageSectionSchema = Schema({
 const pageSchema = Schema({
   sections: [pageSectionSchema],
   name: String,
-  url: String
+  path: String
 });
 
 mongoose.model('Page', pageSchema);
@@ -58,11 +59,12 @@ mongoose.model('Page', pageSchema);
 const eventSchema = Schema({
   address: String, // mappable
   calendar: String,
+  dates: [Date],
   end: Date,
   primaryEventId: ObjectId, // set in one-off cases
   location: String, // room, house owner's name, etc.
   name: String,
-  dates: [Date],
+  path: String,
   resourceIds: [ObjectId], // resources
   start: Date,
   text: String,
@@ -142,6 +144,7 @@ const messageSchema = Schema({
   image: image,
   library: String,
   name: String,
+  path: String,
   series: Boolean,
   seriesId: ObjectId,
   text: String,

@@ -82,6 +82,7 @@ export default {
     { path: 'newsletters/:id', component: Newsletter },
     { path: 'newsletters/:id/edit', component: NewsletterEdit },
     { path: 'newsletters', component: Newsletters },
-    { path: 'files', component: Files }
+    { path: 'files', component: Files },
+    { path: ':id', component: Page }
   ]
 };

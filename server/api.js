@@ -1,6 +1,7 @@
 "use strict";
 import express from 'express';
 import mongoose from 'mongoose';
+import { ObjectID } from 'mongodb';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import moment from 'moment';
@@ -81,7 +82,8 @@ const register = (category, modelName, options={}) => {
     router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
-      let query = Doc.findById(id);
+      const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
+      let query = Doc.findOne(criteria);
       if (options.populate) {
         query = query.populate(options.populate);
       }
@@ -235,9 +237,11 @@ router.get('/messages/:id', (req, res) => {
   const Doc = mongoose.model('Message');
   let results = { remaining: 4 };
   let errors = [];
+  const subFields = 'name verses date path';
 
   // message
-  Doc.findById(id).populate({ path: 'seriesId', select: 'name' }).exec()
+  const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
+  Doc.findOne(criteria).populate({ path: 'seriesId', select: 'name' }).exec()
   .then(message => {
 
     // nextMessage
@@ -246,7 +250,7 @@ router.get('/messages/:id', (req, res) => {
       date: { $gt: message.date },
       series: { $ne: true }
     })
-    .sort('date').limit(1).select('name verses').exec()
+    .sort('date').limit(1).select(subFields).exec()
     .then(doc => messageCompleter('nextMessage', doc[0], results, res))
     .catch(error => messageCompleter('error', error, results, res));
 
@@ -256,17 +260,17 @@ router.get('/messages/:id', (req, res) => {
       date: { $lt: message.date },
       series: { $ne: true }
     })
-    .sort('-date').limit(1).select('name verses').exec()
+    .sort('-date').limit(1).select(subFields).exec()
     .then(doc => messageCompleter('previousMessage', doc[0], results, res))
+    .catch(error => messageCompleter('error', error, results, res));
+
+    // seriesMessages
+    Doc.find({ seriesId: message.id }).select(subFields).exec()
+    .then(doc => messageCompleter('seriesMessages', doc, results, res))
     .catch(error => messageCompleter('error', error, results, res));
 
     messageCompleter('message', message, results, errors, res);
   })
-  .catch(error => messageCompleter('error', error, results, res));
-
-  // seriesMessages
-  Doc.find({ seriesId: id }).select('name').exec()
-  .then(doc => messageCompleter('seriesMessages', doc, results, res))
   .catch(error => messageCompleter('error', error, results, res));
 });
 

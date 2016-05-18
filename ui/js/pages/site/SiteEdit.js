@@ -13,6 +13,7 @@ export default class SiteEdit extends Component {
   }
 
   componentDidMount () {
+    document.title = 'Site';
     getSite()
     // allow for no site existing yet
     .then(site => this.setState({ site: site || {} }))

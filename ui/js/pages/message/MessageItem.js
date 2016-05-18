@@ -10,7 +10,8 @@ const MessageItem = (props) => {
     classNames.push(props.className);
   }
   return (
-    <Link className={classNames.join(' ')} to={`/messages/${message._id}`}>
+    <Link className={classNames.join(' ')}
+      to={`/messages/${message.path || message._id}`}>
       <div className="item">
         <span>{message.name}</span>
         <span className="box--row">
