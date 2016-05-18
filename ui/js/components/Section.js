@@ -16,6 +16,7 @@ const Section = (props) => {
     let style;
     if (color) {
       style = { backgroundColor: color, color: '#fff' };
+      classNames.push('section__container--colored');
     }
 
     child = React.cloneElement(child, {

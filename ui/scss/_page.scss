@@ -33,6 +33,16 @@
   }
 }
 
+.section__container--colored {
+  a {
+    color: #fff;
+
+    &:hover {
+      color: $control-color;
+    }
+  }
+}
+
 
 .map {
   position: relative;

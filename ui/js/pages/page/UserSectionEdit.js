@@ -46,6 +46,10 @@ export default class UserSectionEdit extends Component {
             onChange={formState.toggle('full')}/>
           <label htmlFor="full">Edge to edge</label>
         </FormField>
+        <FormField label="Background color">
+          <input ref="color" name="color" value={section.color || ''}
+            onChange={formState.change('color')}/>
+        </FormField>
       </fieldset>
     );
   }

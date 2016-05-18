@@ -14,11 +14,20 @@ const PageContents = (props) => {
     } else if ('image' === section.type) {
       return <Image key={index} full={section.full} image={section.image} />;
     } else if ('event' === section.type) {
-      return <EventSummary key={index} full={section.full} id={section.objectId} />;
+      return (
+        <EventSummary key={index} full={section.full} color={section.color}
+          id={section.objectId} />
+      );
     } else if ('library' === section.type) {
-      return <Library key={index} full={section.full} name={section.name} />;
+      return (
+        <Library key={index} full={section.full} color={section.color}
+          name={section.name} />
+      );
     } else if ('user' === section.type) {
-      return <UserSummary key={index} full={section.full} id={section.objectId} />;
+      return (
+        <UserSummary key={index} full={section.full} color={section.color}
+          id={section.objectId} />
+      );
     } else {
       return 'TBD';
     }
