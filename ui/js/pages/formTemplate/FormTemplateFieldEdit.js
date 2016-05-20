@@ -1,6 +1,9 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import DownIcon from '../../icons/Down';
+import UpIcon from '../../icons/Up';
+import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateOptionEdit from './FormTemplateOptionEdit';
 
@@ -78,23 +81,29 @@ export default class FormTemplateFieldEdit extends Component {
 
     const options = (field.options || []).map((option, index) => {
       const raise = (index === 0 ? undefined : (
-        <button type="button"
-          onClick={formState.swapWith('options', index, index-1)}>up</button>
+        <button type="button" className="button--icon"
+          onClick={formState.swapWith('options', index, index-1)}>
+          <UpIcon />
+        </button>
       ));
       const lower = (index === (field.options.length - 1) ? undefined : (
-        <button type="button"
-          onClick={formState.swapWith('options', index, index+1)}>down</button>
+        <button type="button" className="button--icon"
+          onClick={formState.swapWith('options', index, index+1)}>
+          <DownIcon />
+        </button>
         ));
 
       return (
         <div key={index}>
           <div className="form__fields-header">
             <legend>{`Option ${index + 1}`}</legend>
-            <span>
+            <span className="form__fields-header-actions">
               {raise}
               {lower}
-              <button type="button"
-                onClick={formState.removeAt('options', index)}>remove</button>
+              <button type="button" className="button--icon"
+                onClick={formState.removeAt('options', index)}>
+                <TrashIcon />
+              </button>
             </span>
           </div>
           <FormTemplateOptionEdit key={index} option={option} index={index}

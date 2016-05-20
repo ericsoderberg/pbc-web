@@ -106,8 +106,7 @@ const formTemplateFieldSchema = Schema({
   options: [formTemplateOptionSchema],
   required: Boolean,
   type: { type: String,
-    enum: ['single line', 'multiple line', 'single choice', 'multiple choice',
-      'count', 'instructions']
+    enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions']
   },
   value: String // unused?
 });

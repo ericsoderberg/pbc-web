@@ -1,51 +1,82 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import DownIcon from '../../icons/Down';
+import UpIcon from '../../icons/Up';
+import TrashIcon from '../../icons/Trash';
 import FormTemplateSectionEdit from './FormTemplateSectionEdit';
 
 export default class FormTemplateFormContents extends Component {
 
   constructor () {
     super();
+    this.state = {
+      expandedSections: {}, // _id or id
+      newSectionId: 1
+    };
+  }
+
+  _toggleSection (id) {
+    return () => {
+      let expandedSections = { ...this.state.expandedSections };
+      expandedSections[id] = ! expandedSections[id];
+      this.setState({ expandedSections: expandedSections });
+    };
   }
 
   render () {
     const { formState } = this.props;
+    const { expandedSections } = this.state;
     const formTemplate = formState.object;
 
     const sections = (formTemplate.sections || []).map((section, index) => {
 
       const raise = (index === 0 ? undefined : (
-        <button type="button"
-          onClick={formState.swapWith('sections', index, index-1)}>up</button>
+        <button type="button" className="button--icon"
+          onClick={formState.swapWith('sections', index, index-1)}>
+          <UpIcon />
+        </button>
       ));
       const lower = (index === (formTemplate.sections.length - 1) ? undefined : (
-        <button type="button"
-          onClick={formState.swapWith('sections', index, index+1)}>down</button>
+        <button type="button" className="button--icon"
+          onClick={formState.swapWith('sections', index, index+1)}>
+          <DownIcon />
+        </button>
         ));
 
       let header;
       if (formTemplate.sections.length > 1) {
         header = (
           <div className="form__fields-header">
-            <legend>{`Section ${index + 1}`}</legend>
-            <span>
+            <h4 className="form__fields-header-label"
+              onClick={this._toggleSection(section._id || section.id)}>
+              {section.name || `Section ${index + 1}`}
+            </h4>
+            <span className="form__fields-header-actions">
               {raise}
               {lower}
-              <button type="button"
-                onClick={formState.removeAt('sections', index)}>remove</button>
+              <button type="button" className="button--icon"
+                onClick={formState.removeAt('sections', index)}>
+                <TrashIcon />
+              </button>
             </span>
           </div>
         );
       }
 
+      let edit;
+      if (! header || expandedSections[section._id] || expandedSections[section.id]) {
+        edit = (
+          <FormTemplateSectionEdit key={index} section={section}
+            includeName={formTemplate.sections.length > 1}
+            onChange={formState.changeAt('sections', index)} />
+        );
+      }
 
       return (
         <div key={index}>
           {header}
-          <FormTemplateSectionEdit key={index} section={section}
-            includeName={formTemplate.sections.length > 1}
-            onChange={formState.changeAt('sections', index)} />
+          {edit}
         </div>
       );
     });
@@ -68,10 +99,14 @@ export default class FormTemplateFormContents extends Component {
           </FormField>
         </fieldset>
         {sections}
-        <fieldset>
+        <fieldset className="form__fields">
           <FormField>
             <div className="form__tabs">
-              <button type="button" onClick={formState.addTo('sections')}>
+              <button type="button" onClick={formState.addTo('sections', () => {
+                const id = this.state.newSectionId;
+                this.setState({ newSectionId: this.state.newSectionId + 1 });
+                return { id: id };
+              })}>
                 Add section
               </button>
             </div>

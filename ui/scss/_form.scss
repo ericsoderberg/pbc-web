@@ -40,11 +40,24 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-right: $unit;
-  margin-bottom: - $double-unit;
+  // margin-bottom: - $double-unit;
 
-  legend {
-    margin: $quarter-unit;
+  + .form__fields,
+  + * .form__fields {
+    margin-top: 0;
+  }
+}
+
+.form__fields-header-label {
+  flex: 1 0 auto;
+  margin: 0;
+  padding: ($unit * 0.6667) $quarter-unit;
+  height: $double-unit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
   }
 }
 
@@ -95,6 +108,10 @@
   justify-content: space-between;
   padding: $half-unit $half-unit 0;
   color: $tertiary-color;
+
+  + .form__tabs {
+    margin-top: $quarter-unit;
+  }
 }
 
 .form-field__image {
@@ -177,7 +194,6 @@
 .date-time__header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
 }
 
@@ -261,4 +277,12 @@
 
 .image-field__image {
   max-width: 100%;
+}
+
+.control-icon {
+  width: $unit;
+  height: $unit;
+  cursor: pointer;
+  fill: $secondary-color;
+  stroke: $secondary-color;
 }

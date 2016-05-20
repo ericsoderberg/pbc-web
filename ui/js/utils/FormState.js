@@ -89,7 +89,11 @@ export default class FormState {
   addTo (propertyName, object = {}) {
     return event => {
       let array = (this.object[propertyName] || []).slice(0);
-      array.push(object);
+      if (typeof object === 'function') {
+        array.push(object());
+      } else {
+        array.push(object);
+      }
       this.set(propertyName, array);
     };
   }
