@@ -66,18 +66,6 @@ button {
   margin: 0;
   cursor: pointer;
 
-  &:not(.button--link):not(.button--icon) {
-    padding: $half-unit $unit;
-    background-color: $control-background-color;
-    color: $control-color;
-    font-size: 18px;
-
-    &:hover {
-      background-color: $control-hover-background;
-      color: $active-color;
-    }
-  }
-
   &.button--icon {
     padding: $half-unit;
     width: $double-unit;
@@ -92,6 +80,20 @@ button {
         stroke: $active-color;
       }
     }
+  }
+}
+
+button:not(.button--link):not(.button--icon),
+.link--button {
+  padding: $half-unit $unit;
+  background-color: $control-background-color;
+  color: $control-color;
+  font-size: 18px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
   }
 }
 

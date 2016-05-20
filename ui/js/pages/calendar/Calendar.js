@@ -17,18 +17,22 @@ export default class Calendar extends Component {
 
   componentDidMount () {
     document.title = 'Calendar';
-    const filterValue = this.props.params.calendar;
-    let filter = (filterValue ? { calendar: filterValue } : undefined);
-    this.setState({ filter: filter }, this._get);
 
+    this._setFilter(this.props);
+
+    // Load the possible calendars
     getItems('events', { distinct: 'calendar' })
     .then(response => this.setState({ filterValues: response }))
     .catch(error => console.log('!!! Calendar filter catch', error));
   }
 
   componentWillReceiveProps (nextProps) {
-    const filterValue = nextProps.params.calendar;
-    let filter = (filterValue ? { calendar: filterValue } : undefined);
+    this._setFilter(nextProps);
+  }
+
+  _setFilter (props) {
+    const name = props.location.query.name;
+    let filter = (name ? { name: name } : undefined);
     this.setState({ filter: filter }, this._get);
   }
 
@@ -55,8 +59,8 @@ export default class Calendar extends Component {
 
   _onFilter (event) {
     const value = event.target.value;
-    const path = value ? `/calendar/${value}` : '/calendar';
-    this.context.router.replace({ pathname: path });
+    const search = (value && 'All' !== value) ? `?name=${value}` : undefined;
+    this.context.router.replace({ pathname: '/calendar', search: search });
   }
 
   _renderDaysOfWeek () {
@@ -164,10 +168,10 @@ export default class Calendar extends Component {
       let options = (filterValues || []).map(value => (
         <option key={value}>{value}</option>
       ));
-      options.unshift(<option key="_all"></option>);
+      options.unshift(<option key="_all">All</option>);
       filterControl = (
         <select key="filter" className="select--header"
-          value={filter.calendar} onChange={this._onFilter}>
+          value={filter ? filter.name : undefined} onChange={this._onFilter}>
           {options}
         </select>
       );
@@ -175,7 +179,7 @@ export default class Calendar extends Component {
 
     return (
       <main>
-        <PageHeader title="Calendar"
+        <PageHeader title="Calendar" homer={true}
           searchText={searchText} onSearch={this._onSearch}
           actions={filterControl} />
         <div className="calendar">
@@ -204,8 +208,8 @@ export default class Calendar extends Component {
 };
 
 Calendar.propTypes = {
-  params: PropTypes.shape({
-    calendar: PropTypes.string
+  location: PropTypes.shape({
+    query: PropTypes.object
   })
 };
 

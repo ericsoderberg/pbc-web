@@ -5,7 +5,12 @@ export default class PageHeader extends Component {
 
   constructor () {
     super();
+    this._onHome = this._onHome.bind(this);
     this._onBack = this._onBack.bind(this);
+  }
+
+  _onHome () {
+    this.context.router.push('/');
   }
 
   _onBack () {
@@ -13,14 +18,18 @@ export default class PageHeader extends Component {
   }
 
   render () {
-    const { title, searchText, onSearch, actions, form, back } = this.props;
+    const { title, searchText, onSearch, actions, form, back, homer } = this.props;
     let classes = ["page-header"];
     if (form) {
       classes.push("page-header--form");
     }
 
     let backControl;
-    if (back) {
+    if (homer) {
+      backControl = (
+        <button className="page-header__back" onClick={this._onHome}>Home</button>
+      );
+    } else if (back) {
       backControl = (
         <button className="page-header__back" onClick={this._onBack}>&lt;</button>
       );
@@ -53,6 +62,7 @@ PageHeader.propTypes = {
   back: PropTypes.bool,
   color: PropTypes.string,
   form: PropTypes.bool,
+  homer: PropTypes.bool,
   onSearch: PropTypes.func,
   searchText: PropTypes.string,
   title: PropTypes.string.isRequired

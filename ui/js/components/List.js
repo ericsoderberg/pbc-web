@@ -16,9 +16,7 @@ export default class List extends Component {
   componentDidMount () {
     document.title = this.props.title;
 
-    getItems(this.props.category, { sort: this.props.sort })
-    .then(response => this.setState({ items: response }))
-    .catch(error => console.log('!!! List catch', error));
+    this._setFilter(this.props);
 
     if (this.props.filter) {
       getItems(this.props.category, { distinct: this.props.filter })
@@ -28,13 +26,22 @@ export default class List extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const filterValue = nextProps.location.query[nextProps.filter];
+    this._setFilter(nextProps);
+  }
+
+  _setFilter (props) {
+    const filterValue = props.location.query[props.filter];
     let filter;
     if (filterValue) {
       filter = {};
-      filter[this.props.filter] = filterValue;
+      filter[props.filter] = filterValue;
     }
-    getItems(this.props.category, { sort: this.props.sort, filter: filter })
+    this.setState({ filter: filter }, this._get);
+  }
+
+  _get () {
+    getItems(this.props.category,
+      { sort: this.props.sort, filter: this.state.filter })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
   }
@@ -53,13 +60,13 @@ export default class List extends Component {
 
   _onFilter (event) {
     const value = event.target.value;
-    this.context.router.replace({ pathname: window.location.pathname,
-      query: { library: value } });
+    const search = (value && 'All' !== value) ? `?library=${value}` : undefined;
+    this.context.router.replace({ pathname: window.location.pathname, search: search });
   }
 
   render () {
-    const { filter, Item, path, title, marker, sort } = this.props;
-    const { filterValues, searchText } = this.state;
+    const { Item, path, title, marker, sort } = this.props;
+    const { filterValues, searchText, filter } = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
@@ -94,13 +101,14 @@ export default class List extends Component {
     );
 
     let filterControl;
-    if (filter && filterValues) {
+    if (filterValues) {
       let options = (filterValues || []).map(value => (
         <option key={value}>{value}</option>
       ));
-      options.unshift(<option key="_all"></option>);
+      options.unshift(<option key="_all">All</option>);
       filterControl = (
-        <select key="filter" className="select--header" onChange={this._onFilter}>
+        <select key="filter" className="select--header"
+          value={filter ? filter.library : undefined} onChange={this._onFilter}>
           {options}
         </select>
       );
