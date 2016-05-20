@@ -105,7 +105,11 @@ const formTemplateFieldSchema = Schema({
   name: String,
   options: [formTemplateOptionSchema],
   required: Boolean,
-  value: String
+  type: { type: String,
+    enum: ['single line', 'multiple line', 'single choice', 'multiple choice',
+      'count', 'instructions']
+  },
+  value: String // unused?
 });
 
 const formTemplateSectionSchema = Schema({
@@ -116,7 +120,9 @@ const formTemplateSectionSchema = Schema({
 
 const formTemplateSchema = Schema({
   name: String,
+  path: String,
   sections: [formTemplateSectionSchema],
+  submitLabel: String,
   version: Number
 });
 
@@ -130,7 +136,7 @@ const formFieldSchema = Schema({
 const formSchema = Schema({
   fields: [formFieldSchema],
   paymentId: ObjectId,
-  templateId: ObjectId,
+  formTemplateId: ObjectId,
   userId: ObjectId,
   version: Number
 });

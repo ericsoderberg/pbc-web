@@ -12,9 +12,7 @@ class EventFormFields extends Component {
   constructor () {
     super();
     this._onStartChange = this._onStartChange.bind(this);
-    this._onAddAdditionalTime = this._onAddAdditionalTime.bind(this);
     this._additionalTimeChange = this._additionalTimeChange.bind(this);
-    this._onRemoveAdditionalTime = this._onRemoveAdditionalTime.bind(this);
     this.state = { events: [] };
   }
 
@@ -40,14 +38,6 @@ class EventFormFields extends Component {
     formState.set(props);
   }
 
-  _onAddAdditionalTime () {
-    const { formState } = this.props;
-    const event = formState.object;
-    let times = (event.times || []).splice(0);
-    times.push({ start: event.start, end: event.end });
-    formState.set('times', times);
-  }
-
   _additionalTimeChange (field, index) {
     return (value) => {
       const { formState } = this.props;
@@ -56,14 +46,6 @@ class EventFormFields extends Component {
       times[index][field] = value;
       formState.set('times', times);
     };
-  }
-
-  _onRemoveAdditionalTime (index) {
-    const { formState } = this.props;
-    const event = formState.object;
-    let times = (event.times || []).splice(0);
-    times.splice(index, 1);
-    formState.set('times', times);
   }
 
   render () {
@@ -92,7 +74,7 @@ class EventFormFields extends Component {
         <FormField key={`start-${index}`} label="Also starts"
           help={
             <button type="button" className="button--link"
-              onClick={this._onRemoveAdditionalTime.bind(this, index)}>
+              onClick={formState.removeAt('times', index)}>
               Remove
             </button>
           }>
@@ -148,7 +130,9 @@ class EventFormFields extends Component {
         {additionalTimes}
         <FormField>
           <div className="form__tabs">
-            <button type="button" onClick={this._onAddAdditionalTime}>
+            <button type="button"
+              onClick={formState.addTo('times',
+                { start: event.start, end: event.end })}>
               Add additional time
             </button>
           </div>

@@ -23,43 +23,10 @@ export default class PageFormContents extends Component {
 
   constructor (props) {
     super(props);
-    this._onAddSection = this._onAddSection.bind(this);
-    this._onChangeSection = this._onChangeSection.bind(this);
-    this._onSwapSection = this._onSwapSection.bind(this);
-    this._onRemoveSection = this._onRemoveSection.bind(this);
   }
 
   componentDidMount () {
     this.refs.name.focus();
-  }
-
-  _onAddSection (type) {
-    const { formState } = this.props;
-    let sections = (formState.object.sections || []).slice(0);
-    sections.push({ type: type });
-    formState.change('sections')(sections);
-  }
-
-  _onChangeSection (section, index) {
-    const { formState } = this.props;
-    let sections = formState.object.sections.slice(0);
-    sections[index] = section;
-    formState.change('sections')(sections);
-  }
-
-  _onSwapSection (section, index, nextIndex) {
-    const { formState } = this.props;
-    let sections = formState.object.sections.slice(0);
-    sections[index] = sections[nextIndex];
-    sections[nextIndex] = section;
-    formState.change('sections')(sections);
-  }
-
-  _onRemoveSection (index) {
-    const { formState } = this.props;
-    let sections = formState.object.sections.slice(0);
-    sections.splice(index, 1);
-    formState.change('sections')(sections);
   }
 
   render () {
@@ -69,29 +36,30 @@ export default class PageFormContents extends Component {
     const sections = (page.sections || []).map((section, index) => {
       const Section = SECTIONS[section.type];
       const raise = (index === 0 ? undefined : (
-        <button type="button" onClick={
-            this._onSwapSection.bind(this, section, index, index - 1)}>up</button>
+        <button type="button"
+          onClick={formState.swapWith('fields', index, index-1)}>up</button>
       ));
       const lower = (index === (page.sections.length - 1) ? undefined : (
-        <button type="button" onClick={
-            this._onSwapSection.bind(this, section, index, index + 1)}>down</button>
+        <button type="button"
+          onClick={formState.swapWith('fields', index, index+1)}>down</button>
         ));
       return (
         <div key={index}>
           <div className="form__fields-header">
             {raise}
             {lower}
-            <button type="button" onClick={
-                this._onRemoveSection.bind(this, index)}>remove</button>
+            <button type="button"
+              onClick={formState.removeAt('sections', index)}>remove</button>
           </div>
           <Section section={section}
-            onChange={(nextSection) => this._onChangeSection(nextSection, index)} />
+            onChange={formState.changeAt('sections', index)} />
         </div>
       );
     });
 
     const addControls = ['text', 'image', 'event', 'library', 'user', 'pages', 'video'].map(type => (
-      <button key={type} type="button" onClick={this._onAddSection.bind(this, type)}>
+      <button key={type} type="button"
+        onClick={formState.addTo('sections', { type: type })}>
         {type}
       </button>
     ));

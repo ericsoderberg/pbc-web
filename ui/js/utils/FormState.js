@@ -83,4 +83,40 @@ export default class FormState {
       this._processFiles(files, propertyName);
     });
   }
+
+  // array properties
+
+  addTo (propertyName, object = {}) {
+    return event => {
+      let array = (this.object[propertyName] || []).slice(0);
+      array.push(object);
+      this.set(propertyName, array);
+    };
+  }
+
+  changeAt (propertyName, index) {
+    return object => {
+      let array = (this.object[propertyName] || []).slice(0);
+      array[index] = object;
+      this.set(propertyName, array);
+    };
+  }
+
+  swapWith (propertyName, index, nextIndex) {
+    return () => {
+      let array = (this.object[propertyName] || []).slice(0);
+      const object = array[index];
+      array[index] = array[nextIndex];
+      array[nextIndex] = object;
+      this.set(propertyName, array);
+    };
+  }
+
+  removeAt (propertyName, index) {
+    return () => {
+      let array = (this.object[propertyName] || []).slice(0);
+      array.splice(index, 1);
+      this.set(propertyName, array);
+    };
+  }
 }

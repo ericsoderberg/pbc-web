@@ -58,6 +58,19 @@ export default class FormField extends Component {
       error = <span className="form-field__error">{this.props.error}</span>;
     }
 
+    let labels;
+    if (label || help || error) {
+      labels = (
+        <div className="form-field__labels">
+          {label}
+          <div>
+            {help}
+            {error}
+          </div>
+        </div>
+      );
+    }
+
     let onDragEnter, onDragOver, onDragLeave, onDrop;
     if (this.props.onDrop) {
       onDragEnter = this._onDragEnter;
@@ -70,13 +83,7 @@ export default class FormField extends Component {
       <div className={classNames.join(' ')}
         onDragEnter={onDragEnter} onDragOver={onDragOver}
         onDragLeave={onDragLeave} onDrop={onDrop} >
-        <div className="form-field__labels">
-          {label}
-          <div>
-            {help}
-            {error}
-          </div>
-        </div>
+        {labels}
         {this.props.children}
       </div>
     );

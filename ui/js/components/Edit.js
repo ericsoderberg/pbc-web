@@ -16,7 +16,7 @@ export default class Edit extends Component {
     document.title = this.props.title;
     getItem(this.props.category, this.props.params.id)
     .then(item => this.setState({ item: item }))
-    .catch(error => console.log("!!! Edit catch", error));;
+    .catch(error => console.log("!!! Edit catch", error));
   }
 
   _onUpdate (item) {
