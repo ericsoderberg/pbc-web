@@ -311,7 +311,7 @@ router.get('/calendar', (req, res) => {
   // find all events withing the time window
   const Doc = mongoose.model('Event');
   let q = {
-    stop: { $gte: start.toDate() },
+    end: { $gte: start.toDate() },
     start: { $lt: end.toDate() }
   };
   if (req.query.search) {
@@ -321,8 +321,8 @@ router.get('/calendar', (req, res) => {
   if (req.query.filter) {
     q = { ...q, ...JSON.parse(req.query.filter) };
   }
-  let query = Doc.find(q);
-  query.sort('start')
+  Doc.find(q)
+  .sort('start')
   .exec()
   .then(docs => {
     res.status(200).json({

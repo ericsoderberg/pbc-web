@@ -32,7 +32,7 @@ export default class Calendar extends Component {
 
   _setFilter (props) {
     const name = props.location.query.name;
-    let filter = (name ? { name: name } : undefined);
+    let filter = (name ? { calendar: name } : undefined);
     this.setState({ filter: filter }, this._get);
   }
 
@@ -171,7 +171,7 @@ export default class Calendar extends Component {
       options.unshift(<option key="_all">All</option>);
       filterControl = (
         <select key="filter" className="select--header"
-          value={filter ? filter.name : undefined} onChange={this._onFilter}>
+          value={filter ? filter.calendar : undefined} onChange={this._onFilter}>
           {options}
         </select>
       );
