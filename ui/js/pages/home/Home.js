@@ -17,6 +17,7 @@ export default class Home extends Component {
     .then(site => {
       this.setState({ site: site });
       if (site.homePageId) {
+        document.title = site.name;
         return getItem('pages', site.homePageId);
       } else {
         return Promise.reject();
@@ -29,7 +30,7 @@ export default class Home extends Component {
     const { site, page } = this.state;
     return (
       <main>
-        <PageHeader title={site.name || '-'} />
+        <PageHeader logo={true} />
         <PageContents item={page} />
         <div className="section__container">
           <div className="form__tabs">

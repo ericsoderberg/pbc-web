@@ -54,6 +54,7 @@
 .page-header {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   align-items: center;
   width: 100%;
   height: $double-unit;
@@ -67,7 +68,7 @@
 }
 
 .page-header__logo {
-  height: 100%;
+  height: $unit;
 }
 
 .page-header__back {

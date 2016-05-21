@@ -10,7 +10,7 @@ export default class PagePreview extends Component {
     const page = item;
     return (
       <main className="page-preview">
-        <PageHeader title={page.name || ''} />
+        <PageHeader />
         <PageContents item={page} />
       </main>
     );

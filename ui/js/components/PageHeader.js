@@ -35,6 +35,11 @@ export default class PageHeader extends Component {
       classes.push("page-header--form");
     }
 
+    let logo;
+    if (this.props.logo && site && site.logo) {
+      logo = <img className="page-header__logo" src={site.logo.data} />;
+    }
+
     let backControl;
     if (homer) {
       let classNames = ['button--header'];
@@ -67,13 +72,26 @@ export default class PageHeader extends Component {
       );
     }
 
+    let h1;
+    if (title) {
+      h1 = <h1 className="page-header__title">{title}</h1>;
+    }
+
+    let main;
+    if (title || search || ! logo) {
+      main = (
+        <span className="page-header__main">
+          {h1}
+          {search}
+        </span>
+      );
+    }
+
     return (
       <header className={classes.join(' ')}>
         {backControl}
-        <span className="page-header__main">
-          <h1 className="page-header__title">{title}</h1>
-          {search}
-        </span>
+        {logo}
+        {main}
         {actions}
       </header>
     );
@@ -86,9 +104,10 @@ PageHeader.propTypes = {
   color: PropTypes.string,
   form: PropTypes.bool,
   homer: PropTypes.bool,
+  logo: PropTypes.bool,
   onSearch: PropTypes.func,
   searchText: PropTypes.string,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string
 };
 
 PageHeader.contextTypes = {

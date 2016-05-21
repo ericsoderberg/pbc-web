@@ -10,7 +10,8 @@ import { initialize } from './actions';
 initialize();
 
 const main = (
-  <Router history={browserHistory} routes={routes} />
+  <Router history={browserHistory} routes={routes}
+    onUpdate={() => document.body.scrollTop = 0} />
 );
 
 const element = document.getElementById('content');
