@@ -43,7 +43,8 @@ router.delete('/sessions/:id', (req, res) => {
   authorize(req, res)
   .then(session => {
     const id = req.params.id;
-    if (session._id == id) { /// === doesn't seem to work
+    console.log('!!! delete session', id, session._id);
+    if (session._id.equals(id)) { /// === doesn't seem to work
       session.remove()
       .then(() => res.status(200).send());
     } else {
@@ -63,11 +64,13 @@ function authorize (req, res) {
       if (session) {
         return session;
       } else {
+        console.log('!!! ! authorized no session');
         res.status(401).json({ error: 'Not authorized' });
         return Promise.reject();
       }
     });
   } else {
+    console.log('!!! ! authorized no authorization');
     res.status(401).json({ error: 'Not authorized' });
     return Promise.reject();
   }

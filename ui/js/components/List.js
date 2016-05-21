@@ -3,8 +3,9 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItems } from '../actions';
 import PageHeader from './PageHeader';
+import Stored from './Stored';
 
-export default class List extends Component {
+class List extends Component {
 
   constructor (props) {
     super(props);
@@ -65,7 +66,7 @@ export default class List extends Component {
   }
 
   render () {
-    const { Item, path, title, marker, sort } = this.props;
+    const { Item, path, title, marker, sort, session } = this.props;
     const { filterValues, searchText, filter } = this.state;
 
     const descending = (sort && sort[0] === '-');
@@ -96,9 +97,12 @@ export default class List extends Component {
       ));
     }
 
-    const addControl = (
-      <Link key="add" to={`${path}/add`} className="a--header">Add</Link>
-    );
+    let addControl;
+    if (session && session.administrator) {
+      addControl = (
+        <Link key="add" to={`${path}/add`} className="a--header">Add</Link>
+      );
+    }
 
     let filterControl;
     if (filterValues) {
@@ -116,7 +120,7 @@ export default class List extends Component {
 
     return (
       <main>
-        <PageHeader title={title}
+        <PageHeader title={title} homer={true}
           searchText={searchText} onSearch={this._onSearch}
           actions={[filterControl, addControl]} />
         <ul className="list">
@@ -137,6 +141,9 @@ List.propTypes = {
     value: PropTypes.any
   }),
   path: PropTypes.string,
+  session: PropTypes.shape({
+    administrator: PropTypes.bool
+  }),
   sort: PropTypes.string,
   title: PropTypes.string
 };
@@ -148,3 +155,9 @@ List.defaultProps = {
 List.contextTypes = {
   router: PropTypes.any
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(List, select);

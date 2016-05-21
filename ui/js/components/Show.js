@@ -3,8 +3,9 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../actions';
 import PageHeader from './PageHeader';
+import Stored from './Stored';
 
-export default class Show extends Component {
+class Show extends Component {
 
   constructor () {
     super();
@@ -32,14 +33,19 @@ export default class Show extends Component {
   }
 
   render () {
-    const { category, Contents } = this.props;
+    const { category, Contents, title, session } = this.props;
     const { item } = this.state;
-    const editControl = (
-      <Link to={`/${category}/${item._id}/edit`} className="a--header">Edit</Link>
-    );
+
+    let editControl;
+    if (session && session.administrator) {
+      editControl = (
+        <Link to={`/${category}/${item._id}/edit`} className="a--header">Edit</Link>
+      );
+    }
+
     return (
       <main>
-        <PageHeader title={item.name || '-'} back={true} actions={editControl} />
+        <PageHeader title={title} back={true} actions={editControl} />
         <Contents item={item} />
       </main>
     );
@@ -51,5 +57,15 @@ Show.propTypes = {
   Contents: PropTypes.func.isRequired,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  session: PropTypes.shape({
+    administrator: PropTypes.bool
+  }),
+  title: PropTypes.string
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(Show, select);

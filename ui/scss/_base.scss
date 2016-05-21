@@ -83,13 +83,14 @@ button {
   }
 }
 
-button:not(.button--link):not(.button--icon),
+button:not(.button--link):not(.button--icon):not(.button--header),
 .link--button {
   padding: $half-unit $unit;
   background-color: $control-background-color;
   color: $control-color;
   font-size: 18px;
   text-decoration: none;
+  text-align: center;
 
   &:hover {
     background-color: $control-hover-background;

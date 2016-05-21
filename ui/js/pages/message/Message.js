@@ -6,5 +6,6 @@ export default class Message extends Show {};
 
 Message.defaultProps = {
   category: 'messages',
-  Contents: MessageContents
+  Contents: MessageContents,
+  title: 'Message'
 };

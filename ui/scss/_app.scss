@@ -56,7 +56,7 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
-  height: $unit * 3;
+  height: $double-unit;
   background-color: $header-background-color;
 }
 
@@ -64,6 +64,10 @@
   max-width: $form-width;
   justify-content: space-between;
   margin: 0 auto;
+}
+
+.page-header__logo {
+  height: 100%;
 }
 
 .page-header__back {
@@ -80,7 +84,7 @@
 
 .page-header__title {
   margin: 0 $unit;
-  line-height: $unit * 3;
+  line-height: $double-unit;
 }
 
 .page-header__search {
@@ -89,7 +93,7 @@
   flex: 1;
   margin: 0;
   padding: 0 $half-unit;
-  height: $unit * 3;
+  height: $double-unit;
   border: none;
   border-width: 1px;
   border-color: $header-background-color;
@@ -102,11 +106,11 @@
 .button--header,
 .select--header {
   text-decoration: none;
-  background-color: #eee;
+  background-color: $header-background-color;
   color: inherit;
   font-size: 18px;
   cursor: pointer;
-  padding: $unit;
+  padding: $half-unit $unit;
   height: 100%;
 
   &:hover {

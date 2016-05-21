@@ -52,7 +52,7 @@ export function deleteSession () {
   return fetch(`/api/sessions/${_sessionId}`, {
     method: 'DELETE', headers: _headers })
   .then(processStatus)
-  .then(clearSession);
+  .catch(clearSession);
 }
 
 // Generic

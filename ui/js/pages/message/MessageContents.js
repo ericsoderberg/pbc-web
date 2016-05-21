@@ -126,6 +126,7 @@ export default class MessageContents extends Component {
         {files}
         <div className="section__container">
           <dl className="page-attributes section">
+            <dt>Name</dt><dd>{message.name}</dd>
             <dt>Verses</dt><dd>{message.verses}</dd>
             <dt>Author</dt><dd>{message.author}</dd>
             <dt>Date</dt><dd>{date}</dd>

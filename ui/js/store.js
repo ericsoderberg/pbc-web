@@ -24,9 +24,7 @@ export function subscribe (handler) {
   _index += 1;
   _listeners.push(listener);
   return function unsubscribe() {
-    if (subscribers.has(subscriber)) {
-      _listeners = _listeners.filter(l => (l.index !== listener.index));
-    }
+    _listeners = _listeners.filter(l => (l.index !== listener.index));
   };
 }
 

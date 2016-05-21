@@ -36,6 +36,7 @@ export default class Home extends Component {
             <Link to="/calendar?name=Main" className="link--button">Calendar</Link>
             <Link to="/messages?library=Main" className="link--button">Messages</Link>
             <Link to="/search" className="link--button">Search</Link>
+            <Link to="/sign-in" className="link--button">Sign In</Link>
           </div>
         </div>
         <div className="section__container">

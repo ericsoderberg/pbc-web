@@ -1,13 +1,21 @@
 "use strict";
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import MainNav from './MainNav';
+import Stored from './Stored';
 
-export default class App extends Component {
+class App extends Component {
 
   render () {
+    const { session } = this.props;
+
+    let nav;
+    if (session && session.administrator) {
+      nav = <MainNav className="app__nav" />;
+    }
+    
     return (
       <div className="app">
-        <MainNav className="app__nav" />
+        {nav}
         <section className="app__content">
           {this.props.children}
         </section>
@@ -15,3 +23,15 @@ export default class App extends Component {
     );
   }
 };
+
+App.propTypes = {
+  session: PropTypes.shape({
+    administrator: PropTypes.bool
+  })
+};
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(App, select);

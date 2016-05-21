@@ -32,7 +32,8 @@ class MainNav extends Component {
   }
 
   _signOut () {
-    deleteSession();
+    deleteSession()
+    .catch(error => console.log('!!! MainNav _signOut catch', error));
   }
 
   _renderLinks(routes) {
@@ -81,6 +82,12 @@ class MainNav extends Component {
       </nav>
     );
   }
+};
+
+MainNav.propTypes = {
+  session: PropTypes.shape({
+    administrator: PropTypes.bool
+  })
 };
 
 MainNav.contextTypes = {
