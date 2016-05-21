@@ -25,9 +25,23 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    const { section, onChange } = nextProps;
     this.setState({
       expandAdd: (! section || ! section.fields || section.fields.length === 0),
-      formState: new FormState(nextProps.section, nextProps.onChange)
+      formState: new FormState(section, onChange)
+    });
+  }
+
+  _addField (type) {
+    return this.state.formState.addTo('fields', () => {
+      const id = this.state.newFieldId;
+      let expandedFields = { ...this.state.expandedFields };
+      expandedFields[id] = ! expandedFields[id];
+      this.setState({
+        expandedFields: expandedFields,
+        newFieldId: this.state.newFieldId + 1
+      });
+      return { type: type, id: id };
     });
   }
 
@@ -104,12 +118,7 @@ export default class FormTemplateSectionEdit extends Component {
     if (expandAdd) {
 
       const addControls = FIELD_TYPES.map(type => (
-        <button key={type} type="button"
-          onClick={formState.addTo('fields', () => {
-            const id = this.state.newFieldId;
-            this.setState({ newFieldId: this.state.newFieldId + 1 });
-            return { type: type, id: id };
-          })}>
+        <button key={type} type="button" onClick={this._addField(type)}>
           {type}
         </button>
       ));
