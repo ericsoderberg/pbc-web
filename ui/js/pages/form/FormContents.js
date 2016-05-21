@@ -99,7 +99,11 @@ export default class FormContents extends Component {
   _renderTemplateField (templateField, index) {
     let result;
     if ('instructions' === templateField.type) {
-      result = <Text key={index} text={templateField.help} plain={true} />;
+      result = (
+        <div key={index} className="form__text">
+          <Text text={templateField.help} plain={true} />
+        </div>
+      );
     } else {
       result = this._renderFormField(templateField, index);
     }
@@ -109,7 +113,11 @@ export default class FormContents extends Component {
   _renderTemplateSection (templateSection, index) {
     let name;
     if (templateSection.name) {
-      name = <h2>{templateSection.name}</h2>;
+      name = (
+        <div className="form__text">
+          <h2>{templateSection.name}</h2>
+        </div>
+      );
     }
     const fields =
       (templateSection.fields || []).map(this._renderTemplateField);

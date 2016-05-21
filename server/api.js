@@ -65,7 +65,7 @@ function authorize (req, res) {
       if (session) {
         return session;
       } else {
-        console.log('!!! ! authorized no session');
+        console.log('!!! ! authorized no session', token);
         res.status(401).json({ error: 'Not authorized' });
         return Promise.reject();
       }

@@ -61,6 +61,11 @@
   }
 }
 
+.form__text {
+  max-width: $form-width;
+  margin: 0 auto;
+}
+
 .form-field {
   position: relative;
   background-color: $background-color;
