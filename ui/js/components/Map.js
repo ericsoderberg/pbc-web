@@ -31,6 +31,10 @@ export default class Map extends Component {
     }, this._load);
   }
 
+  componentWillUnmount () {
+    this._unmounted = true;
+  }
+
   _load () {
     if (! this.state.lat || ! this.state.lon) {
       this._getGeocode();
@@ -84,6 +88,7 @@ export default class Map extends Component {
   _getGeocode () {
     const { mergedAddress } = this.state;
     getGeocode(mergedAddress)
+    .then (places => this._unmounted ? Promise.reject('unmounted') : places)
     .then(places => {
       const place = places[0];
       this.setState({ lat: place.lat, lon: place.lon }, this._setMap);

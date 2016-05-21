@@ -9,7 +9,7 @@ export default class FormPreview extends Component {
     const { item: formTemplate } = this.props;
     return (
       <main className="page-preview">
-        <PageHeader title={formTemplate.name || ''} />
+        <PageHeader />
         <FormAdd formTemplate={formTemplate} />
       </main>
     );

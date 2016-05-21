@@ -164,7 +164,8 @@ export function getUnavailableDates (event) {
 // Map
 
 export function getGeocode (address) {
-  return fetch(`http://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`, {
+  const query = `?q=${encodeURIComponent(address)}&format=json`;
+  return fetch(`http://nominatim.openstreetmap.org/search${query}`, {
     method: 'GET', headers: { ..._headers, Authorization: undefined }})
   .then(response => response.json());
 }

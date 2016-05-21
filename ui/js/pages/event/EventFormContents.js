@@ -12,7 +12,7 @@ class EventFormFields extends Component {
   constructor () {
     super();
     this._onStartChange = this._onStartChange.bind(this);
-    this._additionalTimeChange = this._additionalTimeChange.bind(this);
+    this._otherTimeChange = this._otherTimeChange.bind(this);
     this.state = { events: [] };
   }
 
@@ -38,7 +38,7 @@ class EventFormFields extends Component {
     formState.set(props);
   }
 
-  _additionalTimeChange (field, index) {
+  _otherTimeChange (field, index) {
     return (value) => {
       const { formState } = this.props;
       const event = formState.object;
@@ -59,7 +59,7 @@ class EventFormFields extends Component {
       ));
       events.unshift(<option key={0} />);
       primaryEvent = (
-        <FormField label="Primary event" help="For recurring event on-offs">
+        <FormField label="Primary event" help="For recurring event one-offs">
           <select name="primaryEventId" value={event.primaryEventId || ''}
             onChange={formState.change('primaryEventId')}>
             {events}
@@ -68,9 +68,9 @@ class EventFormFields extends Component {
       );
     }
 
-    let additionalTimes;
+    let otherTimes;
     if (event.times && event.times.length > 0) {
-      additionalTimes = event.times.map((time, index) => [
+      otherTimes = event.times.map((time, index) => [
         <FormField key={`start-${index}`} label="Also starts"
           help={
             <button type="button" className="button--link"
@@ -80,12 +80,12 @@ class EventFormFields extends Component {
           }>
           <DateTime format="h:mm a" name={`start-${index}`} step={15}
             value={time.start || ''}
-            onChange={this._additionalTimeChange('start', index)} />
+            onChange={this._otherTimeChange('start', index)} />
         </FormField>,
         <FormField key={`end-${index}`} label="Also ends">
           <DateTime format="h:mm a" name={`end-${index}`} step={15}
             value={time.end || ''}
-            onChange={this._additionalTimeChange('end', index)} />
+            onChange={this._otherTimeChange('end', index)} />
         </FormField>
       ]);
     }
@@ -127,13 +127,13 @@ class EventFormFields extends Component {
             onChange={formState.change('path')}/>
         </FormField>
         {primaryEvent}
-        {additionalTimes}
+        {otherTimes}
         <FormField>
           <div className="form__tabs">
             <button type="button"
               onClick={formState.addTo('times',
                 { start: event.start, end: event.end })}>
-              Add additional time
+              Add other time
             </button>
           </div>
         </FormField>

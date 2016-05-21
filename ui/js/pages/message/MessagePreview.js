@@ -11,7 +11,7 @@ export default class MessagePreview extends Component {
 
     return (
       <main className="page-preview">
-        <PageHeader title={message.name || ''} />
+        <PageHeader />
         <MessageContents item={message} />
       </main>
     );
