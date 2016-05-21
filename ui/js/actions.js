@@ -68,6 +68,9 @@ export function getItems (category, options={}) {
   if (options.sort) {
     params.push(`sort=${encodeURIComponent(options.sort)}`);
   }
+  if (options.select) {
+    params.push(`select=${encodeURIComponent(options.select)}`);
+  }
   if (options.distinct) {
     params.push(`distinct=${encodeURIComponent(options.distinct)}`);
   }

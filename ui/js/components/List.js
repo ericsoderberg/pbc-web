@@ -16,15 +16,7 @@ class List extends Component {
 
   componentDidMount () {
     document.title = this.props.title;
-
     this._setFilter(this.props);
-
-    if (this.props.filter) {
-      getItems(this.props.category,
-        { distinct: this.props.filter })
-      .then(response => this.setState({ filterValues: response }))
-      .catch(error => console.log('!!! List filter catch', error));
-    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -32,18 +24,23 @@ class List extends Component {
   }
 
   _setFilter (props) {
-    const filterValue = props.location.query[props.filter];
-    let filter;
-    if (filterValue) {
-      filter = {};
-      filter[props.filter] = filterValue;
+    let filter, filterValue;
+    if (props.filter) {
+      filterValue = props.location.query[props.filter.property];
+      if (filterValue) {
+        filter = {};
+        filter[props.filter.property] = filterValue;
+      }
     }
-    this.setState({ filter: filter }, this._get);
+    this.setState({ filter: filter, filterValue: filterValue }, this._get);
   }
 
   _get () {
-    getItems(this.props.category,
-      { sort: this.props.sort, filter: this.state.filter, populate: this.props.populate })
+    getItems(this.props.category, {
+      sort: this.props.sort,
+      filter: this.state.filter,
+      populate: this.props.populate
+    })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
   }
@@ -52,8 +49,11 @@ class List extends Component {
     const searchText = event.target.value;
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(() => {
-      getItems(this.props.category,
-        { sort: this.props.sort, search: searchText, populate: this.props.populate })
+      getItems(this.props.category, {
+        sort: this.props.sort,
+        search: searchText,
+        populate: this.props.populate
+      })
       .then(response => this.setState({ items: response }))
       .catch(error => console.log('!!! List search catch', error));
     }, 100);
@@ -61,14 +61,18 @@ class List extends Component {
   }
 
   _onFilter (event) {
+    const { filter: { property } } = this.props;
     const value = event.target.value;
-    const search = (value && 'All' !== value) ? `?library=${value}` : undefined;
-    this.context.router.replace({ pathname: window.location.pathname, search: search });
+    const search = (value && 'All' !== value) ? `?${property}=${value}` : undefined;
+    this.context.router.replace({
+      pathname: window.location.pathname,
+      search: search
+    });
   }
 
   render () {
-    const { Item, path, title, marker, sort, session } = this.props;
-    const { filterValues, searchText, filter } = this.state;
+    const { Item, path, title, marker, sort, session, filter } = this.props;
+    const { searchText, filterValue } = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
@@ -106,14 +110,16 @@ class List extends Component {
     }
 
     let filterControl;
-    if (filterValues) {
-      let options = (filterValues || []).map(value => (
-        <option key={value}>{value}</option>
+    if (filter && filter.options && filter.options.length > 0) {
+      let options = filter.options.map(option => (
+        <option key={option.value} value={option.value}>
+          {option.label || option.value}
+        </option>
       ));
-      options.unshift(<option key="_all">All</option>);
+      options.unshift(<option key="_all" value="all">All</option>);
       filterControl = (
         <select key="filter" className="select--header"
-          value={filter ? filter.library : undefined} onChange={this._onFilter}>
+          value={filterValue} onChange={this._onFilter}>
           {options}
         </select>
       );
@@ -134,7 +140,13 @@ class List extends Component {
 
 List.propTypes = {
   category: PropTypes.string,
-  filter: PropTypes.string,
+  filter: PropTypes.shape({
+    property: PropTypes.string.isRequired,
+    options: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.any.isRequired
+    })).isRequired
+  }),
   Item: PropTypes.func.isRequired,
   marker: PropTypes.shape({
     label: PropTypes.node,

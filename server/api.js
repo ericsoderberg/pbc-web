@@ -144,6 +144,9 @@ const register = (category, modelName, options={}) => {
     if (req.query.sort) {
       query.sort(req.query.sort);
     }
+    if (req.query.select) {
+      query.sort(req.query.select);
+    }
     if (req.query.populate) {
       const populate = JSON.parse(req.query.populate);
       if (Array.isArray(populate)) {

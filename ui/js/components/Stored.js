@@ -23,8 +23,9 @@ export default function (Wrapped, mapper) {
     componentWillReceiveProps (nextProps) {
       if (mapper) {
         const mappedProps = mapper(getState(), nextProps);
-        this.setState({ props: { ...this.props, ...mappedProps,
-          dispatch: dispatch }});
+        this.setState({ props: { ...nextProps, ...mappedProps }});
+      } else {
+        this.setState({ props: nextProps });
       }
     }
 
