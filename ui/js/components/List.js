@@ -20,7 +20,8 @@ class List extends Component {
     this._setFilter(this.props);
 
     if (this.props.filter) {
-      getItems(this.props.category, { distinct: this.props.filter })
+      getItems(this.props.category,
+        { distinct: this.props.filter })
       .then(response => this.setState({ filterValues: response }))
       .catch(error => console.log('!!! List filter catch', error));
     }
@@ -42,7 +43,7 @@ class List extends Component {
 
   _get () {
     getItems(this.props.category,
-      { sort: this.props.sort, filter: this.state.filter })
+      { sort: this.props.sort, filter: this.state.filter, populate: this.props.populate })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
   }
@@ -52,7 +53,7 @@ class List extends Component {
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(() => {
       getItems(this.props.category,
-        { sort: this.props.sort, search: searchText })
+        { sort: this.props.sort, search: searchText, populate: this.props.populate })
       .then(response => this.setState({ items: response }))
       .catch(error => console.log('!!! List search catch', error));
     }, 100);

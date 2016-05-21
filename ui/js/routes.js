@@ -10,6 +10,8 @@ import EventAdd from './pages/event/EventAdd';
 import Event from './pages/event/Event';
 import EventEdit from './pages/event/EventEdit';
 import Files from './pages/file/Files';
+import FormAdd from './pages/form/FormAdd';
+import FormEdit from './pages/form/FormEdit';
 import Forms from './pages/form/Forms';
 import FormTemplates from './pages/formTemplate/FormTemplates';
 import FormTemplateAdd from './pages/formTemplate/FormTemplateAdd';
@@ -68,6 +70,8 @@ export default {
     { path: 'resources/:id', component: Resource },
     { path: 'resources/:id/edit', component: ResourceEdit },
     { path: 'resources', component: Resources },
+    { path: 'forms/add', component: FormAdd },
+    { path: 'forms/:id/edit', component: FormEdit },
     { path: 'forms', component: Forms },
     { path: 'form-templates/add', component:  FormTemplateAdd },
     { path: 'form-templates/:id', component:  FormTemplate },

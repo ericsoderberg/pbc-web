@@ -28,7 +28,8 @@ router.post('/sessions', (req, res) => {
         email: email,
         loginAt: new Date(),
         name: user.name,
-        token: hat() // better to encrypt this before storing it, someday
+        token: hat(), // better to encrypt this before storing it, someday
+        userId: user._id
       });
       session.save()
       .then(response => res.status(200).json(session))
@@ -103,7 +104,9 @@ const register = (category, modelName, options={}) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
       let data = req.body;
-      data = (transform.put ? transform.put(data) : data);
+      data.modified = new Date();
+      data.userId = session.userId;
+      data = (transform.put ? transform.put(data, session) : data);
       Doc.findOneAndUpdate({ _id: id }, data)
       .exec()
       .then(doc => res.status(200).json(doc))
@@ -131,7 +134,7 @@ const register = (category, modelName, options={}) => {
     let query = Doc.find();
     if (req.query.search) {
       const exp = new RegExp(req.query.search, 'i');
-      query = query.or([
+      query.or([
         { 'name': exp }
       ]);
     }
@@ -140,6 +143,14 @@ const register = (category, modelName, options={}) => {
     }
     if (req.query.sort) {
       query.sort(req.query.sort);
+    }
+    if (req.query.populate) {
+      const populate = JSON.parse(req.query.populate);
+      if (Array.isArray(populate)) {
+        populate.forEach(pop => query.populate(pop));
+      } else {
+        query.populate(populate);
+      }
     }
     if (req.query.distinct) {
       query.distinct(req.query.distinct);
@@ -158,7 +169,10 @@ const register = (category, modelName, options={}) => {
     .then(session => {
       const Doc = mongoose.model(modelName);
       let data = req.body;
-      data = (transform.post ? transform.post(data) : data);
+      data.created = new Date();
+      data.modified = data.created;
+      data.userId = session.userId;
+      data = (transform.post ? transform.post(data, session) : data);
       const doc = new Doc(data);
       doc.save()
       .then(doc => res.status(200).json(doc))
@@ -171,12 +185,14 @@ const register = (category, modelName, options={}) => {
 
 router.post('/users/sign-up', (req, res) => {
   const User = mongoose.model('User');
-  let userData = req.body;
-  if (userData.password) {
-    userData.encryptedPassword = bcrypt.hashSync(userData.password, 10);
-    delete userData.password;
+  let data = req.body;
+  if (data.password) {
+    data.encryptedPassword = bcrypt.hashSync(data.password, 10);
+    delete data.password;
   }
-  const doc = new User(userData);
+  data.created = new Date();
+  data.modified = data.created;
+  const doc = new User(data);
   doc.save()
   .then(doc => res.status(200).json(doc))
   .catch(error => res.status(400).json({ error: error }));
@@ -238,13 +254,16 @@ function messageCompleter (property, value, results, res) {
 router.get('/messages/:id', (req, res) => {
   const id = req.params.id;
   const Doc = mongoose.model('Message');
+  // TODO: Convert to Promise.all()
   let results = { remaining: 4 };
   let errors = [];
   const subFields = 'name verses date path';
 
   // message
   const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
-  Doc.findOne(criteria).populate({ path: 'seriesId', select: 'name' }).exec()
+  const query = Doc.findOne(criteria);
+  query.populate({ path: 'seriesId', select: 'name' });
+  query.exec()
   .then(message => {
 
     // nextMessage
@@ -291,7 +310,10 @@ router.post('/site', (req, res) => {
   authorize(req, res)
   .then(session => {
     const Doc = mongoose.model('Site');
-    const doc = new Doc(req.body);
+    let data = req.body;
+    data.modified = new Date();
+    data.userId = session.userId;
+    const doc = new Doc(data);
     Doc.remove({})
     .exec()
     .then(() => doc.save())

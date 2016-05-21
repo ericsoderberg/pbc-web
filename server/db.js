@@ -20,15 +20,18 @@ const sessionSchema = Schema({
   email: String,
   loginAt: Date,
   name: String,
-  token: String
+  token: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 export const Session = mongoose.model('Session', sessionSchema);
 
 const userSchema = Schema({
   administrator: Boolean,
   avatar: image,
+  created: Date,
   email: String,
   encryptedPassword: String,
+  modified: Date,
   name: String,
   path: String,
   text: String
@@ -44,23 +47,26 @@ const pageSectionSchema = Schema({
   full: Boolean,
   image: image,       // image type
   name: String,       // library type
-  eventId: ObjectId,  // event type
-  formTemplateId: ObjectId,   // form type
+  eventId: { type: Schema.Types.ObjectId, ref: 'Event' },  // event type
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },   // form type
   pages: [{           // pages type
-    id: ObjectId,
+    id: { type: Schema.Types.ObjectId, ref: 'Page' },
     image: image,
     text: String,
     tile: image
   }],
   text: String,       // text type
   url: String,        // video type
-  userId: ObjectId    // user type
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }    // user type
 });
 
 const pageSchema = Schema({
+  created: Date,
   sections: [pageSectionSchema],
+  modified: Date,
   name: String,
-  path: String
+  path: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('Page', pageSchema);
@@ -68,26 +74,32 @@ mongoose.model('Page', pageSchema);
 const eventSchema = Schema({
   address: String, // mappable
   calendar: String,
+  created: Date,
   dates: [Date],
   end: Date,
-  primaryEventId: ObjectId, // set in one-off cases
+  primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' }, // set in one-off cases
   location: String, // room, house owner's name, etc.
+  modified: Date,
   name: String,
   path: String,
-  resourceIds: [ObjectId], // resources
+  resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }], // resources
   start: Date,
   text: String,
   times: [{
     end: Date,
     start: Date
-  }]
+  }],
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('Event', eventSchema);
 
 const resourceSchema = Schema({
+  created: Date,
+  modified: Date,
   name: String,
-  text: String
+  text: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('Resource', resourceSchema);
@@ -118,25 +130,28 @@ const formTemplateSectionSchema = Schema({
 });
 
 const formTemplateSchema = Schema({
+  created: Date,
+  modified: Date,
   name: String,
   path: String,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
   version: Number
 });
 
 mongoose.model('FormTemplate', formTemplateSchema);
 
-const formFieldSchema = Schema({
-  fieldId: ObjectId,
-  value: String
-});
-
 const formSchema = Schema({
-  fields: [formFieldSchema],
+  created: Date,
+  fields: [{
+    fieldId: ObjectId,
+    value: String
+  }],
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
+  modified: Date,
   paymentId: ObjectId,
-  formTemplateId: ObjectId,
-  userId: ObjectId,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
   version: Number
 });
 
@@ -144,32 +159,37 @@ mongoose.model('Form', formSchema);
 
 const paymentSchema = Schema({
   amount: Number,
+  created: Date,
   method: String,
+  modified: Date,
   received: Date,
   sent: Date,
-  userId: ObjectId
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('Payment', paymentSchema);
 
 const messageSchema = Schema({
   author: String,
+  created: Date,
   date: Date,
-  image: image,
-  library: String,
-  name: String,
-  path: String,
-  series: Boolean,
-  seriesId: ObjectId,
-  text: String,
-  videoUrl: String,
-  verses: String,
   files: [{
     _id: String,
     name: String,
     size: Number,
     type: { type: String }
-  }]
+  }],
+  image: image,
+  library: String,
+  modified: Date,
+  name: String,
+  path: String,
+  series: Boolean,
+  seriesId: { type: Schema.Types.ObjectId, ref: 'Message' },
+  text: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  videoUrl: String,
+  verses: String
 });
 
 mongoose.model('Message', messageSchema);
@@ -178,28 +198,35 @@ const siteSchema = Schema({
   address: String,
   copyright: String,
   email: String,
-  homePageId: ObjectId,
+  homePageId: { type: Schema.Types.ObjectId, ref: 'Page' },
   name: String,
   logo: image,
-  phone: String
+  phone: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('Site', siteSchema);
 
 const newsletterSchema = Schema({
   addresses: String,
+  created: Date,
   date: Date,
+  modified: Date,
   name: String,
   // TODO: references to events, pages, etc.
-  text: String
+  text: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('Newsletter', newsletterSchema);
 
 const emailListSchema = Schema({
   addresses: [String],
+  created: Date,
+  modified: Date,
   name: String,
-  text: String
+  text: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 mongoose.model('EmailList', emailListSchema);

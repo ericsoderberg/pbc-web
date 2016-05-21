@@ -15,6 +15,7 @@ const ADMIN_ROUTES = [
   { label: 'Pages', path: '/pages' },
   { label: 'Events', path: '/events' },
   { label: 'Newsletters', path: '/newsletters' },
+  { label: 'Forms', path: '/forms' },
   { label: 'Form Templates', path: '/form-templates' },
   { label: 'Messages', path: '/messages' },
   { label: 'People', path: '/users' },

@@ -1,7 +1,7 @@
 .form__container {
   display: flex;
   flex-direction: row;
-  min-height: 100vh;
+  // min-height: 100vh;
 }
 
 .form {
@@ -138,6 +138,7 @@
   justify-content: space-between;
   max-width: $form-width;
   margin: $unit auto 0;
+  padding-bottom: $unit;
 }
 
 // confirm-remove
