@@ -7,6 +7,7 @@ import Library from '../../components/Library';
 import PageSummaries from '../../components/PageSummaries';
 import UserSummary from '../../components/UserSummary';
 import Video from '../../components/Video';
+import FormAdd from '../form/FormAdd';
 
 const PageContents = (props) => {
   const page = props.item;
@@ -39,6 +40,11 @@ const PageContents = (props) => {
       return (
         <Video key={index} full={section.full} color={section.color}
           url={section.url} />
+      );
+    } else if ('form' === section.type) {
+      return (
+        <FormAdd key={index} full={section.full} color={section.color}
+          formTemplateId={section.formTemplateId} />
       );
     } else {
       return 'TBD';

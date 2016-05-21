@@ -12,12 +12,14 @@ import LibrarySectionEdit from './LibrarySectionEdit';
 import UserSectionEdit from './UserSectionEdit';
 import PagesSectionEdit from './PagesSectionEdit';
 import VideoSectionEdit from './VideoSectionEdit';
+import FormSectionEdit from './FormSectionEdit';
 
 const SECTION_TYPES = ['text', 'image', 'event', 'library', 'user', 'pages',
-  'video'];
+  'video', 'form'];
 
 const SECTIONS = {
   event: EventSectionEdit,
+  form: FormSectionEdit,
   image: ImageSectionEdit,
   library: LibrarySectionEdit,
   pages: PagesSectionEdit,

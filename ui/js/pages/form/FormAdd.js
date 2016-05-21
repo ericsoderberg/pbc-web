@@ -15,7 +15,7 @@ export default class FormAdd extends Component {
     this.state = {
       form: {
         fields: [],
-        formTemplateId: props.formTemplateId || props.formTemplate._id
+        formTemplateId: props.formTemplateId || (props.formTemplate || {})._id
       },
       formTemplate: props.formTemplate || {}
     };
@@ -153,7 +153,8 @@ export default class FormAdd extends Component {
   }
 
   render () {
-    const { formTemplate, error } = this.state;
+    const { error } = this.state;
+    const formTemplate = this.state.formTemplate || {};
 
     const sections =
       (formTemplate.sections || []).map(this._renderTemplateSection);

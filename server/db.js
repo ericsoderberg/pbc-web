@@ -45,7 +45,7 @@ const pageSectionSchema = Schema({
   image: image,       // image type
   name: String,       // library type
   eventId: ObjectId,  // event type
-  formId: ObjectId,   // form type
+  formTemplateId: ObjectId,   // form type
   pages: [{           // pages type
     id: ObjectId,
     image: image,
