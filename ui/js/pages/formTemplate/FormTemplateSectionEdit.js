@@ -17,7 +17,7 @@ export default class FormTemplateSectionEdit extends Component {
     super(props);
     const { section, onChange } = props;
     this.state = {
-      expandAdd: false,
+      expandAdd: (! section || ! section.fields || section.fields.length === 0),
       expandedFields: {}, // _id or id
       formState: new FormState(section, onChange),
       newFieldId: 1
@@ -26,6 +26,7 @@ export default class FormTemplateSectionEdit extends Component {
 
   componentWillReceiveProps (nextProps) {
     this.setState({
+      expandAdd: (! section || ! section.fields || section.fields.length === 0),
       formState: new FormState(nextProps.section, nextProps.onChange)
     });
   }
