@@ -16,6 +16,19 @@ export default class FormTemplateFormContents extends Component {
     };
   }
 
+  _addSection () {
+    return this.props.formState.addTo('sections', () => {
+      const id = this.state.newSectionId;
+      let expandedSections = { ...this.state.expandedSections };
+      expandedSections[id] = true;
+      this.setState({
+        expandedSections: expandedSections,
+        newSectionId: this.state.newSectionId + 1
+      });
+      return { id: id };
+    });
+  }
+
   _toggleSection (id) {
     return () => {
       let expandedSections = { ...this.state.expandedSections };
@@ -102,11 +115,7 @@ export default class FormTemplateFormContents extends Component {
         <fieldset className="form__fields">
           <FormField>
             <div className="form__tabs">
-              <button type="button" onClick={formState.addTo('sections', () => {
-                const id = this.state.newSectionId;
-                this.setState({ newSectionId: this.state.newSectionId + 1 });
-                return { id: id };
-              })}>
+              <button type="button" onClick={this._addSection()}>
                 Add section
               </button>
             </div>

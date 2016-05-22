@@ -147,7 +147,11 @@ export default class FormContents extends Component {
 
 FormContents.propTypes = {
   error: PropTypes.node,
-  form: PropTypes.object.isRequired,
-  formTemplate: PropTypes.object.isRequired,
+  form: PropTypes.shape({
+    fields: PropTypes.arrayOf(PropTypes.object).isRequired
+  }).isRequired,
+  formTemplate: PropTypes.shape({
+    sections: PropTypes.arrayOf(PropTypes.object)
+  }).isRequired,
   onChange: PropTypes.func.isRequired
 };

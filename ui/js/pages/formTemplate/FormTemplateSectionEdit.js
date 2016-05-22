@@ -36,7 +36,7 @@ export default class FormTemplateSectionEdit extends Component {
     return this.state.formState.addTo('fields', () => {
       const id = this.state.newFieldId;
       let expandedFields = { ...this.state.expandedFields };
-      expandedFields[id] = ! expandedFields[id];
+      expandedFields[id] = true;
       this.setState({
         expandedFields: expandedFields,
         newFieldId: this.state.newFieldId + 1
