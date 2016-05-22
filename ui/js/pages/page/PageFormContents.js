@@ -32,8 +32,9 @@ export default class PageFormContents extends Component {
 
   constructor (props) {
     super(props);
+    const { formState: { object: page } } = props;
     this.state = {
-      expandAdd: false,
+      expandAdd: (! page || ! page.sections || page.sections.length === 0),
       expandedSections: {}, // _id or id
       newSectionId: 1
     };
@@ -41,6 +42,19 @@ export default class PageFormContents extends Component {
 
   componentDidMount () {
     this.refs.name.focus();
+  }
+
+  _addSection (type) {
+    return this.props.formState.addTo('sections', () => {
+      const id = this.state.newSectionId;
+      let expandedSections = { ...this.state.expandedSections };
+      expandedSections[id] = true;
+      this.setState({
+        expandedSections: expandedSections,
+        newSectionId: this.state.newSectionId + 1
+      });
+      return { type: type, id: id };
+    });
   }
 
   _toggleSection (id) {
@@ -105,12 +119,7 @@ export default class PageFormContents extends Component {
     if (expandAdd) {
 
       const addControls = SECTION_TYPES.map(type => (
-        <button key={type} type="button"
-          onClick={formState.addTo('sections', () => {
-            const id = this.state.newSectionId;
-            this.setState({ newSectionId: this.state.newSectionId + 1 });
-            return { type: type, id: id };
-          })}>
+        <button key={type} type="button" onClick={this._addSection(type)}>
           {type}
         </button>
       ));

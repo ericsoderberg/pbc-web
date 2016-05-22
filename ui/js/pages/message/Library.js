@@ -10,7 +10,7 @@ export default class Library extends Component {
 
   constructor (props) {
     super(props);
-    this.state = { message: props.library || {} };
+    this.state = {};
   }
 
   componentDidMount () {
@@ -23,11 +23,11 @@ export default class Library extends Component {
 
   _load (props) {
     if (props.name) {
-      let date = moment().subtract(1, 'day');
+      let date = moment().add(1, 'day');
       getItems('messages', {
         filter: {
           library: props.name,
-          date: { $gt: date.toString() }
+          date: { $lt: date.toString() }
         },
         limit: 1
       })
@@ -36,29 +36,51 @@ export default class Library extends Component {
     }
   }
 
-  render () {
-    const { color, full, plain } = this.props;
-    const { message } = this.state;
-
+  _renderMessage (message) {
     let image;
     if (message.image) {
       image = <Image image={message.image} plain={true} />;
     }
 
     return (
+      <Link to={`/messages/${message._id}`}>
+        {image}
+        <div className="library__message">
+          <label>{moment(message.date).format('MMM Do')}</label>
+          <div className="library__message-details">
+            <h2>{message.name}</h2>
+            <div>{message.verses}</div>
+            <div className="library__message-author">{message.author}</div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  _renderLibrary () {
+    const { name } = this.props;
+    return (
+      <Link className="link--button" to={`/messages?library=${name}`}>
+        Messages
+      </Link>
+    );
+  }
+
+  render () {
+    const { color, full, plain } = this.props;
+    const { message } = this.state;
+
+    let contents;
+    if (message) {
+      contents = this._renderMessage(message);
+    } else {
+      contents = this._renderLibrary();
+    }
+
+    return (
       <Section color={color} full={full} plain={plain}>
         <div className="library">
-          <Link to={`/messages/${message._id}`}>
-            {image}
-            <div className="library__message">
-              <label>Last Week</label>
-              <div className="library__message-details">
-                <h2>{message.name}</h2>
-                <div>{message.verses}</div>
-                <div className="library__message-author">{message.author}</div>
-              </div>
-            </div>
-          </Link>
+          {contents}
         </div>
       </Section>
     );
@@ -66,7 +88,7 @@ export default class Library extends Component {
 };
 
 Library.propTypes = {
-  library: PropTypes.object,
+  // library: PropTypes.object,
   name: PropTypes.string,
   ...Section.propTypes
 };
