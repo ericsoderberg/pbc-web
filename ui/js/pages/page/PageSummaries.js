@@ -25,7 +25,7 @@ export default class PageSummaries extends Component {
   _load (props) {
     props.pageSummaries.forEach(pageSummary => {
       if (! this.state.pages[pageSummary.id]) {
-        getItem('pages', pageSummary.id)
+        getItem('pages', pageSummary.id, { select: 'name' })
         .then(page => {
           let pages = { ...this.state.pages };
           pages[pageSummary.id] = page;
@@ -79,21 +79,58 @@ export default class PageSummaries extends Component {
     );
   }
 
-  render () {
-    const { color, full, plain } = this.props;
+  _renderSummaries () {
+    const { pageSummaries } = this.props;
 
-    const tiles = (this.props.pageSummaries || []).map((pageSummary, index) => {
+    const tiles = (pageSummaries || []).map((pageSummary, index) => {
       return this._renderTile(pageSummary, index);
     });
     const active = this._renderActive(this.props.pageSummaries[this.state.active]);
 
     return (
+      <div className="page-summaries">
+        <div className="page-summaries__tiles">
+          {tiles}
+        </div>
+        {active}
+      </div>
+    );
+  }
+
+  _renderLinks () {
+    const { pageSummaries } = this.props;
+
+    const links = (pageSummaries || []).map((pageSummary) => {
+      const page = this.state.pages[pageSummary.id] || {};
+      return (
+        <Link key={pageSummary.id} className="link--button"
+          to={pageSummary.page || `/pages/${pageSummary.id}`}>
+          {page.name}
+        </Link>
+      );
+    });
+
+    return (
+      <div className="page-links">
+        {links}
+      </div>
+    );
+  }
+
+  render () {
+    const { color, full, plain, summary } = this.props;
+
+    let contents;
+    if (summary) {
+      contents = this._renderSummaries();
+    } else {
+      contents = this._renderLinks();
+    }
+
+    return (
       <Section color={color} full={full} plain={plain}>
         <div className="page-summaries">
-          <div className="page-summaries__tiles">
-            {tiles}
-          </div>
-          {active}
+          {contents}
         </div>
       </Section>
     );

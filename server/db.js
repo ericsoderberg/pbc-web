@@ -55,6 +55,7 @@ const pageSectionSchema = Schema({
     text: String,
     tile: image
   }],
+  summary: Boolean,    // pages type
   text: String,       // text type
   url: String,        // video type
   userId: { type: Schema.Types.ObjectId, ref: 'User' }    // user type

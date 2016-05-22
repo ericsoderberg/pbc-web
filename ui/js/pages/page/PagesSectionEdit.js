@@ -22,7 +22,7 @@ class SubPageEdit extends Component {
   }
 
   render () {
-    const { index } = this.props;
+    const { index, summary } = this.props;
     const { formState } = this.state;
     const pageSummary = formState.object;
 
@@ -31,10 +31,24 @@ class SubPageEdit extends Component {
     ));
     pages.unshift(<option key={0} />);
 
-    const textHelp = (
-      <a href="http://daringfireball.net/projects/markdown/syntax"
-        target="_blank">Markdown syntax</a>
-    );
+    let summaryFields;
+    if (summary) {
+      const textHelp = (
+        <a href="http://daringfireball.net/projects/markdown/syntax"
+          target="_blank">Markdown syntax</a>
+      );
+
+      summaryFields = [
+        <ImageField key="tile" label="Tile image" name={`tile-${index}`}
+          formState={formState} property="tile" />,
+        <ImageField key="image" label="Image" name={`image-${index}`}
+          formState={formState} property="image" />,
+        <FormField key="text" label="Text" help={textHelp}>
+          <textarea name={`text-${index}`} value={pageSummary.text || ''} rows={6}
+            onChange={formState.change('text')}/>
+        </FormField>
+      ];
+    }
 
     return (
       <div>
@@ -45,14 +59,7 @@ class SubPageEdit extends Component {
             {pages}
           </select>
         </FormField>
-        <ImageField label="Tile image" name={`tile-${index}`}
-          formState={formState} property="tile" />
-        <ImageField label="Image" name={`image-${index}`}
-          formState={formState} property="image" />
-        <FormField label="Text" help={textHelp}>
-          <textarea name={`text-${index}`} value={pageSummary.text || ''} rows={6}
-            onChange={formState.change('text')}/>
-        </FormField>
+        {summaryFields}
       </div>
     );
   }
@@ -63,7 +70,8 @@ SubPageEdit.propTypes = {
   index: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   pages: PropTypes.array.isRequired,
-  pageSummary: PropTypes.object.isRequired
+  pageSummary: PropTypes.object.isRequired,
+  summary: PropTypes.bool
 };
 
 export default class PagesSectionEdit extends Component {
@@ -116,13 +124,19 @@ export default class PagesSectionEdit extends Component {
 
     const subPages = (section.pages || [{}]).map((pageSummary, index) => (
       <SubPageEdit key={index} pageSummary={pageSummary} index={index}
-        pages={this.state.pages}
+        pages={this.state.pages} summary={section.summary}
         onChange={(nextPageSummary) => this._onChangePage(nextPageSummary, index)} />
     ));
 
     return (
       <div>
         <fieldset className="form__fields">
+          <FormField>
+            <input name="summary" type="checkbox"
+              checked={section.summary || false}
+              onChange={formState.toggle('summary')}/>
+            <label htmlFor="summary">Summaries</label>
+          </FormField>
           <SectionFields formState={formState} />
           {subPages}
           <div><legend>{`Page ${subPages.length + 1}`}</legend></div>
