@@ -10,6 +10,7 @@ import rmdir from 'rimraf';
 import './db';
 
 const FILES_PATH = 'public/files';
+const ID_REGEXP = /^[A-Za-z0-9]+$/;
 
 const router = express.Router();
 
@@ -44,7 +45,6 @@ router.delete('/sessions/:id', (req, res) => {
   authorize(req, res)
   .then(session => {
     const id = req.params.id;
-    console.log('!!! delete session', id, session._id);
     if (session._id.equals(id)) { /// === doesn't seem to work
       session.remove()
       .then(() => res.status(200).send());
@@ -86,7 +86,8 @@ const register = (category, modelName, options={}) => {
     router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
-      const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
+      const criteria = (ObjectID.isValid(id) && ID_REGEXP.test(id)) ?
+        {_id: id} : {path: id};
       let query = Doc.findOne(criteria);
       if (req.query.select) {
         query.select(req.query.select);
@@ -547,7 +548,6 @@ router.get('/files/:id', (req, res) => {
     if (err) {
       res.status(400).json({ error: error });
     } else {
-      console.log('!!! get', files);
       res.download(`${FILES_PATH}/${id}/${files[0]}`);
     }
   });
@@ -557,7 +557,6 @@ router.delete('/files/:id', (req, res) => {
   authorize(req, res)
   .then(session => {
     const id = req.params.id;
-    console.log('!!! delete', id);
     rmdir(`${FILES_PATH}/${id}`, (error) => {
       if (error) {
         res.status(400).json({ error: error });
@@ -586,12 +585,10 @@ router.post('/files', (req, res) => {
   authorize(req, res)
   .then(session => {
     const id = new mongoose.Types.ObjectId();
-    console.log('!!! post new file', id);
     let fstream;
     req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
       const dir = `${FILES_PATH}/${id}`;
       fs.mkdir(dir, () => {
-        console.log("Uploading: " + filename);
         fstream = fs.createWriteStream(`${dir}/${filename}`);
         file.pipe(fstream);
         fstream.on('close', function () {

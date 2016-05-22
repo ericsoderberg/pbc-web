@@ -44,6 +44,13 @@ export default class PageFormContents extends Component {
     this.refs.name.focus();
   }
 
+  componentWillReceiveProps (nextProps) {
+    const { formState: { object: page } } = nextProps;
+    this.setState({
+      expandAdd: (! page || ! page.sections || page.sections.length === 0)
+    });
+  }
+
   _addSection (type) {
     return this.props.formState.addTo('sections', () => {
       const id = this.state.newSectionId;
