@@ -2,12 +2,12 @@
 import React, { PropTypes } from 'react';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
-import EventSummary from '../../components/EventSummary';
-import Library from '../../components/Library';
-import PageSummaries from '../../components/PageSummaries';
-import UserSummary from '../../components/UserSummary';
+import EventSummary from '../event/EventSummary';
+import Library from '../message/Library';
+import PageSummaries from './PageSummaries';
+import UserSummary from '../user/UserSummary';
 import Video from '../../components/Video';
-import FormAdd from '../form/FormAdd';
+import FormSummary from '../form/FormSummary';
 
 const PageContents = (props) => {
   const page = props.item;
@@ -43,7 +43,7 @@ const PageContents = (props) => {
       );
     } else if ('form' === section.type) {
       return (
-        <FormAdd key={index} full={section.full} color={section.color}
+        <FormSummary key={index} full={section.full} color={section.color}
           formTemplateId={section.formTemplateId} />
       );
     } else {

@@ -2,9 +2,9 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
-import { getItems } from '../actions';
-import Section from './Section';
-import Image from './Image';
+import { getItems } from '../../actions';
+import Section from '../../components/Section';
+import Image from '../../components/Image';
 
 export default class Library extends Component {
 

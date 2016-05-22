@@ -12,9 +12,8 @@ export default class FormAdd extends Component {
     this.state = {
       form: {
         fields: [],
-        formTemplateId: props.formTemplateId || (props.formTemplate || {})._id
-      },
-      formTemplate: props.formTemplate || {}
+        formTemplateId: props.formTemplateId
+      }
     };
   }
 
@@ -23,22 +22,22 @@ export default class FormAdd extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ formTemplate: nextProps.formTemplate });
-    this._load(nextProps);
-  }
-
-  _load (props) {
-    if (! props.formTemplate && props.formTemplateId) {
-      getItem('form-templates', props.formTemplateId)
-      .then(formTemplate => this.setState({ formTemplate: formTemplate }))
-      .catch(error => console.log("!!! FormAdd catch", error));
+    if (nextProps.formTemplateId !== this.props.formTemplateId) {
+      this._load(nextProps);
     }
   }
 
+  _load (props) {
+    getItem('form-templates', props.formTemplateId)
+    .then(formTemplate => this.setState({ formTemplate: formTemplate }))
+    .catch(error => console.log("!!! FormAdd catch", error));
+  }
+
   _onAdd (event) {
+    const { onDone } = this.props;
     event.preventDefault();
     postItem('forms', this.state.form)
-    .then(response => this.context.router.goBack())
+    .then(response => onDone ? onDone() : this.context.router.goBack())
     .catch(error => this.setState({ error: error }));
   }
 
@@ -47,25 +46,42 @@ export default class FormAdd extends Component {
   }
 
   render () {
+    const { onCancel } = this.props;
     const { form, formTemplate } = this.state;
 
-    return (
-      <form className="form" action={'/forms'} onSubmit={this._onAdd}>
-        <FormContents form={form} formTemplate={formTemplate}
-          onChange={this._onChange} />
-        <footer className="form__footer">
-          <button type="submit">
-            {formTemplate.submitLabel || 'Submit'}
-          </button>
-        </footer>
-      </form>
-    );
+    let result;
+    if (formTemplate) {
+      
+      let cancelControl;
+      if (onCancel) {
+        cancelControl = <button type="button" onClick={onCancel}>Cancel</button>;
+      }
+
+      result = (
+        <form className="form" action={'/forms'} onSubmit={this._onAdd}>
+          <FormContents form={form} formTemplate={formTemplate}
+            onChange={this._onChange} />
+          <footer className="form__footer">
+            <button type="submit">
+              {formTemplate.submitLabel || 'Submit'}
+            </button>
+            {cancelControl}
+          </footer>
+        </form>
+      );
+
+    } else {
+      result = <span>Loading ...</span>;
+    }
+    return result;
   }
 };
 
 FormAdd.propTypes = {
-  formTemplateId: PropTypes.string,
-  formTemplate: PropTypes.object
+  formTemplateId: PropTypes.string.isRequired,
+  formTemplate: PropTypes.object,
+  onCancel: PropTypes.func,
+  onDone: PropTypes.func
 };
 
 FormAdd.contextTypes = {

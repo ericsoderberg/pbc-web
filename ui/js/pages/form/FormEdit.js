@@ -22,7 +22,7 @@ export default class FormEdit extends Component {
   }
 
   componentDidMount () {
-    getItem('forms', this.props.params.id)
+    getItem('forms', this.props.id || this.props.params.id)
     .then(form => {
       this.setState({ form: form });
       return getItem('form-templates', form.formTemplateId);
@@ -32,20 +32,27 @@ export default class FormEdit extends Component {
   }
 
   _onUpdate (event) {
+    const { onDone } = this.props;
     event.preventDefault();
     putItem('forms', this.state.form)
-    .then(response => this.context.router.goBack())
+    .then(response => onDone ? onDone() : this.context.router.goBack())
     .catch(error => this.setState({ error: error }));
   }
 
   _onCancel () {
-    this.context.router.goBack();
+    const { onCancel } = this.props;
+    if (onCancel) {
+      onCancel();
+    } else {
+      this.context.router.goBack();
+    }
   }
 
   _onRemove (event) {
+    const { onDone } = this.props;
     event.preventDefault();
-    deleteItem('forms', this.props.params.id)
-    .then(response => this.context.router.go(-1))
+    deleteItem('forms', this.props.id || this.props.params.id)
+    .then(response => onDone ? onDone() : this.context.router.goBack())
     .catch(error => this.setState({ error: error }));
   }
 
@@ -54,32 +61,40 @@ export default class FormEdit extends Component {
   }
 
   render () {
-    const { form } = this.state;
-    const formTemplate = this.state.formTemplate || {};
+    const { form, formTemplate } = this.state;
 
-    return (
-      <form className="form" action={`/forms${form._id}`}
-        onSubmit={this._onUpdate}>
-        <FormContents form={form} formTemplate={formTemplate}
-          onChange={this._onChange} />
-        <footer className="form__footer">
-          <button type="submit">
-            {formTemplate.submitLabel || 'Update'}
-          </button>
-          <ConfirmRemove onConfirm={this._onRemove} />
-          <button type="button" onClick={this._onCancel}>
-            Cancel
-          </button>
-        </footer>
-      </form>
-    );
+    let result;
+    if (form && formTemplate) {
+      
+      result = (
+        <form className="form" action={`/forms${form._id}`}
+          onSubmit={this._onUpdate}>
+          <FormContents form={form} formTemplate={formTemplate}
+            onChange={this._onChange} />
+          <footer className="form__footer">
+            <button type="submit">Update</button>
+            <ConfirmRemove onConfirm={this._onRemove} />
+            <button type="button" onClick={this._onCancel}>
+              Cancel
+            </button>
+          </footer>
+        </form>
+      );
+
+    } else {
+      result = <span>Loading ...</span>;
+    }
+    return result;
   }
 };
 
 FormEdit.propTypes = {
+  id: PropTypes.string,
+  onCancel: PropTypes.func,
+  onDone: PropTypes.func,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
-  }).isRequired
+  })
 };
 
 FormEdit.contextTypes = {

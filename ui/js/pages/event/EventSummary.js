@@ -1,10 +1,10 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getItem } from '../actions';
-import { friendlyTimes } from '../utils/EventTimes';
-import Section from './Section';
-import Map from './Map';
+import { getItem } from '../../actions';
+import { friendlyTimes } from '../../utils/EventTimes';
+import Section from '../../components/Section';
+import Map from '../../components/Map';
 
 export default class EventSummary extends Component {
 

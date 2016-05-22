@@ -1,9 +1,9 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getItem } from '../actions';
-import Section from './Section';
-import Image from './Image';
+import { getItem } from '../../actions';
+import Section from '../../components/Section';
+import Image from '../../components/Image';
 
 export default class UserSummary extends Component {
 

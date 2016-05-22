@@ -91,8 +91,16 @@ export function postItem (category, item) {
   .then(response => response.json());
 }
 
-export function getItem (category, id) {
-  return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
+export function getItem (category, id, options={}) {
+  const params = [];
+  if (options.select) {
+    params.push(`select=${encodeURIComponent(options.select)}`);
+  }
+  if (options.populate) {
+    params.push(`populate=${encodeURIComponent(JSON.stringify(options.populate))}`);
+  }
+  const q = params.length > 0 ? `?${params.join('&')}`: '';
+  return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
     method: 'GET', headers: _headers })
   .then(processStatus)
   .then(response => response.json());

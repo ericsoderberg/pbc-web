@@ -88,6 +88,9 @@ const register = (category, modelName, options={}) => {
       const Doc = mongoose.model(modelName);
       const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
       let query = Doc.findOne(criteria);
+      if (req.query.select) {
+        query.select(req.query.select);
+      }
       if (options.populate) {
         query = query.populate(options.populate);
       }
@@ -145,7 +148,7 @@ const register = (category, modelName, options={}) => {
       query.sort(req.query.sort);
     }
     if (req.query.select) {
-      query.sort(req.query.select);
+      query.select(req.query.select);
     }
     if (req.query.populate) {
       const populate = JSON.parse(req.query.populate);
