@@ -114,7 +114,7 @@ class EventFormFields extends Component {
           <input name="address" value={event.address || ''}
             onChange={formState.change('address')}/>
         </FormField>
-        <FormField name="text" label="Text">
+        <FormField label="Text">
           <textarea ref="text" name="text" value={event.text || ''} rows={4}
             onChange={formState.change('text')}/>
         </FormField>
@@ -122,7 +122,7 @@ class EventFormFields extends Component {
           <input name="calendar" value={event.calendar || ''}
             onChange={formState.change('calendar')}/>
         </FormField>
-        <FormField name="path" label="Path">
+        <FormField label="Path">
           <input name="path" value={event.path || ''}
             onChange={formState.change('path')}/>
         </FormField>

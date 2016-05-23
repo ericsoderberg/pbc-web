@@ -8,6 +8,7 @@ import moment from 'moment';
 import fs from 'fs';
 import rmdir from 'rimraf';
 import './db';
+import { render as renderNewsletter } from './newsletter';
 
 const FILES_PATH = 'public/files';
 const ID_REGEXP = /^[A-Za-z0-9]+$/;
@@ -229,7 +230,6 @@ register('users', 'User', {
 
 register('pages', 'Page');
 register('resources', 'Resource');
-register('newsletters', 'Newsletter');
 register('form-templates', 'FormTemplate');
 register('forms', 'Form');
 register('email-lists', 'EmailList');
@@ -238,32 +238,9 @@ register('email-lists', 'EmailList');
 
 register('messages', 'Message', { except: 'get' });
 
-function messageCompleter (property, value, results, res) {
-  if (! results.sent) {
-    if ('error' === property) {
-      res.status(400).json({ error: value });
-      results.sent = true;
-    } else {
-      results[property] = value;
-      results.remaining -= 1;
-      if (0 === results.remaining) {
-        const message = results.message.toObject();
-        message.nextMessage = results.nextMessage;
-        message.previousMessage = results.previousMessage;
-        message.seriesMessages = results.seriesMessages;
-        res.json(message);
-        results.sent = true;
-      }
-    }
-  }
-}
-
 router.get('/messages/:id', (req, res) => {
   const id = req.params.id;
   const Doc = mongoose.model('Message');
-  // TODO: Convert to Promise.all()
-  let results = { remaining: 4 };
-  let errors = [];
   const subFields = 'name verses date path';
 
   // message
@@ -274,34 +251,101 @@ router.get('/messages/:id', (req, res) => {
   .then(message => {
 
     // nextMessage
-    Doc.find({
+    const nextPromise = Doc.find({
       library: message.library,
       date: { $gt: message.date },
       series: { $ne: true }
     })
-    .sort('date').limit(1).select(subFields).exec()
-    .then(doc => messageCompleter('nextMessage', doc[0], results, res))
-    .catch(error => messageCompleter('error', error, results, res));
+    .sort('date').limit(1).select(subFields).exec();
 
     // previousMessage
-    Doc.find({
+    const previousPromise = Doc.find({
       library: message.library,
       date: { $lt: message.date },
       series: { $ne: true }
     })
-    .sort('-date').limit(1).select(subFields).exec()
-    .then(doc => messageCompleter('previousMessage', doc[0], results, res))
-    .catch(error => messageCompleter('error', error, results, res));
+    .sort('-date').limit(1).select(subFields).exec();
 
     // seriesMessages
-    Doc.find({ seriesId: message.id }).select(subFields).exec()
-    .then(doc => messageCompleter('seriesMessages', doc, results, res))
-    .catch(error => messageCompleter('error', error, results, res));
+    const seriesMessagesPromise = Doc.find({ seriesId: message.id })
+    .select(subFields).exec();
 
-    messageCompleter('message', message, results, errors, res);
+    return Promise.all([Promise.resolve(message), nextPromise,
+      previousPromise, seriesMessagesPromise]);
   })
-  .catch(error => messageCompleter('error', error, results, res));
+  .then(docs => {
+    let messageData = docs[0].toObject();
+    messageData.nextMessage = docs[1][0];
+    messageData.previousMessage = docs[2][0];
+    messageData.seriesMessages = docs[3];
+    res.json(messageData);
+  })
+  .catch(error => res.status(400).json({ error: error }));
 });
+
+// Newsletter
+
+router.post('/newsletters/render', (req, res) => {
+  const Newsletter = mongoose.model('Newsletter');
+  const newsletter = new Newsletter(req.body);
+  const Message = mongoose.model('Message');
+  const Event = mongoose.model('Event');
+  const messageFields = 'name verses date path author';
+
+  // nextMessage
+  let nextPromise;
+  if (newsletter.date && newsletter.library) {
+    nextPromise = Message.find({
+      library: newsletter.library,
+      date: { $gt: newsletter.date },
+      series: { $ne: true }
+    })
+    .sort('date').limit(1).select(messageFields).exec();
+  } else {
+    nextPromise = Promise.resolve([]);
+  }
+
+  // previousMessage
+  let previousPromise;
+  if (newsletter.date && newsletter.library) {
+    previousPromise = Message.find({
+      library: newsletter.library,
+      date: { $lt: newsletter.date },
+      series: { $ne: true }
+    })
+    .sort('-date').limit(1).select(messageFields).exec();
+  } else {
+    previousPromise = Promise.resolve([]);
+  }
+
+  // events
+  let eventsPromise;
+  if (newsletter.date && newsletter.calendar) {
+    const date = moment(newsletter.date);
+    eventsPromise = Event.find({
+      calendar: newsletter.calendar,
+      start: {
+        $gt: date.toDate(),
+        $lt: moment(date).add(2, 'months').toDate()
+      }
+    }).exec();
+  } else {
+    eventsPromise = Promise.resolve([]);
+  }
+
+  Promise.all([Promise.resolve(newsletter), nextPromise,
+    previousPromise, eventsPromise])
+  .then(docs => {
+    let newsletterData = docs[0].toObject();
+    newsletterData.nextMessage = docs[1][0];
+    newsletterData.previousMessage = docs[2][0];
+    newsletterData.events = docs[3];
+    res.send(renderNewsletter(newsletterData));
+  })
+  .catch(error => res.status(400).json({ error: error }));
+});
+
+register('newsletters', 'Newsletter');
 
 // Site
 
@@ -338,7 +382,7 @@ router.get('/calendar', (req, res) => {
   const previous = moment(date).subtract(1, 'month');
   const next = moment(date).add(1, 'month');
   // find all events withing the time window
-  const Doc = mongoose.model('Event');
+  const Event = mongoose.model('Event');
   let q = {
     end: { $gte: start.toDate() },
     start: { $lt: end.toDate() }
@@ -350,7 +394,7 @@ router.get('/calendar', (req, res) => {
   if (req.query.filter) {
     q = { ...q, ...JSON.parse(req.query.filter) };
   }
-  Doc.find(q)
+  Event.find(q)
   .sort('start')
   .exec()
   .then(docs => {

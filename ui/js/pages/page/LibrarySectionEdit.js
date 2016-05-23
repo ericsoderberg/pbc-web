@@ -15,7 +15,7 @@ export default class LibrarySectionEdit extends Component {
 
   componentDidMount () {
     getItems('messages', { distinct: 'library' })
-    .then(response => this.setState({ libraries: response }));
+    .then(libraries => this.setState({ libraries: libraries }));
   }
 
   componentWillReceiveProps (nextProps) {
@@ -32,8 +32,8 @@ export default class LibrarySectionEdit extends Component {
 
     return (
       <fieldset className="form__fields">
-        <FormField name="library" label="Library">
-          <select name="objectId" value={section.name || ''}
+        <FormField label="Library">
+          <select name="library" value={section.name || ''}
             onChange={formState.change('name')}>
             {libraries}
           </select>

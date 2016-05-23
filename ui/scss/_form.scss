@@ -1,7 +1,7 @@
 .form__container {
   display: flex;
   flex-direction: row;
-  // min-height: 100vh;
+  min-height: 100vh;
 }
 
 .form {
@@ -200,6 +200,7 @@
 .date-time__header {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 }
 

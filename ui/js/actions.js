@@ -175,6 +175,15 @@ export function getUnavailableDates (event) {
   .then(response => response.json());
 }
 
+// Newsletter
+
+export function postNewsletterRender (newsletter) {
+  return fetch('/api/newsletters/render', {
+    method: 'POST', headers: _headers, body: JSON.stringify(newsletter) })
+  .then(processStatus)
+  .then(response => response.text());;
+}
+
 // Map
 
 export function getGeocode (address) {

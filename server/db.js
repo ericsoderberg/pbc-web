@@ -209,12 +209,13 @@ const siteSchema = Schema({
 mongoose.model('Site', siteSchema);
 
 const newsletterSchema = Schema({
-  addresses: String,
+  address: String,
+  calendar: String,
   created: Date,
   date: Date,
+  library: String,
   modified: Date,
   name: String,
-  // TODO: references to events, pages, etc.
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

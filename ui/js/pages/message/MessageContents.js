@@ -10,11 +10,6 @@ import MessageItem from './MessageItem';
 
 export default class MessageContents extends Component {
 
-  constructor () {
-    super();
-    this.state = {};
-  }
-
   _renderMessageNav (message, type) {
     return (
       <Link className={`message__nav-${type}`}
@@ -149,5 +144,3 @@ export default class MessageContents extends Component {
 MessageContents.PropTypes = {
   item: PropTypes.object.isRequired
 };
-
-export default MessageContents;

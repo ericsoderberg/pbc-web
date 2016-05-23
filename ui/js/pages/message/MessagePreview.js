@@ -6,8 +6,7 @@ import MessageContents from './MessageContents';
 export default class MessagePreview extends Component {
 
   render () {
-    const { item } = this.props;
-    const message = item;
+    const { item: message } = this.props;
 
     return (
       <main className="page-preview">
