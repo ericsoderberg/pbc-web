@@ -12,6 +12,7 @@
   max-width: $page-width;
   margin: $double-unit auto;
 
+  &.image,
   > .image,
   > a > .image {
     width: 100%;
@@ -71,18 +72,32 @@
 
 .event-summary {
   display: flex;
-  flex-direction: row;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
 }
 
 .event-summary__summary {
   display: flex;
   flex-direction: column;
-  flex: 1 0 50%;
   text-decoration: none;
   text-align: center;
   justify-content: center;
   align-items: center;
-  padding: $double-unit 0;
+
+  @media all and (min-width: 700px) {
+    flex: 1 0 50%;
+    padding: $double-unit 0;
+  }
+
+  @media all and (max-width: 699px) {
+    padding: $unit;
+  }
 
   h2 {
     margin-top: 0;
@@ -95,7 +110,10 @@
 }
 
 .event-summary__map {
-  flex: 0 0 50%;
+
+  @media all and (min-width: 700px) {
+    flex: 0 0 50%;
+  }
 
   .map {
     height: 176px; // 100%;
@@ -112,23 +130,41 @@
 }
 
 .library__message {
-  max-width: $page-width;
-  margin: 0 auto;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: $unit 0 $double-unit;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    max-width: $page-width;
+    margin: 0 auto;
+    align-items: center;
+    padding: $unit 0 $double-unit;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+    padding: $unit;
+  }
 
   label {
     font-size: 32px;
     font-weight: 100;
-    flex: 0 0 $sidebar-width;
-    padding-left: $unit;
+
+    @media all and (min-width: 700px) {
+      flex: 0 0 $sidebar-width;
+      padding-left: $unit;
+    }
+
+    @media all and (max-width: 699px) {
+      margin-bottom: $half-unit;
+    }
   }
 }
 
 .library__message-details {
-  margin-left: $double-unit;
+
+  @media all and (min-width: 700px) {
+    margin-left: $double-unit;
+  }
 
   h2 {
     margin: 0 0 $unit;
@@ -209,12 +245,26 @@
 
 .page-summaries__active {
   display: flex;
-  flex-direction: row;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
 }
 
 .page-summaries__active-summary {
-  flex: 0 0 30%;
-  padding: $double-unit;
+
+  @media all and (min-width: 700px) {
+    flex: 0 0 30%;
+    padding: $double-unit;
+  }
+
+  @media all and (max-width: 699px) {
+    padding: $unit;
+  }
 }
 
 .page-summaries__active-image {
@@ -225,27 +275,41 @@
 
 .page-links {
   display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  flex-wrap: wrap;
-  max-width: $page-width;
-  margin: 0 auto;
-  padding: $double-unit 0;
 
-  > * {
-    flex: 1 0 auto;
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: stretch;
+    flex-wrap: wrap;
+    max-width: $page-width;
+    margin: 0 auto;
+    padding: $double-unit 0;
+
+    > * {
+      flex: 1 0 auto;
+    }
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
   }
 }
 
 .footer {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  max-width: $page-width;
-  margin: 0 auto;
   color: #666;
   font-size: 14px;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: space-between;
+    max-width: $page-width;
+    margin: 0 auto;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
 
   a {
     padding: $unit;

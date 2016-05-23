@@ -1,12 +1,26 @@
 .form__container {
   display: flex;
-  flex-direction: row;
   min-height: 100vh;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
 }
 
 .form {
-  flex: 1 0 $form-width;
   background-color: $secondary-background-color;
+
+  @media all and (min-width: 700px) {
+    flex: 1 0 $form-width;
+  }
+
+  @media all and (max-width: 699px) {
+    flex: 1 0 100vh;
+  }
 }
 
 .form-error {
@@ -20,9 +34,12 @@
 }
 
 .form-error__message {
-  max-width: $form-width;
-  margin: 0 auto;
   color: #ee3333;
+
+  @media all and (min-width: 700px) {
+    max-width: $form-width;
+    margin: 0 auto;
+  }
 }
 
 .form__fields {
@@ -139,11 +156,23 @@
 
 .form__footer {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  max-width: $form-width;
-  margin: $unit auto 0;
-  padding-bottom: $unit;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: space-between;
+    max-width: $form-width;
+    margin: $unit auto 0;
+    padding-bottom: $unit;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+    padding: 0 $unit;
+
+    button {
+      margin: $half-unit 0;
+    }
+  }
 }
 
 // confirm-remove
