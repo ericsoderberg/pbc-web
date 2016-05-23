@@ -34,7 +34,7 @@
 }
 
 .form-error__message {
-  color: #ee3333;
+  color: $error-color;
 
   @media all and (min-width: 700px) {
     max-width: $form-width;
@@ -134,6 +134,10 @@
   + .form__tabs {
     margin-top: $quarter-unit;
   }
+}
+
+.form-field__error {
+  color: $error-color;
 }
 
 .form-field__image {

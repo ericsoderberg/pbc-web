@@ -43,6 +43,7 @@ export default class FormContents extends Component {
   }
 
   _renderFormField (templateField, index) {
+    const error = this.props.error || {};
     let value;
     this._fieldForId(this.props.form.fields, templateField._id,
       (field, index) => {
@@ -90,7 +91,7 @@ export default class FormContents extends Component {
 
     return (
       <FormField key={index} label={templateField.name}
-        help={templateField.help}>
+        help={templateField.help} error={error[templateField._id]}>
         {contents}
       </FormField>
     );
@@ -130,15 +131,19 @@ export default class FormContents extends Component {
   }
 
   render () {
-    const { formTemplate } = this.props;
-    const { error } = this.state;
+    const { formTemplate, error } = this.props;
+
+    let formError;
+    if (error && typeof error === 'string') {
+      formError = <FormError message={error} />;
+    }
 
     const sections =
     (formTemplate.sections || []).map(this._renderTemplateSection);
 
     return (
       <div>
-        <FormError message={error} />
+        {formError}
         {sections}
       </div>
     );
@@ -146,7 +151,7 @@ export default class FormContents extends Component {
 };
 
 FormContents.propTypes = {
-  error: PropTypes.node,
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   form: PropTypes.shape({
     fields: PropTypes.arrayOf(PropTypes.object).isRequired
   }).isRequired,
