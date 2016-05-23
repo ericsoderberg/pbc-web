@@ -147,6 +147,8 @@ const formSchema = Schema({
   created: Date,
   fields: [{
     fieldId: ObjectId,
+    optionId: ObjectId, // choice
+    optionIds: [ObjectId], // choices
     value: String
   }],
   formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },

@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItem, postItem } from '../../actions';
 import FormContents from './FormContents';
+import { setFormError, clearFormError } from './FormUtils';
 
 export default class FormAdd extends Component {
 
@@ -33,48 +34,11 @@ export default class FormAdd extends Component {
     .catch(error => console.log("!!! FormAdd catch", error));
   }
 
-  _setError (formTemplate, form) {
-    let error;
-    // check for required fields
-    formTemplate.sections.forEach(section => {
-      section.fields.forEach(templateField => {
-        if (templateField.required) {
-          // see if we have it
-          if (! form.fields.some(field => (
-            field.fieldId === templateField._id && field.value))) {
-            if (! error) {
-              error = {};
-            }
-            error[templateField._id] = 'required';
-          }
-        }
-      });
-    });
-    return error;
-  }
-
-  _clearError (formTemplate, form, error) {
-    error = { ...error };
-    formTemplate.sections.forEach(section => {
-      section.fields.forEach(templateField => {
-        if (templateField.required) {
-          // see if we have it
-          if (form.fields.some(field => (
-            field.fieldId === templateField._id && field.value))) {
-            delete error[templateField._id];
-          }
-        }
-      });
-    });
-    return error;
-  }
-
   _onAdd (event) {
     event.preventDefault();
     const { onDone } = this.props;
     const { formTemplate, form } = this.state;
-
-    const error = this._setError(formTemplate, form);
+    const error = setFormError(formTemplate, form);
 
     if (error) {
       this.setState({ error: error });
@@ -88,7 +52,7 @@ export default class FormAdd extends Component {
   _onChange (form) {
     const { formTemplate } = this.state;
     // clear any error for fields that have changed
-    const error = this._clearError(formTemplate, form, this.state.error);
+    const error = clearFormError(formTemplate, form, this.state.error);
     this.setState({ form: form, error: error });
   }
 

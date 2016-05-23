@@ -14,7 +14,7 @@ class FormSummary extends Component {
     this._onAdd = this._onAdd.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this._onDone = this._onDone.bind(this);
-    this.state = {};
+    this.state = { };
   }
 
   componentDidMount () {
@@ -32,7 +32,7 @@ class FormSummary extends Component {
     if (! formTemplate) {
       getItem('form-templates', formTemplateId, { select: 'name' })
       .then(formTemplate => this.setState({ formTemplate: formTemplate }))
-      .catch(error => console.log('!!! EventSummary formTemplate catch', error));
+      .catch(error => console.log('!!! FormSummary formTemplate catch', error));
     }
     this._loadForms(props);
   }
@@ -42,7 +42,7 @@ class FormSummary extends Component {
     getItems('forms',
       { filter: { formTemplateId: formTemplateId }, select: 'modified' })
     .then(forms => this.setState({ forms: forms }))
-    .catch(error => console.log('!!! EventSummary forms catch', error));
+    .catch(error => console.log('!!! FormSummary forms catch', error));
   }
 
   _onAdd () {
@@ -69,7 +69,7 @@ class FormSummary extends Component {
     const { formTemplate, forms, adding, editId } = this.state;
 
     let contents;
-    if (! forms) {
+    if (! forms || ! formTemplate) {
       contents = <span>Loading ...</span>;
     } else if (adding || forms.length === 0) {
       const onCancel = forms.length > 0 ? this._onCancel : undefined;

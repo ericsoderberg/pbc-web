@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getItem, putItem, deleteItem } from '../../actions';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import FormContents from './FormContents';
+import { setFormError, clearFormError } from './FormUtils';
 
 export default class FormEdit extends Component {
 
@@ -32,11 +33,18 @@ export default class FormEdit extends Component {
   }
 
   _onUpdate (event) {
-    const { onDone } = this.props;
     event.preventDefault();
-    putItem('forms', this.state.form)
-    .then(response => onDone ? onDone() : this.context.router.goBack())
-    .catch(error => this.setState({ error: error }));
+    const { onDone } = this.props;
+    const { formTemplate, form } = this.state;
+    const error = setFormError(formTemplate, form);
+
+    if (error) {
+      this.setState({ error: error });
+    } else {
+      putItem('forms', this.state.form)
+      .then(response => onDone ? onDone() : this.context.router.goBack())
+      .catch(error => this.setState({ error: error }));
+    }
   }
 
   _onCancel () {
@@ -57,7 +65,10 @@ export default class FormEdit extends Component {
   }
 
   _onChange (form) {
-    this.setState({ form: form });
+    const { formTemplate } = this.state;
+    // clear any error for fields that have changed
+    const error = clearFormError(formTemplate, form, this.state.error);
+    this.setState({ form: form, error: error });
   }
 
   render () {
@@ -65,7 +76,7 @@ export default class FormEdit extends Component {
 
     let result;
     if (form && formTemplate) {
-      
+
       result = (
         <form className="form" action={`/forms${form._id}`}
           onSubmit={this._onUpdate}>

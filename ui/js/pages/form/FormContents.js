@@ -13,15 +13,16 @@ export default class FormContents extends Component {
     this.state = {};
   }
 
-  _fieldForId (fields, id, found, missed) {
-    if ( ! (fields || []).some((field, index) => {
+  _fieldIndex (id) {
+    const { form: { fields } } = this.props;
+    let result = -1;
+    fields.some((field, index) => {
       if (field.fieldId === id) {
-        found(field, index);
+        result = index;
         return true;
       }
-    })) {
-      missed();
-    }
+    });
+    return result;
   }
 
   _change (templateFieldId) {
@@ -30,61 +31,94 @@ export default class FormContents extends Component {
       const nextField = { fieldId: templateFieldId, value: value };
       let form = { ...this.props.form };
       let fields = form.fields.slice(0);
-      this._fieldForId(fields, templateFieldId,
-        (field, index) => {
-          fields[index] = nextField;
-        },
-        () => {
-          fields.push(nextField);
-        });
+      const index = this._fieldIndex(templateFieldId);
+      if (index === -1) {
+        fields.push(nextField);
+      } else {
+        fields[index] = nextField;
+      }
+      form.fields = fields;
+      this.props.onChange(form);
+    };
+  }
+
+  _setOption (templateFieldId, optionId) {
+    return (event) => {
+      const nextField = { fieldId: templateFieldId, optionId: optionId };
+      let form = { ...this.props.form };
+      let fields = form.fields.slice(0);
+      const index = this._fieldIndex(templateFieldId);
+      if (index === -1) {
+        fields.push(nextField);
+      } else {
+        fields[index] = nextField;
+      }
+      form.fields = fields;
+      this.props.onChange(form);
+    };
+  }
+
+  _toggleOption (templateFieldId, optionId) {
+    return (event) => {
+      let form = { ...this.props.form };
+      let fields = form.fields.slice(0);
+      const index = this._fieldIndex(templateFieldId);
+      if (index === -1) {
+        fields.push({ fieldId: templateFieldId, optionIds: [optionId] });
+      } else {
+        let optionIds = fields[index].optionIds.slice(0);
+        let optionIndex = optionIds.indexOf(optionId);
+        if (optionIndex === -1) {
+          optionIds.push(optionId);
+        } else {
+          optionIds.splice(optionIndex, 1);
+        }
+        fields[index] = { fieldId: templateFieldId, optionIds: optionIds };
+      }
       form.fields = fields;
       this.props.onChange(form);
     };
   }
 
   _renderFormField (templateField, index) {
+    const { form: { fields } } = this.props;
     const error = this.props.error || {};
-    let value;
-    this._fieldForId(this.props.form.fields, templateField._id,
-      (field, index) => {
-        value = field.value;
-      },
-      () => {
-        value = '';
-      });
+    const fieldIndex = this._fieldIndex(templateField._id);
+    const field = fields[fieldIndex] || {};
 
     let contents;
     if ('line' === templateField.type) {
       contents = (
-        <input name={templateField.name} value={value} type="text"
+        <input name={templateField.name} value={field.value || ''} type="text"
           onChange={this._change(templateField._id)} />
       );
     } else if ('lines' === templateField.type) {
       contents = (
-        <textarea name={templateField.name} value={value}
+        <textarea name={templateField.name} value={field.value || ''}
           onChange={this._change(templateField._id)} />
       );
     } else if ('choice' === templateField.type) {
       contents = (templateField.options || []).map((option, index) => (
         <div key={index}>
           <input name={templateField.name} type="radio"
-            checked={value || false}
-            onChange={this._change(templateField._id)}/>
+            checked={field.optionId === option._id}
+            onChange={this._setOption(templateField._id, option._id)}/>
           <label htmlFor={templateField.name}>{option.name}</label>
         </div>
       ));
     } else if ('choices' === templateField.type) {
+      const optionIds = field.optionIds || [];
       contents = (templateField.options || []).map((option, index) => (
         <div key={index}>
           <input name={templateField.name} type="checkbox"
-            checked={value || false}
-            onChange={this._change(templateField._id)}/>
+            checked={optionIds.indexOf(option._id) !== -1}
+            onChange={this._toggleOption(templateField._id, option._id)}/>
           <label htmlFor={templateField.name}>{option.name}</label>
         </div>
       ));
     } else if ('count' === templateField.type) {
       contents = (
-        <input name={templateField.name} value={value} type="text"
+        <input name={templateField.name} value={field.value || ''} type="text"
           onChange={this._change(templateField._id)} />
       );
     }
