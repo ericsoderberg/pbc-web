@@ -29,6 +29,7 @@ export default class Library extends Component {
           library: props.name,
           date: { $lt: date.toString() }
         },
+        sort: '-date',
         limit: 1
       })
       .then(messages => this.setState({ message: messages[0] }))
