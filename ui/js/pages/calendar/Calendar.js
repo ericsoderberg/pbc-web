@@ -85,27 +85,45 @@ export default class Calendar extends Component {
 
   _renderEvents (date, events) {
     let result = [];
-    while (events.length > 0 &&
-      moment(events[0].start).isSame(date, 'date')) {
-      const event = events.shift();
+    events.forEach(event => {
+
       const start = moment(event.start);
-      let time;
-      if (start.isAfter(date)) {
-        time = (
-          <span className="calendar__event-time">
-            {start.format('h:mm a')}
-          </span>
+      let eventDate;
+      if (start.isSame(date, 'date')) {
+        eventDate = start;
+      } else if (event.dates) {
+        event.dates.some(date2 => {
+          eventDate = moment(date2);
+          if (! eventDate.isSame(date, 'date')) {
+            eventDate = undefined;
+          } else {
+            return true;
+          }
+        });
+      }
+
+      if (eventDate) {
+
+        let time;
+        if (eventDate.isSame(date, 'day')) {
+          time = (
+            <span className="calendar__event-time">
+              {start.format('h:mm a')}
+            </span>
+          );
+        }
+
+        result.push(
+          <li key={event._id} className="calendar__event">
+            <Link to={`/events/${event._id}`}>
+              {time}
+              {event.name}
+            </Link>
+          </li>
         );
       }
-      result.push(
-        <li key={event._id} className="calendar__event">
-          <Link to={`/events/${event._id}`}>
-            {time}
-            {event.name}
-          </Link>
-        </li>
-      );
-    }
+
+    });
     return result;
   }
 
