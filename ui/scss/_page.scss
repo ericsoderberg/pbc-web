@@ -33,23 +33,6 @@
   a {
     color: inherit;
   }
-  // a {
-  //   color: $active-color;
-  //
-  //   &:hover {
-  //     color: $control-color;
-  //   }
-  // }
-
-  // button,
-  // .link--button {
-  //   background-color: transparent;
-  //
-  //   &:hover {
-  //     background-color: $control-hover-background;
-  //     color: $active-color;
-  //   }
-  // }
 }
 
 .section__container--footer {
@@ -101,9 +84,7 @@
   display: flex;
   flex-direction: column;
   text-decoration: none;
-  text-align: center;
   justify-content: center;
-  align-items: center;
 
   @media all and (min-width: 700px) {
     flex: 1 0 50%;
@@ -280,12 +261,12 @@
 
 .page-tile__name {
   position: relative;
-  display: block;
+  display: inline-block;
   font-size: 24px;
   font-weight: 100;
   padding: $unit;
   background-color: $control-background-color;
-  color: $color;
+  color: $control-color;
   margin-right: $unit;
   transition: all 0.2s;
 
@@ -328,10 +309,27 @@
 }
 
 .event-times__times {
-  margin-left: $quarter-unit;
-
   &:before {
     content: ' @ ';
+    color: $tertiary-color;
+  }
+}
+
+.event-times__date,
+.event-times__time {
+  white-space: nowrap;
+}
+
+.event-times__date + .event-times__date {
+  &:before {
+    content: ' - ';
+    color: $tertiary-color;
+  }
+}
+
+.event-times__time + .event-times__time {
+  &:before {
+    content: ' & ';
     color: $tertiary-color;
   }
 }

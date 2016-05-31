@@ -47,7 +47,7 @@ export default class EventDates extends Component {
 
     let weeks = [];
     let days = [];
-    const today = moment();
+    const today = moment().startOf('day');
     let date = moment(today).subtract(1, 'month').startOf('week');
 
     while (weeks.length < 53) {

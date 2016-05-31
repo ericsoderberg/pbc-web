@@ -4,28 +4,49 @@ import moment from 'moment';
 
 const EventTimes = (props) => {
   const { event } = props;
-
-  let additionalTimes = '';
-  if (event.times && event.times.length > 0) {
-    additionalTimes = ' & ' + event.times.map(time => {
-      return moment(time.start).format('h:mm a');
-    }).join(' & ');
-  }
   const start = moment(event.start);
 
   let dates;
   if (event.dates && event.dates.length > 0) {
     // distinguish multiple days in the same week from the same day across weeks
-    if (moment(event.dates[0]).isSame(moment(event.start), 'day')) {
-      dates = start.format('dddd[s]');
+    if (moment(event.dates[0]).day() === start.day()) {
+      dates = (
+        <span className="event-times__date">
+          {start.format('dddd[s]')}
+        </span>
+      );
     } else {
-      dates = start.format('MMMM Do') + ' - ' +
-        moment(event.dates[event.dates.length-1]).format('MMMM Do');
+      dates = [
+        <span key="1" className="event-times__date">
+          {start.format('MMMM Do')}
+        </span>,
+        <span key="2" className="event-times__date">
+          {moment(event.dates[event.dates.length-1]).format('MMMM Do')}
+        </span>
+      ];
     }
   } else {
-    dates = start.format('MMMM Do YYYY');
+    dates = (
+      <span className="event-times__date">
+        {start.format('MMMM Do YYYY')}
+      </span>
+    );
   }
-  const times = start.format('h:mm a') + additionalTimes;
+
+  let times = [
+    <span key="first" className="event-times__time">
+      {start.format('h:mm a')}
+    </span>
+  ];
+  if (event.times && event.times.length > 0) {
+    event.times.forEach(time => {
+      times.push(
+        <span key={time.start} className="event-times__time">
+          {moment(time.start).format('h:mm a')}
+        </span>
+      );
+    });
+  }
 
   return (
     <div className="event-times">
