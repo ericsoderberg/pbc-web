@@ -16,8 +16,15 @@ export default class Add extends Component {
   }
 
   _onAdd (item) {
-    postItem(this.props.category, item)
-    .then(response => this.context.router.goBack())
+    const { category, showable } = this.props;
+    postItem(category, item)
+    .then(newItem => {
+      if (showable) {
+        this.context.router.push(`/${category}/${newItem._id}`);
+      } else {
+        this.context.router.goBack();
+      }
+    })
     .catch(error => this.setState({ error: error }));
   }
 
@@ -38,6 +45,7 @@ Add.propTypes = {
   default: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
   Preview: PropTypes.func,
+  showable: PropTypes.bool,
   title: PropTypes.string.isRequired
 };
 

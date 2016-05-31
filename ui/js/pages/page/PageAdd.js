@@ -9,5 +9,6 @@ PageAdd.defaultProps = {
   category: 'pages',
   FormContents: PageFormContents,
   Preview: PagePreview,
+  showable: true,
   title: 'Add Page'
 };

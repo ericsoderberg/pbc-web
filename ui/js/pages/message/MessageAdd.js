@@ -9,5 +9,6 @@ MessageAdd.defaultProps = {
   category: 'messages',
   FormContents: MessageFormContents,
   Preview: MessagePreview,
+  showable: true,
   title: 'Add Message'
 };

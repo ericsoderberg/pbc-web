@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 import List from '../../components/List';
+import EventTimes from '../../components/EventTimes';
 
 const Item = (props) => {
   const { className, item: event } = props;
@@ -12,9 +13,7 @@ const Item = (props) => {
       to={`/events/${event.path || event._id}`}>
       <div className="item">
         <span>{event.name}</span>
-        <span className="box--row">
-          {moment(event.start).format('M/D/YYYY h:mm a')}
-        </span>
+        <EventTimes event={event} />
       </div>
     </Link>
   );

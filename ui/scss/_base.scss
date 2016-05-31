@@ -8,7 +8,7 @@ body,
 #content {
   margin: 0;
   padding: 0;
-  font-family: 'Lucide Grande', sans-serif;
+  font-family: 'Avant Garde', 'Lucide Grande', sans-serif;
   font-size: 16px;
   background-color: $background-color;
   color: $color;
@@ -24,9 +24,9 @@ a,
   font-size: inherit;
   padding: 0;
 
-  &:hover {
-    background-color: $secondary-background-color;
-  }
+  // &:hover {
+  //   background-color: $secondary-background-color;
+  // }
 }
 
 input,
@@ -49,7 +49,7 @@ h3 {
 }
 
 p {
-  font-family: Georgia, serif;
+  // font-family: Georgia, serif;
   max-width: $text-width;
   margin: $unit 0;
 }
@@ -83,18 +83,45 @@ button {
   }
 }
 
-button:not(.button--link):not(.button--icon):not(.button--header),
+button:not(.button--link):not(.button--icon):not(.button--header):not(.button--circle),
 .link--button {
   padding: $half-unit $unit;
   background-color: $control-background-color;
   color: $control-color;
-  font-size: 18px;
+  font-size: 20px;
   text-decoration: none;
   text-align: center;
 
   &:hover {
     background-color: $control-hover-background;
     color: $active-color;
+  }
+}
+
+.button--circle,
+.link--circle {
+  position: relative;
+  width: $sextuple-unit;
+  height: $sextuple-unit;
+  border-radius: $triple-unit;
+  // margin: $half-unit;
+  padding: $half-unit;
+  font-size: 20px;
+  background-color: rgba(32, 32, 32, 0.7); //rgba(255, 255, 255, 0.8);
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+
+  .link__text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 

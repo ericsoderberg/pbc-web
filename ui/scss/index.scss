@@ -3,7 +3,9 @@ $unit: 24px;
 $half-unit: $unit / 2;
 $quarter-unit: $unit / 4;
 $double-unit: $unit * 2;
+$triple-unit: $unit * 3;
 $quadruple-unit: $unit * 4;
+$sextuple-unit: $unit * 6;
 
 $sidebar-width: round($unit * 10); // 240px
 $form-width: round($unit * 20); // 480px
@@ -19,7 +21,7 @@ $header-background-color: #eee;
 $hover-background: #f2f2f2;
 $control-background-color: #eee;
 $control-color: #000;
-$control-hover-background: #333;
+$control-hover-background: rgba(0, 0, 0, 0.8); //#333;
 $control-active-background: #555;
 $active-color: #fff;
 $error-color: #ee3333;

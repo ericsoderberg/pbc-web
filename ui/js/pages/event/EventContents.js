@@ -1,6 +1,6 @@
 "use strict";
 import React, { PropTypes } from 'react';
-import { friendlyTimes } from '../../utils/EventTimes';
+import EventTimes from '../../components/EventTimes';
 import Text from '../../components/Text';
 import Map from '../../components/Map';
 
@@ -22,7 +22,7 @@ const EventContents = (props) => {
       {text}
       <div className="section__container">
         <div className="text section">
-          <h2>{friendlyTimes(event)}</h2>
+          <EventTimes event={event} />
         </div>
       </div>
       {map}

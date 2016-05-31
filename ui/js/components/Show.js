@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getItem } from '../actions';
+import { getItem, postItem } from '../actions';
 import PageHeader from './PageHeader';
 import Stored from './Stored';
 
@@ -9,6 +9,7 @@ class Show extends Component {
 
   constructor () {
     super();
+    this._onCopy = this._onCopy.bind(this);
     this.state = { item: {} };
   }
 
@@ -32,20 +33,39 @@ class Show extends Component {
     .catch(error => console.log('!!! Show catch', error));
   }
 
+  _onCopy () {
+    const { category } = this.props;
+    const copyItem = { ...this.state.item };
+    copyItem.name += ' - Copy';
+    delete copyItem._id;
+    postItem(category, copyItem)
+    .then(newItem => {
+      this.context.router.push(`/${category}/${newItem._id}/edit`);
+    })
+    .catch(error => this.setState({ error: error }));
+  }
+
   render () {
     const { category, Contents, title, session } = this.props;
     const { item } = this.state;
 
-    let editControl;
+    let controls;
     if (session && session.administrator) {
-      editControl = (
-        <Link to={`/${category}/${item._id}/edit`} className="a--header">Edit</Link>
-      );
+      controls = [
+        <button key="copy" type="button" className="button--header"
+          onClick={this._onCopy}>
+          Copy
+        </button>,
+        <Link key="edit" to={`/${category}/${item._id}/edit`}
+          className="a--header">
+          Edit
+        </Link>
+      ];
     }
 
     return (
       <main>
-        <PageHeader title={title} back={true} actions={editControl} />
+        <PageHeader title={title} back={true} actions={controls} />
         <Contents item={item} />
       </main>
     );
@@ -62,6 +82,10 @@ Show.propTypes = {
     administrator: PropTypes.bool
   }),
   title: PropTypes.string
+};
+
+Show.contextTypes = {
+  router: PropTypes.any
 };
 
 const select = (state, props) => ({

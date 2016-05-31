@@ -34,7 +34,7 @@ const PageContents = (props) => {
     } else if ('pages' === section.type) {
       return (
         <PageSummaries key={index} full={section.full} color={section.color}
-          pageSummaries={section.pages} summary={section.summary} />
+          pages={section.pages} />
       );
     } else if ('video' === section.type) {
       return (

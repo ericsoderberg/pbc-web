@@ -51,11 +51,8 @@ const pageSectionSchema = Schema({
   formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },   // form type
   pages: [{           // pages type
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
-    image: image,
-    text: String,
-    tile: image
+    image: image
   }],
-  summary: Boolean,    // pages type
   text: String,       // text type
   url: String,        // video type
   userId: { type: Schema.Types.ObjectId, ref: 'User' }    // user type

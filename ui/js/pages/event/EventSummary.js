@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
-import { friendlyTimes } from '../../utils/EventTimes';
+import EventTimes from '../../components/EventTimes';
 import Section from '../../components/Section';
 import Map from '../../components/Map';
 
@@ -36,8 +36,6 @@ export default class EventSummary extends Component {
     const { color, full, plain } = this.props;
     const { event } = this.state;
 
-    let times = friendlyTimes(event);
-
     let map;
     if (event.address) {
       map = (
@@ -50,10 +48,12 @@ export default class EventSummary extends Component {
       <Section color={color} full={full} plain={plain}>
         <div className="event-summary">
           <Link to={`/events/${event._id}`} className="event-summary__summary">
-            <h2>{event.name}</h2>
-            <span className="event-summary__date">{times}</span>
+            <EventTimes event={event} />
           </Link>
           {map}
+          <Link to={`/events/${event._id}`} className="link--circle">
+            <span className="link__text">{event.name}</span>
+          </Link>
         </div>
       </Section>
     );

@@ -4,8 +4,7 @@ import markdownToJSX from 'markdown-to-jsx';
 import Section from './Section';
 
 const Text = (props) => {
-  const { text, color, plain } = props;
-  const full = color ? true : props.full;
+  const { text, color, plain, full } = props;
   return (
     <Section color={color} full={full} plain={plain}>
       <div className="text">

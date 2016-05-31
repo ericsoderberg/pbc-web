@@ -9,5 +9,6 @@ EventAdd.defaultProps = {
   category: 'events',
   FormContents: EventFormContents,
   Preview: EventPreview,
+  showable: true,
   title: 'Add Event'
 };

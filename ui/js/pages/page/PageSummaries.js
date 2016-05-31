@@ -3,15 +3,13 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import Section from '../../components/Section';
-import Text from '../../components/Text';
 import Image from '../../components/Image';
 
 export default class PageSummaries extends Component {
 
   constructor () {
     super();
-    this._onActivate = this._onActivate.bind(this);
-    this.state = { active: 0, pages: {} };
+    this.state = {pages: {} };
   }
 
   componentDidMount () {
@@ -23,12 +21,12 @@ export default class PageSummaries extends Component {
   }
 
   _load (props) {
-    props.pageSummaries.forEach(pageSummary => {
-      if (! this.state.pages[pageSummary.id]) {
-        getItem('pages', pageSummary.id, { select: 'name' })
+    props.pages.forEach(pageRef => {
+      if (! this.state.pages[pageRef.id]) {
+        getItem('pages', pageRef.id, { select: 'name' })
         .then(page => {
           let pages = { ...this.state.pages };
-          pages[pageSummary.id] = page;
+          pages[pageRef.id] = page;
           this.setState({ pages: pages });
         })
         .catch(error => console.log('!!! PageSummaries catch', error));
@@ -36,101 +34,35 @@ export default class PageSummaries extends Component {
     });
   }
 
-  _onActivate (index) {
-    this.setState({ active: index });
-  }
+  render () {
+    const { color, full, plain, pages } = this.props;
 
-  _renderTile (pageSummary, index) {
-    const page = this.state.pages[pageSummary.id] || {};
-    let classNames = ['page-summaries__tile'];
-    if (index === this.state.active) {
-      classNames.push('page-summaries__tile--active');
-    }
-
-    let image;
-    if (pageSummary.tile) {
-      image = <Image image={pageSummary.tile} plain={true} />;
-    }
-
-    return (
-      <div key={index} className={classNames.join(' ')}
-        onClick={this._onActivate.bind(this, index)}>
-        {image}
-        <h3 className="page-summaries__tile-name">{page.name}</h3>
-      </div>
-    );
-  }
-
-  _renderActive (pageSummary) {
-    let image;
-    if (pageSummary.image) {
-      image = <Image image={pageSummary.image} plain={true} />;
-    }
-    return (
-      <div className="page-summaries__active">
-        <div className="page-summaries__active-summary">
-          <Text plain={true} text={pageSummary.text} />
-          <Link to={pageSummary.page || `/pages/${pageSummary.id}`}>Learn more</Link>
-        </div>
-        <div className="page-summaries__active-image">
-          {image}
-        </div>
-      </div>
-    );
-  }
-
-  _renderSummaries () {
-    const { pageSummaries } = this.props;
-
-    const tiles = (pageSummaries || []).map((pageSummary, index) => {
-      return this._renderTile(pageSummary, index);
-    });
-    const active = this._renderActive(this.props.pageSummaries[this.state.active]);
-
-    return (
-      <div className="page-summaries">
-        <div className="page-summaries__tiles">
-          {tiles}
-        </div>
-        {active}
-      </div>
-    );
-  }
-
-  _renderLinks () {
-    const { pageSummaries } = this.props;
-
-    const links = (pageSummaries || []).map((pageSummary) => {
-      const page = this.state.pages[pageSummary.id] || {};
+    const links = (pages || []).map(pageRef => {
+      const page = this.state.pages[pageRef.id] || {};
+      let classNames;
+      let contents;
+      if (pageRef.image) {
+        classNames = ['page-tile'];
+        contents = [
+          <Image key="image" image={pageRef.image} plain={true} />,
+          <label key="name" className="page-tile__name">{page.name}</label>
+        ];
+      } else {
+        classNames = ['link--circle'];
+        contents = <span className="link__text">{page.name}</span>;
+      }
       return (
-        <Link key={pageSummary.id} className="link--button"
-          to={pageSummary.page || `/pages/${pageSummary.id}`}>
-          {page.name}
+        <Link key={pageRef.id} className={classNames.join(' ')}
+          to={page.path || `/pages/${page._id}`}>
+          {contents}
         </Link>
       );
     });
 
     return (
-      <div className="page-links">
-        {links}
-      </div>
-    );
-  }
-
-  render () {
-    const { color, full, plain, summary } = this.props;
-
-    let contents;
-    if (summary) {
-      contents = this._renderSummaries();
-    } else {
-      contents = this._renderLinks();
-    }
-
-    return (
       <Section color={color} full={full} plain={plain}>
         <div className="page-summaries">
-          {contents}
+          {links}
         </div>
       </Section>
     );
@@ -138,7 +70,7 @@ export default class PageSummaries extends Component {
 };
 
 PageSummaries.propTypes = {
-  pageSummaries: PropTypes.array,
+  pages: PropTypes.array,
   id: PropTypes.string,
   ...Section.propTypes
 };

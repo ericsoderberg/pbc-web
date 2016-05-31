@@ -40,7 +40,10 @@ export default class Library extends Component {
   _renderMessage (message) {
     let image;
     if (message.image) {
-      image = <Image image={message.image} plain={true} />;
+      image = (
+        <Image className="library__message-image" image={message.image}
+          plain={true} />
+      );
     }
 
     return (
@@ -53,6 +56,9 @@ export default class Library extends Component {
             <div>{message.verses}</div>
             <div className="library__message-author">{message.author}</div>
           </div>
+          <button className="button--circle" type="button">
+            Latest Message
+          </button>
         </div>
       </Link>
     );

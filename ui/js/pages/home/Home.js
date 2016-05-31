@@ -34,10 +34,18 @@ export default class Home extends Component {
         <PageContents item={page} />
         <div className="section__container section__container--footer">
           <div className="page-links">
-            <Link to="/calendar?name=Main" className="link--button">Calendar</Link>
-            <Link to="/messages?library=Main" className="link--button">Messages</Link>
-            <Link to="/search" className="link--button">Search</Link>
-            <Link to="/sign-in" className="link--button">Sign In</Link>
+            <Link to="/calendar?name=Main" className="link--circle">
+              <span className="link__text">Calendar</span>
+            </Link>
+            <Link to="/messages?library=Main" className="link--circle">
+              <span className="link__text">Messages</span>
+            </Link>
+            <Link to="/search" className="link--circle">
+              <span className="link__text">Search</span>
+            </Link>
+            <Link to="/sign-in" className="link--circle">
+              <span className="link__text">Sign In</span>
+            </Link>
           </div>
           <footer className="footer">
             <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
