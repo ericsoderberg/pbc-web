@@ -2,6 +2,7 @@
   display: flex;
   width: 100%;
   height: $double-unit;
+  padding: 0;
 
   audio {
     position: absolute;
@@ -10,7 +11,7 @@
 }
 
 .audio__control {
-  flex: 0 0 $quadruple-unit;
+  flex: 0 0 auto;
 }
 
 .audio__position {

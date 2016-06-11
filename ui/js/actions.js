@@ -77,6 +77,9 @@ export function getItems (category, options={}) {
   if (options.populate) {
     params.push(`populate=${encodeURIComponent(JSON.stringify(options.populate))}`);
   }
+  if (options.limit) {
+    params.push(`limit=${encodeURIComponent(options.limit)}`);
+  }
   const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })

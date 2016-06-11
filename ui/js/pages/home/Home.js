@@ -1,11 +1,12 @@
 "use strict";
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getSite, getItem } from '../../actions';
+import { getSite, getItems, getItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import PageContents from '../page/PageContents';
+import Stored from '../../components/Stored';
 
-export default class Home extends Component {
+class Home extends Component {
 
   constructor () {
     super();
@@ -24,30 +25,62 @@ export default class Home extends Component {
       }
     })
     .then(response => this.setState({ page: response }));
+    getItems('events', { limit: 1, select: 'name' })
+    .then(events => this.setState({ haveEvents: events.length > 0 }));
+    getItems('messages', { limit: 1, select: 'name' })
+    .then(messages => this.setState({ haveMessages: messages.length > 0 }));
   }
 
   render () {
-    const { site, page } = this.state;
+    const { session: { token } } = this.props;
+    const { site, page, haveEvents, haveMessages } = this.state;
+    let links = [];
+    if (haveEvents) {
+      links.push(
+        <Link key="calendar" to="/calendar?name=Main"
+          className="link--circle">
+          <span className="link__text">Calendar</span>
+        </Link>
+      );
+    }
+    if (haveMessages) {
+      links.push(
+        <Link key="libray" to="/messages?library=Main"
+          className="link--circle">
+          <span className="link__text">Messages</span>
+        </Link>
+      );
+    }
+    if (page) {
+      links.push(
+        <Link key="search" to="/search" className="link--circle">
+          <span className="link__text">Search</span>
+        </Link>
+      );
+    }
+    if (token) {
+      links.push(
+        <a key="session" className="link--circle"
+          onClick={this._signOut}>
+          <span className="link__text">Sign Out</span>
+        </a>
+      );
+    } else {
+      links.push(
+        <Link key="session" to="/sign-in" className="link--circle">
+          <span className="link__text">Sign In</span>
+        </Link>
+      );
+    }
     return (
       <main>
         <PageHeader logo={true} />
         <PageContents item={page} />
         <div className="section__container section__container--footer">
           <div className="page-links">
-            <Link to="/calendar?name=Main" className="link--circle">
-              <span className="link__text">Calendar</span>
-            </Link>
-            <Link to="/messages?library=Main" className="link--circle">
-              <span className="link__text">Messages</span>
-            </Link>
-            <Link to="/search" className="link--circle">
-              <span className="link__text">Search</span>
-            </Link>
-            <Link to="/sign-in" className="link--circle">
-              <span className="link__text">Sign In</span>
-            </Link>
+            {links}
           </div>
-          <footer className="footer">
+          <footer className="home__footer footer">
             <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
             <a href={`tel:${site.phone}`}>{site.phone}</a>
             <span>{site.copyright}</span>
@@ -57,3 +90,15 @@ export default class Home extends Component {
     );
   }
 };
+
+Home.propTypes = {
+  session: PropTypes.shape({
+    token: PropTypes.any
+  })
+};
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(Home, select);

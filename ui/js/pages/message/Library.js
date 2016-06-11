@@ -38,27 +38,29 @@ export default class Library extends Component {
   }
 
   _renderMessage (message) {
+    let classNames = ['library__message'];
     let image;
     if (message.image) {
       image = (
         <Image className="library__message-image" image={message.image}
           plain={true} />
       );
+      classNames.push('library__message--imaged');
     }
 
     return (
       <Link to={`/messages/${message._id}`}>
         {image}
-        <div className="library__message">
+        <div className={classNames}>
+          <button className="button--circle" type="button">
+            Latest Message
+          </button>
           <label>{moment(message.date).format('MMM Do')}</label>
           <div className="library__message-details">
             <h2>{message.name}</h2>
             <div>{message.verses}</div>
             <div className="library__message-author">{message.author}</div>
           </div>
-          <button className="button--circle" type="button">
-            Latest Message
-          </button>
         </div>
       </Link>
     );

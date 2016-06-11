@@ -163,7 +163,7 @@ const register = (category, modelName, options={}) => {
     if (req.query.distinct) {
       query.distinct(req.query.distinct);
     } else if (req.query.limit) {
-      query.limit(req.query.limit);
+      query.limit(parseInt(req.query.limit, 10));
     } else {
       query.limit(20);
     }

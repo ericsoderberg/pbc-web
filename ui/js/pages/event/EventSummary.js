@@ -47,13 +47,13 @@ export default class EventSummary extends Component {
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="event-summary">
+          <Link to={`/events/${event._id}`} className="link--circle">
+            <span className="link__text">{event.name}</span>
+          </Link>
           <Link to={`/events/${event._id}`} className="event-summary__summary">
             <EventTimes event={event} />
           </Link>
           {map}
-          <Link to={`/events/${event._id}`} className="link--circle">
-            <span className="link__text">{event.name}</span>
-          </Link>
         </div>
       </Section>
     );

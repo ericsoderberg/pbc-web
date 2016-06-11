@@ -64,7 +64,7 @@ export default class MessageFormContents extends Component {
       field = (
         <FormField key={index} name={`file-${index}`} label="File">
           <div className="box--row">
-            <span>{file.name || file._id}</span>
+            <span className="input">{file.name || file._id}</span>
             <ConfirmRemove onConfirm={this._removeFile(index)} />
           </div>
         </FormField>

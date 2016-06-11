@@ -14,6 +14,10 @@
 .form {
   background-color: $secondary-background-color;
 
+  .section__container & {
+    background-color: inherit;
+  }
+
   @media all and (min-width: 700px) {
     flex: 1 0 $form-width;
   }
@@ -91,6 +95,16 @@
   margin: 0 auto;
   margin-bottom: -1px;
 
+  .section__container & {
+    background-color: rgba($background-color, 0.9);
+
+    input,
+    select,
+    textarea {
+      background-color: transparent;
+    }
+  }
+
   input:not([type="checkbox"]):not([type="radio"]),
   select,
   textarea {
@@ -117,6 +131,11 @@
     &::-moz-focus-inner {
       border: none;
     }
+  }
+
+  .input {
+    padding: $half-unit;
+    flex: 1;
   }
 }
 

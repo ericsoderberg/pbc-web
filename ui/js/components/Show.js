@@ -33,7 +33,8 @@ class Show extends Component {
     .catch(error => console.log('!!! Show catch', error));
   }
 
-  _onCopy () {
+  _onCopy (event) {
+    event.preventDefault();
     const { category } = this.props;
     const copyItem = { ...this.state.item };
     copyItem.name += ' - Copy';
@@ -52,10 +53,10 @@ class Show extends Component {
     let controls;
     if (session && session.administrator) {
       controls = [
-        <button key="copy" type="button" className="button--header"
+        <a key="copy" href={`/${category}/add`} className="a--header"
           onClick={this._onCopy}>
           Copy
-        </button>,
+        </a>,
         <Link key="edit" to={`/${category}/${item._id}/edit`}
           className="a--header">
           Edit
