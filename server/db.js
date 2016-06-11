@@ -29,10 +29,10 @@ const userSchema = Schema({
   administrator: Boolean,
   avatar: image,
   created: Date,
-  email: String,
-  encryptedPassword: String,
+  email: {type: String, required: true, unique: true},
+  encryptedPassword: {type: String, required: true},
   modified: Date,
-  name: String,
+  name: {type: String, required: true},
   path: String,
   text: String
 });
@@ -225,7 +225,7 @@ const emailListSchema = Schema({
   addresses: [String],
   created: Date,
   modified: Date,
-  name: String,
+  name: {type: String, required: true, unique: true},
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

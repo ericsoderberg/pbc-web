@@ -4,12 +4,16 @@ import React, { Component, PropTypes } from 'react';
 export default class FormError extends Component {
 
   render () {
-    const { message } = this.props;
+    const { message, error } = this.props;
     let classes = ['form-error'];
     let text;
     if (message) {
       classes.push('form-error--active');
       text = message.error || message;
+    }
+    if (error && error.errmsg) {
+      classes.push('form-error--active');
+      text = error.errMsg;
     }
     return (
       <div className={classes.join(' ')}>
@@ -22,5 +26,11 @@ export default class FormError extends Component {
 };
 
 FormError.propTypes = {
-  message: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+  message: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  error: PropTypes.shape({
+    error: PropTypes.shape({
+      errMsg: PropTypes.string,
+      errors: PropTypes.object
+    })
+  })
 };

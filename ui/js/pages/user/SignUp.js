@@ -14,7 +14,10 @@ export default class SignUp extends Component {
     this._onSignUp = this._onSignUp.bind(this);
     this._setUser = this._setUser.bind(this);
     const user = { name: '', email: '', password: '' };
-    this.state = { formState: new FormState(user, this._setUser) };
+    this.state = {
+      formState: new FormState(user, this._setUser),
+      errors: {}
+    };
   }
 
   componentDidMount () {
@@ -25,11 +28,33 @@ export default class SignUp extends Component {
     this.context.router.goBack();
   }
 
+  _errorToState (error) {
+    let result = {};
+    if (error) {
+      if (error.errmsg) {
+        result.errorMessage = error.errmsg;
+      } else if (error.errors) {
+        result.errors = {};
+        Object.keys(error.errors).forEach(name => {
+          const err = error.errors[name];
+          if ('encryptedPassword' === name) {
+            name = 'password';
+          }
+          if ('required' === err.kind) {
+            result.errors[name] = 'required';
+          }
+        });
+      }
+    }
+    return result;
+  }
+
   _onSignUp (event) {
     event.preventDefault();
     postSignUp(this.state.formState.object)
       .then(response => this.context.router.goBack())
-      .catch(error => this.setState({ error: error }));
+      .catch(error => this.setState(this._errorToState(error)))
+      .catch(error => console.log('!!! SignUp catch', error));
   }
 
   _setUser (user) {
@@ -37,7 +62,7 @@ export default class SignUp extends Component {
   }
 
   render () {
-    const { formState, error } = this.state;
+    const { formState, errorMessage, errors } = this.state;
     const user = formState.object;
 
     const cancelControl = (
@@ -50,17 +75,17 @@ export default class SignUp extends Component {
       <div className="form__container">
         <form className="form" action="/api/users/sign-up" onSubmit={this._onSignUp}>
           <PageHeader title="Sign Up" actions={cancelControl} />
-          <FormError message={error} />
+          <FormError message={errorMessage} />
           <fieldset className="form__fields">
-            <FormField name="name" label="Name">
+            <FormField name="name" label="Name" error={errors.name}>
               <input ref="name" name="name" value={user.name || ''}
                 onChange={formState.change('name')}/>
             </FormField>
-            <FormField name="email" label="Email">
+            <FormField name="email" label="Email" error={errors.email}>
               <input name="email" value={user.email || ''}
                 onChange={formState.change('email')}/>
             </FormField>
-            <FormField name="password" label="Password">
+            <FormField name="password" label="Password" error={errors.password}>
               <input name="password" type="password" value={user.password || ''}
                 onChange={formState.change('password')}/>
             </FormField>

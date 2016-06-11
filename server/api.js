@@ -192,18 +192,23 @@ const register = (category, modelName, options={}) => {
 // User
 
 router.post('/users/sign-up', (req, res) => {
-  const User = mongoose.model('User');
   let data = req.body;
-  if (data.password) {
-    data.encryptedPassword = bcrypt.hashSync(data.password, 10);
-    delete data.password;
-  }
-  data.created = new Date();
-  data.modified = data.created;
-  const doc = new User(data);
-  doc.save()
-  .then(doc => res.status(200).json(doc))
-  .catch(error => res.status(400).json({ error: error }));
+  const User = mongoose.model('User');
+  // if this is the first user, make them administrator
+  User.count()
+  .then(count => {
+    if (data.password) {
+      data.encryptedPassword = bcrypt.hashSync(data.password, 10);
+      delete data.password;
+    }
+    data.created = new Date();
+    data.modified = data.created;
+    data.administrator = 0 === count;
+    const doc = new User(data);
+    doc.save()
+    .then(doc => res.status(200).json(doc))
+    .catch(error => res.status(400).json(error));
+  });
 });
 
 const encryptPassword = (data) => {

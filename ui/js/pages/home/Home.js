@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getSite, getItems, getItem } from '../../actions';
+import { getSite, getItems, getItem, deleteSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import PageContents from '../page/PageContents';
 import Stored from '../../components/Stored';
@@ -10,6 +10,7 @@ class Home extends Component {
 
   constructor () {
     super();
+    this._signOut = this._signOut.bind(this);
     this.state = { site: {}, page: {} };
   }
 
@@ -31,8 +32,14 @@ class Home extends Component {
     .then(messages => this.setState({ haveMessages: messages.length > 0 }));
   }
 
+  _signOut () {
+    deleteSession()
+    .then(() => this.context.router.go('/'))
+    .catch(error => console.log('!!! Home _signOut catch', error));
+  }
+
   render () {
-    const { session: { token } } = this.props;
+    const { session } = this.props;
     const { site, page, haveEvents, haveMessages } = this.state;
     let links = [];
     if (haveEvents) {
@@ -58,7 +65,7 @@ class Home extends Component {
         </Link>
       );
     }
-    if (token) {
+    if (session && session.token) {
       links.push(
         <a key="session" className="link--circle"
           onClick={this._signOut}>
@@ -95,6 +102,10 @@ Home.propTypes = {
   session: PropTypes.shape({
     token: PropTypes.any
   })
+};
+
+Home.contextTypes = {
+  router: PropTypes.any
 };
 
 const select = (state, props) => ({
