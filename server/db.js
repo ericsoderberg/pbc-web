@@ -202,6 +202,7 @@ const siteSchema = Schema({
   name: String,
   logo: image,
   phone: String,
+  socialUrls: [String],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 

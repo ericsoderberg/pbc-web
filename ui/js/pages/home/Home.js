@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 import { getSite, getItems, getItem, deleteSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import PageContents from '../page/PageContents';
+import FacebookIcon from '../../icons/Facebook';
+import TwitterIcon from '../../icons/Twitter';
 import Stored from '../../components/Stored';
 
 class Home extends Component {
@@ -41,6 +43,7 @@ class Home extends Component {
   render () {
     const { session } = this.props;
     const { site, page, haveEvents, haveMessages } = this.state;
+
     let links = [];
     if (haveEvents) {
       links.push(
@@ -79,6 +82,28 @@ class Home extends Component {
         </Link>
       );
     }
+
+    let socialLinks;
+    if (site.socialUrls) {
+      const links = site.socialUrls.map(url => {
+        const site = url.split('.')[1];
+        let contents;
+        if ('facebook' === site) {
+          contents = <FacebookIcon />;
+        } else if ('twitter' === site) {
+          contents = <TwitterIcon />;
+        } else {
+          contents = site;
+        }
+        return <a key={url} href={url}>{contents}</a>;
+      });
+      socialLinks = (
+        <div className="social-links">
+          {links}
+        </div>
+      );
+    }
+
     return (
       <main>
         <PageHeader logo={true} />
@@ -87,6 +112,7 @@ class Home extends Component {
           <div className="page-links">
             {links}
           </div>
+          {socialLinks}
           <footer className="home__footer footer">
             <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
             <a href={`tel:${site.phone}`}>{site.phone}</a>

@@ -86,22 +86,24 @@ export default class FormState {
 
   // array properties
 
-  addTo (propertyName, object = {}) {
+  addTo (propertyName, value = {}) {
     return event => {
       let array = (this.object[propertyName] || []).slice(0);
-      if (typeof object === 'function') {
-        array.push(object());
+      if (typeof value === 'function') {
+        array.push(value());
       } else {
-        array.push(object);
+        array.push(value);
       }
       this.set(propertyName, array);
     };
   }
 
   changeAt (propertyName, index) {
-    return object => {
+    return event => {
+      // handle Section onChange which just sends the value, not an event
+      let value = (event.target ? event.target.value : event);
       let array = (this.object[propertyName] || []).slice(0);
-      array[index] = object;
+      array[index] = value;
       this.set(propertyName, array);
     };
   }
@@ -109,9 +111,9 @@ export default class FormState {
   swapWith (propertyName, index, nextIndex) {
     return () => {
       let array = (this.object[propertyName] || []).slice(0);
-      const object = array[index];
+      const value = array[index];
       array[index] = array[nextIndex];
-      array[nextIndex] = object;
+      array[nextIndex] = value;
       this.set(propertyName, array);
     };
   }

@@ -360,6 +360,22 @@
   }
 }
 
+.social-links {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: $page-width;
+  margin: 0 auto;
+  padding: $double-unit 0;
+
+  > * {
+    flex: 0 0 auto;
+    margin: 0 $unit;
+  }
+}
+
 .home__footer {
   a,
   span {

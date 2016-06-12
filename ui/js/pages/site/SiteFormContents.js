@@ -26,6 +26,24 @@ export default class SiteFormContents extends Component {
     ));
     pages.unshift(<option key={0} />);
 
+    let socialLinks;
+    if (site.socialUrls && site.socialUrls.length > 0) {
+      socialLinks = site.socialUrls.map((url, index) => {
+        return (
+          <FormField key={url} label="Social url"
+            help={
+              <button type="button" className="button--link"
+                onClick={formState.removeAt('socialUrls', index)}>
+                Remove
+              </button>
+            }>
+            <input name={`social-${index}`} value={url}
+              onChange={formState.changeAt('socialUrls', index)} />
+          </FormField>
+        );
+      });
+    }
+
     return (
       <fieldset className="form__fields">
         <FormField label="Name">
@@ -55,6 +73,15 @@ export default class SiteFormContents extends Component {
         <FormField label="Copyright">
           <input name="copyright" value={site.copyright || ''}
             onChange={formState.change('copyright')}/>
+        </FormField>
+        {socialLinks}
+        <FormField>
+          <div className="form__tabs">
+            <button type="button"
+              onClick={formState.addTo('socialUrls', '')}>
+              Add social url
+            </button>
+          </div>
         </FormField>
       </fieldset>
     );
