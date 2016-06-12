@@ -28,7 +28,7 @@ export default class Messages extends Component {
 
     const marker = {
       property: 'date',
-      value: (new Date()).toISOString(),
+      value: moment().startOf('day').toISOString(),
       label: (
         <div className="marker">
           <span>Today</span><span>{moment().format('MMM Do YYYY')}</span>

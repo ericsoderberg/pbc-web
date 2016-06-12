@@ -26,7 +26,7 @@ const MessageItem = (props) => {
   );
 
   let contents = link;
-  const now = moment();
+  const now = moment().startOf('day').subtract(1, 'minute');
   if (date.isBetween(now, moment(now).add(7, 'days'), 'day')) {
     contents = (
       <div className="item--primary">
