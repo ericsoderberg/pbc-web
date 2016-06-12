@@ -51,7 +51,7 @@ export default class Library extends Component {
     return (
       <Link to={`/messages/${message._id}`}>
         {image}
-        <div className={classNames}>
+        <div className={classNames.join(' ')}>
           <button className="button--circle" type="button">
             Latest Message
           </button>

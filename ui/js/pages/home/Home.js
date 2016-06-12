@@ -58,13 +58,13 @@ class Home extends Component {
         </Link>
       );
     }
-    if (page) {
-      links.push(
-        <Link key="search" to="/search" className="link--circle">
-          <span className="link__text">Search</span>
-        </Link>
-      );
-    }
+    // if (page) {
+    //   links.push(
+    //     <Link key="search" to="/search" className="link--circle">
+    //       <span className="link__text">Search</span>
+    //     </Link>
+    //   );
+    // }
     if (session && session.token) {
       links.push(
         <a key="session" className="link--circle"

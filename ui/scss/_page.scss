@@ -183,8 +183,10 @@
 }
 
 .library__message--imaged {
-  .button--circle {
-    top: 0;
+  @media all and (min-width: 700px) {
+    .button--circle {
+      top: 0;
+    }
   }
 }
 

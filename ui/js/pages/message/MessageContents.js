@@ -73,18 +73,6 @@ export default class MessageContents extends Component {
       ];
     }
 
-    let series;
-    if (message.seriesId) {
-      series = [
-        <dt key="t">Series</dt>,
-        <dd key="d">
-          <Link to={`/messages/${message.seriesId._id}`}>
-            {message.seriesId.name}
-          </Link>
-        </dd>
-      ];
-    }
-
     let nextMessage;
     if (message.nextMessage) {
       nextMessage = this._renderMessageNav(message.nextMessage, 'next');
@@ -99,26 +87,35 @@ export default class MessageContents extends Component {
       previousMessage = <span></span>;
     }
 
-    // The date could be a partial string, a moment object, or an ISO-8601 string
-    let date = message.date;
-    if (typeof date === 'string') {
-      if (date.match(/.+T.+Z/)) {
-        date = moment(date);
-      } else {
-        date = moment(date, 'M/D/YYYY'); // match MessageFormContents
-      }
-    }
-    if (date) {
-      date = date.format('MMMM Do YYYY');
-    }
+    let attributes;
+    if (this.props.attributes) {
 
-    return (
-      <div>
-        {video}
-        {audio}
-        {image}
-        {text}
-        {files}
+      // The date could be a partial string, a moment object, or an ISO-8601 string
+      let date = message.date;
+      if (typeof date === 'string') {
+        if (date.match(/.+T.+Z/)) {
+          date = moment(date);
+        } else {
+          date = moment(date, 'M/D/YYYY'); // match MessageFormContents
+        }
+      }
+      if (date) {
+        date = date.format('MMMM Do YYYY');
+      }
+
+      let series;
+      if (message.seriesId) {
+        series = [
+          <dt key="t">Series</dt>,
+          <dd key="d">
+            <Link to={`/messages/${message.seriesId._id}`}>
+              {message.seriesId.name}
+            </Link>
+          </dd>
+        ];
+      }
+
+      attributes = (
         <div className="section__container">
           <dl className="page-attributes section">
             <dt>Name</dt><dd>{message.name}</dd>
@@ -129,6 +126,17 @@ export default class MessageContents extends Component {
             <dt>Library</dt><dd>{message.library}</dd>
           </dl>
         </div>
+      );
+    }
+
+    return (
+      <div>
+        {video}
+        {audio}
+        {image}
+        {text}
+        {files}
+        {attributes}
         <div className="section__container section__container--full">
           <div className="message__nav footer">
             {previousMessage}
@@ -142,5 +150,10 @@ export default class MessageContents extends Component {
 };
 
 MessageContents.PropTypes = {
+  attributes: PropTypes.bool,
   item: PropTypes.object.isRequired
+};
+
+MessageContents.defaultProps = {
+  attributes: true
 };

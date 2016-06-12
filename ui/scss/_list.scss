@@ -40,6 +40,10 @@ a.item__container {
   margin: 0 auto;
 }
 
+.item--primary {
+  border-top: $unit solid $hover-background;
+}
+
 .box--row {
   display: flex;
   flex-direction: row;
