@@ -35,7 +35,7 @@ router.post('/sessions', (req, res) => {
       });
       session.save()
       .then(response => res.status(200).json(session))
-      .catch(error => res.status(400).json({ error: error }));
+      .catch(error => res.status(400).json(error));
     } else {
       res.status(401).json({error: "Invalid email or password"});
     }
@@ -99,7 +99,7 @@ const register = (category, modelName, options={}) => {
       query.exec()
       .then(doc => (transform.get ? transform.get(doc) : doc))
       .then(doc => res.json(doc))
-      .catch(error => res.status(400).json({ error: error }));
+      .catch(error => res.status(400).json(error));
     });
   }
 
@@ -115,7 +115,7 @@ const register = (category, modelName, options={}) => {
       Doc.findOneAndUpdate({ _id: id }, data)
       .exec()
       .then(doc => res.status(200).json(doc))
-      .catch(error => res.status(400).json({ error: error }));
+      .catch(error => res.status(400).json(error));
     });
   });
 
@@ -130,7 +130,7 @@ const register = (category, modelName, options={}) => {
         doc.remove()
           .then(doc => res.status(200).send());
       })
-      .catch(error => res.status(400).json({ error: error }));
+      .catch(error => res.status(400).json(error));
     });
   });
 
@@ -169,7 +169,7 @@ const register = (category, modelName, options={}) => {
     }
     query.exec()
     .then(docs => res.json(docs))
-    .catch(error => res.status(400).json({ error: error }));
+    .catch(error => res.status(400).json(error));
   });
 
   router.post(`/${category}`, (req, res) => {
@@ -184,7 +184,7 @@ const register = (category, modelName, options={}) => {
       const doc = new Doc(data);
       doc.save()
       .then(doc => res.status(200).json(doc))
-      .catch(error => res.status(400).json({ error: error }));
+      .catch(error => res.status(400).json(error));
     });
   });
 };
@@ -222,8 +222,10 @@ const encryptPassword = (data) => {
 register('users', 'User', {
   transform: {
     get: (user) => {
-      user = user.toObject();
-      delete user.encryptedPassword;
+      if (user) {
+        user = user.toObject();
+        delete user.encryptedPassword;
+      }
       return user;
     },
     put: encryptPassword,
@@ -285,7 +287,7 @@ router.get('/messages/:id', (req, res) => {
     messageData.seriesMessages = docs[3];
     res.json(messageData);
   })
-  .catch(error => res.status(400).json({ error: error }));
+  .catch(error => res.status(400).json(error));
 });
 
 // Newsletter
@@ -347,7 +349,7 @@ router.post('/newsletters/render', (req, res) => {
     newsletterData.events = docs[3];
     res.send(renderNewsletter(newsletterData));
   })
-  .catch(error => res.status(400).json({ error: error }));
+  .catch(error => res.status(400).json(error));
 });
 
 register('newsletters', 'Newsletter');
@@ -359,7 +361,7 @@ router.get('/site', (req, res) => {
   Doc.findOne({})
   .exec()
   .then(doc => res.json(doc))
-  .catch(error => res.status(400).json({ error: error }));
+  .catch(error => res.status(400).json(error));
 });
 
 router.post('/site', (req, res) => {
@@ -374,7 +376,7 @@ router.post('/site', (req, res) => {
     .exec()
     .then(() => doc.save())
     .then(doc => res.status(200).json(doc))
-    .catch(error => res.status(400).json({ error: error }));
+    .catch(error => res.status(400).json(error));
   });
 });
 
@@ -412,7 +414,7 @@ router.get('/calendar', (req, res) => {
       start: start
     });
   })
-  .catch(error => res.status(400).json({ error: error }));
+  .catch(error => res.status(400).json(error));
 });
 
 // Events
@@ -511,7 +513,7 @@ router.post('/events/resources', (req, res) => {
   // Get all resources and annotate with events.
   .then(resourcesWithEvents)
   .then(resources => res.status(200).json(resources))
-  .catch(error => res.status(400).json({ error: error }));
+  .catch(error => res.status(400).json(error));
 });
 
 // Supporting functions for /events/unavailable-dates
@@ -579,7 +581,7 @@ router.post('/events/unavailable-dates', (req, res) => {
     return unavailableDates;
   })
   .then(unavailableDates => res.status(200).json(unavailableDates))
-  .catch(error => res.status(400).json({ error: error }));
+  .catch(error => res.status(400).json(error));
 });
 
 register('events', 'Event');
@@ -593,9 +595,9 @@ router.get('/files/:id/:name', (req, res) => {
 
 router.get('/files/:id', (req, res) => {
   const id = req.params.id;
-  fs.readdir(`${FILES_PATH}/${id}`, (err, files) => {
-    if (err) {
-      res.status(400).json({ error: error });
+  fs.readdir(`${FILES_PATH}/${id}`, (error, files) => {
+    if (error) {
+      res.status(400).json(error);
     } else {
       res.download(`${FILES_PATH}/${id}/${files[0]}`);
     }
@@ -608,7 +610,7 @@ router.delete('/files/:id', (req, res) => {
     const id = req.params.id;
     rmdir(`${FILES_PATH}/${id}`, (error) => {
       if (error) {
-        res.status(400).json({ error: error });
+        res.status(400).json(error);
       } else {
         res.status(200).send();
       }
@@ -621,7 +623,7 @@ router.get('/files', (req, res) => {
   .then(session => {
     fs.readdir(`${FILES_PATH}`, (error, files) => {
       if (error) {
-        res.status(400).json({ error: error });
+        res.status(400).json(error);
       } else {
         files = files.map(id => ({ _id: id }));
         res.status(200).json(files);

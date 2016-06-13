@@ -7,5 +7,5 @@ export default class UserEdit extends Edit {};
 UserEdit.defaultProps = {
   category: 'users',
   FormContents: UserFormContents,
-  title: 'Edit Person'
+  title: 'Edit Account'
 };

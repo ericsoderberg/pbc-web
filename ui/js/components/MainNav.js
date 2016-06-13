@@ -59,19 +59,23 @@ class MainNav extends Component {
   }
 
   render () {
+    const { session } = this.props;
     const mainLinks = this._renderLinks(MAIN_ROUTES);
 
-    let session, adminLinks;
-    if (this.props.session) {
-      session = [
-        <div key="name" className="main-nav__session-name">{this.props.session.name}</div>,
-        <a key="control" className="main-nav__link" onClick={this._signOut}>Sign Out</a>
+    let sessionControls, adminLinks;
+    if (session) {
+      sessionControls = [
+        <Link key="name" className="main-nav__link"
+          to={`/users/${session.userId}/edit`}>{session.name}</Link>,
+        <a key="out" className="main-nav__link" onClick={this._signOut}>
+          Sign Out
+        </a>
       ];
-      if (this.props.session.administrator) {
+      if (session.administrator) {
         adminLinks = this._renderLinks(ADMIN_ROUTES);
       }
     } else {
-      session = <Link className="main-nav__link" to="/sign-in" >Sign In</Link>;
+      sessionControls = <Link className="main-nav__link" to="/sign-in" >Sign In</Link>;
     }
 
     return (
@@ -79,7 +83,7 @@ class MainNav extends Component {
         {mainLinks}
         {adminLinks}
         <div className="main-nav__session">
-          {session}
+          {sessionControls}
         </div>
       </nav>
     );
@@ -88,7 +92,9 @@ class MainNav extends Component {
 
 MainNav.propTypes = {
   session: PropTypes.shape({
-    administrator: PropTypes.bool
+    administrator: PropTypes.bool,
+    name: PropTypes.string,
+    userId: PropTypes.string
   })
 };
 
