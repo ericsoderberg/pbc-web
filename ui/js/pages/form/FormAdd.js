@@ -59,6 +59,10 @@ export default class FormAdd extends Component {
   render () {
     const { onCancel } = this.props;
     const { form, formTemplate, error } = this.state;
+    let classNames = ['form'];
+    if (this.props.className) {
+      classNames.push(this.props.className);
+    }
 
     let result;
     if (formTemplate) {
@@ -69,7 +73,7 @@ export default class FormAdd extends Component {
       }
 
       result = (
-        <form className="form" action={'/forms'} onSubmit={this._onAdd}>
+        <form className={classNames.join(' ')} action={'/forms'} onSubmit={this._onAdd}>
           <FormContents form={form} formTemplate={formTemplate}
             onChange={this._onChange} error={error} />
           <footer className="form__footer">

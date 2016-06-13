@@ -85,6 +85,10 @@
 .form__text {
   max-width: $form-width;
   margin: 0 auto;
+
+  .text {
+    padding: 0;
+  }
 }
 
 .form-field {

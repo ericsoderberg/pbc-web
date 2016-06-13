@@ -13,7 +13,7 @@ export default class SiteFormContents extends Component {
 
   componentDidMount () {
     this.refs.name.focus();
-    getItems('pages')
+    getItems('pages', { sort: 'name' })
     .then(response => this.setState({ pages: response }));
   }
 

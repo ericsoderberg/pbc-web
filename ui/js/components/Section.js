@@ -20,7 +20,7 @@ const Section = (props) => {
     }
 
     child = React.cloneElement(child, {
-      className: `${child.props.className} section`});
+      className: `${child.props.className || ''} section`});
 
     result = (
       <div className={classNames.join(' ')} style={style}>
