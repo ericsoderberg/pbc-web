@@ -136,12 +136,15 @@ const register = (category, modelName, options={}) => {
 
   router.get(`/${category}`, (req, res) => {
     const Doc = mongoose.model(modelName);
+    const search = options.search || ['name'];
     let query = Doc.find();
     if (req.query.search) {
       const exp = new RegExp(req.query.search, 'i');
-      query.or([
-        { 'name': exp }
-      ]);
+      query.or(search.map(propertyName => {
+        let obj = {};
+        obj[propertyName] = exp;
+        return obj;
+      }));
     }
     if (req.query.filter) {
       query.find(JSON.parse(req.query.filter));
@@ -220,6 +223,7 @@ const encryptPassword = (data) => {
 };
 
 register('users', 'User', {
+  search: ['name', 'email'],
   transform: {
     get: (user) => {
       if (user) {
@@ -243,7 +247,10 @@ register('email-lists', 'EmailList');
 
 // Messages
 
-register('messages', 'Message', { except: 'get' });
+register('messages', 'Message', {
+  except: 'get',
+  search: ['name', 'author', 'verses']
+});
 
 router.get('/messages/:id', (req, res) => {
   const id = req.params.id;
