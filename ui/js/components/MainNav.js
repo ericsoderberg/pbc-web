@@ -59,7 +59,7 @@ class MainNav extends Component {
   }
 
   render () {
-    const { session } = this.props;
+    const { session, onClick } = this.props;
     const mainLinks = this._renderLinks(MAIN_ROUTES);
 
     let sessionControls, adminLinks;
@@ -79,7 +79,8 @@ class MainNav extends Component {
     }
 
     return (
-      <nav className={`main-nav ${this.props.className}`}>
+      <nav className={`main-nav ${this.props.className}`}
+        onClick={onClick}>
         {mainLinks}
         {adminLinks}
         <div className="main-nav__session">
@@ -91,6 +92,7 @@ class MainNav extends Component {
 };
 
 MainNav.propTypes = {
+  onClick: PropTypes.func,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     name: PropTypes.string,

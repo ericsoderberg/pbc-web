@@ -10,7 +10,7 @@ const Item = (props) => {
     <Link className={classNames.join(' ')}
       to={`/resources/${resource._id}/edit`}>
       <div className="item">
-        <span>{resource.name}</span>
+        <span className="item__name">{resource.name}</span>
       </div>
     </Link>
   );

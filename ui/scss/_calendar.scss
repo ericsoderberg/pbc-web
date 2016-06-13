@@ -1,61 +1,41 @@
 .calendar {
-  // @include media-query(lap-and-up) {
-    padding: $unit;
-
-    // .form__field & {
-    //   padding: 0;
-    // }
-  // }
-
-  // @include media-query(desk) {
-  //   padding: 0 $double-unit;
-  //
-  //   .form__field & {
-  //     padding: 0;
-  //   }
-  // }
+  padding: $unit;
 }
-//
-// .calendar__header {
-//   // @include main-content();
-//   // @include inuit-font-size($inuit-heading-size-1, quadruple($inuit-base-spacing-unit));
-//   display: flex;
-//   margin-bottom: $unit;
-//
-//   // @include media-query(palm) {
-//   //   // @include inuit-font-size($inuit-heading-size-1);
-//   //   display: block;
-//   // }
-// }
 
 .calendar__header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  max-width: $form-width;
+  max-width: $page-width;
   margin: 0 auto $unit;
-}
 
-.calendar__title {
-  font-size: 24px;
-}
+  a:not(:last-child) {
+    margin-right: $unit;
+  }
 
-// .calendar__search {
-//   display: block;
-//   flex: 1;
-// }
+  select {
+    font-size: 24px;
+
+    option {
+      font-size: 16px;
+    }
+  }
+}
 
 .calendar__week {
-  display: flex;
-  align-items: stretch;
-
-  // .form__field & {
-  //   align-items: flex-end;
-  // }
+  @media all and (min-width: 700px) {
+    display: flex;
+    align-items: stretch;
+  }
 }
 
 .calendar__week--header {
+
+  @media all and (max-width: 699px) {
+    display: none;
+  }
+
   .calendar__day {
     white-space: nowrap;
     overflow: hidden;
@@ -67,10 +47,12 @@
 }
 
 .calendar__day {
-  display: inline-block;
-  vertical-align: top;
-  flex: 1;
-  text-align: left;
+  @media all and (min-width: 700px) {
+    display: inline-block;
+    vertical-align: top;
+    flex: 1;
+    text-align: left;
+  }
 }
 
 .calendar__day--today {
@@ -95,6 +77,10 @@
 .calendar__day--alternate {
   background-color: $secondary-background-color;
 
+  @media all and (max-width: 699px) {
+    display: none;
+  }
+
   .calendar__day-date {
     background-color: $secondary-background-color;
     font-weight: 100;
@@ -104,14 +90,12 @@
 .calendar__day-date-month,
 .calendar__day-date-year {
   margin-right: $quarter-unit;
-  display: none;
+  @media all and (min-width: 700px) {
+    display: none;
+  }
 
   &--first {
     display: inline;
-
-    // .form__field & {
-    //   display: block;
-    // }
   }
 }
 
@@ -141,11 +125,7 @@
   margin-right: $quarter-unit;
   text-indent: 0;
   color: #666;
-  // display: none;
-
-  // @include media-query(desk) {
-    display: inline-block;
-  // }
+  display: inline-block;
 }
 
 .calendar__nav {
@@ -173,32 +153,3 @@
 .calendar__spinner {
   margin: $unit auto;
 }
-
-// @include media-query(palm) {
-//
-//   .calendar__week {
-//     flex-direction: column;
-//   }
-//
-//   .calendar__week--header {
-//     display: none;
-//   }
-//
-//   .calendar__day {
-//     display: block;
-//     width: auto;
-//     padding: 0px $inuit-base-spacing-unit;
-//   }
-//
-//   .calendar__day-date-month {
-//     display: inline;
-//   }
-//
-//   .calendar__day-date-weekday {
-//     display: inline;
-//   }
-//
-//   .calendar__event-time {
-//     display: inline-block;
-//   }
-// }

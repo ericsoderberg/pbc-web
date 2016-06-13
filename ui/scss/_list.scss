@@ -32,12 +32,27 @@ a.item__container {
 
 .item {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
   padding: $unit;
   max-width: $page-width;
   margin: 0 auto;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
+}
+
+.item__name {
+  font-weight: 600;
+
+  @media all and (max-width: 699px) {
+    margin-bottom: $half-unit;
+  }
 }
 
 .item--primary {
@@ -46,10 +61,17 @@ a.item__container {
 
 .box--row {
   display: flex;
-  flex-direction: row;
-  align-items: center;
 
-  > *:not(:last-child) {
-    margin-right: $half-unit;
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    align-items: center;
+
+    > *:not(:last-child) {
+      margin-right: $half-unit;
+    }
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
   }
 }

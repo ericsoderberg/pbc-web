@@ -109,8 +109,6 @@
   select,
   textarea {
     width: 100%;
-    border: none;
-    padding: $half-unit;
 
     &:focus {
       outline: none;
@@ -120,17 +118,6 @@
   input[type="checkbox"],
   input[type="radio"] {
     margin: $half-unit;
-  }
-
-  select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background: $small-drop-caret no-repeat center right $half-unit;
-    cursor: pointer;
-
-    &::-moz-focus-inner {
-      border: none;
-    }
   }
 
   .input {

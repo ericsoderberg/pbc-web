@@ -17,7 +17,7 @@ class Item extends Component {
     return (
       <div className={classNames.join(' ')}>
         <div className="item">
-          <span>{file.name || file._id}</span>
+          <span className="item__name">{file.name || file._id}</span>
           <ConfirmRemove onConfirm={this._onRemove.bind(this, file._id)} />
         </div>
       </div>

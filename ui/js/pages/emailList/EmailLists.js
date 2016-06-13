@@ -10,7 +10,7 @@ const Item = (props) => {
     <Link className={classNames.join(' ')}
       to={`/email-lists/${emailList._id}/edit`}>
       <div className="item">
-        <span>{emailList.name}</span>
+        <span className="item__name">{emailList.name}</span>
       </div>
     </Link>
   );

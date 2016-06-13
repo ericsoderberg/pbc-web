@@ -10,8 +10,8 @@ const Item = (props) => {
   return (
     <Link className={classNames.join(' ')} to={`/newsletters/${newsletter._id}/edit`}>
       <div className="item">
+        <span className="item__name">{moment(newsletter.date).format('MMM Do YYYY')}</span>
         <span>{newsletter.name}</span>
-        <span>{moment(newsletter.date).format('MMM Do YYYY')}</span>
       </div>
     </Link>
   );

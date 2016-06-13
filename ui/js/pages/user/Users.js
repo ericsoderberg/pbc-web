@@ -12,7 +12,7 @@ const Item = (props) => {
       <div className="item">
         <span className="box--row">
           <img className="avatar" src={user.avatar ? user.avatar.data : ''} />
-          <span>{user.name}</span>
+          <span className="item__name">{user.name}</span>
           <span>{admin}</span>
         </span>
         <span>{user.email}</span>

@@ -4,12 +4,16 @@ import { Link } from 'react-router';
 import moment from 'moment';
 import { getCalendar, getItems } from '../../actions';
 import PageHeader from '../../components/PageHeader';
+import LeftIcon from '../../icons/Left';
+import RightIcon from '../../icons/Right';
 
 export default class Calendar extends Component {
 
   constructor () {
     super();
     this._changeDate = this._changeDate.bind(this);
+    this._onChangeMonth = this._onChangeMonth.bind(this);
+    this._onChangeYear = this._onChangeYear.bind(this);
     this._onSearch = this._onSearch.bind(this);
     this._onFilter = this._onFilter.bind(this);
     this.state = { calendar: { events: [] }, searchText: '' };
@@ -39,13 +43,26 @@ export default class Calendar extends Component {
   _get () {
     getCalendar({ date: this.state.date, searchText: this.state.searchText,
       filter: this.state.filter})
-    .then(response => this.setState({ calendar: response }));
+    .then(response => this.setState({ calendar: response }))
+    .catch(error => console.log('!!! Calendar get catch', error));
   }
 
   _changeDate (date) {
     return (event) => {
       this.setState({ date: date }, this._get);
     };
+  }
+
+  _onChangeMonth (event) {
+    let date = moment(this.state.date);
+    date.month(event.target.value);
+    this.setState({ date: date }, this._get);
+  }
+
+  _onChangeYear (event) {
+    let date = moment(this.state.date);
+    date.year(event.target.value);
+    this.setState({ date: date }, this._get);
   }
 
   _onSearch (event) {
@@ -158,6 +175,9 @@ export default class Calendar extends Component {
       days.push(
         <div key={date.valueOf()} className={classNames.join(' ')}>
           <div className="calendar__day-date">
+            <span className="calendar__day-date-month">
+              {date.format('MMMM')}
+            </span>
             {date.format('D')}
           </div>
           <ol className="calendar__events">
@@ -178,6 +198,7 @@ export default class Calendar extends Component {
 
   render () {
     const { calendar, filterValues, searchText, filter } = this.state;
+    const date = moment(calendar.date);
     const daysOfWeek = this._renderDaysOfWeek();
     const weeks = this._renderWeeks();
 
@@ -195,6 +216,30 @@ export default class Calendar extends Component {
       );
     }
 
+    let months = [];
+    let monthDate = moment(date).startOf('year');
+    while (monthDate.year() === date.year()) {
+      months.push(
+        <option key={monthDate.month()}>{monthDate.format('MMMM')}</option>
+      );
+      monthDate.add(1, 'month');
+    }
+
+    let years = [];
+    let now = moment();
+    let yearDate = moment().subtract(3, 'years');
+    while (yearDate.year() <= (now.year() + 2)) {
+      years.push(
+        <option key={yearDate.year()}>{yearDate.format('YYYY')}</option>
+      );
+      yearDate.add(1, 'year');
+    }
+
+    let today;
+    if (! date.isSame(now, 'date')) {
+      today = <a onClick={this._changeDate(moment())}>Today</a>;
+    }
+
     return (
       <main>
         <PageHeader title="Calendar" homer={true}
@@ -202,18 +247,25 @@ export default class Calendar extends Component {
           actions={filterControl} />
         <div className="calendar">
           <div className="calendar__header">
-            <a onClick={this._changeDate(moment(calendar.previous))}>
-              {moment(calendar.previous).format('< MMMM')}
-            </a>
-            <span className="calendar__title">
-              {moment(calendar.date).format('MMMM YYYY')}
+            <button type="button" className="button--icon"
+              onClick={this._changeDate(moment(calendar.previous))}>
+              <LeftIcon />
+            </button>
+            <span>
+              <select value={moment(calendar.date).format('MMMM')}
+                onChange={this._onChangeMonth}>
+                {months}
+              </select>
+              <select value={moment(calendar.date).format('YYYY')}
+                onChange={this._onChangeYear}>
+                {years}
+              </select>
+              {today}
             </span>
-            <a onClick={this._changeDate(moment())}>
-              Today
-            </a>
-            <a onClick={this._changeDate(moment(calendar.next))}>
-              {moment(calendar.next).format('MMMM >')}
-            </a>
+            <button type="button" className="button--icon"
+              onClick={this._changeDate(moment(calendar.next))}>
+              <RightIcon />
+            </button>
           </div>
           <div className="calendar__week calendar__week--header">
             {daysOfWeek}

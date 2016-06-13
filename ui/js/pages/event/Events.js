@@ -12,7 +12,7 @@ const Item = (props) => {
     <Link className={classNames.join(' ')}
       to={`/events/${event.path || event._id}`}>
       <div className="item">
-        <span>{event.name}</span>
+        <span className="item__name">{event.name}</span>
         <EventTimes event={event} />
       </div>
     </Link>

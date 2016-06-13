@@ -33,6 +33,20 @@ input,
 textarea,
 select {
   font-size: inherit;
+  border: none;
+  padding: $half-unit;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: $small-drop-caret no-repeat center right $half-unit;
+  cursor: pointer;
+  padding: $half-unit $double-unit $half-unit $half-unit;
+
+  &::-moz-focus-inner {
+    border: none;
+  }
 }
 
 textarea {

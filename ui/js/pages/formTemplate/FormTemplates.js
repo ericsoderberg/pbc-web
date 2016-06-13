@@ -10,7 +10,7 @@ const Item = (props) => {
     <Link className={classNames.join(' ')}
       to={`/form-templates/${formTemplate._id}/edit`}>
       <div className="item">
-        <span>{formTemplate.name}</span>
+        <span className="item__name">{formTemplate.name}</span>
       </div>
     </Link>
   );

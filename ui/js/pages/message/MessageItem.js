@@ -16,7 +16,7 @@ const MessageItem = (props) => {
     <Link className={classNames.join(' ')}
       to={`/messages/${message.path || message._id}`}>
       <div className="item">
-        <span>{message.name}</span>
+        <span className="item__name">{message.name}</span>
         <span className="box--row">
           <span>{message.verses}</span>
           <span className="tertiary">{date.format('MMM Do YYYY')}</span>
