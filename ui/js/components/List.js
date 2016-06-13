@@ -71,7 +71,8 @@ class List extends Component {
   }
 
   render () {
-    const { Item, path, title, marker, sort, session, filter } = this.props;
+    const { Item, path, title, marker, sort, session, filter,
+      homer } = this.props;
     const { searchText, filterValue } = this.state;
 
     const descending = (sort && sort[0] === '-');
@@ -127,7 +128,7 @@ class List extends Component {
 
     return (
       <main>
-        <PageHeader title={title} homer={true}
+        <PageHeader title={title} homer={homer}
           searchText={searchText} onSearch={this._onSearch}
           actions={[filterControl, addControl]} />
         <ul className="list">
@@ -147,6 +148,7 @@ List.propTypes = {
       value: PropTypes.any.isRequired
     })).isRequired
   }),
+  homer: PropTypes.bool,
   Item: PropTypes.func.isRequired,
   marker: PropTypes.shape({
     label: PropTypes.node,

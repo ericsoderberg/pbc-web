@@ -37,7 +37,7 @@ export default class Messages extends Component {
     };
 
     return (
-      <List location={location}
+      <List location={location} homer={true}
         category="messages" title="Messages" path="/messages"
         filter={filter} sort="-date"
         Item={MessageItem} marker={marker} />
