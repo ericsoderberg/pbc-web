@@ -36,11 +36,8 @@ class List extends Component {
   }
 
   _get () {
-    getItems(this.props.category, {
-      sort: this.props.sort,
-      filter: this.state.filter,
-      populate: this.props.populate
-    })
+    const { category, filter, populate, select, sort } = this.props;
+    getItems(category, { sort, filter, select, populate })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
   }
@@ -156,6 +153,7 @@ List.propTypes = {
     value: PropTypes.any
   }),
   path: PropTypes.string,
+  select: PropTypes.string,
   session: PropTypes.shape({
     administrator: PropTypes.bool
   }),

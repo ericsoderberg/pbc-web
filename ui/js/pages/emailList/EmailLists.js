@@ -23,5 +23,6 @@ EmailLists.defaultProps = {
   category: 'email-lists',
   Item: Item,
   path: '/email-lists',
+  select: 'name',
   title: 'Email Lists'
 };

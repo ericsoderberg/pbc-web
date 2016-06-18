@@ -23,5 +23,6 @@ FormTemplates.defaultProps = {
   category: 'form-templates',
   Item: Item,
   path: '/form-templates',
+  select: 'name',
   title: 'Form Templates'
 };

@@ -23,5 +23,6 @@ Pages.defaultProps = {
   category: 'pages',
   Item: Item,
   path: '/pages',
+  select: 'name path',
   title: 'Pages'
 };
