@@ -81,13 +81,13 @@ export default class PageFormContents extends Component {
       const Section = SECTIONS[section.type];
 
       const raise = (index === 0 ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index-1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (page.sections.length - 1) ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index+1)}>
           <DownIcon />
         </button>
@@ -111,7 +111,7 @@ export default class PageFormContents extends Component {
             <span className="form__fields-header-actions">
               {raise}
               {lower}
-              <button type="button" className="button--icon"
+              <button type="button" className="button-icon"
                 onClick={formState.removeAt('sections', index)}>
                 <TrashIcon />
               </button>
@@ -126,7 +126,8 @@ export default class PageFormContents extends Component {
     if (expandAdd) {
 
       const addControls = SECTION_TYPES.map(type => (
-        <button key={type} type="button" onClick={this._addSection(type)}>
+        <button key={type} type="button" className="button"
+          onClick={this._addSection(type)}>
           {type}
         </button>
       ));
@@ -146,7 +147,7 @@ export default class PageFormContents extends Component {
 
       add = (
         <div className="form__fields-header">
-          <button type="button" className="button--icon"
+          <button type="button" className="button-icon"
             onClick={() => this.setState({ expandAdd: true })}>
             <AddIcon />
           </button>

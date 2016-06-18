@@ -104,7 +104,7 @@ class List extends Component {
     let addControl;
     if (session && session.administrator) {
       addControl = (
-        <Link key="add" to={`${path}/add`} className="a--header">Add</Link>
+        <Link key="add" to={`${path}/add`} className="a-header">Add</Link>
       );
     }
 
@@ -117,7 +117,7 @@ class List extends Component {
       ));
       options.unshift(<option key="_all" value="all">All</option>);
       filterControl = (
-        <select key="filter" className="select--header"
+        <select key="filter" className="select-header"
           value={filterValue} onChange={this._onFilter}>
           {options}
         </select>

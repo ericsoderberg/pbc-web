@@ -1,6 +1,7 @@
 
 .page-preview {
   min-width: $form-width;
+  border-left: 1px solid $nav-background-color;
 }
 
 .section__container {
@@ -66,7 +67,7 @@
     max-width: $page-width;
     margin: 0 auto;
 
-    .link--circle {
+    .button-circle {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -148,7 +149,7 @@
     // align-items: center;
     padding: $double-unit 0;
 
-    .button--circle {
+    .button-circle {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -161,7 +162,7 @@
     align-items: center;
     padding: $unit;
 
-    .button--circle {
+    .button-circle {
       margin-bottom: $unit;
     }
   }
@@ -184,7 +185,7 @@
 
 .library__message--imaged {
   @media all and (min-width: 700px) {
-    .button--circle {
+    .button-circle {
       top: 0;
     }
   }

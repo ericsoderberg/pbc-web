@@ -69,7 +69,7 @@ export default class Library extends Component {
   _renderLibrary () {
     const { name } = this.props;
     return (
-      <Link className="link--button" to={`/messages?library=${name}`}>
+      <Link className="button" to={`/messages?library=${name}`}>
         Messages
       </Link>
     );

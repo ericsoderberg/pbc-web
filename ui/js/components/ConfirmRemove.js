@@ -29,10 +29,11 @@ export default class ConfirmRemove extends Component {
     return (
       <div className={classNames.join(' ')}>
         <div className="confirm-remove__confirm">
-          <button onClick={this.props.onConfirm}>Confirm</button>
-          <button onClick={this._onCancel}>Cancel</button>
+          <button className="button" onClick={this.props.onConfirm}>Confirm</button>
+          <button className="button" onClick={this._onCancel}>Cancel</button>
         </div>
-        <button className="confirm-remove__remove" onClick={this._onRemove}>
+        <button className="button button--secondary confirm-remove__remove"
+          onClick={this._onRemove}>
           Remove
         </button>
       </div>

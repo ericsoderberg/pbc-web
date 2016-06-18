@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
+import CloseIcon from '../../icons/Close';
 
 export default class SiteFormContents extends Component {
 
@@ -31,10 +32,10 @@ export default class SiteFormContents extends Component {
       socialLinks = site.socialUrls.map((url, index) => {
         return (
           <FormField key={index} label="Social url"
-            help={
-              <button type="button" className="button--link"
+            closeControl={
+              <button type="button" className="button-icon"
                 onClick={formState.removeAt('socialUrls', index)}>
-                Remove
+                <CloseIcon secondary={true} />
               </button>
             }>
             <input name={`social-${index}`} value={url}
@@ -77,7 +78,7 @@ export default class SiteFormContents extends Component {
         {socialLinks}
         <FormField>
           <div className="form__tabs">
-            <button type="button"
+            <button type="button" className="button button--secondary"
               onClick={formState.addTo('socialUrls', '')}>
               Add social url
             </button>

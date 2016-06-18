@@ -11,7 +11,7 @@ export default class NewsletterPreview extends Component {
     let sendControl;
     if (newsletter.address) {
       sendControl = (
-        <button type="button" className="button--header">Send</button>
+        <button type="button" className="button-header">Send</button>
       );
     }
 

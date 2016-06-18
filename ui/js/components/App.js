@@ -28,7 +28,7 @@ class App extends Component {
         classNames.push('app--nav');
       } else {
         navControl = (
-          <button type="button" className="button--icon app__nav-control"
+          <button type="button" className="button-icon app__nav-control"
             onClick={this._onToggle}>
             <RightIcon />
           </button>

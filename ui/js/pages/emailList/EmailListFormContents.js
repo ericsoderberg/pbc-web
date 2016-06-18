@@ -57,7 +57,10 @@ export default class EmailListFormContents extends Component {
           <input name="add" value={this.state.addAddress}
             onChange={this._onChangeAdd} />
           <div className="form__tabs">
-            <button type="button" onClick={this._onAdd}>Add</button>
+            <button type="button" className="button button--secondary"
+              onClick={this._onAdd}>
+              Add
+            </button>
           </div>
         </FormField>
         <FormField name="addresses" label="Addresses">

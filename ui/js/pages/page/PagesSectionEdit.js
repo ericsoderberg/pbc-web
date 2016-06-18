@@ -117,7 +117,8 @@ export default class PagesSectionEdit extends Component {
           <div><legend>{`Page ${subPages.length + 1}`}</legend></div>
           <FormField>
             <div className="form__tabs">
-              <button type="button" onClick={this._onAddPage}>
+              <button type="button" className="button button--secondary"
+                onClick={this._onAddPage}>
                 Add page
               </button>
             </div>

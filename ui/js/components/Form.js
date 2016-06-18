@@ -45,7 +45,7 @@ export default class Form extends Component {
     const { formState } = this.state;
 
     const cancelControl = (
-      <button className="button--header" type="button" onClick={this._onCancel}>
+      <button className="button-header" type="button" onClick={this._onCancel}>
         Cancel
       </button>
     );
@@ -67,7 +67,9 @@ export default class Form extends Component {
           <FormError message={error} />
           <FormContents formState={this.state.formState} />
           <footer className="form__footer">
-            <button type="submit" onClick={this._onSubmit}>{submitLabel}</button>
+            <button type="submit" className="button" onClick={this._onSubmit}>
+              {submitLabel}
+            </button>
             {removeControl}
           </footer>
         </form>

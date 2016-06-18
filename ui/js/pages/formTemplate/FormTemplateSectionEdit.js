@@ -73,13 +73,13 @@ export default class FormTemplateSectionEdit extends Component {
     const fields = (section.fields || []).map((field, index) => {
 
       const raise = (index === 0 ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('fields', index, index-1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (section.fields.length - 1) ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('fields', index, index+1)}>
           <DownIcon />
         </button>
@@ -103,7 +103,7 @@ export default class FormTemplateSectionEdit extends Component {
             <span className="form__fields-header-actions">
               {raise}
               {lower}
-              <button type="button" className="button--icon"
+              <button type="button" className="button-icon"
                 onClick={formState.removeAt('fields', index)}>
                 <TrashIcon />
               </button>
@@ -118,7 +118,8 @@ export default class FormTemplateSectionEdit extends Component {
     if (expandAdd) {
 
       const addControls = FIELD_TYPES.map(type => (
-        <button key={type} type="button" onClick={this._addField(type)}>
+        <button key={type} type="button" className="button"
+          onClick={this._addField(type)}>
           {type}
         </button>
       ));
@@ -138,7 +139,7 @@ export default class FormTemplateSectionEdit extends Component {
 
       add = (
         <div className="form__fields-header">
-          <button type="button" className="button--icon"
+          <button type="button" className="button-icon"
             onClick={() => this.setState({ expandAdd: true })}>
             <AddIcon />
           </button>

@@ -16,7 +16,10 @@ body,
 }
 
 a,
-.button--link {
+.link {
+  outline: none;
+  border-radius: 0;
+  border: none;
   color: #000;
   transition: all 0.2s;
   text-decoration: underline;
@@ -29,11 +32,85 @@ a,
   // }
 }
 
+.button,
+.button-circle,
+.button-icon,
+.button-header {
+  outline: none;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+}
+
+.button {
+  padding: $half-unit $unit;
+  background-color: $control-background-color;
+  color: $control-color;
+  font-size: 20px;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+}
+
+.button-icon {
+  padding: $half-unit;
+  width: $double-unit;
+  height: $double-unit;
+  background-color: transparent;
+
+  &:hover {
+    background-color: $control-hover-background;
+
+    .control-icon {
+      fill: $active-color;
+      stroke: $active-color;
+    }
+  }
+}
+
+.button-circle {
+  position: relative;
+  display: inline-block;
+  width: $sextuple-unit;
+  height: $sextuple-unit;
+  border-radius: $triple-unit;
+  // margin: $half-unit;
+  padding: $half-unit;
+  font-size: 20px;
+  background-color: rgba(32, 32, 32, 0.7); //rgba(255, 255, 255, 0.8);
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+
+  .button__label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.button--secondary {
+  background-color: rgba($control-background-color, 0.1);
+  color: $secondary-color;
+}
+
 input,
 textarea,
 select {
   font-size: inherit;
   border: none;
+  border-radius: 0;
   padding: $half-unit;
 }
 
@@ -71,72 +148,6 @@ p {
 fieldset {
   border: none;
   padding: 0;
-}
-
-button {
-  outline: none;
-  border-radius: 0;
-  border: none;
-  margin: 0;
-  cursor: pointer;
-
-  &.button--icon {
-    padding: $half-unit;
-    width: $double-unit;
-    height: $double-unit;
-    background-color: transparent;
-
-    &:hover {
-      background-color: $control-hover-background;
-
-      .control-icon {
-        fill: $active-color;
-        stroke: $active-color;
-      }
-    }
-  }
-}
-
-button:not(.button--link):not(.button--icon):not(.button--header):not(.button--circle),
-.link--button {
-  padding: $half-unit $unit;
-  background-color: $control-background-color;
-  color: $control-color;
-  font-size: 20px;
-  text-decoration: none;
-  text-align: center;
-
-  &:hover {
-    background-color: $control-hover-background;
-    color: $active-color;
-  }
-}
-
-.button--circle,
-.link--circle {
-  position: relative;
-  width: $sextuple-unit;
-  height: $sextuple-unit;
-  border-radius: $triple-unit;
-  // margin: $half-unit;
-  padding: $half-unit;
-  font-size: 20px;
-  background-color: rgba(32, 32, 32, 0.7); //rgba(255, 255, 255, 0.8);
-  color: #fff;
-  text-decoration: none;
-  text-align: center;
-
-  &:hover {
-    background-color: $control-hover-background;
-    color: $active-color;
-  }
-
-  .link__text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
 }
 
 dt {

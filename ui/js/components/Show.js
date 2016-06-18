@@ -53,12 +53,12 @@ class Show extends Component {
     let controls;
     if (session && session.administrator) {
       controls = [
-        <a key="copy" href={`/${category}/add`} className="a--header"
+        <a key="copy" href={`/${category}/add`} className="a-header"
           onClick={this._onCopy}>
           Copy
         </a>,
         <Link key="edit" to={`/${category}/${item._id}/edit`}
-          className="a--header">
+          className="a-header">
           Edit
         </Link>
       ];

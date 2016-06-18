@@ -130,7 +130,7 @@ class EventFormFields extends Component {
         {otherTimes}
         <FormField>
           <div className="form__tabs">
-            <button type="button"
+            <button type="button" className="button button--secondary"
               onClick={formState.addTo('times',
                 { start: event.start, end: event.end })}>
               Add other time
@@ -170,13 +170,16 @@ export default class EventFormContents extends Component {
       <div>
         <View formState={this.props.formState} />
         <div className="form__tabs">
-          <button type="button" onClick={this._onView.bind(this, 'details')}>
+          <button type="button"className="button button--secondary"
+            onClick={this._onView.bind(this, 'details')}>
             Details
           </button>
-          <button type="button" onClick={this._onView.bind(this, 'resources')}>
+          <button type="button" className="button button--secondary"
+            onClick={this._onView.bind(this, 'resources')}>
             Resources
           </button>
-          <button type="button" onClick={this._onView.bind(this, 'dates')}>
+          <button type="button" className="button button--secondary"
+            onClick={this._onView.bind(this, 'dates')}>
             Dates
           </button>
         </div>

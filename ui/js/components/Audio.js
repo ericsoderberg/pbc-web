@@ -88,7 +88,8 @@ export default class Audio extends Component {
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="audio">
-          <button className="audio__control" type="button" onClick={onClick}>{label}</button>
+          <button className="button audio__control" type="button"
+            onClick={onClick}>{label}</button>
           <input className="audio__position" type="range" min={start} max={end}
             value={at} onChange={this._onSeek} />
           <input className="audio__volume" type="range" min={0} max={1} step={0.1}

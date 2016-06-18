@@ -209,7 +209,7 @@ export default class Calendar extends Component {
       ));
       options.unshift(<option key="_all">All</option>);
       filterControl = (
-        <select key="filter" className="select--header"
+        <select key="filter" className="select-header"
           value={filter ? filter.calendar : undefined} onChange={this._onFilter}>
           {options}
         </select>
@@ -247,7 +247,7 @@ export default class Calendar extends Component {
           actions={filterControl} />
         <div className="calendar">
           <div className="calendar__header">
-            <button type="button" className="button--icon"
+            <button type="button" className="button-icon"
               onClick={this._changeDate(moment(calendar.previous))}>
               <LeftIcon />
             </button>
@@ -262,7 +262,7 @@ export default class Calendar extends Component {
               </select>
               {today}
             </span>
-            <button type="button" className="button--icon"
+            <button type="button" className="button-icon"
               onClick={this._changeDate(moment(calendar.next))}>
               <RightIcon />
             </button>

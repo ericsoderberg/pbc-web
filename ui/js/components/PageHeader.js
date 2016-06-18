@@ -42,11 +42,11 @@ export default class PageHeader extends Component {
 
     let backControl;
     if (homer) {
-      let classNames = ['button--header'];
+      let classNames = ['button-header'];
       let contents;
       if (site && site.logo) {
         contents = <img className="page-header__logo" src={site.logo.data} />;
-        classNames.push('button--icon');
+        classNames.push('button-icon');
       } else {
         contents = 'Home';
       }
@@ -57,7 +57,7 @@ export default class PageHeader extends Component {
       );
     } else if (back) {
       backControl = (
-        <button className="button--header button--icon" onClick={this._onBack}>
+        <button className="button-header button-icon" onClick={this._onBack}>
           <BackIcon />
         </button>
       );

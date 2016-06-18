@@ -111,15 +111,15 @@ export default class DateTimeDetails extends Component {
 
     return [
       <header key="header" className="date-time__header">
-        <button type="button" className={'date-time__previous'}
+        <button type="button" className="button date-time__previous"
           onClick={this._onPrevious.bind(this, 'month')}>&lt;</button>
-        <span className={'date-time__title'}>
+        <span className="date-time__title">
           {value.format('MMMM YYYY')}
         </span>
-        <button type="button" className={'date-time__next'}
+        <button type="button" className="button date-time__next"
           onClick={this._onNext.bind(this, 'month')}>&gt;</button>
       </header>,
-      <div key="grid" className={'date-time__grid'}>
+      <div key="grid" className="date-time__grid">
         <table>
           <thead>
             <tr>{headerCells}</tr>
@@ -129,7 +129,7 @@ export default class DateTimeDetails extends Component {
           </tbody>
         </table>
       </div>,
-      <button key="today" type="button" className={'date-time__today'}
+      <button key="today" type="button" className="button date-time__today"
         onClick={this._onToday}>Today</button>
     ];
   }
@@ -137,10 +137,10 @@ export default class DateTimeDetails extends Component {
   _renderTimeElement (value, format, propertyName) {
     return (
       <div key={format} className="date-time__time-select">
-        <button type="button"
+        <button type="button" className="button"
           onClick={this._onPrevious.bind(this, propertyName)}>-</button>
         <span className="date-time__time-element">{value.format(format)}</span>
-        <button type="button"
+        <button type="button" className="button"
           onClick={this._onNext.bind(this, propertyName)}>+</button>
       </div>
     );

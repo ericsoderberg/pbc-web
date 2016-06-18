@@ -81,13 +81,13 @@ export default class FormTemplateFieldEdit extends Component {
 
     const options = (field.options || []).map((option, index) => {
       const raise = (index === 0 ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('options', index, index-1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (field.options.length - 1) ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('options', index, index+1)}>
           <DownIcon />
         </button>
@@ -100,7 +100,7 @@ export default class FormTemplateFieldEdit extends Component {
             <span className="form__fields-header-actions">
               {raise}
               {lower}
-              <button type="button" className="button--icon"
+              <button type="button" className="button-icon"
                 onClick={formState.removeAt('options', index)}>
                 <TrashIcon />
               </button>
@@ -118,7 +118,8 @@ export default class FormTemplateFieldEdit extends Component {
         <fieldset className="form__fields">
           <FormField>
             <div className="form__tabs">
-              <button type="button" onClick={formState.addTo('options')}>
+              <button type="button" className="button button--secondary"
+                onClick={formState.addTo('options')}>
                 Add option
               </button>
             </div>

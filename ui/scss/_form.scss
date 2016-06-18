@@ -150,6 +150,12 @@
   color: $error-color;
 }
 
+.form-field__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .form-field__image {
   padding-top: $half-unit;
   max-width: $form-width - $double-unit;
@@ -335,4 +341,9 @@
   cursor: pointer;
   fill: $secondary-color;
   stroke: $secondary-color;
+}
+
+.control-icon--secondary {
+  fill: $secondary-icon-color;
+  stroke: $secondary-icon-color;
 }

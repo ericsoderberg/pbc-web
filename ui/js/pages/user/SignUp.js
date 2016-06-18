@@ -66,7 +66,7 @@ export default class SignUp extends Component {
     const user = formState.object;
 
     const cancelControl = (
-      <button className="button--header" type="button" onClick={this._onCancel}>
+      <button className="button-header" type="button" onClick={this._onCancel}>
         Cancel
       </button>
     );

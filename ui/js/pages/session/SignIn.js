@@ -47,11 +47,11 @@ export default class SignIn extends Component {
     const session = formState.object;
 
     const cancelControl = (
-      <button className="button--header" type="button" onClick={this._onCancel}>
+      <button className="button-header" type="button" onClick={this._onCancel}>
         Cancel
       </button>
     );
-    
+
     return (
       <div className="form__container">
         <form className="form" action="/api/sessions" onSubmit={this._onSignIn}>
@@ -68,8 +68,12 @@ export default class SignIn extends Component {
             </FormField>
           </fieldset>
           <footer className="form__footer">
-            <button type="submit" onClick={this._onSignIn}>Sign In</button>
-            <button onClick={this._onSignUp}>Sign Up</button>
+            <button type="submit" className="button" onClick={this._onSignIn}>
+              Sign In
+            </button>
+            <button className="button" onClick={this._onSignUp}>
+              Sign Up
+            </button>
           </footer>
         </form>
       </div>

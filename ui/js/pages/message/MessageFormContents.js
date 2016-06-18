@@ -132,7 +132,10 @@ export default class MessageFormContents extends Component {
               onChange={formState.change('videoUrl')}/>
           </FormField>
           {files}
-          <button type="button" onClick={this._onAddFile}>Add file</button>
+          <button type="button" className="button button--secondary"
+            onClick={this._onAddFile}>
+            Add file
+          </button>
         </fieldset>
         <fieldset className="form__fields">
           <FormField name="seriesId" label="In Series">

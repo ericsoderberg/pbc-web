@@ -48,8 +48,8 @@ export default class PageSummaries extends Component {
           <label key="name" className="page-tile__name">{page.name}</label>
         ];
       } else {
-        classNames = ['link--circle'];
-        contents = <span className="link__text">{page.name}</span>;
+        classNames = ['button-circle'];
+        contents = <span className="button__label">{page.name}</span>;
       }
       return (
         <Link key={pageRef.id} className={classNames.join(' ')}

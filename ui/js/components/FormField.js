@@ -58,6 +58,11 @@ export default class FormField extends Component {
       error = <span className="form-field__error">{this.props.error}</span>;
     }
 
+    let close;
+    if (this.props.closeControl) {
+      close = <div className="form-field__close">{this.props.closeControl}</div>;
+    }
+
     let labels;
     if (label || help || error) {
       labels = (
@@ -66,6 +71,7 @@ export default class FormField extends Component {
           <div>
             {help}
             {error}
+            {close}
           </div>
         </div>
       );
@@ -91,6 +97,7 @@ export default class FormField extends Component {
 };
 
 FormField.propTypes = {
+  closeControl: PropTypes.node,
   error: PropTypes.string,
   help: PropTypes.node,
   label: PropTypes.string,

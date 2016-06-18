@@ -53,7 +53,7 @@
   font-family: 'Lucide Grande', sans-serif;
   display: flex;
   flex-direction: column;
-  background-color: #666;
+  background-color: $nav-background-color;
   color: $active-color;
 
   @media all and (min-width: 700px) {
@@ -156,9 +156,9 @@
   font-size: 1.4rem;
 }
 
-.a--header,
-.button--header,
-.select--header {
+.a-header,
+.button-header,
+.select-header {
   text-decoration: none;
   background-color: $header-background-color;
   color: inherit;

@@ -45,13 +45,13 @@ export default class FormTemplateFormContents extends Component {
     const sections = (formTemplate.sections || []).map((section, index) => {
 
       const raise = (index === 0 ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index-1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (formTemplate.sections.length - 1) ? undefined : (
-        <button type="button" className="button--icon"
+        <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index+1)}>
           <DownIcon />
         </button>
@@ -68,7 +68,7 @@ export default class FormTemplateFormContents extends Component {
             <span className="form__fields-header-actions">
               {raise}
               {lower}
-              <button type="button" className="button--icon"
+              <button type="button" className="button-icon"
                 onClick={formState.removeAt('sections', index)}>
                 <TrashIcon />
               </button>
@@ -115,7 +115,8 @@ export default class FormTemplateFormContents extends Component {
         <fieldset className="form__fields">
           <FormField>
             <div className="form__tabs">
-              <button type="button" onClick={this._addSection()}>
+              <button type="button" className="button button--secondary"
+                onClick={this._addSection()}>
                 Add section
               </button>
             </div>
