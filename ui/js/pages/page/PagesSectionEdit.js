@@ -4,6 +4,7 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import FormState from '../../utils/FormState';
+import CloseIcon from '../../icons/Close';
 import SectionFields from './SectionFields';
 
 class SubPageEdit extends Component {
@@ -22,7 +23,7 @@ class SubPageEdit extends Component {
   }
 
   render () {
-    const { index } = this.props;
+    const { index, onRemove } = this.props;
     const { formState } = this.state;
     const pageSummary = formState.object;
 
@@ -34,7 +35,13 @@ class SubPageEdit extends Component {
     return (
       <div>
         <legend>{`Page ${index + 1}`}</legend>
-        <FormField label="Page">
+        <FormField label="Page"
+          closeControl={
+            <button type="button" className="button-icon"
+              onClick={onRemove}>
+              <CloseIcon secondary={true} />
+            </button>
+          }>
           <select name={`id-${index}`} value={pageSummary.id || ''}
             onChange={formState.change('id')}>
             {pages}
@@ -51,6 +58,7 @@ class SubPageEdit extends Component {
 SubPageEdit.propTypes = {
   index: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
   pages: PropTypes.array.isRequired,
   pageSummary: PropTypes.object.isRequired
 };
@@ -106,7 +114,8 @@ export default class PagesSectionEdit extends Component {
     const subPages = (section.pages || [{}]).map((pageSummary, index) => (
       <SubPageEdit key={index} pageSummary={pageSummary} index={index}
         pages={this.state.pages}
-        onChange={(nextPageSummary) => this._onChangePage(nextPageSummary, index)} />
+        onChange={(nextPageSummary) => this._onChangePage(nextPageSummary, index)}
+        onRemove={formState.removeAt('pages', index)} />
     ));
 
     return (
