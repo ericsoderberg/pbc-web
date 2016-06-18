@@ -6,28 +6,18 @@ import Text from '../../components/Text';
 import Image from '../../components/Image';
 import Audio from '../../components/Audio';
 import Video from '../../components/Video';
+import Button from '../../components/Button';
 import MessageItem from './MessageItem';
 
 export default class MessageContents extends Component {
 
-  constructor () {
-    super();
-    this._onNav = this._onNav.bind(this);
-  }
-
-  _onNav (event) {
-    event.preventDefault();
-    this.context.router.replace(event.currentTarget.getAttribute('href'));
-  }
-
   _renderMessageNav (message, type) {
     return (
-      <Link className={`message__nav-${type}`}
-        to={`/messages/${message.path || message._id}`}
-        onClick={this._onNav}>
+      <Button left={'previous' === type} right={'next' === type}
+        path={`/messages/${message.path || message._id}`}>
         <div className="message__nav-name">{message.name}</div>
         <div className="message__nav-verses">{message.verses}</div>
-      </Link>
+      </Button>
     );
   }
 
@@ -163,10 +153,6 @@ export default class MessageContents extends Component {
 MessageContents.PropTypes = {
   attributes: PropTypes.bool,
   item: PropTypes.object.isRequired
-};
-
-MessageContents.contextTypes = {
-  router: PropTypes.any
 };
 
 MessageContents.defaultProps = {

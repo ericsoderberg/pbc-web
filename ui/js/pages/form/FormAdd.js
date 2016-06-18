@@ -77,7 +77,7 @@ export default class FormAdd extends Component {
           <FormContents form={form} formTemplate={formTemplate}
             onChange={this._onChange} error={error} />
           <footer className="form__footer">
-            <button type="submit">
+            <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}
             </button>
             {cancelControl}

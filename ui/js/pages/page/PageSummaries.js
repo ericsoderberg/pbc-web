@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import Section from '../../components/Section';
 import Image from '../../components/Image';
+import Button from '../../components/Button';
 
 export default class PageSummaries extends Component {
 
@@ -39,24 +40,24 @@ export default class PageSummaries extends Component {
 
     const links = (pages || []).map(pageRef => {
       const page = this.state.pages[pageRef.id] || {};
-      let classNames;
-      let contents;
+      let link;
       if (pageRef.image) {
-        classNames = ['page-tile'];
-        contents = [
-          <Image key="image" image={pageRef.image} plain={true} />,
-          <label key="name" className="page-tile__name">{page.name}</label>
-        ];
+        link = (
+          <Link key={pageRef.id} className="page-tile"
+            to={page.path || `/pages/${page._id}`}>
+            <Image image={pageRef.image} plain={true} />
+            <Button right={true}>{page.name}</Button>
+          </Link>
+        );
       } else {
-        classNames = ['button-circle'];
-        contents = <span className="button__label">{page.name}</span>;
+        link = (
+          <Button key={pageRef.id} circle={true}
+            path={page.path || `/pages/${page._id}`}>
+            {page.name}
+          </Button>
+        );
       }
-      return (
-        <Link key={pageRef.id} className={classNames.join(' ')}
-          to={page.path || `/pages/${page._id}`}>
-          {contents}
-        </Link>
-      );
+      return link;
     });
 
     return (

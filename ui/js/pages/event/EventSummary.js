@@ -5,6 +5,7 @@ import { getItem } from '../../actions';
 import EventTimes from '../../components/EventTimes';
 import Section from '../../components/Section';
 import Map from '../../components/Map';
+import Button from '../../components/Button';
 
 export default class EventSummary extends Component {
 
@@ -47,9 +48,9 @@ export default class EventSummary extends Component {
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="event-summary">
-          <Link to={`/events/${event._id}`} className="button-circle">
+          <Button path={`/events/${event._id}`} circle={true}>
             <span className="button__label">{event.name}</span>
-          </Link>
+          </Button>
           <Link to={`/events/${event._id}`} className="event-summary__summary">
             <EventTimes event={event} />
           </Link>

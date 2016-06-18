@@ -34,6 +34,8 @@ a,
 
 .button,
 .button-circle,
+.button-right,
+.button-left,
 .button-icon,
 .button-header {
   outline: none;
@@ -41,6 +43,7 @@ a,
   border: none;
   margin: 0;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .button {
@@ -48,7 +51,6 @@ a,
   background-color: $control-background-color;
   color: $control-color;
   font-size: 20px;
-  text-decoration: none;
   text-align: center;
 
   &:hover {
@@ -84,7 +86,6 @@ a,
   font-size: 20px;
   background-color: rgba(32, 32, 32, 0.7); //rgba(255, 255, 255, 0.8);
   color: #fff;
-  text-decoration: none;
   text-align: center;
 
   &:hover {
@@ -97,6 +98,42 @@ a,
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+}
+
+.button-right,
+.button-left {
+  position: relative;
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 100;
+  padding: $unit;
+  background-color: $control-background-color;
+  color: $control-color;
+  transition: all 0.2s;
+}
+
+.button__arrow {
+  position: absolute;
+  top: 0;
+  width: $unit;
+  height: 100%;
+  fill: $control-background-color;
+}
+
+.button-right {
+  margin-right: $unit;
+
+  .button__arrow {
+    right: -$unit;
+  }
+}
+
+.button-left {
+  margin-left: $unit;
+
+  .button__arrow {
+    left: -$unit;
   }
 }
 

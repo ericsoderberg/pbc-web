@@ -5,6 +5,7 @@ import moment from 'moment';
 import { getItems } from '../../actions';
 import Section from '../../components/Section';
 import Image from '../../components/Image';
+import Button from '../../components/Button';
 
 export default class Library extends Component {
 
@@ -52,9 +53,7 @@ export default class Library extends Component {
       <Link to={`/messages/${message._id}`}>
         {image}
         <div className={classNames.join(' ')}>
-          <button className="button-circle" type="button">
-            Latest Message
-          </button>
+          <Button circle={true}>Latest Message</Button>
           <label>{moment(message.date).format('MMM Do')}</label>
           <div className="library__message-details">
             <h2>{message.name}</h2>
@@ -69,9 +68,9 @@ export default class Library extends Component {
   _renderLibrary () {
     const { name } = this.props;
     return (
-      <Link className="button" to={`/messages?library=${name}`}>
+      <Button path={`/messages?library=${name}`} right={true}>
         Messages
-      </Link>
+      </Button>
     );
   }
 

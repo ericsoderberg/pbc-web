@@ -166,6 +166,7 @@
   cursor: pointer;
   padding: $half-unit $unit;
   height: 100%;
+  width: auto;
 
   &:hover {
     background-color: $control-hover-background;

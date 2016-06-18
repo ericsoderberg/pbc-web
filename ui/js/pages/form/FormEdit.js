@@ -83,9 +83,10 @@ export default class FormEdit extends Component {
           <FormContents form={form} formTemplate={formTemplate}
             onChange={this._onChange} />
           <footer className="form__footer">
-            <button type="submit">Update</button>
+            <button type="submit" className="button">Update</button>
             <ConfirmRemove onConfirm={this._onRemove} />
-            <button type="button" onClick={this._onCancel}>
+            <button type="button" className="button button--secondary"
+              onClick={this._onCancel}>
               Cancel
             </button>
           </footer>
