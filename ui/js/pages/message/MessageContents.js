@@ -43,14 +43,16 @@ export default class MessageContents extends Component {
     let files = [];
     (message.files || []).forEach(file => {
       const path = `/api/files/${file._id}`;
-      if (! file.type.match(/audio/)) {
-        files.push(
-          <a key={file._id} className="item__container" href={path}>
-            <div className="item">{file.name}</div>
-          </a>
-        );
-      } else {
-        audio = <Audio file={file} full={true} />;
+      if (file.type) {
+        if (! file.type.match(/audio/)) {
+          files.push(
+            <a key={file._id} className="item__container" href={path}>
+              <div className="item">{file.name}</div>
+            </a>
+          );
+        } else {
+          audio = <Audio file={file} full={true} />;
+        }
       }
     });
     if (files.length > 0) {

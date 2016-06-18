@@ -61,7 +61,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  // margin-bottom: - $double-unit;
+  padding: 0 $unit;
 
   + .form__fields,
   + * .form__fields {
@@ -72,7 +72,7 @@
 .form__fields-header-label {
   flex: 1 0 auto;
   margin: 0;
-  padding: ($unit * 0.6667) $quarter-unit;
+  padding: ($unit * 0.6667) $half-unit;
   height: $double-unit;
   cursor: pointer;
 

@@ -4,7 +4,7 @@ import { getItems, postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import DateTime from '../../components/DateTime';
-import ConfirmRemove from '../../components/ConfirmRemove';
+import CloseIcon from '../../icons/Close';
 
 export default class MessageFormContents extends Component {
 
@@ -44,7 +44,6 @@ export default class MessageFormContents extends Component {
     return (event) => {
       const message = this.props.formState.object;
       const files = event.target.files;
-      console.log('!!! _onChangeFile', files[0]);
       let data = new FormData();
       data.append('file', files[0]);
       postFile(data)
@@ -59,19 +58,27 @@ export default class MessageFormContents extends Component {
   }
 
   _renderFileField (file, index) {
+    let closeControl = (
+      <button type="button" className="button-icon"
+        onClick={this.props.formState.removeAt('files', index)}>
+        <CloseIcon secondary={true} />
+      </button>
+    );
+
     let field;
     if (file._id) {
       field = (
-        <FormField key={index} name={`file-${index}`} label="File">
+        <FormField key={index} name={`file-${index}`} label="File"
+          closeControl={closeControl}>
           <div className="box--row">
             <span className="input">{file.name || file._id}</span>
-            <ConfirmRemove onConfirm={this._removeFile(index)} />
           </div>
         </FormField>
       );
     } else {
       field = (
-        <FormField key={index} name={`file-${index}`} label="File">
+        <FormField key={index} name={`file-${index}`} label="File"
+          closeControl={closeControl}>
           <input name={`file-${index}`} type="file"
             onChange={this._changeFile(index)}/>
         </FormField>
@@ -132,10 +139,14 @@ export default class MessageFormContents extends Component {
               onChange={formState.change('videoUrl')}/>
           </FormField>
           {files}
-          <button type="button" className="button button--secondary"
-            onClick={this._onAddFile}>
-            Add file
-          </button>
+          <FormField>
+            <div className="form__tabs">
+              <button type="button" className="button button--secondary"
+                onClick={this._onAddFile}>
+                Add file
+              </button>
+            </div>
+          </FormField>
         </fieldset>
         <fieldset className="form__fields">
           <FormField name="seriesId" label="In Series">
