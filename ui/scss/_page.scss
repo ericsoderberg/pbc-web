@@ -12,11 +12,10 @@
 .section__container {
   position: relative;
   padding: 0 $unit;
-  opacity: 0;
   overflow: hidden;
 
   @media all and (min-width: 700px) {
-    animation: fadein 1s forwards;
+    animation: fadein 1s forwards both;
 
     &:nth-child(2) {
       animation-delay: 0.6s;
@@ -265,6 +264,10 @@
   @media all and (max-width: 699px) {
     flex-direction: column;
     align-items: center;
+
+    > * {
+      margin: $half-unit 0;
+    }
   }
 }
 
