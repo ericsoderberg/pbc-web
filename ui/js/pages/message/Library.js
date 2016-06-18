@@ -53,13 +53,9 @@ export default class Library extends Component {
       <Link to={`/messages/${message._id}`}>
         {image}
         <div className={classNames.join(' ')}>
-          <Button circle={true}>Latest Message</Button>
+          <Button right={true}>Latest Message</Button>
           <label>{moment(message.date).format('MMM Do')}</label>
-          <div className="library__message-details">
-            <h2>{message.name}</h2>
-            <div>{message.verses}</div>
-            <div className="library__message-author">{message.author}</div>
-          </div>
+          <h2>{message.name}</h2>
         </div>
       </Link>
     );

@@ -84,8 +84,8 @@ a,
   // margin: $half-unit;
   padding: $half-unit;
   font-size: 20px;
-  background-color: rgba(32, 32, 32, 0.7); //rgba(255, 255, 255, 0.8);
-  color: #fff;
+  background-color: $control-background-color;
+  color: $control-color;
   text-align: center;
 
   &:hover {
@@ -111,6 +111,15 @@ a,
   background-color: $control-background-color;
   color: $control-color;
   transition: all 0.2s;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+
+    .button__arrow {
+      fill: $control-hover-background;
+    }
+  }
 }
 
 .button__arrow {
@@ -119,6 +128,7 @@ a,
   width: $unit;
   height: 100%;
   fill: $control-background-color;
+  transition: fill 0.2s;
 }
 
 .button-right {

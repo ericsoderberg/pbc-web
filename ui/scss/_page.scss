@@ -15,8 +15,7 @@
   padding: $double-unit 0;
 
   &.image,
-  > .image,
-  > a > .image {
+  > .image {
     width: 100%;
   }
 }
@@ -132,7 +131,8 @@
 @import 'audio';
 
 .library {
-  a {
+  > a {
+    display: block;
     text-decoration: none;
   }
 }
@@ -143,17 +143,10 @@
 
   @media all and (min-width: 700px) {
     flex-direction: row;
+    align-items: center;
     max-width: $page-width;
     margin: 0 auto;
-    // align-items: center;
-    padding: $double-unit 0;
-
-    .button-circle {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
+    padding: 0;
   }
 
   @media all and (max-width: 699px) {
@@ -161,19 +154,18 @@
     align-items: center;
     padding: $unit;
 
-    .button-circle {
-      margin-bottom: $unit;
+    > * {
+      margin: $half-unit 0;
     }
   }
 
   label {
-    font-size: 32px;
+    font-size: 1.5em;
     font-weight: 100;
     text-align: right;
 
     @media all and (min-width: 700px) {
-      flex: 0 0 50%;
-      padding-right: $quadruple-unit;
+      margin: 0 $unit;
     }
 
     @media all and (max-width: 699px) {
@@ -192,25 +184,9 @@
 
 .library__message-image {
   .section__container--full & {
-    margin-top: - $double-unit;
+    margin: (- $double-unit) (- $unit) $double-unit;
+    width: calc(100% + #{$double-unit});
   }
-}
-
-.library__message-details {
-
-  @media all and (min-width: 700px) {
-    flex: 0 0 50%;
-    padding-left: $quadruple-unit;
-  }
-
-  h2 {
-    margin: 0 0 $unit;
-  }
-}
-
-.library__message-author {
-  margin-top: $quarter-unit;
-  color: $secondary-color;
 }
 
 .user-summary {
