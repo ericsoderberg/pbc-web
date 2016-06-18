@@ -36,7 +36,8 @@ class List extends Component {
   }
 
   _get () {
-    const { category, filter, populate, select, sort } = this.props;
+    const { category, populate, select, sort } = this.props;
+    const { filter } = this.state;
     getItems(category, { sort, filter, select, populate })
     .then(response => this.setState({ items: response }))
     .catch(error => console.log('!!! List catch', error));
@@ -60,7 +61,7 @@ class List extends Component {
   _onFilter (event) {
     const { filter: { property } } = this.props;
     const value = event.target.value;
-    const search = (value && 'All' !== value) ? `?${property}=${value}` : undefined;
+    const search = (value && ! value.match(/^all$/i)) ? `?${property}=${value}` : undefined;
     this.context.router.replace({
       pathname: window.location.pathname,
       search: search
