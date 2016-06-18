@@ -52,7 +52,7 @@ export default class Library extends Component {
       <Link to={`/messages/${message._id}`}>
         {image}
         <div className={classNames.join(' ')}>
-          <button className="button--circle" type="button">
+          <button className="button-circle" type="button">
             Latest Message
           </button>
           <label>{moment(message.date).format('MMM Do')}</label>

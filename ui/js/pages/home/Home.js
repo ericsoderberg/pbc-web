@@ -63,7 +63,7 @@ class Home extends Component {
     }
     // if (page) {
     //   links.push(
-    //     <Link key="search" to="/search" className="link--circle">
+    //     <Link key="search" to="/search">
     //       <span className="link__text">Search</span>
     //     </Link>
     //   );
@@ -76,7 +76,7 @@ class Home extends Component {
       );
     } else {
       links.push(
-        <Link key="session" to="/sign-in" className="link--circle">
+        <Link key="session" to="/sign-in">
           <span className="link__text">Sign In</span>
         </Link>
       );
