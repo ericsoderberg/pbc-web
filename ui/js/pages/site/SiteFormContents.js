@@ -30,7 +30,7 @@ export default class SiteFormContents extends Component {
     if (site.socialUrls && site.socialUrls.length > 0) {
       socialLinks = site.socialUrls.map((url, index) => {
         return (
-          <FormField key={url} label="Social url"
+          <FormField key={index} label="Social url"
             help={
               <button type="button" className="button--link"
                 onClick={formState.removeAt('socialUrls', index)}>

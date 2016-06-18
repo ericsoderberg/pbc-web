@@ -6,6 +6,8 @@ import PageHeader from '../../components/PageHeader';
 import PageContents from '../page/PageContents';
 import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
+import VimeoIcon from '../../icons/Vimeo';
+import YouTubeIcon from '../../icons/YouTube';
 import Stored from '../../components/Stored';
 
 class Home extends Component {
@@ -86,12 +88,15 @@ class Home extends Component {
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
       const links = site.socialUrls.map(url => {
-        const site = url.split('.')[1];
         let contents;
-        if ('facebook' === site) {
+        if (url.match(/facebook/)) {
           contents = <FacebookIcon />;
-        } else if ('twitter' === site) {
+        } else if (url.match(/twitter/)) {
           contents = <TwitterIcon />;
+        } else if (url.match(/vimeo/)) {
+          contents = <VimeoIcon />;
+        } else if (url.match(/youtube/)) {
+          contents = <YouTubeIcon />;
         } else {
           contents = site;
         }
