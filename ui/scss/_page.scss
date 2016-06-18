@@ -30,6 +30,7 @@
   .section.image {
     margin: (- $double-unit) (- $unit);
     width: calc(100% + #{$double-unit});
+    pointer-events: none; // so we don't inhibit neighboring section controls
   }
 }
 
