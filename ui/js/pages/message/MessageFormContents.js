@@ -165,7 +165,7 @@ export default class MessageFormContents extends Component {
             <input name="library" value={message.library || ''}
               onChange={formState.change('library')}/>
           </FormField>
-          <FormField name="path" label="Path">
+          <FormField name="path" label="Path" help="unique url name">
             <input name="path" value={message.path || ''}
               onChange={formState.change('path')}/>
           </FormField>

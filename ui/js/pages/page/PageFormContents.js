@@ -163,7 +163,7 @@ export default class PageFormContents extends Component {
             <input ref="name" name="name" value={page.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
-          <FormField name="path" label="Path">
+          <FormField name="path" label="Path" help="unique url name">
             <input name="path" value={page.path || ''}
               onChange={formState.change('path')}/>
           </FormField>

@@ -182,6 +182,10 @@
 }
 
 .library__message-image {
+  .section__container & {
+    width: 100%;
+  }
+
   .section__container--full & {
     margin: (- $double-unit) (- $unit) $double-unit;
     width: calc(100% + #{$double-unit});
