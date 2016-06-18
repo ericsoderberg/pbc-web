@@ -65,15 +65,6 @@
     flex-direction: row;
     max-width: $page-width;
     margin: 0 auto;
-
-    .button-circle {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      display: block;
-      transform: translate(-50%, -50%);
-      z-index: 1;
-    }
   }
 
   @media all and (max-width: 699px) {
@@ -87,10 +78,11 @@
   flex-direction: column;
   text-decoration: none;
   justify-content: center;
+  align-items: center;
 
   @media all and (min-width: 700px) {
     flex: 1 0 50%;
-    padding: $double-unit $quadruple-unit $double-unit $double-unit;
+    padding: $double-unit;
   }
 
   @media all and (max-width: 699px) {
@@ -101,6 +93,7 @@
     font-size: 32px;
     font-weight: 100;
     text-align: center;
+    margin-top: $unit;
   }
 
   .event-times__times {
