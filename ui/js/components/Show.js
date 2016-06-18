@@ -4,13 +4,14 @@ import { Link } from 'react-router';
 import { getItem, postItem } from '../actions';
 import PageHeader from './PageHeader';
 import Stored from './Stored';
+import Loading from './Loading';
 
 class Show extends Component {
 
   constructor () {
     super();
     this._onCopy = this._onCopy.bind(this);
-    this.state = { item: {} };
+    this.state = { };
   }
 
   componentDidMount () {
@@ -20,6 +21,7 @@ class Show extends Component {
   componentWillReceiveProps (nextProps) {
     if (nextProps.category !== this.props.category ||
       nextProps.params.id !== this.props.params.id) {
+      this.setState({ item: undefined });
       this._load(nextProps);
     }
   }
@@ -51,7 +53,7 @@ class Show extends Component {
     const { item } = this.state;
 
     let controls;
-    if (session && session.administrator) {
+    if (item && session && session.administrator) {
       controls = [
         <a key="copy" href={`/${category}/add`} className="a-header"
           onClick={this._onCopy}>
@@ -64,10 +66,17 @@ class Show extends Component {
       ];
     }
 
+    let contents;
+    if (item) {
+      contents = <Contents item={item} />;
+    } else {
+      contents = <Loading />;
+    }
+
     return (
       <main>
         <PageHeader title={title} back={true} actions={controls} />
-        <Contents item={item} />
+        {contents}
       </main>
     );
   }

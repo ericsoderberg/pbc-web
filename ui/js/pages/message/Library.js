@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItems } from '../../actions';
@@ -9,17 +10,23 @@ import Button from '../../components/Button';
 
 export default class Library extends Component {
 
-  constructor (props) {
-    super(props);
-    this.state = {};
+  constructor () {
+    super();
+    this._onScroll = this._onScroll.bind(this);
+    this.state = { offset: 0 };
   }
 
   componentDidMount () {
     this._load(this.props);
+    window.addEventListener('scroll', this._onScroll);
   }
 
   componentWillReceiveProps (nextProps) {
     this._load(nextProps);
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('scroll', this._onScroll);
   }
 
   _load (props) {
@@ -38,13 +45,25 @@ export default class Library extends Component {
     }
   }
 
+  _onScroll (event) {
+    const elem = findDOMNode(this.refs.image);
+    const rect = elem.getBoundingClientRect();
+    if (rect.top < 0) {
+      this.setState({ offset: Math.floor(Math.abs(rect.top) / 20) });
+    }
+  }
+
   _renderMessage (message) {
     let classNames = ['library__message'];
     let image;
     if (message.image) {
+      const style = {
+        top: this.state.offset,
+        transform: `scale(${1 + (this.state.offset / 600)})`
+      };
       image = (
-        <Image className="library__message-image" image={message.image}
-          plain={true} />
+        <Image ref="image" className="library__message-image"
+          image={message.image} plain={true} style={style} />
       );
       classNames.push('library__message--imaged');
     }

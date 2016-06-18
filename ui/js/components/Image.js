@@ -1,19 +1,22 @@
 "use strict";
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 import Section from './Section';
 
-const Image = (props) => {
-  const { image, full, plain } = props;
-  let classNames = ['image'];
-  if (props.className) {
-    classNames.push(props.className);
-  }
+export default class Image extends Component {
+  render () {
+    const { image, full, plain, style } = this.props;
+    let classNames = ['image'];
+    if (this.props.className) {
+      classNames.push(this.props.className);
+    }
 
-  return (
-    <Section full={full} plain={plain}>
-      <img className={classNames.join(' ')} src={image ? image.data : ''} />
-    </Section>
-  );
+    return (
+      <Section full={full} plain={plain}>
+        <img className={classNames.join(' ')} src={image ? image.data : ''}
+          style={style} />
+      </Section>
+    );
+  }
 };
 
 Image.propTypes = {
@@ -22,5 +25,3 @@ Image.propTypes = {
   }),
   ...Section.propTypes
 };
-
-export default Image;

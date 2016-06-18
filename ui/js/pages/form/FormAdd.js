@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem, postItem } from '../../actions';
+import Loading from '../../components/Loading';
 import FormContents from './FormContents';
 import { setFormError, clearFormError } from './FormUtils';
 
@@ -86,7 +87,7 @@ export default class FormAdd extends Component {
       );
 
     } else {
-      result = <span>Loading ...</span>;
+      result = <Loading />;
     }
     return result;
   }

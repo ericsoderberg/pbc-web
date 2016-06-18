@@ -9,13 +9,14 @@ import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
 import Stored from '../../components/Stored';
+import Loading from '../../components/Loading';
 
 class Home extends Component {
 
   constructor () {
     super();
     this._signOut = this._signOut.bind(this);
-    this.state = { site: {}, page: {} };
+    this.state = {};
   }
 
   componentDidMount () {
@@ -29,9 +30,12 @@ class Home extends Component {
         return Promise.reject();
       }
     })
-    .then(response => this.setState({ page: response }));
+    .then(response => this.setState({ page: response }))
+    .catch(error => console.log('!!! Home catch', error));
+
     getItems('events', { limit: 1, select: 'name' })
     .then(events => this.setState({ haveEvents: events.length > 0 }));
+
     getItems('messages', { limit: 1, select: 'name' })
     .then(messages => this.setState({ haveMessages: messages.length > 0 }));
   }
@@ -42,10 +46,9 @@ class Home extends Component {
     .catch(error => console.log('!!! Home _signOut catch', error));
   }
 
-  render () {
+  _renderLinks () {
     const { session } = this.props;
-    const { site, page, haveEvents, haveMessages } = this.state;
-
+    const { haveEvents, haveMessages } = this.state;
     let links = [];
     if (haveEvents) {
       links.push(
@@ -81,6 +84,20 @@ class Home extends Component {
         </Link>
       );
     }
+    return links;
+  }
+
+  _renderContents () {
+    const { site, page } = this.state;
+
+    let pageContents;
+    if (page) {
+      pageContents = <PageContents key="page" item={page} />;
+    } else {
+      pageContents = <Loading key="page" />;
+    }
+
+    const links = this._renderLinks();
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
@@ -106,21 +123,37 @@ class Home extends Component {
       );
     }
 
+    return [
+      <PageHeader key="header" logo={true} />,
+      pageContents,
+      <div key="footer"
+        className="section__container section__container--footer">
+        <div className="page-links">
+          {links}
+        </div>
+        {socialLinks}
+        <footer className="home__footer footer">
+          <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
+          <a href={`tel:${site.phone}`}>{site.phone}</a>
+          <span>{site.copyright}</span>
+        </footer>
+      </div>
+    ];
+  }
+
+  render () {
+    const { site } = this.state;
+
+    let contents;
+    if (site) {
+      contents = this._renderContents();
+    } else {
+      contents = <Loading />;
+    }
+
     return (
       <main>
-        <PageHeader logo={true} />
-        <PageContents item={page} />
-        <div className="section__container section__container--footer">
-          <div className="page-links">
-            {links}
-          </div>
-          {socialLinks}
-          <footer className="home__footer footer">
-            <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
-            <a href={`tel:${site.phone}`}>{site.phone}</a>
-            <span>{site.copyright}</span>
-          </footer>
-        </div>
+        {contents}
       </main>
     );
   }

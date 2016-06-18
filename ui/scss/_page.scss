@@ -4,8 +4,17 @@
   border-left: 1px solid $nav-background-color;
 }
 
+@keyframes fadein {
+  0% { opacity: 0; top: $unit; }
+  100% { opacity: 1; top: 0; }
+}
+
 .section__container {
+  position: relative;
   padding: 0 $unit;
+  opacity: 0;
+  overflow: hidden;
+  animation: fadein 1s forwards;
 }
 
 .section {
@@ -36,7 +45,8 @@
 
 .section__container--colored {
 
-  a {
+  a,
+  .loading {
     color: inherit;
   }
 }
@@ -182,6 +192,8 @@
 }
 
 .library__message-image {
+  position: relative;
+
   .section__container & {
     width: 100%;
   }
@@ -338,6 +350,14 @@
   @media all and (max-width: 699px) {
     flex-direction: column;
   }
+}
+
+.loading {
+  font-size: 2em;
+  font-weight: 100;
+  color: $secondary-icon-color;
+  margin: $quadruple-unit;
+  text-align: center;
 }
 
 .social-links {

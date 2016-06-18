@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems, getItem } from '../../actions';
 import Section from '../../components/Section';
+import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
@@ -70,7 +71,7 @@ class FormSummary extends Component {
 
     let contents;
     if (! forms || ! formTemplate) {
-      contents = <span>Loading ...</span>;
+      contents = <Loading />;
     } else if (adding || forms.length === 0) {
       const onCancel = forms.length > 0 ? this._onCancel : undefined;
       contents = (

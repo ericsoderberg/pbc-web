@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItem, putItem, deleteItem } from '../../actions';
 import ConfirmRemove from '../../components/ConfirmRemove';
+import Loading from '../../components/Loading';
 import FormContents from './FormContents';
 import { setFormError, clearFormError } from './FormUtils';
 
@@ -94,7 +95,7 @@ export default class FormEdit extends Component {
       );
 
     } else {
-      result = <span>Loading ...</span>;
+      result = <Loading />;
     }
     return result;
   }
