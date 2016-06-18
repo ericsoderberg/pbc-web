@@ -84,7 +84,7 @@ class Home extends Component {
     }
 
     let socialLinks;
-    if (site.socialUrls) {
+    if (site.socialUrls && site.socialUrls.length > 0) {
       const links = site.socialUrls.map(url => {
         const site = url.split('.')[1];
         let contents;
