@@ -26,6 +26,11 @@
     max-width: none;
     margin: 0;
   }
+
+  .section.image {
+    margin: (- $double-unit) (- $unit);
+    width: calc(100% + #{$double-unit});
+  }
 }
 
 .section__container--colored {
