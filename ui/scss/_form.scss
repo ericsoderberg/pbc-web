@@ -94,7 +94,7 @@
 .form-field {
   position: relative;
   background-color: $background-color;
-  border: 1px solid #ccc;
+  border: 1px solid $border-color;
   max-width: $form-width;
   margin: 0 auto;
   margin-bottom: -1px;
@@ -242,8 +242,16 @@
 }
 
 .date-time__details {
-  margin-top: $unit;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background-color: $background-color;
   text-align: center;
+  padding: 0 $unit $unit;
+  border-style: none solid solid;
+  border-width: 1px;
+  border-color: $border-color;
 }
 
 .date-time__header {
