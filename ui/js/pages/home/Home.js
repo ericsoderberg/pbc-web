@@ -49,16 +49,14 @@ class Home extends Component {
     let links = [];
     if (haveEvents) {
       links.push(
-        <Link key="calendar" to="/calendar?name=Main"
-          className="link--circle">
+        <Link key="calendar" to="/calendar">
           <span className="link__text">Calendar</span>
         </Link>
       );
     }
     if (haveMessages) {
       links.push(
-        <Link key="libray" to="/messages?library=Main"
-          className="link--circle">
+        <Link key="libray" to="/messages">
           <span className="link__text">Messages</span>
         </Link>
       );
@@ -72,8 +70,7 @@ class Home extends Component {
     // }
     if (session && session.token) {
       links.push(
-        <a key="session" className="link--circle"
-          onClick={this._signOut}>
+        <a key="session" onClick={this._signOut}>
           <span className="link__text">Sign Out</span>
         </a>
       );

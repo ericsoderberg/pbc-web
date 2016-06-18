@@ -312,8 +312,8 @@
     align-items: center;
     flex-wrap: wrap;
     max-width: $page-width;
-    margin: 0 auto;
-    padding: $double-unit 0;
+    margin: 0 auto $double-unit;
+    padding-top: $double-unit;
 
     > * {
       flex: 0 0 auto;
@@ -368,8 +368,7 @@
   align-items: center;
   flex-wrap: wrap;
   max-width: $page-width;
-  margin: 0 auto;
-  padding: $double-unit 0;
+  margin: $double-unit auto;
 
   > * {
     flex: 0 0 auto;
