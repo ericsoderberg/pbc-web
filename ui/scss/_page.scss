@@ -14,7 +14,30 @@
   padding: 0 $unit;
   opacity: 0;
   overflow: hidden;
-  animation: fadein 1s forwards;
+
+  @media all and (min-width: 700px) {
+    animation: fadein 1s forwards;
+
+    &:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 1.2s;
+    }
+
+    &:nth-child(4) {
+      animation-delay: 1.8s;
+    }
+
+    &:nth-child(5) {
+      animation-delay: 2.4s;
+    }
+
+    &:nth-child(6) {
+      animation-delay: 3s;
+    }
+  }
 }
 
 .section {
@@ -45,8 +68,7 @@
 
 .section__container--colored {
 
-  a,
-  .loading {
+  a {
     color: inherit;
   }
 }
@@ -193,6 +215,7 @@
 
 .library__message-image {
   position: relative;
+  margin-bottom: -4px;
 
   .section__container & {
     width: 100%;
@@ -253,6 +276,7 @@
 
   img {
     width: 100%;
+    margin-bottom: -4px;
   }
 
   &:hover {
@@ -353,11 +377,37 @@
 }
 
 .loading {
-  font-size: 2em;
-  font-weight: 100;
-  color: $secondary-icon-color;
-  margin: $quadruple-unit;
-  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    margin: $unit;
+    fill: $secondary-icon-color;
+    animation-name: fadein;
+    animation-delay: 1s;
+    animation-duration: 1s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+
+    &:nth-child(2) {
+      animation-delay: 1.3s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 1.6s;
+    }
+
+    &:nth-child(4) {
+      animation-delay: 1.9s;
+    }
+
+    .section__container--colored & {
+      fill: $secondary-background-color;
+    }
+  }
 }
 
 .social-links {
