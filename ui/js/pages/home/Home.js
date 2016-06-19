@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getSite, getItems, getItem, deleteSession } from '../../actions';
-import PageHeader from '../../components/PageHeader';
+// import PageHeader from '../../components/PageHeader';
 import PageContents from '../page/PageContents';
 import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
@@ -124,7 +124,7 @@ class Home extends Component {
     }
 
     return [
-      <PageHeader key="header" logo={true} />,
+      // <PageHeader key="header" logo={true} />,
       pageContents,
       <div key="footer"
         className="section__container section__container--footer">

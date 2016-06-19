@@ -35,7 +35,7 @@ export default class FormPreview extends Component {
           <FormContents form={form} formTemplate={formTemplate}
             onChange={this._onChange} />
           <footer className="form__footer">
-            <button type="submit">
+            <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}
             </button>
           </footer>
