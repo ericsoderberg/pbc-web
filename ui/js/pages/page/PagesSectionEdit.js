@@ -4,6 +4,8 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import FormState from '../../utils/FormState';
+import DownIcon from '../../icons/Down';
+import UpIcon from '../../icons/Up';
 import CloseIcon from '../../icons/Close';
 import SectionFields from './SectionFields';
 
@@ -23,26 +25,45 @@ class SubPageEdit extends Component {
   }
 
   render () {
-    const { index, onRemove } = this.props;
+    const { index, onRemove, onRaise, onLower } = this.props;
     const { formState } = this.state;
     const pageSummary = formState.object;
+    const pageId = typeof pageSummary.id === 'object' ? pageSummary.id._id :
+      pageSummary.id;
 
     const pages = this.props.pages.map(page => (
       <option key={page._id} label={page.name} value={page._id} />
     ));
     pages.unshift(<option key={0} />);
 
+    const raise = (onRaise ? (
+      <button type="button" className="button-icon" onClick={onRaise}>
+        <UpIcon />
+      </button>
+    ) : undefined);
+    const lower = (onLower ? (
+      <button type="button" className="button-icon" onClick={onLower}>
+        <DownIcon />
+      </button>
+    ) : undefined);
+
     return (
       <div>
-        <legend>{`Page ${index + 1}`}</legend>
-        <FormField label="Page"
-          closeControl={
+        <div className="form__fields-header">
+          <span className="form__fields-header-label">
+            {`page ${index + 1}`}
+          </span>
+          <span className="form__fields-header-actions">
+            {raise}
+            {lower}
             <button type="button" className="button-icon"
               onClick={onRemove}>
               <CloseIcon secondary={true} />
             </button>
-          }>
-          <select name={`id-${index}`} value={pageSummary.id || ''}
+          </span>
+        </div>
+        <FormField label="Page">
+          <select name={`id-${index}`} value={pageId || ''}
             onChange={formState.change('id')}>
             {pages}
           </select>
@@ -58,6 +79,8 @@ class SubPageEdit extends Component {
 SubPageEdit.propTypes = {
   index: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
+  onRaise: PropTypes.func,
+  onLower: PropTypes.func,
   onRemove: PropTypes.func.isRequired,
   pages: PropTypes.array.isRequired,
   pageSummary: PropTypes.object.isRequired
@@ -110,20 +133,30 @@ export default class PagesSectionEdit extends Component {
   render () {
     const { formState } = this.state;
     const section = formState.object;
+    const pages = section.pages || [{}];
 
-    const subPages = (section.pages || [{}]).map((pageSummary, index) => (
+    const subPages = pages.map((pageSummary, index) => {
+      return (
       <SubPageEdit key={index} pageSummary={pageSummary} index={index}
         pages={this.state.pages}
+        onRaise={index > 0 ?
+          formState.swapWith('pages', index, index-1) : undefined}
+        onLower={index < (pages.length - 1) ?
+          formState.swapWith('pages', index, index+1) : undefined}
         onChange={(nextPageSummary) => this._onChangePage(nextPageSummary, index)}
         onRemove={formState.removeAt('pages', index)} />
-    ));
+    );});
 
     return (
       <div>
         <fieldset className="form__fields">
           <SectionFields formState={formState} />
           {subPages}
-          <div><legend>{`Page ${subPages.length + 1}`}</legend></div>
+          <div className="form__fields-header">
+            <span className="form__fields-header-label">
+              {`page ${subPages.length + 1}`}
+            </span>
+          </div>
           <FormField>
             <div className="form__tabs">
               <button type="button" className="button button--secondary"

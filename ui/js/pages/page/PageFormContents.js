@@ -91,7 +91,7 @@ export default class PageFormContents extends Component {
           onClick={formState.swapWith('sections', index, index+1)}>
           <DownIcon />
         </button>
-        ));
+      ));
 
       let edit;
       if (expandedSections[section._id] || expandedSections[section.id]) {
