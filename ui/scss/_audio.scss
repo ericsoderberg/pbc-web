@@ -16,6 +16,7 @@
 
 .audio__position {
   flex: 1;
+  padding: $unit 0;
 
   // Reset
   &[type=range] {

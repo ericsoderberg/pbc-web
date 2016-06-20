@@ -14,6 +14,7 @@ class App extends Component {
 
   _onToggle () {
     this.setState({ navActive: ! this.state.navActive });
+    window.scrollTo(0, 0);
   }
 
   render () {

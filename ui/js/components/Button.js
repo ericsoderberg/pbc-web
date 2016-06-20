@@ -10,7 +10,11 @@ export default class Button extends Component {
 
   _onClick (event) {
     event.preventDefault();
-    this.context.router.push(this.props.path);
+    if (this.props.replaceHistory) {
+      this.context.router.replace(this.props.path);
+    } else {
+      this.context.router.push(this.props.path);
+    }
   }
 
   render () {
@@ -68,6 +72,7 @@ Button.propTypes = {
   left: PropTypes.bool,
   onClick: PropTypes.func,
   path: PropTypes.string,
+  replaceHistory: PropTypes.bool,
   right: PropTypes.bool,
   secondary: PropTypes.bool,
   tag: PropTypes.string,

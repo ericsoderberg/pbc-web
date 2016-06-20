@@ -187,10 +187,10 @@
 
   @media all and (max-width: 699px) {
     flex-direction: column;
-    padding: 0 $unit;
+    padding: 0;
 
     button {
-      margin: $half-unit 0;
+      margin: $unit 0;
     }
   }
 }

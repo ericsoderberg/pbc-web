@@ -14,7 +14,7 @@ export default class MessageContents extends Component {
   _renderMessageNav (message, type) {
     return (
       <Button left={'previous' === type} right={'next' === type}
-        path={`/messages/${message.path || message._id}`}>
+        path={`/messages/${message.path || message._id}`} replaceHistory={true}>
         <div className="message__nav-name">{message.name}</div>
         <div className="message__nav-verses">{message.verses}</div>
       </Button>

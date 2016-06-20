@@ -1,5 +1,6 @@
 
 .app {
+  position: relative;
   display: flex;
   flex-direction: row;
   min-height: 100vh;
@@ -12,9 +13,10 @@
 
   @media all and (max-width: 699px) {
     position: absolute;
-    top: 0px;
+    bottom: 0px;
     left: 0px;
-    margin-left: - $half-unit;
+    z-index: 2;
+    // margin-left: - $half-unit;
   }
 }
 
@@ -154,6 +156,13 @@
   border-left-style: solid;
   background-color: transparent;
   font-size: 1.4rem;
+}
+
+.page-header__actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: $double-unit;
 }
 
 .a-header,

@@ -91,7 +91,15 @@
 
 .video {
   width: 100%;
-  height: 540px;
+
+  @media all and (min-width: 700px) {
+    height: 540px;
+  }
+
+  @media all and (max-width: 699px) {
+    padding: $unit 0;
+    height: 62vw; // empirically determined
+  }
 }
 
 .event-summary {
@@ -206,7 +214,7 @@
 
 .library__message--imaged {
   margin-top: -4px;
-  
+
   // @media all and (min-width: 700px) {
   //   .button-circle {
   //     top: 0;

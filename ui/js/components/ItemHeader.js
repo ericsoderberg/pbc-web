@@ -29,22 +29,24 @@ class ItemHeader extends Component {
   render () {
     const { category, item, title, session } = this.props;
 
-    let controls;
+    let actions;
     if (item && session && session.administrator) {
-      controls = [
-        <a key="copy" href={`/${category}/add`} className="a-header"
-          onClick={this._onCopy}>
-          Copy
-        </a>,
-        <Link key="edit" to={`/${category}/${item.path || item._id}/edit`}
-          className="a-header">
-          Edit
-        </Link>
-      ];
+      actions = (
+        <nav className="page-header__actions">
+          <a href={`/${category}/add`} className="a-header"
+            onClick={this._onCopy}>
+            Copy
+          </a>
+          <Link to={`/${category}/${item.path || item._id}/edit`}
+            className="a-header">
+            Edit
+          </Link>
+        </nav>
+      );
     }
 
     return (
-      <PageHeader title={title} back={true} actions={controls} />
+      <PageHeader title={title} back={true} actions={actions} />
     );
   }
 };

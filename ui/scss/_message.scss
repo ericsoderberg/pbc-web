@@ -1,8 +1,19 @@
 
 .message__nav {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column-reverse;
+
+    > * {
+      margin: $quarter-unit 0;
+    }
+  }
 }
 
 .message__nav-next,
