@@ -11,7 +11,7 @@ import './db';
 import { render as renderNewsletter } from './newsletter';
 
 const FILES_PATH = 'public/files';
-const ID_REGEXP = /^[A-Za-z0-9]+$/;
+const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 const router = express.Router();
 
@@ -87,15 +87,23 @@ const register = (category, modelName, options={}) => {
     router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
-      const criteria = (ObjectID.isValid(id) && ID_REGEXP.test(id)) ?
+      const criteria = ID_REGEXP.test(id) ?
         {_id: id} : {path: id};
       let query = Doc.findOne(criteria);
       if (req.query.select) {
         query.select(req.query.select);
       }
-      if (options.populate) {
-        query = query.populate(options.populate);
+      if (req.query.populate) {
+        const populate = JSON.parse(req.query.populate);
+        if (Array.isArray(populate)) {
+          populate.forEach(pop => query.populate(pop));
+        } else {
+          query.populate(populate);
+        }
       }
+      // if (options.populate) {
+      //   query = query.populate(options.populate);
+      // }
       query.exec()
       .then(doc => (transform.get ? transform.get(doc) : doc))
       .then(doc => res.json(doc))

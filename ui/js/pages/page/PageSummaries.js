@@ -10,7 +10,7 @@ export default class PageSummaries extends Component {
 
   constructor () {
     super();
-    this.state = {pages: {} };
+    this.state = { pages: {} };
   }
 
   componentDidMount () {
@@ -22,9 +22,11 @@ export default class PageSummaries extends Component {
   }
 
   _load (props) {
+    // When editing, we have id's but not names, get the names we need
     props.pages.forEach(pageRef => {
-      if (! this.state.pages[pageRef.id]) {
-        getItem('pages', pageRef.id, { select: 'name' })
+      if (typeof pageRef.id === 'string' &&
+        ! this.state.pages[pageRef.id]) {
+        getItem('pages', pageRef.id, { select: 'name path' })
         .then(page => {
           let pages = { ...this.state.pages };
           pages[pageRef.id] = page;
@@ -38,21 +40,27 @@ export default class PageSummaries extends Component {
   render () {
     const { color, full, plain, pages } = this.props;
 
-    const links = (pages || []).map(pageRef => {
-      const page = this.state.pages[pageRef.id] || {};
+    const links = (pages || []).map((pageRef, index) => {
+      let page;
+      if (typeof pageRef.id === 'object') {
+       // populated on server
+        page = pageRef.id;
+      } else {
+        // populated via _load
+        page = this.state.pages[pageRef.id] || {};
+      }
+      let path = page.path ? `/${page.path}` : `/pages/${page._id}`;
       let link;
       if (pageRef.image) {
         link = (
-          <Link key={pageRef.id} className="page-tile"
-            to={page.path || `/pages/${page._id}`}>
+          <Link key={index} className="page-tile" to={path}>
             <Image image={pageRef.image} plain={true} />
             <Button right={true}>{page.name}</Button>
           </Link>
         );
       } else {
         link = (
-          <Button key={pageRef.id} circle={true}
-            path={page.path || `/pages/${page._id}`}>
+          <Button key={index} circle={true} path={path}>
             {page.name}
           </Button>
         );
@@ -72,6 +80,5 @@ export default class PageSummaries extends Component {
 
 PageSummaries.propTypes = {
   pages: PropTypes.array,
-  id: PropTypes.string,
   ...Section.propTypes
 };

@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import { getSite, getItems, getItem, deleteSession } from '../../actions';
+import { getSite, getItems, getPage, deleteSession } from '../../actions';
 // import PageHeader from '../../components/PageHeader';
 import PageContents from '../page/PageContents';
 import FacebookIcon from '../../icons/Facebook';
@@ -20,18 +20,18 @@ class Home extends Component {
   }
 
   componentDidMount () {
-    getSite()
-    .then(site => {
-      this.setState({ site: site });
-      if (site.homePageId) {
-        document.title = site.name;
-        return getItem('pages', site.homePageId);
-      } else {
-        return Promise.reject();
-      }
-    })
-    .then(response => this.setState({ page: response }))
-    .catch(error => console.log('!!! Home catch', error));
+    if (! this.props.site) {
+      getSite()
+      .then(site => {
+        if (site.homePageId) {
+          document.title = site.name;
+          return getPage(site.homePageId);
+        } else {
+          return Promise.reject();
+        }
+      })
+      .catch(error => console.log('!!! Home catch', error));
+    }
 
     getItems('events', { limit: 1, select: 'name' })
     .then(events => this.setState({ haveEvents: events.length > 0 }));
@@ -88,7 +88,7 @@ class Home extends Component {
   }
 
   _renderContents () {
-    const { site, page } = this.state;
+    const { site, page } = this.props;
 
     let pageContents;
     if (page) {
@@ -142,7 +142,7 @@ class Home extends Component {
   }
 
   render () {
-    const { site } = this.state;
+    const { site } = this.props;
 
     let contents;
     if (site) {
@@ -160,17 +160,27 @@ class Home extends Component {
 };
 
 Home.propTypes = {
+  page: PropTypes.object,
   session: PropTypes.shape({
     token: PropTypes.any
-  })
+  }),
+  site: PropTypes.object
 };
 
 Home.contextTypes = {
   router: PropTypes.any
 };
 
-const select = (state, props) => ({
-  session: state.session
-});
+const select = (state, props) => {
+  let page;
+  if (state.site && state.pages) {
+    page = state.pages[state.site.homePageId];
+  }
+  return {
+    page: page,
+    session: state.session,
+    site: state.site
+  };
+};
 
 export default Stored(Home, select);

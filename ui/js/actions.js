@@ -20,7 +20,7 @@ const processStatus = (response) => {
 const setSession = (session) => {
   _sessionId = session._id;
   _headers.Authorization = `Token token=${session.token}`;
-  dispatch(state => ({ session: session }));
+  dispatch(state => ({ ...state, session: session }));
   localStorage.session = JSON.stringify(session);
   return session;
 };
@@ -123,6 +123,36 @@ export function deleteItem (category, id) {
   .then(processStatus);
 }
 
+// Page
+
+export function getPage (id) {
+  return getItem('pages', id, {
+    populate: [
+      { path: 'sections.pages.id', select: 'name path' }
+    ]
+  })
+  .then(page => {
+    dispatch(state => {
+      let pages = state.pages || {};
+      pages[page.path || page._id] = page;
+      return { ...state, pages: pages };
+    });
+    return page;
+  });
+}
+
+export function putPage (page) {
+  return putItem ('pages', page)
+  .then(page => {
+    dispatch(state => {
+      let pages = state.pages || {};
+      pages[page.path || page._id] = page;
+      return { ...state, pages: pages };
+    });
+    return page;
+  });
+}
+
 // User
 
 export function postSignUp (user) {
@@ -136,7 +166,11 @@ export function postSignUp (user) {
 
 export function getSite () {
   return fetch('/api/site', { method: 'GET', headers: _headers })
-  .then(response => response.json());
+  .then(response => response.json())
+  .then(site => {
+    dispatch(state => ({ ...state, site: site }));
+    return site;
+  });;
 }
 
 export function postSite (site) {

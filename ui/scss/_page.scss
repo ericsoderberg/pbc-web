@@ -205,16 +205,18 @@
 }
 
 .library__message--imaged {
-  @media all and (min-width: 700px) {
-    .button-circle {
-      top: 0;
-    }
-  }
+  margin-top: -4px;
+  
+  // @media all and (min-width: 700px) {
+  //   .button-circle {
+  //     top: 0;
+  //   }
+  // }
 }
 
 .library__message-image {
   position: relative;
-  margin-bottom: -4px;
+  // margin-bottom: -4px;
 
   .section__container & {
     width: 100%;

@@ -1,17 +1,14 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
-import { getItem, postItem } from '../actions';
-import PageHeader from './PageHeader';
-import Stored from './Stored';
+import { getItem } from '../actions';
+import ItemHeader from './ItemHeader';
 import Loading from './Loading';
 
-class Show extends Component {
+export default class Show extends Component {
 
   constructor () {
     super();
-    this._onCopy = this._onCopy.bind(this);
-    this.state = { };
+    this.state = {};
   }
 
   componentDidMount () {
@@ -19,52 +16,30 @@ class Show extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.category !== this.props.category ||
-      nextProps.params.id !== this.props.params.id) {
-      this.setState({ item: undefined });
+    if ((nextProps.category !== this.props.category ||
+      nextProps.params.id !== this.props.params.id)) {
       this._load(nextProps);
     }
   }
 
   _load (props) {
-    getItem(props.category, props.params.id)
-    .then(item => {
-      document.title = item.name;
-      this.setState({ item: item });
-    })
-    .catch(error => console.log('!!! Show catch', error));
-  }
-
-  _onCopy (event) {
-    event.preventDefault();
-    const { category } = this.props;
-    const copyItem = { ...this.state.item };
-    copyItem.name += ' - Copy';
-    delete copyItem._id;
-    postItem(category, copyItem)
-    .then(newItem => {
-      this.context.router.push(`/${category}/${newItem._id}/edit`);
-    })
-    .catch(error => this.setState({ error: error }));
+    if (props.item) {
+      document.title = props.item.name;
+      this.setState({ item: props.item });
+    } else {
+      this.setState({ item: undefined });
+      getItem(props.category, props.params.id)
+      .then(item => {
+        document.title = item.name;
+        this.setState({ item: item });
+      })
+      .catch(error => console.log('!!! Show catch', error));
+    }
   }
 
   render () {
-    const { category, Contents, title, session } = this.props;
+    const { category, Contents, title } = this.props;
     const { item } = this.state;
-
-    let controls;
-    if (item && session && session.administrator) {
-      controls = [
-        <a key="copy" href={`/${category}/add`} className="a-header"
-          onClick={this._onCopy}>
-          Copy
-        </a>,
-        <Link key="edit" to={`/${category}/${item._id}/edit`}
-          className="a-header">
-          Edit
-        </Link>
-      ];
-    }
 
     let contents;
     if (item) {
@@ -75,7 +50,7 @@ class Show extends Component {
 
     return (
       <main>
-        <PageHeader title={title} back={true} actions={controls} />
+        <ItemHeader title={title} category={category} item={item} />
         {contents}
       </main>
     );
@@ -85,11 +60,9 @@ class Show extends Component {
 Show.propTypes = {
   category: PropTypes.string.isRequired,
   Contents: PropTypes.func.isRequired,
+  item: PropTypes.object,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
-  }).isRequired,
-  session: PropTypes.shape({
-    administrator: PropTypes.bool
   }),
   title: PropTypes.string
 };
@@ -97,9 +70,3 @@ Show.propTypes = {
 Show.contextTypes = {
   router: PropTypes.any
 };
-
-const select = (state, props) => ({
-  session: state.session
-});
-
-export default Stored(Show, select);
