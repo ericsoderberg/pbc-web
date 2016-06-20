@@ -44,6 +44,8 @@ export default class Button extends Component {
           <path d='M0,0 L24,12 L0,24 Z' />
         </svg>
       );
+    } else {
+      classNames.push(`button`);
     }
     if (secondary) {
       classNames.push('button--secondary');

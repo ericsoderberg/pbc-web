@@ -284,12 +284,15 @@
 .page-tile {
   flex: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   cursor: pointer;
+  margin: $half-unit;
 
   img {
     width: 100%;
-    margin-bottom: -4px;
+    // margin-bottom: -4px;
   }
 
   &:hover {

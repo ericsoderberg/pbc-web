@@ -55,7 +55,7 @@ export default class PageSummaries extends Component {
         link = (
           <Link key={index} className="page-tile" to={path}>
             <Image image={pageRef.image} plain={true} />
-            <Button right={true}>{page.name}</Button>
+            <Button>{page.name}</Button>
           </Link>
         );
       } else {
