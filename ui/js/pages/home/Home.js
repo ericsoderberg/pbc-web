@@ -1,13 +1,12 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
-import { getSite, getItems, getPage, deleteSession } from '../../actions';
-// import PageHeader from '../../components/PageHeader';
+import { getSite, getPage, deleteSession } from '../../actions';
 import PageContents from '../page/PageContents';
 import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
+import Button from '../../components/Button';
 import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
 
@@ -32,12 +31,6 @@ class Home extends Component {
       })
       .catch(error => console.log('!!! Home catch', error));
     }
-
-    getItems('events', { limit: 1, select: 'name' })
-    .then(events => this.setState({ haveEvents: events.length > 0 }));
-
-    getItems('messages', { limit: 1, select: 'name' })
-    .then(messages => this.setState({ haveMessages: messages.length > 0 }));
   }
 
   _signOut () {
@@ -46,45 +39,23 @@ class Home extends Component {
     .catch(error => console.log('!!! Home _signOut catch', error));
   }
 
-  _renderLinks () {
+  _renderSession () {
     const { session } = this.props;
-    const { haveEvents, haveMessages } = this.state;
-    let links = [];
-    if (haveEvents) {
-      links.push(
-        <Link key="calendar" to="/calendar">
-          <span className="link__text">Calendar</span>
-        </Link>
-      );
-    }
-    if (haveMessages) {
-      links.push(
-        <Link key="libray" to="/messages">
-          <span className="link__text">Messages</span>
-        </Link>
-      );
-    }
-    // if (page) {
-    //   links.push(
-    //     <Link key="search" to="/search">
-    //       <span className="link__text">Search</span>
-    //     </Link>
-    //   );
-    // }
+    let sessionControl;
     if (session && session.token) {
-      links.push(
-        <a key="session" onClick={this._signOut}>
+      sessionControl = (
+        <a onClick={this._signOut}>
           <span className="link__text">Sign Out</span>
         </a>
       );
     } else {
-      links.push(
-        <Link key="session" to="/sign-in">
-          <span className="link__text">Sign In</span>
-        </Link>
+      sessionControl = (
+        <Button path="/sign-in">
+          Sign In
+        </Button>
       );
     }
-    return links;
+    return sessionControl;
   }
 
   _renderContents () {
@@ -97,11 +68,11 @@ class Home extends Component {
       pageContents = <Loading key="page" />;
     }
 
-    const links = this._renderLinks();
+    const sessionControl = this._renderSession();
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
-      const links = site.socialUrls.map(url => {
+      socialLinks = site.socialUrls.map(url => {
         let contents;
         if (url.match(/facebook/)) {
           contents = <FacebookIcon />;
@@ -116,11 +87,11 @@ class Home extends Component {
         }
         return <a key={url} href={url}>{contents}</a>;
       });
-      socialLinks = (
-        <div className="social-links">
-          {links}
-        </div>
-      );
+    }
+
+    let logo;
+    if (site && site.logo) {
+      logo = <img className="home__logo" src={site.logo.data} />;
     }
 
     return [
@@ -128,10 +99,13 @@ class Home extends Component {
       pageContents,
       <div key="footer"
         className="section__container section__container--footer">
-        <div className="page-links">
-          {links}
+        <div className="footer__links">
+          <div className="home__brand">
+            {logo}
+            {socialLinks}
+          </div>
+          {sessionControl}
         </div>
-        {socialLinks}
         <footer className="home__footer footer">
           <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
           <a href={`tel:${site.phone}`}>{site.phone}</a>

@@ -169,6 +169,8 @@
 @import 'audio';
 
 .library {
+  overflow: hidden;
+
   > a {
     display: block;
     text-decoration: none;
@@ -220,6 +222,7 @@
 
 .library__message-image {
   position: relative;
+  max-width: 100%;
   // margin-bottom: -4px;
 
   .section__container & {
@@ -254,6 +257,10 @@
 .page-summaries {
   display: flex;
 
+  > * {
+    margin: $half-unit 0;
+  }
+
   @media all and (min-width: 700px) {
     flex-direction: row;
     justify-content: space-between;
@@ -265,10 +272,6 @@
   @media all and (max-width: 699px) {
     flex-direction: column;
     align-items: center;
-
-    > * {
-      margin: $half-unit 0;
-    }
   }
 }
 
@@ -334,12 +337,12 @@
     align-items: center;
     flex-wrap: wrap;
     max-width: $page-width;
-    margin: 0 auto $double-unit;
-    padding-top: $double-unit;
+    margin: 0 auto $unit;
+    padding-top: $unit;
 
     > * {
       flex: 0 0 auto;
-      margin: 0 $unit;
+      margin: $unit;
     }
   }
 
@@ -417,18 +420,43 @@
   }
 }
 
-.social-links {
+.footer__links {
+  display: flex;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    max-width: $page-width;
+    margin: $double-unit auto;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+    margin: $unit;
+  }
+}
+
+.home__brand {
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
-  max-width: $page-width;
-  margin: $double-unit auto;
+
+  @media all and (max-width: 699px) {
+    margin-bottom: $unit;
+  }
 
   > * {
     flex: 0 0 auto;
-    margin: 0 $unit;
+    margin: 0 $half-unit;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }
 
