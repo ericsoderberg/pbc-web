@@ -262,7 +262,7 @@
     justify-content: space-between;
     flex-wrap: wrap;
     max-width: $page-width;
-    margin: 0 auto;
+    margin: $double-unit auto;
 
     > * {
       margin: $half-unit;
@@ -293,6 +293,7 @@
 
   @media all and (max-width: 699px) {
     margin: 0 0 $half-unit;
+    width: 100%;
 
     &:last-child {
       margin-bottom: 0;
