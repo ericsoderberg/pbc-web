@@ -157,6 +157,10 @@
     flex: 0 0 50%;
   }
 
+  @media all and (max-width: 699px) {
+    width: 100%;
+  }
+
   .map {
     height: round($unit * 12);
 

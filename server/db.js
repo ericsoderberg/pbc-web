@@ -49,6 +49,7 @@ const pageSectionSchema = Schema({
   name: String,       // library type
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },  // event type
   formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },   // form type
+  navigable: Boolean, // event type
   pages: [{           // pages type
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
     image: image

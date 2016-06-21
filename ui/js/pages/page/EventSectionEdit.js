@@ -41,6 +41,12 @@ export default class EventSectionEdit extends Component {
             {events}
           </select>
         </FormField>
+        <FormField>
+          <input name="navigable" type="checkbox"
+            checked={(false === section.navigable ? section.navigable : true)}
+            onChange={formState.toggle('navigable')}/>
+          <label htmlFor="navigable">Navigable?</label>
+        </FormField>
         <SectionFields formState={formState} />
       </fieldset>
     );

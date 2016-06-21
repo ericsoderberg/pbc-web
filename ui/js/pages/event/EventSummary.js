@@ -36,8 +36,24 @@ export default class EventSummary extends Component {
   }
 
   render () {
-    const { color, full, plain } = this.props;
+    const { color, full, plain, navigable } = this.props;
     const { event } = this.state;
+
+    let contents;
+    if (false === navigable) {
+      contents = (
+        <div className="event-summary__summary">
+          <EventTimes event={event} />
+        </div>
+      );
+    } else {
+      contents = (
+        <Link to={`/events/${event._id}`} className="event-summary__summary">
+          <Button right={true}>{event.name}</Button>
+          <EventTimes event={event} />
+        </Link>
+      );
+    }
 
     let map;
     if (event.address) {
@@ -47,13 +63,11 @@ export default class EventSummary extends Component {
         </div>
       );
     }
+
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="event-summary">
-          <Link to={`/events/${event._id}`} className="event-summary__summary">
-            <Button right={true}>{event.name}</Button>
-            <EventTimes event={event} />
-          </Link>
+          {contents}
           {map}
         </div>
       </Section>
@@ -63,5 +77,6 @@ export default class EventSummary extends Component {
 
 EventSummary.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+  navigable: PropTypes.bool,
   ...Section.propTypes
 };

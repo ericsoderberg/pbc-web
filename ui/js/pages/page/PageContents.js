@@ -19,7 +19,7 @@ const PageContents = (props) => {
     } else if ('event' === section.type) {
       return (
         <EventSummary key={index} full={section.full} color={section.color}
-          id={section.eventId} />
+          id={section.eventId} navigable={section.navigable} />
       );
     } else if ('library' === section.type) {
       return (
