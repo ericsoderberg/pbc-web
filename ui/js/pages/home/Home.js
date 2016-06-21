@@ -44,7 +44,7 @@ class Home extends Component {
     let sessionControl;
     if (session && session.token) {
       sessionControl = (
-        <a onClick={this._signOut}>
+        <a className="home__sign-out" onClick={this._signOut}>
           <span className="link__text">Sign Out</span>
         </a>
       );

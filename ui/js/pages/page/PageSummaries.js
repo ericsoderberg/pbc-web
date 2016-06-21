@@ -38,7 +38,7 @@ export default class PageSummaries extends Component {
   }
 
   render () {
-    const { color, full, plain, pages } = this.props;
+    const { color, full, pages } = this.props;
 
     const links = (pages || []).map((pageRef, index) => {
       let page;
@@ -69,7 +69,7 @@ export default class PageSummaries extends Component {
     });
 
     return (
-      <Section color={color} full={full} plain={plain}>
+      <Section color={color} full={full} plain={full}>
         <div className="page-summaries">
           {links}
         </div>
