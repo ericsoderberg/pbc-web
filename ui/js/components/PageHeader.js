@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getSite } from '../actions';
 import BackIcon from '../icons/Back';
+import Search from './Search';
 
 export default class PageHeader extends Component {
 
@@ -42,22 +43,23 @@ export default class PageHeader extends Component {
 
     let backControl;
     if (homer) {
-      let classNames = ['button-header'];
       let contents;
+      let className;
       if (site && site.logo) {
         contents = <img className="page-header__logo" src={site.logo.data} />;
-        classNames.push('button-icon');
+        className = 'button-icon';
       } else {
         contents = 'Home';
+        className = 'button-header';
       }
       backControl = (
-        <button className={classNames.join(' ')} onClick={this._onHome}>
+        <button className={className} onClick={this._onHome}>
           {contents}
         </button>
       );
     } else if (back) {
       backControl = (
-        <button className="button-header button-icon" onClick={this._onBack}>
+        <button className="button-icon" onClick={this._onBack}>
           <BackIcon />
         </button>
       );
@@ -65,11 +67,7 @@ export default class PageHeader extends Component {
 
     let search;
     if (onSearch) {
-      search = (
-        <input className="page-header__search"
-          placeholder="Search"
-          value={searchText} onChange={onSearch} />
-      );
+      search = <Search value={searchText} onChange={onSearch} />;
     }
 
     let h1;

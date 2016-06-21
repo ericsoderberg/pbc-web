@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItems } from '../actions';
 import PageHeader from './PageHeader';
+import Filter from './Filter';
 import Stored from './Stored';
 
 class List extends Component {
@@ -108,19 +109,12 @@ class List extends Component {
       );
     }
 
-    let filterControl;
+    let filterAction;
     if (filter && filter.options && filter.options.length > 0) {
-      let options = filter.options.map(option => (
-        <option key={option.value} value={option.value}>
-          {option.label || option.value}
-        </option>
-      ));
-      options.unshift(<option key="_all" value="all">All</option>);
-      filterControl = (
-        <select key="filter" className="select-header"
-          value={filterValue} onChange={this._onFilter}>
-          {options}
-        </select>
+      filterAction = (
+        <Filter key="filter" options={filter.options}
+          value={filterValue}
+          onChange={this._onFilter} />
       );
     }
 
@@ -128,7 +122,7 @@ class List extends Component {
       <main>
         <PageHeader title={title} homer={homer}
           searchText={searchText} onSearch={this._onSearch}
-          actions={[filterControl, addControl]} />
+          actions={[filterAction, addControl]} />
         <ul className="list">
           {items}
         </ul>
@@ -141,10 +135,7 @@ List.propTypes = {
   category: PropTypes.string,
   filter: PropTypes.shape({
     property: PropTypes.string.isRequired,
-    options: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.string,
-      value: PropTypes.any.isRequired
-    })).isRequired
+    options: PropTypes.arrayOf(PropTypes.string).isRequired
   }),
   homer: PropTypes.bool,
   Item: PropTypes.func.isRequired,

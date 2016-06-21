@@ -14,9 +14,7 @@ export default class Messages extends Component {
 
   componentDidMount () {
     getItems('messages', { distinct: 'library' })
-    .then(response => this.setState({ filterOptions:
-      // convert to options format with label and value properties
-      response.map(value => ({ label: value, value: value }))}))
+    .then(response => this.setState({ filterOptions: response }))
     .catch(error => console.log('!!! Messages catch', error));
   }
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import moment from 'moment';
 import { getCalendar, getItems } from '../../actions';
 import PageHeader from '../../components/PageHeader';
+import Filter from '../../components/Filter';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
 
@@ -26,7 +27,7 @@ export default class Calendar extends Component {
 
     // Load the possible calendars
     getItems('events', { distinct: 'calendar' })
-    .then(response => this.setState({ filterValues: response }))
+    .then(response => this.setState({ filterOptions: response }))
     .catch(error => console.log('!!! Calendar filter catch', error));
   }
 
@@ -197,22 +198,17 @@ export default class Calendar extends Component {
   }
 
   render () {
-    const { calendar, filterValues, searchText, filter } = this.state;
+    const { calendar, filterOptions, searchText, filter } = this.state;
     const date = moment(calendar.date);
     const daysOfWeek = this._renderDaysOfWeek();
     const weeks = this._renderWeeks();
 
-    let filterControl;
-    if (filterValues) {
-      let options = (filterValues || []).map(value => (
-        <option key={value}>{value}</option>
-      ));
-      options.unshift(<option key="_all">All</option>);
-      filterControl = (
-        <select key="filter" className="select-header"
-          value={filter ? filter.calendar : undefined} onChange={this._onFilter}>
-          {options}
-        </select>
+    let filterAction;
+    if (filterOptions && filterOptions.length > 1) {
+      filterAction = (
+        <Filter options={filterOptions}
+          value={filter ? filter.calendar : undefined}
+          onChange={this._onFilter} />
       );
     }
 
@@ -244,7 +240,7 @@ export default class Calendar extends Component {
       <main>
         <PageHeader title="Calendar" homer={true}
           searchText={searchText} onSearch={this._onSearch}
-          actions={filterControl} />
+          actions={filterAction} />
         <div className="calendar">
           <div className="calendar__header">
             <button type="button" className="button-icon"
