@@ -176,6 +176,9 @@ export default class Calendar extends Component {
       days.push(
         <div key={date.valueOf()} className={classNames.join(' ')}>
           <div className="calendar__day-date">
+            <span className="calendar__day-date-dayofweek">
+              {date.format('dddd')}
+            </span>
             <span className="calendar__day-date-month">
               {date.format('MMMM')}
             </span>
