@@ -17,7 +17,8 @@ export default class MessageFormContents extends Component {
 
   componentDidMount () {
     this.refs.name.focus();
-    getItems('messages', { filter: { series: true } })
+    // get the possible series to connect to
+    getItems('messages', { filter: { series: true }, select: 'name library' })
     .then(series => this.setState({ series: series }))
     .catch(error => console.log('!!! MessageFormContents catch', error));
   }
@@ -101,10 +102,33 @@ export default class MessageFormContents extends Component {
       files = message.files.map(this._renderFileField);
     }
 
-    const series = this.state.series.map(message => (
-      <option key={message._id} label={message.name} value={message._id} />
-    ));
-    series.unshift(<option key={0} />);
+    let seriesField;
+    if (! message.series) {
+      const options = this.state.series.map(message => (
+        <option key={message._id} label={message.name} value={message._id} />
+      ));
+      options.unshift(<option key={0} />);
+      seriesField = (
+        <FormField name="seriesId" label="In Series">
+          <select name="seriesId" value={message.seriesId || ''}
+            onChange={formState.change('seriesId')}>
+            {options}
+          </select>
+        </FormField>
+      );
+    }
+
+    let nonSeriesField;
+    if (! message.seriesId) {
+      nonSeriesField = (
+        <FormField>
+          <input name="series" type="checkbox"
+            checked={message.series || false}
+            onChange={formState.toggle('series')}/>
+          <label htmlFor="series">This is a series</label>
+        </FormField>
+      );
+    }
 
     return (
       <div>
@@ -149,18 +173,8 @@ export default class MessageFormContents extends Component {
           </FormField>
         </fieldset>
         <fieldset className="form__fields">
-          <FormField name="seriesId" label="In Series">
-            <select name="seriesId" value={message.seriesId || ''}
-              onChange={formState.change('seriesId')}>
-              {series}
-            </select>
-          </FormField>
-          <FormField>
-            <input name="series" type="checkbox"
-              checked={message.series || false}
-              onChange={formState.toggle('series')}/>
-            <label htmlFor="series">Series?</label>
-          </FormField>
+          {seriesField}
+          {nonSeriesField}
           <FormField label="Library">
             <input name="library" value={message.library || ''}
               onChange={formState.change('library')}/>
