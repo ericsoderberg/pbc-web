@@ -263,7 +263,7 @@ register('email-lists', 'EmailList');
 
 // Pages
 
-const PAGE_MESSAGE_FIELDS = 'path name verses author date image seriesId';
+const PAGE_MESSAGE_FIELDS = 'path name verses author date image series seriesId';
 
 const populatePage = (page) => {
   const Message = mongoose.model('Message');

@@ -96,17 +96,39 @@ export default class MessageContents extends Component {
     let attributes;
     if (this.props.attributes) {
 
-      // The date could be a partial string, a moment object, or an ISO-8601 string
-      let date = message.date;
-      if (typeof date === 'string') {
-        if (date.match(/.+T.+Z/)) {
-          date = moment(date);
-        } else {
-          date = moment(date, 'M/D/YYYY'); // match MessageFormContents
-        }
+      let verses;
+      if (message.verses) {
+        verses = [
+          <dt key="t">Verses</dt>,
+          <dd key="d">{message.verses}</dd>
+        ];
       }
-      if (date) {
-        date = date.format('MMMM Do YYYY');
+
+      let author;
+      if (message.author) {
+        author = [
+          <dt key="t">Author</dt>,
+          <dd key="d">{message.author}</dd>
+        ];
+      }
+
+      let date;
+      if (message.date) {
+        // The date could be a partial string, a moment object, or an ISO-8601 string
+        let dateProperty = message.date;
+        if (typeof dateProperty === 'string') {
+          if (dateProperty.match(/.+T.+Z/)) {
+            dateProperty = moment(dateProperty);
+          } else {
+            dateProperty = moment(dateProperty, 'M/D/YYYY'); // match MessageFormContents
+          }
+        }
+        if (dateProperty) {
+          date = [
+            <dt key="t">Author</dt>,
+            <dd key="d">{dateProperty.format('MMMM Do YYYY')}</dd>
+          ];
+        }
       }
 
       let series;
@@ -121,15 +143,23 @@ export default class MessageContents extends Component {
         ];
       }
 
+      let library;
+      if (message.library) {
+        library = [
+          <dt key="t">Library</dt>,
+          <dd key="d">{message.library}</dd>
+        ];
+      }
+
       attributes = (
         <div className="section__container">
           <dl className="page-attributes section">
             <dt>Name</dt><dd>{message.name}</dd>
-            <dt>Verses</dt><dd>{message.verses}</dd>
-            <dt>Author</dt><dd>{message.author}</dd>
-            <dt>Date</dt><dd>{date}</dd>
+            {verses}
+            {author}
+            {date}
             {series}
-            <dt>Library</dt><dd>{message.library}</dd>
+            {library}
           </dl>
         </div>
       );
