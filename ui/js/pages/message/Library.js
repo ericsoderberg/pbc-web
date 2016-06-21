@@ -83,7 +83,7 @@ export default class Library extends Component {
     }
 
     return (
-      <Link to={`/messages/${series._id}`}>
+      <Link to={`/messages/${series.path || series._id}`}>
         {image}
         <div className={classNames.join(' ')}>
           <Button right={true}>Current Series</Button>
@@ -109,7 +109,7 @@ export default class Library extends Component {
     }
 
     return (
-      <Link to={`/messages/${message._id}`}>
+      <Link to={`/messages/${message.path || message._id}`}>
         {image}
         <div className={classNames.join(' ')}>
           <Button right={true}>Latest Message</Button>
