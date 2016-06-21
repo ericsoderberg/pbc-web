@@ -34,7 +34,7 @@ class MainNav extends Component {
 
   _signOut () {
     deleteSession()
-    .then(() => this.context.router.go('/'))
+    .then(() => window.location = '/')
     .catch(error => console.log('!!! MainNav _signOut catch', error));
   }
 

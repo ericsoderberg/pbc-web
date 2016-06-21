@@ -91,7 +91,9 @@ export default class SignUp extends Component {
             </FormField>
           </fieldset>
           <footer className="form__footer">
-            <button type="submit" onClick={this._onSignUp}>Sign Up</button>
+            <button type="submit" className="button" onClick={this._onSignUp}>
+              Sign Up
+            </button>
           </footer>
         </form>
       </div>
