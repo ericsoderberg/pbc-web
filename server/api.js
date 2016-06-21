@@ -120,7 +120,7 @@ const register = (category, modelName, options={}) => {
       data.modified = new Date();
       data.userId = session.userId;
       data = (transform.put ? transform.put(data, session) : data);
-      Doc.findOneAndUpdate({ _id: id }, data)
+      Doc.findOneAndUpdate({ _id: id }, data, { new: true })
       .exec()
       .then(doc => res.status(200).json(doc))
       .catch(error => res.status(400).json(error));
