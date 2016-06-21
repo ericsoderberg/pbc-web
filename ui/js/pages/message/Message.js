@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getMessage } from '../../actions';
+import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
@@ -10,7 +10,7 @@ class Message extends Component {
 
   componentDidMount () {
     if (! this.props.message) {
-      getMessage(this.props.params.id)
+      getItem('messages', this.props.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Message catch', error));
     }
   }
@@ -18,7 +18,7 @@ class Message extends Component {
   componentWillReceiveProps (nextProps) {
     if (nextProps.params.id !== this.props.params.id &&
       ! nextProps.message) {
-      getMessage(nextProps.params.id)
+      getItem('messages', nextProps.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Message catch', error));
     }
   }

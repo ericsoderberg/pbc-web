@@ -10,10 +10,10 @@ import Button from '../../components/Button';
 
 export default class Library extends Component {
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this._onScroll = this._onScroll.bind(this);
-    this.state = { offset: 0 };
+    this.state = { offset: 0, message: props.message };
   }
 
   componentDidMount () {
@@ -22,7 +22,10 @@ export default class Library extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this._load(nextProps);
+    if (this.props.name !== nextProps.name ||
+      this.props.message !== nextProps.message) {
+      this._load(nextProps);
+    }
   }
 
   componentWillUnmount () {
@@ -30,7 +33,9 @@ export default class Library extends Component {
   }
 
   _load (props) {
-    if (props.name) {
+    if (props.message) {
+      this.setState({ message: props.message });
+    } else if (props.name) {
       let date = moment().subtract(1, 'day');
       getItems('messages', {
         filter: {
@@ -155,7 +160,7 @@ export default class Library extends Component {
 };
 
 Library.propTypes = {
-  // library: PropTypes.object,
+  message: PropTypes.object,
   name: PropTypes.string,
   ...Section.propTypes
 };

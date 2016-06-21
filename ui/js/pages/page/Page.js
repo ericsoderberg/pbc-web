@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getPage } from '../../actions';
+import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
@@ -10,7 +10,7 @@ class Page extends Component {
 
   componentDidMount () {
     if (! this.props.page) {
-      getPage(this.props.params.id)
+      getItem('pages', this.props.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Page catch', error));
     }
   }
@@ -18,7 +18,7 @@ class Page extends Component {
   componentWillReceiveProps (nextProps) {
     if (nextProps.params.id !== this.props.params.id &&
       ! nextProps.page) {
-      getPage(nextProps.params.id)
+      getItem('pages', nextProps.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Page catch', error));
     }
   }

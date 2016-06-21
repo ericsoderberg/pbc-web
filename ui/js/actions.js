@@ -58,6 +58,27 @@ export function deleteSession () {
 
 // Generic
 
+function cacheAdd (category, item) {
+  dispatch(state => {
+    let cache = { ...(state[category] || {}) };
+    cache[item.path || item._id] = item;
+    const nextState = { ...state };
+    nextState[category] = cache;
+    return nextState;
+  });
+}
+
+function cacheRemove (category, item) {
+  dispatch(state => {
+    let cache = { ...(state[category] || {}) };
+    delete cache[item.path];
+    delete cache[item._id];
+    const nextState = { ...state };
+    nextState[category] = cache;
+    return nextState;
+  });
+}
+
 export function getItems (category, options={}) {
   const params = [];
   if (options.search) {
@@ -107,51 +128,57 @@ export function getItem (category, id, options={}) {
   return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
     method: 'GET', headers: _headers })
   .then(processStatus)
-  .then(response => response.json());
+  .then(response => response.json())
+  .then(item => {
+    if (options.cache) {
+      cacheAdd(category, item);
+    }
+    return item;
+  });
 }
 
 export function putItem (category, item) {
   return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
     method: 'PUT', headers: _headers, body: JSON.stringify(item) })
   .then(processStatus)
-  .then(response => response.json());
+  .then(response => response.json())
+  .then(item => {
+    cacheRemove(category, item);
+    return item;
+  });
 }
 
 export function deleteItem (category, id) {
   return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
     method: 'DELETE', headers: _headers })
-  .then(processStatus);
+  .then(processStatus)
+  .then(response => {
+    cacheRemove(category, { _id: id });
+    return response;
+  });
 }
 
 // Page
 
-export function getPage (id) {
-  return getItem('pages', id, {
-    populate: [
-      { path: 'sections.pages.id', select: 'name path' }
-    ]
-  })
-  .then(page => {
-    dispatch(state => {
-      let pages = state.pages || {};
-      pages[page.path || page._id] = page;
-      return { ...state, pages: pages };
-    });
-    return page;
-  });
-}
+// export function getPage (id) {
+//   return getItem('pages', id, {
+//     populate: [
+//       { path: 'sections.pages.id', select: 'name path' }
+//     ]
+//   });
+// }
 
-export function putPage (page) {
-  return putItem ('pages', page)
-  .then(page => {
-    dispatch(state => {
-      let pages = state.pages || {};
-      pages[page.path || page._id] = page;
-      return { ...state, pages: pages };
-    });
-    return page;
-  });
-}
+// export function putPage (page) {
+//   return putItem ('pages', page)
+//   .then(page => {
+//     dispatch(state => {
+//       let pages = state.pages || {};
+//       pages[page.path || page._id] = page;
+//       return { ...state, pages: pages };
+//     });
+//     return page;
+//   });
+// }
 
 // User
 
@@ -182,29 +209,29 @@ export function postSite (site) {
 
 // Messages
 
-export function getMessage (id) {
-  return getItem('messages', id, { populate: true })
-  .then(message => {
-    dispatch(state => {
-      let messages = state.messages || {};
-      messages[message.path || message._id] = message;
-      return { ...state, messages: messages };
-    });
-    return message;
-  });
-}
+// export function getMessage (id) {
+//   return getItem('messages', id, { populate: true })
+//   .then(message => {
+//     dispatch(state => {
+//       let messages = state.messages || {};
+//       messages[message.path || message._id] = message;
+//       return { ...state, messages: messages };
+//     });
+//     return message;
+//   });
+// }
 
-export function putMessage (message) {
-  return putItem ('messages', message)
-  .then(message => {
-    dispatch(state => {
-      let messages = state.messages || {};
-      messages[message.path || message._id] = message;
-      return { ...state, messages: messages };
-    });
-    return message;
-  });
-}
+// export function putMessage (message) {
+//   return putItem ('messages', message)
+//   .then(message => {
+//     dispatch(state => {
+//       let messages = state.messages || {};
+//       messages[message.path || message._id] = message;
+//       return { ...state, messages: messages };
+//     });
+//     return message;
+//   });
+// }
 
 // Calendar
 

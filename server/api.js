@@ -80,6 +80,14 @@ function authorize (req, res) {
 
 // Generic
 
+function addPopulate (query, populate) {
+  if (Array.isArray(populate)) {
+    populate.forEach(pop => query.populate(pop));
+  } else {
+    query.populate(populate);
+  }
+}
+
 const register = (category, modelName, options={}) => {
   const transform = options.transform || {};
 
@@ -95,16 +103,14 @@ const register = (category, modelName, options={}) => {
     if (req.query.populate) {
       const populate = JSON.parse(req.query.populate);
       if (true === populate) {
-        // ignore, this is for transform functions
-      } else if (Array.isArray(populate)) {
-        populate.forEach(pop => query.populate(pop));
+        // populate from options and transform
+        if (options.populate && options.populate.get) {
+          addPopulate(query, options.populate.get);
+        }
       } else {
-        query.populate(populate);
+        addPopulate(query, populate);
       }
     }
-    // if (options.populate) {
-    //   query = query.populate(options.populate);
-    // }
     query.exec()
     .then(doc => (transform.get ? transform.get(doc, req) : doc))
     .then(doc => res.json(doc))
@@ -120,7 +126,7 @@ const register = (category, modelName, options={}) => {
       data.modified = new Date();
       data.userId = session.userId;
       data = (transform.put ? transform.put(data, session) : data);
-      Doc.findOneAndUpdate({ _id: id }, data, { new: true })
+      Doc.findOneAndUpdate({ _id: id }, data)
       .exec()
       .then(doc => res.status(200).json(doc))
       .catch(error => res.status(400).json(error));
@@ -165,10 +171,13 @@ const register = (category, modelName, options={}) => {
     }
     if (req.query.populate) {
       const populate = JSON.parse(req.query.populate);
-      if (Array.isArray(populate)) {
-        populate.forEach(pop => query.populate(pop));
+      if (true === populate) {
+        // populate from options
+        if (options.populate && options.populate.index) {
+          addPopulate(query, options.populate.index);
+        }
       } else {
-        query.populate(populate);
+        addPopulate(query, populate);
       }
     }
     if (req.query.distinct) {
@@ -247,11 +256,75 @@ register('users', 'User', {
 
 // other
 
-register('pages', 'Page');
 register('resources', 'Resource');
 register('form-templates', 'FormTemplate');
 register('forms', 'Form');
 register('email-lists', 'EmailList');
+
+// Pages
+
+const PAGE_MESSAGE_FIELDS = 'path name verses author date image seriesId';
+
+const populatePage = (page) => {
+  const Message = mongoose.model('Message');
+  let date = moment().subtract(1, 'day');
+
+  let promises = [Promise.resolve(page)];
+
+  // Library
+  page.sections.filter(section => 'library' === section.type)
+  .forEach(section => {
+    promises.push(
+      Message.findOne({
+        library: section.name,
+        date: { $gt: date.toString() },
+        series: { $ne: true }
+      })
+      .sort('date').select(PAGE_MESSAGE_FIELDS).exec()
+      .then(message => {
+        if (message && message.seriesId) {
+          // get series instead
+          return (
+            Message.findOne({ _id: message.seriesId })
+            .select(PAGE_MESSAGE_FIELDS).exec()
+          );
+        } else {
+          return message;
+        }
+      })
+    );
+  });
+
+  return Promise.all(promises)
+  .then(docs => {
+    let pageData = docs[0].toObject();
+    pageData.sections.filter(section => 'library' === section.type)
+    .forEach((section, index) => {
+      section.message = docs[1 + index];
+    });
+    return pageData;
+  });
+};
+
+register('pages', 'Page', {
+  populate: {
+    get: [
+      { path: 'sections.pages.id', select: 'name path' },
+      {
+        path: 'sections.eventId',
+        select: 'name path start end dates times address location'
+      }
+    ]
+  },
+  transform: {
+    get: (page, req) => {
+      if (page && req.query.populate) {
+        return populatePage(page);
+      }
+      return page;
+    }
+  }
+});
 
 // Messages
 
@@ -291,6 +364,9 @@ const populateMessage = (message) => {
 };
 
 register('messages', 'Message', {
+  populate: {
+    get: { path: 'seriesId', select: 'name path' }
+  },
   transform: {
     get: (message, req) => {
       if (message && req.query.populate) {

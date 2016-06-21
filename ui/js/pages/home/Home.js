@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getSite, getPage, deleteSession } from '../../actions';
+import { getSite, getItem, deleteSession } from '../../actions';
 import PageContents from '../page/PageContents';
 import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
@@ -24,7 +24,8 @@ class Home extends Component {
       .then(site => {
         if (site.homePageId) {
           document.title = site.name;
-          return getPage(site.homePageId);
+          return getItem('pages', site.homePageId,
+            { cache: true, populate: true });
         } else {
           return Promise.reject();
         }

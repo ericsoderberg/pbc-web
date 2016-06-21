@@ -24,7 +24,7 @@ const PageContents = (props) => {
     } else if ('library' === section.type) {
       return (
         <Library key={index} full={section.full} color={section.color}
-          name={section.name} />
+          name={section.name} message={section.message} />
       );
     } else if ('user' === section.type) {
       return (

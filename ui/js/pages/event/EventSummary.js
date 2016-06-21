@@ -11,7 +11,7 @@ export default class EventSummary extends Component {
 
   constructor (props) {
     super(props);
-    this.state = { event: props.event || {} };
+    this.state = { event: (typeof props.id === 'string' ? props.id : {}) };
   }
 
   componentDidMount () {
@@ -25,8 +25,10 @@ export default class EventSummary extends Component {
   }
 
   _load (props) {
-    const { event, id } = props;
-    if (id && ! event) {
+    const { id } = props;
+    if (typeof id === 'object') {
+      this.setState({ event: id });
+    } else if (typeof id === 'string') {
       getItem('events', id)
       .then(event => this.setState({ event: event }))
       .catch(error => console.log('!!! EventSummary catch', error));
@@ -60,7 +62,6 @@ export default class EventSummary extends Component {
 };
 
 EventSummary.propTypes = {
-  event: PropTypes.object,
-  id: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   ...Section.propTypes
 };
