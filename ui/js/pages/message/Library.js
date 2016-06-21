@@ -90,12 +90,16 @@ export default class Library extends Component {
   }
 
   render () {
-    const { color, full, plain } = this.props;
+    const { color, full } = this.props;
     const { message } = this.state;
+    let plain = full;
 
     let contents;
     if (message) {
       contents = this._renderMessage(message);
+      if (! message.image) {
+        plain = false;
+      }
     } else {
       contents = this._renderLibrary();
     }

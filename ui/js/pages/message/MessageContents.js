@@ -36,7 +36,7 @@ export default class MessageContents extends Component {
 
     let image;
     if (message.image) {
-      image = <Image image={message.image} full={true} />;
+      image = <Image image={message.image} full={true} plain={true} />;
     }
 
     let audio;
