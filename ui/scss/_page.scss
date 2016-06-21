@@ -377,12 +377,12 @@
 
 .footer {
   display: flex;
-  align-items: center;
   font-size: 14px;
 
   @media all and (min-width: 700px) {
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     max-width: $page-width;
     margin: 0 auto;
   }
