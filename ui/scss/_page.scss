@@ -2,6 +2,10 @@
 .page-preview {
   min-width: $form-width;
   border-left: 1px solid $nav-background-color;
+
+  .form {
+    padding: 0 $unit;
+  }
 }
 
 @keyframes fadein {

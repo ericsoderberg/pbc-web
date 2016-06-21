@@ -43,6 +43,7 @@ export default class EventSummary extends Component {
     if (false === navigable) {
       contents = (
         <div className="event-summary__summary">
+          <h2>{event.name}</h2>
           <EventTimes event={event} />
         </div>
       );

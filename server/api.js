@@ -378,51 +378,6 @@ register('messages', 'Message', {
   search: ['name', 'author', 'verses']
 });
 
-// router.get('/messages/:id', (req, res) => {
-//   const id = req.params.id;
-//   const Doc = mongoose.model('Message');
-//   const subFields = 'name verses date path';
-//
-//   // message
-//   const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
-//   const query = Doc.findOne(criteria);
-//   query.populate({ path: 'seriesId', select: 'name' });
-//   query.exec()
-//   .then(message => {
-//
-//     // nextMessage
-//     const nextPromise = Doc.find({
-//       library: message.library,
-//       date: { $gt: message.date },
-//       series: { $ne: true }
-//     })
-//     .sort('date').limit(1).select(subFields).exec();
-//
-//     // previousMessage
-//     const previousPromise = Doc.find({
-//       library: message.library,
-//       date: { $lt: message.date },
-//       series: { $ne: true }
-//     })
-//     .sort('-date').limit(1).select(subFields).exec();
-//
-//     // seriesMessages
-//     const seriesMessagesPromise = Doc.find({ seriesId: message.id })
-//     .select(subFields).exec();
-//
-//     return Promise.all([Promise.resolve(message), nextPromise,
-//       previousPromise, seriesMessagesPromise]);
-//   })
-//   .then(docs => {
-//     let messageData = docs[0].toObject();
-//     messageData.nextMessage = docs[1][0];
-//     messageData.previousMessage = docs[2][0];
-//     messageData.seriesMessages = docs[3];
-//     res.json(messageData);
-//   })
-//   .catch(error => res.status(400).json(error));
-// });
-
 // Newsletter
 
 router.post('/newsletters/render', (req, res) => {
