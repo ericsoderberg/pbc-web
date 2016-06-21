@@ -180,6 +180,32 @@ export function postSite (site) {
   .then(response => response.json());
 }
 
+// Messages
+
+export function getMessage (id) {
+  return getItem('messages', id, { populate: true })
+  .then(message => {
+    dispatch(state => {
+      let messages = state.messages || {};
+      messages[message.path || message._id] = message;
+      return { ...state, messages: messages };
+    });
+    return message;
+  });
+}
+
+export function putMessage (message) {
+  return putItem ('messages', message)
+  .then(message => {
+    dispatch(state => {
+      let messages = state.messages || {};
+      messages[message.path || message._id] = message;
+      return { ...state, messages: messages };
+    });
+    return message;
+  });
+}
+
 // Calendar
 
 export function getCalendar (options={}) {

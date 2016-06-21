@@ -172,8 +172,21 @@
   overflow: hidden;
 
   > a {
-    display: block;
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
+
+    @media all and (min-width: 700px) {
+      // align-items: center;
+    }
+
+    @media all and (max-width: 699px) {
+      align-items: center;
+
+      h2 {
+        text-align: center;
+      }
+    }
   }
 }
 
@@ -199,6 +212,10 @@
     }
   }
 
+  h2 {
+    margin-left: $unit;
+  }
+
   label {
     font-size: 1.5em;
     font-weight: 100;
@@ -222,7 +239,7 @@
 
 .library__message-image {
   position: relative;
-  max-width: 100%;
+  min-width: 100%;
   // margin-bottom: -4px;
 
   .section__container & {

@@ -1,7 +1,7 @@
 "use strict";
 import express from 'express';
 import mongoose from 'mongoose';
-import { ObjectID } from 'mongodb';
+// import { ObjectID } from 'mongodb';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import moment from 'moment';
@@ -83,33 +83,33 @@ function authorize (req, res) {
 const register = (category, modelName, options={}) => {
   const transform = options.transform || {};
 
-  if ('get' !== options.except) {
-    router.get(`/${category}/:id`, (req, res) => {
-      const id = req.params.id;
-      const Doc = mongoose.model(modelName);
-      const criteria = ID_REGEXP.test(id) ?
-        {_id: id} : {path: id};
-      let query = Doc.findOne(criteria);
-      if (req.query.select) {
-        query.select(req.query.select);
+  router.get(`/${category}/:id`, (req, res) => {
+    const id = req.params.id;
+    const Doc = mongoose.model(modelName);
+    const criteria = ID_REGEXP.test(id) ?
+      {_id: id} : {path: id};
+    let query = Doc.findOne(criteria);
+    if (req.query.select) {
+      query.select(req.query.select);
+    }
+    if (req.query.populate) {
+      const populate = JSON.parse(req.query.populate);
+      if (true === populate) {
+        // ignore, this is for transform functions
+      } else if (Array.isArray(populate)) {
+        populate.forEach(pop => query.populate(pop));
+      } else {
+        query.populate(populate);
       }
-      if (req.query.populate) {
-        const populate = JSON.parse(req.query.populate);
-        if (Array.isArray(populate)) {
-          populate.forEach(pop => query.populate(pop));
-        } else {
-          query.populate(populate);
-        }
-      }
-      // if (options.populate) {
-      //   query = query.populate(options.populate);
-      // }
-      query.exec()
-      .then(doc => (transform.get ? transform.get(doc) : doc))
-      .then(doc => res.json(doc))
-      .catch(error => res.status(400).json(error));
-    });
-  }
+    }
+    // if (options.populate) {
+    //   query = query.populate(options.populate);
+    // }
+    query.exec()
+    .then(doc => (transform.get ? transform.get(doc, req) : doc))
+    .then(doc => res.json(doc))
+    .catch(error => res.status(400).json(error));
+  });
 
   router.put(`/${category}/:id`, (req, res) => {
     authorize(req, res)
@@ -255,55 +255,97 @@ register('email-lists', 'EmailList');
 
 // Messages
 
-register('messages', 'Message', {
-  except: 'get',
-  search: ['name', 'author', 'verses']
-});
-
-router.get('/messages/:id', (req, res) => {
-  const id = req.params.id;
+const populateMessage = (message) => {
   const Doc = mongoose.model('Message');
   const subFields = 'name verses date path';
 
-  // message
-  const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
-  const query = Doc.findOne(criteria);
-  query.populate({ path: 'seriesId', select: 'name' });
-  query.exec()
-  .then(message => {
-
-    // nextMessage
-    const nextPromise = Doc.find({
-      library: message.library,
-      date: { $gt: message.date },
-      series: { $ne: true }
-    })
-    .sort('date').limit(1).select(subFields).exec();
-
-    // previousMessage
-    const previousPromise = Doc.find({
-      library: message.library,
-      date: { $lt: message.date },
-      series: { $ne: true }
-    })
-    .sort('-date').limit(1).select(subFields).exec();
-
-    // seriesMessages
-    const seriesMessagesPromise = Doc.find({ seriesId: message.id })
-    .select(subFields).exec();
-
-    return Promise.all([Promise.resolve(message), nextPromise,
-      previousPromise, seriesMessagesPromise]);
+  // nextMessage
+  const nextPromise = Doc.find({
+    library: message.library,
+    date: { $gt: message.date },
+    series: { $ne: true }
   })
+  .sort('date').limit(1).select(subFields).exec();
+
+  // previousMessage
+  const previousPromise = Doc.find({
+    library: message.library,
+    date: { $lt: message.date },
+    series: { $ne: true }
+  })
+  .sort('-date').limit(1).select(subFields).exec();
+
+  // seriesMessages
+  const seriesMessagesPromise = Doc.find({ seriesId: message.id })
+  .select(subFields).exec();
+
+  return Promise.all([Promise.resolve(message), nextPromise,
+    previousPromise, seriesMessagesPromise])
   .then(docs => {
     let messageData = docs[0].toObject();
     messageData.nextMessage = docs[1][0];
     messageData.previousMessage = docs[2][0];
     messageData.seriesMessages = docs[3];
-    res.json(messageData);
-  })
-  .catch(error => res.status(400).json(error));
+    return messageData;
+  });
+};
+
+register('messages', 'Message', {
+  transform: {
+    get: (message, req) => {
+      if (message && req.query.populate) {
+        return populateMessage(message);
+      }
+      return message;
+    }
+  },
+  search: ['name', 'author', 'verses']
 });
+
+// router.get('/messages/:id', (req, res) => {
+//   const id = req.params.id;
+//   const Doc = mongoose.model('Message');
+//   const subFields = 'name verses date path';
+//
+//   // message
+//   const criteria = ObjectID.isValid(id) ? {_id: id} : {path: id};
+//   const query = Doc.findOne(criteria);
+//   query.populate({ path: 'seriesId', select: 'name' });
+//   query.exec()
+//   .then(message => {
+//
+//     // nextMessage
+//     const nextPromise = Doc.find({
+//       library: message.library,
+//       date: { $gt: message.date },
+//       series: { $ne: true }
+//     })
+//     .sort('date').limit(1).select(subFields).exec();
+//
+//     // previousMessage
+//     const previousPromise = Doc.find({
+//       library: message.library,
+//       date: { $lt: message.date },
+//       series: { $ne: true }
+//     })
+//     .sort('-date').limit(1).select(subFields).exec();
+//
+//     // seriesMessages
+//     const seriesMessagesPromise = Doc.find({ seriesId: message.id })
+//     .select(subFields).exec();
+//
+//     return Promise.all([Promise.resolve(message), nextPromise,
+//       previousPromise, seriesMessagesPromise]);
+//   })
+//   .then(docs => {
+//     let messageData = docs[0].toObject();
+//     messageData.nextMessage = docs[1][0];
+//     messageData.previousMessage = docs[2][0];
+//     messageData.seriesMessages = docs[3];
+//     res.json(messageData);
+//   })
+//   .catch(error => res.status(400).json(error));
+// });
 
 // Newsletter
 

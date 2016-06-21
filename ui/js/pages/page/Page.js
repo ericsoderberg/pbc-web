@@ -15,6 +15,14 @@ class Page extends Component {
     }
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.params.id !== this.props.params.id &&
+      ! nextProps.page) {
+      getPage(nextProps.params.id)
+      .catch(error => console.log('!!! Page catch', error));
+    }
+  }
+
   render () {
     const { page } = this.props;
     let contents;

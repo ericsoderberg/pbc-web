@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
-import { getItems } from '../../actions';
+import { getItems, getItem } from '../../actions';
 import Section from '../../components/Section';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
@@ -31,16 +31,25 @@ export default class Library extends Component {
 
   _load (props) {
     if (props.name) {
-      let date = moment().add(1, 'day');
+      let date = moment().subtract(1, 'day');
       getItems('messages', {
         filter: {
           library: props.name,
-          date: { $lt: date.toString() }
+          date: { $gt: date.toString() }
         },
-        sort: '-date',
+        sort: 'date',
         limit: 1
       })
-      .then(messages => this.setState({ message: messages[0] }))
+      .then(messages => {
+        const message = messages[0];
+        if (message && message.seriesId) {
+          return getItem('messages', message.seriesId);
+        } else {
+          this.setState({ message: message });
+          return undefined;
+        }
+      })
+      .then(series => this.setState({ series: series }))
       .catch(error => console.log('!!! Library catch', error));
     }
   }
@@ -51,6 +60,32 @@ export default class Library extends Component {
     if (rect.top < 0) {
       this.setState({ offset: Math.floor(Math.abs(rect.top) / 20) });
     }
+  }
+
+  _renderSeries (series) {
+    let classNames = ['library__message'];
+    let image;
+    if (series.image) {
+      const style = {
+        top: this.state.offset,
+        transform: `scale(${1 + (this.state.offset / 600)})`
+      };
+      image = (
+        <Image ref="image" className="library__message-image"
+          image={series.image} plain={true} style={style} />
+      );
+      classNames.push('library__message--imaged');
+    }
+
+    return (
+      <Link to={`/messages/${series._id}`}>
+        {image}
+        <div className={classNames.join(' ')}>
+          <Button right={true}>Current Series</Button>
+          <h2>{series.name}</h2>
+        </div>
+      </Link>
+    );
   }
 
   _renderMessage (message) {
@@ -91,11 +126,16 @@ export default class Library extends Component {
 
   render () {
     const { color, full } = this.props;
-    const { message } = this.state;
+    const { message, series } = this.state;
     let plain = full;
 
     let contents;
-    if (message) {
+    if (series) {
+      contents = this._renderSeries(series);
+      if (! series.image) {
+        plain = false;
+      }
+    } else if (message) {
       contents = this._renderMessage(message);
       if (! message.image) {
         plain = false;
