@@ -61,9 +61,11 @@ export default class Library extends Component {
 
   _onScroll (event) {
     const elem = findDOMNode(this.refs.image);
-    const rect = elem.getBoundingClientRect();
-    if (rect.top < 0) {
-      this.setState({ offset: Math.floor(Math.abs(rect.top) / 20) });
+    if (elem) { // might not have an image
+      const rect = elem.getBoundingClientRect();
+      if (rect.top < 0) {
+        this.setState({ offset: Math.floor(Math.abs(rect.top) / 20) });
+      }
     }
   }
 

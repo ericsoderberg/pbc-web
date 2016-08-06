@@ -20,10 +20,14 @@
   color: $tertiary-color;
 }
 
-a.item__container {
+a.item__container,
+button.item__container {
   display: block;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
+  margin: 0;
+  width: 100%;
 
   &:hover {
     background-color: $hover-background;
@@ -40,6 +44,10 @@ a.item__container {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    > *:not(:last-child) {
+      margin-right: $half-unit;
+    }
   }
 
   @media all and (max-width: 699px) {

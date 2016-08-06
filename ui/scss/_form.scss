@@ -355,3 +355,8 @@
   fill: $secondary-icon-color;
   stroke: $secondary-icon-color;
 }
+
+.form-summary {
+  max-width: $form-width;
+  margin: 0 auto;
+}

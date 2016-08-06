@@ -30,7 +30,9 @@ export default class Filter extends Component {
     }
 
     let optionElements = (options || []).map(option => (
-      <option key={option}>{option}</option>
+      <option key={option.value || option} value={option.value}>
+        {option.label || option}
+      </option>
     ));
     optionElements.unshift(<option key="_all">All</option>);
 
@@ -51,5 +53,11 @@ export default class Filter extends Component {
 Filter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.string)
+  options: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired
+    })
+  ])).isRequired
 };

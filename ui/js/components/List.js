@@ -135,7 +135,13 @@ List.propTypes = {
   category: PropTypes.string,
   filter: PropTypes.shape({
     property: PropTypes.string.isRequired,
-    options: PropTypes.arrayOf(PropTypes.string).isRequired
+    options: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired
+      })
+    ])).isRequired
   }),
   homer: PropTypes.bool,
   Item: PropTypes.func.isRequired,

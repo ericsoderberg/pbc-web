@@ -258,7 +258,14 @@ register('users', 'User', {
 
 register('resources', 'Resource');
 register('form-templates', 'FormTemplate');
-register('forms', 'Form');
+register('forms', 'Form', {
+  populate: {
+    index: [
+      { path: 'userId', select: 'name' },
+      { path: 'formTemplateId', select: 'name' }
+    ]
+  }
+});
 register('email-lists', 'EmailList');
 
 // Pages

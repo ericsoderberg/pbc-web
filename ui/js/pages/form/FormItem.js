@@ -7,10 +7,15 @@ const FormItem = (props) => {
   const { className, item: form, onClick } = props;
   let classNames = ['item__container', className];
 
+  let template;
+  if (form.formTemplateId) {
+    template = <span>form.formTemplateId.name</span>;
+  }
+
   const contents = (
     <div className="item">
       <span className="box--row">
-        <span>{form.formTemplateId ? form.formTemplateId.name : ''}</span>
+        {template}
         <span>{form.userId ? form.userId.name : ''}</span>
       </span>
       <span>{moment(form.modified).format('MMM Do YYYY')}</span>
@@ -19,7 +24,7 @@ const FormItem = (props) => {
 
   let result;
   if (onClick) {
-    classNames.push('button--link');
+    classNames.push('link');
     result = (
       <button className={classNames.join(' ')} type="button" onClick={onClick}>
         {contents}

@@ -41,7 +41,8 @@ class FormSummary extends Component {
   _loadForms (props) {
     const { formTemplateId } = props;
     getItems('forms',
-      { filter: { formTemplateId: formTemplateId }, select: 'modified' })
+      { filter: { formTemplateId: formTemplateId },
+        select: 'modified userId', populate: true })
     .then(forms => this.setState({ forms: forms }))
     .catch(error => console.log('!!! FormSummary forms catch', error));
   }
@@ -85,14 +86,22 @@ class FormSummary extends Component {
       );
     } else {
       const items = forms.map(form => (
-        <FormItem key={form._id} item={form}
-          onClick={this._edit(form._id)} />
+        <li key={form._id}>
+          <FormItem item={form} onClick={this._edit(form._id)} />
+        </li>
       ));
       contents = (
         <div>
-          <h3>{formTemplate.name}</h3>
-          {items}
-          <button type="button" onClick={this._onAdd}>Add another</button>
+          <div className="form-summary">
+            <h2>{formTemplate.name}</h2>
+            <ul className="list">
+              {items}
+            </ul>
+            <button type="button" className="button button--secondary"
+              onClick={this._onAdd}>
+              Add another
+            </button>
+          </div>
         </div>
       );
     }

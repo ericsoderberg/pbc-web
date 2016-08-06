@@ -70,7 +70,12 @@ export default class FormAdd extends Component {
 
       let cancelControl;
       if (onCancel) {
-        cancelControl = <button type="button" onClick={onCancel}>Cancel</button>;
+        cancelControl = (
+          <button type="button" className="button button--secondary"
+            onClick={onCancel}>
+            Cancel
+          </button>
+        );
       }
 
       result = (
