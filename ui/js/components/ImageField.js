@@ -10,14 +10,13 @@ export default class ImageField extends Component {
 
     let result;
     if (image) {
-      
+
       result = (
         <FormField label={label}>
           <div>
             <img className="image-field__image" src={image.data} />
           </div>
-          <input name={name} type="checkbox"
-            checked={image || false}
+          <input name={name} type="checkbox" checked={false}
             onChange={() => formState.set(property, false)}/>
           <label htmlFor={name}>Clear</label>
         </FormField>
