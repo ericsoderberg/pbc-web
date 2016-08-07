@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 
 export default class EmailListFormContents extends Component {
@@ -9,7 +10,18 @@ export default class EmailListFormContents extends Component {
     this._onChangeAdd = this._onChangeAdd.bind(this);
     this._onAdd = this._onAdd.bind(this);
     this._onChangeAddresses = this._onChangeAddresses.bind(this);
-    this.state = { addAddress: '' };
+    this.state = { addAddress: '', domains: [] };
+  }
+
+  componentDidMount () {
+    const { formState, session } = this.props;
+    if (session.administrator) {
+      getItems('domains')
+      .then(response => this.setState({ domains: response }))
+      .catch(error => console.log('EmailListFormContents catch', error));
+    } else if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
   }
 
   _onChangeAdd (event) {
@@ -35,13 +47,29 @@ export default class EmailListFormContents extends Component {
   }
 
   render () {
-    const { formState } = this.props;
+    const { formState, session } = this.props;
     const emailList = formState.object;
 
     const textHelp = (
       <a href="http://daringfireball.net/projects/markdown/syntax"
         target="_blank">Markdown syntax</a>
     );
+
+    let administeredBy;
+    if (session.administrator) {
+      let domains = this.state.domains.map(domain => (
+        <option key={domain._id} label={domain.name} value={domain._id} />
+      ));
+      domains.unshift(<option key={0} />);
+      administeredBy = (
+        <FormField label="Administered by">
+          <select name="domainId" value={emailList.domainId || ''}
+            onChange={formState.change('domainId')}>
+            {domains}
+          </select>
+        </FormField>
+      );
+    }
 
     return (
       <fieldset className="form__fields">
@@ -67,11 +95,13 @@ export default class EmailListFormContents extends Component {
           <textarea name="addresses" value={(emailList.addresses || []).join("\n")} rows={8}
             onChange={this._onChangeAddresses}/>
         </FormField>
+        {administeredBy}
       </fieldset>
     );
   }
 };
 
 EmailListFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired
 };

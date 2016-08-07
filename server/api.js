@@ -27,6 +27,7 @@ router.post('/sessions', (req, res) => {
     if (user && bcrypt.compareSync(password, user.encryptedPassword)) {
       const session = new Session({
         administrator: user.administrator,
+        administratorDomainId: user.administratorDomainId,
         email: email,
         loginAt: new Date(),
         name: user.name,
@@ -55,7 +56,7 @@ router.delete('/sessions/:id', (req, res) => {
   });
 });
 
-function authorize (req, res) {
+function authorize (req, res, required=true) {
   const authorization = req.headers.authorization;
   if (authorization) {
     const token = authorization.split('=')[1];
@@ -63,7 +64,7 @@ function authorize (req, res) {
     return Session.findOne({ token: token })
     .exec()
     .then(session => {
-      if (session) {
+      if (session || ! required) {
         return session;
       } else {
         console.log('!!! ! authorized no session', token);
@@ -71,11 +72,39 @@ function authorize (req, res) {
         return Promise.reject();
       }
     });
+  } else if (! required) {
+    return Promise.resolve(undefined);
   } else {
     console.log('!!! ! authorized no authorization');
     res.status(401).json({ error: 'Not authorized' });
     return Promise.reject();
   }
+}
+
+function authorizedAdministrator (session) {
+  if (session && session.administrator) {
+    return {};
+  } else {
+    return { name: false };
+  }
+}
+
+function authorizedForDomain (session) {
+  if (session && session.administrator) {
+    return {};
+  } else if (session && session.administratorDomainId) {
+    return { domainId: session.administratorDomainId };
+  } else {
+    return { name: false };
+  }
+}
+
+function unsetDomainIfNeeded (data) {
+  if (! data.domainId) {
+    delete data.domainId;
+    data.$unset = { domainId: '' };
+  }
+  return data;
 }
 
 // Generic
@@ -149,47 +178,53 @@ const register = (category, modelName, options={}) => {
   });
 
   router.get(`/${category}`, (req, res) => {
-    const Doc = mongoose.model(modelName);
-    const search = options.search || ['name'];
-    let query = Doc.find();
-    if (req.query.search) {
-      const exp = new RegExp(req.query.search, 'i');
-      query.or(search.map(propertyName => {
-        let obj = {};
-        obj[propertyName] = exp;
-        return obj;
-      }));
-    }
-    if (req.query.filter) {
-      query.find(JSON.parse(req.query.filter));
-    }
-    if (req.query.sort) {
-      query.sort(req.query.sort);
-    }
-    if (req.query.select) {
-      query.select(req.query.select);
-    }
-    if (req.query.populate) {
-      const populate = JSON.parse(req.query.populate);
-      if (true === populate) {
-        // populate from options
-        if (options.populate && options.populate.index) {
-          addPopulate(query, options.populate.index);
-        }
-      } else {
-        addPopulate(query, populate);
+    authorize(req, res, false)
+    .then(session => {
+      const Doc = mongoose.model(modelName);
+      const search = options.search || ['name'];
+      let query = Doc.find();
+      if (options.authorize && options.authorize.index) {
+        query.find(options.authorize.index(session));
       }
-    }
-    if (req.query.distinct) {
-      query.distinct(req.query.distinct);
-    } else if (req.query.limit) {
-      query.limit(parseInt(req.query.limit, 10));
-    } else {
-      query.limit(20);
-    }
-    query.exec()
-    .then(docs => res.json(docs))
-    .catch(error => res.status(400).json(error));
+      if (req.query.search) {
+        const exp = new RegExp(req.query.search, 'i');
+        query.or(search.map(propertyName => {
+          let obj = {};
+          obj[propertyName] = exp;
+          return obj;
+        }));
+      }
+      if (req.query.filter) {
+        query.find(JSON.parse(req.query.filter));
+      }
+      if (req.query.sort) {
+        query.sort(req.query.sort);
+      }
+      if (req.query.select) {
+        query.select(req.query.select);
+      }
+      if (req.query.populate) {
+        const populate = JSON.parse(req.query.populate);
+        if (true === populate) {
+          // populate from options
+          if (options.populate && options.populate.index) {
+            addPopulate(query, options.populate.index);
+          }
+        } else {
+          addPopulate(query, populate);
+        }
+      }
+      if (req.query.distinct) {
+        query.distinct(req.query.distinct);
+      } else if (req.query.limit) {
+        query.limit(parseInt(req.query.limit, 10));
+      } else {
+        query.limit(20);
+      }
+      query.exec()
+      .then(docs => res.json(docs))
+      .catch(error => res.status(400).json(error));
+    });
   });
 
   router.post(`/${category}`, (req, res) => {
@@ -236,10 +271,17 @@ const encryptPassword = (data) => {
     data.encryptedPassword = bcrypt.hashSync(data.password, 10);
     delete data.password;
   }
+  if (! data.administratorDomainId) {
+    delete data.administratorDomainId;
+    data.$unset = { administratorDomainId: '' };
+  }
   return data;
 };
 
 register('users', 'User', {
+  authorize: {
+    index: authorizedAdministrator
+  },
   search: ['name', 'email'],
   transform: {
     get: (user) => {
@@ -256,8 +298,21 @@ register('users', 'User', {
 
 // other
 
-register('resources', 'Resource');
-register('form-templates', 'FormTemplate');
+register('resources', 'Resource', {
+  authorize: {
+    index: authorizedAdministrator
+  }
+});
+
+register('form-templates', 'FormTemplate', {
+  authorize: {
+    index: authorizedForDomain
+  },
+  transform: {
+    put: unsetDomainIfNeeded
+  }
+});
+
 register('forms', 'Form', {
   populate: {
     index: [
@@ -266,7 +321,21 @@ register('forms', 'Form', {
     ]
   }
 });
-register('email-lists', 'EmailList');
+
+register('email-lists', 'EmailList', {
+  authorize: {
+    index: authorizedForDomain
+  },
+  transform: {
+    put: unsetDomainIfNeeded
+  }
+});
+
+register('domains', 'Domain', {
+  authorize: {
+    index: authorizedAdministrator
+  }
+});
 
 // Pages
 
@@ -314,6 +383,9 @@ const populatePage = (page) => {
 };
 
 register('pages', 'Page', {
+  authorize: {
+    index: authorizedForDomain
+  },
   populate: {
     get: [
       { path: 'sections.pages.id', select: 'name path' },
@@ -329,7 +401,8 @@ register('pages', 'Page', {
         return populatePage(page);
       }
       return page;
-    }
+    },
+    put: unsetDomainIfNeeded
   }
 });
 
@@ -380,7 +453,8 @@ register('messages', 'Message', {
         return populateMessage(message);
       }
       return message;
-    }
+    },
+    put: unsetDomainIfNeeded
   },
   search: ['name', 'author', 'verses']
 });
@@ -447,7 +521,14 @@ router.post('/newsletters/render', (req, res) => {
   .catch(error => res.status(400).json(error));
 });
 
-register('newsletters', 'Newsletter');
+register('newsletters', 'Newsletter', {
+  authorize: {
+    index: authorizedForDomain
+  },
+  transform: {
+    put: unsetDomainIfNeeded
+  }
+});
 
 // Site
 
@@ -679,7 +760,11 @@ router.post('/events/unavailable-dates', (req, res) => {
   .catch(error => res.status(400).json(error));
 });
 
-register('events', 'Event');
+register('events', 'Event', {
+  transform: {
+    put: unsetDomainIfNeeded
+  }
+});
 
 // Files
 

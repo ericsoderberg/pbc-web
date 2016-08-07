@@ -6,7 +6,8 @@ import List from '../../components/List';
 const Item = (props) => {
   const { className, item: user } = props;
   let classNames = ['item__container', className];
-  const admin = user.administrator ? ' *' : undefined;
+  const admin =
+    (user.administrator || user.administratorDomainId) ? ' *' : undefined;
   return (
     <Link className={classNames.join(' ')} to={`/users/${user._id}`}>
       <div className="item">

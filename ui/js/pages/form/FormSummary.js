@@ -119,6 +119,7 @@ FormSummary.propTypes = {
   formTemplateId: PropTypes.string.isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string,
     userId: PropTypes.string
   }),
   ...Section.propTypes

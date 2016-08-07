@@ -1,6 +1,10 @@
 import App from './components/App';
 import Home from './pages/home/Home';
 import Calendar from './pages/calendar/Calendar';
+import Domains from './pages/domain/Domains';
+import DomainAdd from './pages/domain/DomainAdd';
+import Domain from './pages/domain/Domain';
+import DomainEdit from './pages/domain/DomainEdit';
 import EmailLists from './pages/emailList/EmailLists';
 import EmailListAdd from './pages/emailList/EmailListAdd';
 import EmailList from './pages/emailList/EmailList';
@@ -85,6 +89,10 @@ export default {
     { path: 'newsletters/:id', component: Newsletter },
     { path: 'newsletters/:id/edit', component: NewsletterEdit },
     { path: 'newsletters', component: Newsletters },
+    { path: 'domains/add', component: DomainAdd },
+    { path: 'domains/:id', component: Domain },
+    { path: 'domains/:id/edit', component: DomainEdit },
+    { path: 'domains', component: Domains },
     { path: 'files', component: Files },
     { path: ':id', component: Page }
   ]

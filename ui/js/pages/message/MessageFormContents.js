@@ -12,15 +12,25 @@ export default class MessageFormContents extends Component {
     super();
     this._onAddFile = this._onAddFile.bind(this);
     this._renderFileField = this._renderFileField.bind(this);
-    this.state = { series: [] };
+    this.state = { series: [], domains: [] };
   }
 
   componentDidMount () {
+    const { formState, session } = this.props;
     this.refs.name.focus();
+
     // get the possible series to connect to
     getItems('messages', { filter: { series: true }, select: 'name library' })
     .then(series => this.setState({ series: series }))
     .catch(error => console.log('!!! MessageFormContents catch', error));
+
+    if (session.administrator) {
+      getItems('domains')
+      .then(response => this.setState({ domains: response }))
+      .catch(error => console.log('MessageFormContents catch', error));
+    } else if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
   }
 
   _onAddFile () {
@@ -89,7 +99,7 @@ export default class MessageFormContents extends Component {
   }
 
   render () {
-    const { formState } = this.props;
+    const { formState, session } = this.props;
     const message = formState.object;
 
     const textHelp = (
@@ -126,6 +136,22 @@ export default class MessageFormContents extends Component {
             checked={message.series || false}
             onChange={formState.toggle('series')}/>
           <label htmlFor="series">This is a series</label>
+        </FormField>
+      );
+    }
+
+    let administeredBy;
+    if (session.administrator) {
+      let domains = this.state.domains.map(domain => (
+        <option key={domain._id} label={domain.name} value={domain._id} />
+      ));
+      domains.unshift(<option key={0} />);
+      administeredBy = (
+        <FormField label="Administered by">
+          <select name="domainId" value={message.domainId || ''}
+            onChange={formState.change('domainId')}>
+            {domains}
+          </select>
         </FormField>
       );
     }
@@ -183,6 +209,7 @@ export default class MessageFormContents extends Component {
             <input name="path" value={message.path || ''}
               onChange={formState.change('path')}/>
           </FormField>
+          {administeredBy}
         </fieldset>
       </div>
     );
@@ -190,5 +217,6 @@ export default class MessageFormContents extends Component {
 };
 
 MessageFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired
 };

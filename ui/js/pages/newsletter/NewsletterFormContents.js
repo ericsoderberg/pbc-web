@@ -8,21 +8,31 @@ export default class NewsletterFormContents extends Component {
 
   constructor () {
     super();
-    this.state = { libraries: [], calendars: [] };
+    this.state = { libraries: [], calendars: [], domains: [] };
   }
 
   componentDidMount () {
+    const { formState, session } = this.props;
+
     getItems('messages', { distinct: 'library' })
     .then(libraries => this.setState({ libraries: libraries }))
-    .catch(error => console.log('!!! Newsletter libraries catch', error));
+    .catch(error => console.log('!!! NewsletterFormContents libraries catch', error));
 
     getItems('events', { distinct: 'calendar' })
     .then(calendars => this.setState({ calendars: calendars }))
-    .catch(error => console.log('!!! Newsletter calendars catch', error));
+    .catch(error => console.log('!!! NewsletterFormContents calendars catch', error));
+
+    if (session.administrator) {
+      getItems('domains')
+      .then(response => this.setState({ domains: response }))
+      .catch(error => console.log('NewsletterFormContents domains catch', error));
+    } else if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
   }
 
   render () {
-    const { formState } = this.props;
+    const { formState, session } = this.props;
     const newsletter = formState.object;
 
     const libraries = this.state.libraries.map(library => (
@@ -34,6 +44,22 @@ export default class NewsletterFormContents extends Component {
       <option key={calendar} label={calendar} value={calendar} />
     ));
     calendars.unshift(<option key={0} />);
+
+    let administeredBy;
+    if (session.administrator) {
+      let domains = this.state.domains.map(domain => (
+        <option key={domain._id} label={domain.name} value={domain._id} />
+      ));
+      domains.unshift(<option key={0} />);
+      administeredBy = (
+        <FormField label="Administered by">
+          <select name="domainId" value={newsletter.domainId || ''}
+            onChange={formState.change('domainId')}>
+            {domains}
+          </select>
+        </FormField>
+      );
+    }
 
     return (
       <fieldset className="form__fields">
@@ -66,11 +92,13 @@ export default class NewsletterFormContents extends Component {
           <input name="address" value={newsletter.address || ''}
             onChange={formState.change('address')}/>
         </FormField>
+        {administeredBy}
       </fieldset>
     );
   }
 };
 
 NewsletterFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired
 };

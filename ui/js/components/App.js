@@ -23,7 +23,7 @@ class App extends Component {
     let classNames = ['app'];
 
     let nav, navControl;
-    if (session && session.administrator) {
+    if (session && (session.administrator || session.administratorDomainId)) {
       nav = <MainNav onClick={this._onToggle} />;
       if (navActive) {
         classNames.push('app--nav');
@@ -51,7 +51,8 @@ class App extends Component {
 
 App.propTypes = {
   session: PropTypes.shape({
-    administrator: PropTypes.bool
+    administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string
   })
 };
 

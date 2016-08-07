@@ -17,6 +17,7 @@ const image = {
 
 const sessionSchema = Schema({
   administrator: Boolean,
+  administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   email: String,
   loginAt: Date,
   name: String,
@@ -27,6 +28,7 @@ export const Session = mongoose.model('Session', sessionSchema);
 
 const userSchema = Schema({
   administrator: Boolean,
+  administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   avatar: image,
   created: Date,
   email: {type: String, required: true, unique: true},
@@ -39,32 +41,41 @@ const userSchema = Schema({
 
 mongoose.model('User', userSchema);
 
+const domainSchema = Schema({
+  created: Date,
+  modified: Date,
+  name: {type: String, required: true}
+});
+
+mongoose.model('Domain', domainSchema);
+
 const pageSectionSchema = Schema({
-  type: { type: String,
-    enum: ['text', 'image', 'event', 'library', 'form', 'user', 'pages', 'video']
-  },
   color: String,
+  eventId: { type: Schema.Types.ObjectId, ref: 'Event' },  // event type
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },   // form type
   full: Boolean,
   image: image,       // image type
   name: String,       // library type
-  eventId: { type: Schema.Types.ObjectId, ref: 'Event' },  // event type
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },   // form type
   navigable: Boolean, // event type
   pages: [{           // pages type
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
     image: image
   }],
   text: String,       // text type
+  type: { type: String,
+    enum: ['text', 'image', 'event', 'library', 'form', 'user', 'pages', 'video']
+  },
   url: String,        // video type
   userId: { type: Schema.Types.ObjectId, ref: 'User' }    // user type
 });
 
 const pageSchema = Schema({
   created: Date,
-  sections: [pageSectionSchema],
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: String,
   path: String,
+  sections: [pageSectionSchema],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
@@ -75,12 +86,13 @@ const eventSchema = Schema({
   calendar: String,
   created: Date,
   dates: [Date],
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   end: Date,
-  primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' }, // set in one-off cases
   location: String, // room, house owner's name, etc.
   modified: Date,
   name: String,
   path: String,
+  primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' }, // set in one-off cases
   resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }], // resources
   start: Date,
   text: String,
@@ -130,6 +142,7 @@ const formTemplateSectionSchema = Schema({
 
 const formTemplateSchema = Schema({
   created: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: String,
   path: String,
@@ -174,6 +187,7 @@ const messageSchema = Schema({
   author: String,
   created: Date,
   date: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   files: [{
     _id: String,
     name: String,
@@ -214,6 +228,7 @@ const newsletterSchema = Schema({
   calendar: String,
   created: Date,
   date: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   library: String,
   modified: Date,
   name: String,
@@ -226,6 +241,7 @@ mongoose.model('Newsletter', newsletterSchema);
 const emailListSchema = Schema({
   addresses: [String],
   created: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true, unique: true},
   text: String,

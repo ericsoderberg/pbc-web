@@ -30,7 +30,9 @@ class ItemHeader extends Component {
     const { category, item, title, session } = this.props;
 
     let actions;
-    if (item && session && session.administrator) {
+    if (item && session && (session.administrator ||
+      (session.administratorDomainId &&
+        session.administratorDomainId === item.domainId))) {
       actions = (
         <nav className="page-header__actions">
           <a href={`/${category}/add`} className="a-header"
@@ -55,7 +57,8 @@ ItemHeader.propTypes = {
   category: PropTypes.string.isRequired,
   item: PropTypes.object,
   session: PropTypes.shape({
-    administrator: PropTypes.bool
+    administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string
   }),
   title: PropTypes.string
 };

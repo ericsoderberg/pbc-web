@@ -11,16 +11,19 @@ const MAIN_ROUTES = [
   { label: 'Search', path: '/search' }
 ];
 
-const ADMIN_ROUTES = [
+const DOMAIN_ADMIN_ROUTES = [
   { label: 'Pages', path: '/pages' },
   { label: 'Events', path: '/events' },
   { label: 'Newsletters', path: '/newsletters' },
   { label: 'Forms', path: '/forms' },
   { label: 'Form Templates', path: '/form-templates' },
-  { label: 'Messages', path: '/messages' },
+  { label: 'Email Lists', path: '/email-lists' }
+];
+
+const ADMIN_ROUTES = [
   { label: 'People', path: '/users' },
-  { label: 'Email Lists', path: '/email-lists' },
   { label: 'Resources', path: '/resources' },
+  { label: 'Domains', path: '/domains' },
   { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' }
 ];
@@ -62,7 +65,7 @@ class MainNav extends Component {
     const { session, onClick } = this.props;
     const mainLinks = this._renderLinks(MAIN_ROUTES);
 
-    let sessionControls, adminLinks;
+    let sessionControls, domainAdminLinks, adminLinks;
     if (session) {
       sessionControls = [
         <Link key="name" className="main-nav__link"
@@ -71,6 +74,9 @@ class MainNav extends Component {
           Sign Out
         </a>
       ];
+      if (session.administrator || session.administratorDomainId) {
+        domainAdminLinks = this._renderLinks(DOMAIN_ADMIN_ROUTES);
+      }
       if (session.administrator) {
         adminLinks = this._renderLinks(ADMIN_ROUTES);
       }
@@ -82,6 +88,7 @@ class MainNav extends Component {
       <nav className={`main-nav ${this.props.className}`}
         onClick={onClick}>
         {mainLinks}
+        {domainAdminLinks}
         {adminLinks}
         <div className="main-nav__session">
           {sessionControls}
@@ -95,6 +102,7 @@ MainNav.propTypes = {
   onClick: PropTypes.func,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string,
     name: PropTypes.string,
     userId: PropTypes.string
   })

@@ -13,14 +13,23 @@ class EventFormFields extends Component {
     super();
     this._onStartChange = this._onStartChange.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
-    this.state = { events: [] };
+    this.state = { events: [], domains: [] };
   }
 
   componentDidMount () {
-    // this.refs.name.focus();
+    const { formState, session } = this.props;
+
     getItems('events', { dates: { $gt: {} } })
     .then(response => this.setState({ events: response }))
-    .catch(error => console.log('EventFormFields catch', error));
+    .catch(error => console.log('EventFormContents catch', error));
+
+    if (session.administrator) {
+      getItems('domains')
+      .then(response => this.setState({ domains: response }))
+      .catch(error => console.log('EventFormContents catch', error));
+    } else if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
   }
 
   _onStartChange (start) {
@@ -49,7 +58,7 @@ class EventFormFields extends Component {
   }
 
   render () {
-    const { formState } = this.props;
+    const { formState, session } = this.props;
     const event = formState.object;
 
     let primaryEvent;
@@ -90,6 +99,22 @@ class EventFormFields extends Component {
       ]);
     }
 
+    let administeredBy;
+    if (session.administrator) {
+      let domains = this.state.domains.map(domain => (
+        <option key={domain._id} label={domain.name} value={domain._id} />
+      ));
+      domains.unshift(<option key={0} />);
+      administeredBy = (
+        <FormField label="Administered by">
+          <select name="domainId" value={event.domainId || ''}
+            onChange={formState.change('domainId')}>
+            {domains}
+          </select>
+        </FormField>
+      );
+    }
+
     return (
       <fieldset className="form__fields">
         <FormField label="Name">
@@ -126,6 +151,7 @@ class EventFormFields extends Component {
           <input name="path" value={event.path || ''}
             onChange={formState.change('path')}/>
         </FormField>
+        {administeredBy}
         {primaryEvent}
         {otherTimes}
         <FormField>
@@ -165,10 +191,11 @@ export default class EventFormContents extends Component {
   }
 
   render () {
+    const { formState, session } = this.props;
     const View = VIEWS[this.state.view];
     return (
       <div>
-        <View formState={this.props.formState} />
+        <View formState={formState} session={session} />
         <div className="form__tabs">
           <button type="button"className="button button--secondary"
             onClick={this._onView.bind(this, 'details')}>
@@ -189,5 +216,6 @@ export default class EventFormContents extends Component {
 };
 
 EventFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired
 };

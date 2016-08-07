@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
@@ -11,9 +12,21 @@ export default class FormTemplateFormContents extends Component {
   constructor () {
     super();
     this.state = {
+      domains: [],
       expandedSections: {}, // _id or id
       newSectionId: 1
     };
+  }
+
+  componentDidMount () {
+    const { formState, session } = this.props;
+    if (session.administrator) {
+      getItems('domains')
+      .then(response => this.setState({ domains: response }))
+      .catch(error => console.log('FormTemplateFormContents catch', error));
+    } else if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
   }
 
   _addSection () {
@@ -38,7 +51,7 @@ export default class FormTemplateFormContents extends Component {
   }
 
   render () {
-    const { formState } = this.props;
+    const { formState, session } = this.props;
     const { expandedSections } = this.state;
     const formTemplate = formState.object;
 
@@ -94,6 +107,22 @@ export default class FormTemplateFormContents extends Component {
       );
     });
 
+    let administeredBy;
+    if (session.administrator) {
+      let domains = this.state.domains.map(domain => (
+        <option key={domain._id} label={domain.name} value={domain._id} />
+      ));
+      domains.unshift(<option key={0} />);
+      administeredBy = (
+        <FormField label="Administered by">
+          <select name="domainId" value={formTemplate.domainId || ''}
+            onChange={formState.change('domainId')}>
+            {domains}
+          </select>
+        </FormField>
+      );
+    }
+
     return (
       <div>
         <fieldset className="form__fields">
@@ -105,6 +134,7 @@ export default class FormTemplateFormContents extends Component {
             <input name="path" value={formTemplate.path || ''}
               onChange={formState.change('path')}/>
           </FormField>
+          {administeredBy}
           <FormField label="Submit button label">
             <input name="submitLabel"
               value={formTemplate.submitLabel || 'Submit'}
@@ -128,5 +158,6 @@ export default class FormTemplateFormContents extends Component {
 };
 
 FormTemplateFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired
 };

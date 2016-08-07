@@ -8,7 +8,7 @@ export default class Add extends Component {
   constructor (props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
-    this.state = { item: props.default || {} };
+    this.state = { };
   }
 
   componentDidMount () {
@@ -25,7 +25,7 @@ export default class Add extends Component {
         this.context.router.goBack();
       }
     })
-    .catch(error => this.setState({ error: error }));
+    .catch(error => this.setState({ error: error, item: item }));
   }
 
   render () {
@@ -42,7 +42,6 @@ export default class Add extends Component {
 
 Add.propTypes = {
   category: PropTypes.string.isRequired,
-  default: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
   Preview: PropTypes.func,
   showable: PropTypes.bool,

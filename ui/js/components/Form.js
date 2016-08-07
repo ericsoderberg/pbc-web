@@ -4,6 +4,7 @@ import PageHeader from './PageHeader';
 import FormError from './FormError';
 import FormState from '../utils/FormState';
 import ConfirmRemove from './ConfirmRemove';
+import Stored from './Stored';
 
 export default class Form extends Component {
 
@@ -14,12 +15,14 @@ export default class Form extends Component {
     this._onRemove = this._onRemove.bind(this);
     this._setItem = this._setItem.bind(this);
     this.state = {
-      formState: new FormState(props.item, this._setItem)
+      formState: new FormState(props.item || {}, this._setItem)
     };
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ formState: new FormState(nextProps.item, this._setItem) });
+    if (nextProps.item) {
+      this.setState({ formState: new FormState(nextProps.item, this._setItem) });
+    }
   }
 
   _onCancel () {
@@ -41,7 +44,8 @@ export default class Form extends Component {
   }
 
   render () {
-    const { title, action, submitLabel, onRemove, error, Preview, FormContents } = this.props;
+    const { title, action, submitLabel, onRemove, error, session,
+      Preview, FormContents } = this.props;
     const { formState } = this.state;
 
     const cancelControl = (
@@ -65,7 +69,7 @@ export default class Form extends Component {
         <form className="form" action={action} onSubmit={this._onSubmit}>
           <PageHeader title={title} actions={cancelControl} />
           <FormError message={error} />
-          <FormContents formState={this.state.formState} />
+          <FormContents formState={this.state.formState} session={session} />
           <footer className="form__footer">
             <button type="submit" className="button" onClick={this._onSubmit}>
               {submitLabel}
@@ -83,10 +87,15 @@ Form.propTypes = {
   action: PropTypes.string,
   error: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
-  item: PropTypes.object.isRequired,
+  item: PropTypes.object,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   Preview: PropTypes.func,
+  session: PropTypes.shape({
+    administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string,
+    name: PropTypes.string
+  }),
   submitLabel: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired
 };
@@ -94,3 +103,9 @@ Form.propTypes = {
 Form.contextTypes = {
   router: PropTypes.any
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(Form, select);

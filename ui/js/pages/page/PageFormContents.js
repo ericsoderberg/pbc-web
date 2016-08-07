@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import AddIcon from '../../icons/Add';
 import DownIcon from '../../icons/Down';
@@ -34,6 +35,7 @@ export default class PageFormContents extends Component {
     super(props);
     const { formState: { object: page } } = props;
     this.state = {
+      domains: [],
       expandAdd: (! page || ! page.sections || page.sections.length === 0),
       expandedSections: {}, // _id or id
       newSectionId: 1
@@ -41,7 +43,15 @@ export default class PageFormContents extends Component {
   }
 
   componentDidMount () {
+    const { formState, session } = this.props;
     this.refs.name.focus();
+    if (session.administrator) {
+      getItems('domains')
+      .then(response => this.setState({ domains: response }))
+      .catch(error => console.log('PageFormContents catch', error));
+    } else if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -73,7 +83,7 @@ export default class PageFormContents extends Component {
   }
 
   render () {
-    const { formState } = this.props;
+    const { formState, session } = this.props;
     const { expandedSections, expandAdd } = this.state;
     const page = formState.object;
 
@@ -156,6 +166,22 @@ export default class PageFormContents extends Component {
 
     }
 
+    let administeredBy;
+    if (session.administrator) {
+      let domains = this.state.domains.map(domain => (
+        <option key={domain._id} label={domain.name} value={domain._id} />
+      ));
+      domains.unshift(<option key={0} />);
+      administeredBy = (
+        <FormField label="Administered by">
+          <select name="domainId" value={page.domainId || ''}
+            onChange={formState.change('domainId')}>
+            {domains}
+          </select>
+        </FormField>
+      );
+    }
+
     return (
       <div>
         <fieldset className="form__fields">
@@ -167,6 +193,7 @@ export default class PageFormContents extends Component {
             <input name="path" value={page.path || ''}
               onChange={formState.change('path')}/>
           </FormField>
+          {administeredBy}
         </fieldset>
         {sections}
         {add}
@@ -176,5 +203,6 @@ export default class PageFormContents extends Component {
 };
 
 PageFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired
 };

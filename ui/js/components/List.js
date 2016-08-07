@@ -103,7 +103,7 @@ class List extends Component {
     }
 
     let addControl;
-    if (session && session.administrator) {
+    if (session && (session.administrator || session.administratorDomainId)) {
       addControl = (
         <Link key="add" to={`${path}/add`} className="a-header">Add</Link>
       );
@@ -153,7 +153,8 @@ List.propTypes = {
   path: PropTypes.string,
   select: PropTypes.string,
   session: PropTypes.shape({
-    administrator: PropTypes.bool
+    administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string
   }),
   sort: PropTypes.string,
   title: PropTypes.string
