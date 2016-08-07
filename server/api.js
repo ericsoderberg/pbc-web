@@ -841,7 +841,7 @@ router.post('/files', (req, res) => {
 
 router.get('/search', (req, res) => {
   const Page = mongoose.model('Page');
-  const exp = new RegExp(req.query.search, 'i');
+  const exp = new RegExp(req.query.search, 'ig');
   const q = { $or: [ { name: exp }, { 'sections.text': exp } ] };
   Page.find(q)
   .select('name sections')
@@ -850,9 +850,14 @@ router.get('/search', (req, res) => {
   .then(docs => {
     // prune sections down to just text
     docs.forEach(doc => {
-      doc.sections = doc.sections.filter(section => (
-        'text' === section.type && exp.test(section.text)
-      ));
+      doc.sections = doc.sections.filter(section => {
+        if ('text' === section.type && exp.test(section.text)) {
+          section.text =
+            section.text.replace(exp, `**${req.query.search}**`);
+          return true;
+        }
+        return false;
+      });
     });
     res.status(200).json(docs);
   })
