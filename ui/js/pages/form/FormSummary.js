@@ -39,9 +39,9 @@ class FormSummary extends Component {
   }
 
   _loadForms (props) {
-    const { formTemplateId } = props;
+    const { formTemplateId, session } = props;
     getItems('forms',
-      { filter: { formTemplateId: formTemplateId },
+      { filter: { formTemplateId: formTemplateId, userId: session.userId },
         select: 'modified userId', populate: true })
     .then(forms => this.setState({ forms: forms }))
     .catch(error => console.log('!!! FormSummary forms catch', error));
