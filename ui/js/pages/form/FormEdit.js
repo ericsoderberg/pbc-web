@@ -42,6 +42,7 @@ export default class FormEdit extends Component {
     if (error) {
       this.setState({ error: error });
     } else {
+      form.domainId = formTemplate.domainId;
       putItem('forms', this.state.form)
       .then(response => onDone ? onDone() : this.context.router.goBack())
       .catch(error => this.setState({ error: error }));

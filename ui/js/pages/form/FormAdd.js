@@ -44,6 +44,7 @@ export default class FormAdd extends Component {
     if (error) {
       this.setState({ error: error });
     } else {
+      form.domainId = formTemplate.domainId;
       postItem('forms', form)
       .then(response => onDone ? onDone() : this.context.router.goBack())
       .catch(error => this.setState({ error: error }));

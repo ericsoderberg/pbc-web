@@ -156,6 +156,7 @@ mongoose.model('FormTemplate', formTemplateSchema);
 
 const formSchema = Schema({
   created: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   fields: [{
     fieldId: ObjectId,
     optionId: ObjectId, // choice

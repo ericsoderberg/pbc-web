@@ -314,11 +314,17 @@ register('form-templates', 'FormTemplate', {
 });
 
 register('forms', 'Form', {
+  authorize: {
+    index: authorizedForDomain
+  },
   populate: {
     index: [
       { path: 'userId', select: 'name' },
-      { path: 'formTemplateId', select: 'name' }
+      { path: 'formTemplateId', select: 'name domainId' }
     ]
+  },
+  transform: {
+    put: unsetDomainIfNeeded
   }
 });
 
