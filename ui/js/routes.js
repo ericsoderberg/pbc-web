@@ -30,6 +30,7 @@ import NewsletterAdd from './pages/newsletter/NewsletterAdd';
 import Newsletter from './pages/newsletter/Newsletter';
 import NewsletterEdit from './pages/newsletter/NewsletterEdit';
 import Pages from './pages/page/Pages';
+import PageGraph from './pages/page/PageGraph';
 import PageAdd from './pages/page/PageAdd';
 import Page from './pages/page/Page';
 import PageEdit from './pages/page/PageEdit';
@@ -59,6 +60,7 @@ export default {
     { path: 'users', component: Users },
     { path: 'site', component: SiteEdit },
     { path: 'pages/add', component: PageAdd },
+    { path: 'page-graph', component: PageGraph },
     { path: 'pages/:id', component: Page },
     { path: 'pages/:id/edit', component: PageEdit },
     { path: 'pages', component: Pages },
