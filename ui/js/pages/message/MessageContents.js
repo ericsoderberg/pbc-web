@@ -37,8 +37,7 @@ export default class MessageContents extends Component {
     let image;
     if (message.image) {
       image = (
-        <Image className="message__image" image={message.image}
-          full={true} plain={true} />
+        <Image image={message.image} full={true} />
       );
     }
 
