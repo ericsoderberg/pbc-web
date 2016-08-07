@@ -11,6 +11,13 @@ export default class Search extends Component {
     this.state = { active: false };
   }
 
+  componentDidMount () {
+    const { focusOnMount } = this.props;
+    if (focusOnMount) {
+      this.refs.input.focus();
+    }
+  }
+
   _onActivate (event) {
     this.setState({ active: true }, () => {
       this.refs.input.focus();
@@ -41,6 +48,7 @@ export default class Search extends Component {
 };
 
 Search.propTypes = {
+  focusOnMount: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string
 };

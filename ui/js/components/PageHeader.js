@@ -29,7 +29,8 @@ export default class PageHeader extends Component {
   }
 
   render () {
-    const { title, searchText, onSearch, actions, form, back, homer } = this.props;
+    const { title, searchText, onSearch, actions, form, back, homer,
+      focusOnSearch } = this.props;
     const { site } = this.state;
     let classes = ["page-header"];
     if (form) {
@@ -67,7 +68,10 @@ export default class PageHeader extends Component {
 
     let search;
     if (onSearch) {
-      search = <Search value={searchText} onChange={onSearch} />;
+      search = (
+        <Search ref="search" value={searchText} onChange={onSearch}
+          focusOnMount={focusOnSearch} />
+      );
     }
 
     let h1;
@@ -100,6 +104,7 @@ PageHeader.propTypes = {
   actions: PropTypes.node,
   back: PropTypes.bool,
   color: PropTypes.string,
+  focusOnSearch: PropTypes.bool,
   form: PropTypes.bool,
   homer: PropTypes.bool,
   logo: PropTypes.bool,

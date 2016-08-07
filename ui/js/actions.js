@@ -299,3 +299,14 @@ export function deleteFile (id) {
     method: 'DELETE', headers: _headers })
   .then(processStatus);
 }
+
+// Search
+
+export function getSearch (searchText) {
+  let params = [];
+  params.push(`search=${encodeURIComponent(searchText)}`);
+  const q = params.length > 0 ? `?${params.join('&')}` : '';
+  return fetch(`/api/search${q}`, {
+    method: 'GET', headers: _headers })
+  .then(response => response.json());
+}

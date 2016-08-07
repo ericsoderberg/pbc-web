@@ -38,6 +38,7 @@ import Resources from './pages/resource/Resources';
 import ResourceAdd from './pages/resource/ResourceAdd';
 import Resource from './pages/resource/Resource';
 import ResourceEdit from './pages/resource/ResourceEdit';
+import Search from './pages/search/Search';
 import SignIn from './pages/session/SignIn';
 import SignUp from './pages/user/SignUp';
 import Users from './pages/user/Users';
@@ -96,6 +97,7 @@ export default {
     { path: 'domains/:id/edit', component: DomainEdit },
     { path: 'domains', component: Domains },
     { path: 'files', component: Files },
+    { path: 'search', component: Search },
     { path: ':id', component: Page }
   ]
 };

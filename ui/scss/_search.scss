@@ -1,0 +1,13 @@
+
+.search__link {
+  display: block;
+  font-size: 2em;
+  padding: $half-unit $unit;
+  background-color: $header-background-color;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+}

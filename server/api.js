@@ -837,4 +837,26 @@ router.post('/files', (req, res) => {
   });
 });
 
+// Search
+
+router.get('/search', (req, res) => {
+  const Page = mongoose.model('Page');
+  const exp = new RegExp(req.query.search, 'i');
+  const q = { $or: [ { name: exp }, { 'sections.text': exp } ] };
+  Page.find(q)
+  .select('name sections')
+  .limit(20)
+  .exec()
+  .then(docs => {
+    // prune sections down to just text
+    docs.forEach(doc => {
+      doc.sections = doc.sections.filter(section => (
+        'text' === section.type && exp.test(section.text)
+      ));
+    });
+    res.status(200).json(docs);
+  })
+  .catch(error => res.status(400).json(error));
+});
+
 module.exports = router;
