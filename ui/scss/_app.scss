@@ -106,7 +106,16 @@
   background-color: $header-background-color;
 
   @media all and (min-width: 700px) {
-    height: $double-unit;
+    height: $triple-unit;
+
+    .button-icon {
+      height: $triple-unit;
+      width: $triple-unit;
+
+      + .page-header__main .page-header__title {
+        margin-left: $half-unit;
+      }
+    }
   }
 
   @media all and (max-width: 699px) {
@@ -125,7 +134,7 @@
 }
 
 .page-header__logo {
-  height: $unit;
+  height: 100%;
 }
 
 .page-header__back {
@@ -147,6 +156,7 @@
   @media all and (max-width: 699px) {
     text-align: center;
     flex: 1;
+    margin: 0;
   }
 }
 
@@ -247,6 +257,10 @@
   padding: $half-unit $unit;
   height: 100%;
   width: auto;
+
+  @media all and (min-width: 700px) {
+    line-height: $double-unit;
+  }
 
   &:hover {
     background-color: $control-hover-background;
