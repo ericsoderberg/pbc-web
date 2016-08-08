@@ -11,3 +11,11 @@
     color: $active-color;
   }
 }
+
+.search__item {
+  .text {
+    strong {
+      background-color: $accent-color;
+    }
+  }
+}
