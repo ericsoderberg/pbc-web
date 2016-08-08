@@ -207,6 +207,21 @@
   right: 0;
   flex-direction: column;
   display: none;
+
+  @media all and (max-width: 699px) {
+    margin: $unit 0;
+    width: 100%;
+  }
+
+  button {
+    margin: 0;
+  }
+}
+
+.confirm-remove__remove {
+  @media all and (max-width: 699px) {
+    width: 100%;
+  }
 }
 
 .confirm-remove--confirming {
