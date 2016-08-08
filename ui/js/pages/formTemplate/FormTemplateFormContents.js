@@ -55,6 +55,17 @@ export default class FormTemplateFormContents extends Component {
     const { expandedSections } = this.state;
     const formTemplate = formState.object;
 
+    // build field id/name list for dependencies
+    let dependableFields = [];
+    (formTemplate.sections || []).forEach(section => {
+      (section.fields || []).forEach(field => {
+        dependableFields.push({
+          id: field._id || field.id,
+          name: field.name
+        });
+      });
+    });
+
     const sections = (formTemplate.sections || []).map((section, index) => {
 
       const raise = (index === 0 ? undefined : (
@@ -68,7 +79,7 @@ export default class FormTemplateFormContents extends Component {
           onClick={formState.swapWith('sections', index, index+1)}>
           <DownIcon />
         </button>
-        ));
+      ));
 
       let header;
       if (formTemplate.sections.length > 1) {
@@ -94,6 +105,7 @@ export default class FormTemplateFormContents extends Component {
       if (! header || expandedSections[section._id] || expandedSections[section.id]) {
         edit = (
           <FormTemplateSectionEdit key={index} section={section}
+            dependableFields={dependableFields}
             includeName={formTemplate.sections.length > 1}
             onChange={formState.changeAt('sections', index)} />
         );
@@ -134,12 +146,12 @@ export default class FormTemplateFormContents extends Component {
             <input name="path" value={formTemplate.path || ''}
               onChange={formState.change('path')}/>
           </FormField>
-          {administeredBy}
           <FormField label="Submit button label">
             <input name="submitLabel"
               value={formTemplate.submitLabel || 'Submit'}
               onChange={formState.change('submitLabel')}/>
           </FormField>
+          {administeredBy}
         </fieldset>
         {sections}
         <fieldset className="form__fields">

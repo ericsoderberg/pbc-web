@@ -22,6 +22,7 @@ export default class FormTemplateFieldEdit extends Component {
   }
 
   render () {
+    const { dependableFields } = this.props;
     const { formState } = this.state;
     const field = formState.object;
 
@@ -128,6 +129,20 @@ export default class FormTemplateFieldEdit extends Component {
       );
     }
 
+    let dependsOnOptions = dependableFields.map(dependableField => (
+      <option key={dependableField.id} label={dependableField.name}
+        value={dependableField.id} />
+    ));
+    dependsOnOptions.unshift(<option key={0} />);
+    const dependsOn = (
+      <FormField label="Depends on">
+        <select name="dependsOnId" value={field.dependsOnId || ''}
+          onChange={formState.change('dependsOnId')}>
+          {dependsOnOptions}
+        </select>
+      </FormField>
+    );
+
     return (
       <div>
         <fieldset className="form__fields">
@@ -135,6 +150,7 @@ export default class FormTemplateFieldEdit extends Component {
           {help}
           {required}
           {monetary}
+          {dependsOn}
         </fieldset>
         {options}
         {addOptionControl}
@@ -144,6 +160,7 @@ export default class FormTemplateFieldEdit extends Component {
 };
 
 FormTemplateFieldEdit.propTypes = {
+  dependableFields: PropTypes.arrayOf(PropTypes.object),
   field: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired

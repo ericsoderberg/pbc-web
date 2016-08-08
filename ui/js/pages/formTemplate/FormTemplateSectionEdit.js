@@ -54,17 +54,28 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render () {
-    const { includeName } = this.props;
+    const { includeName, dependableFields } = this.props;
     const { formState, expandedFields, expandAdd } = this.state;
     const section = formState.object;
 
-    let name;
+    let sectionFields;
     if (includeName) {
-      name = (
+      let dependsOnOptions = dependableFields.map(dependableField => (
+        <option key={dependableField.id} label={dependableField.name}
+          value={dependableField.id} />
+      ));
+      dependsOnOptions.unshift(<option key={0} />);
+      sectionFields = (
         <fieldset className="form__fields">
           <FormField label="Section name">
             <input name="name" value={section.name || ''}
               onChange={formState.change('name')}/>
+          </FormField>
+          <FormField label="Depends on">
+            <select name="dependsOnId" value={section.dependsOnId || ''}
+              onChange={formState.change('dependsOnId')}>
+              {dependsOnOptions}
+            </select>
           </FormField>
         </fieldset>
       );
@@ -89,6 +100,7 @@ export default class FormTemplateSectionEdit extends Component {
       if (expandedFields[field._id] || expandedFields[field.id]) {
         edit = (
           <FormTemplateFieldEdit key={index} field={field} index={index}
+            dependableFields={dependableFields}
             onChange={formState.changeAt('fields', index)} />
         );
       }
@@ -150,7 +162,7 @@ export default class FormTemplateSectionEdit extends Component {
 
     return (
       <div>
-        {name}
+        {sectionFields}
         {fields}
         {add}
       </div>
@@ -159,6 +171,7 @@ export default class FormTemplateSectionEdit extends Component {
 };
 
 FormTemplateSectionEdit.propTypes = {
+  dependableFields: PropTypes.arrayOf(PropTypes.object),
   includeName: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
