@@ -31,6 +31,8 @@ class Home extends Component {
         }
       })
       .catch(error => console.log('!!! Home catch', error));
+    } else {
+      document.title = this.props.site.name;
     }
   }
 

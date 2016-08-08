@@ -14,7 +14,7 @@ export default class Search extends Component {
   }
 
   componentDidMount () {
-
+    document.title = 'Search';
   }
 
   _onSearch (event) {

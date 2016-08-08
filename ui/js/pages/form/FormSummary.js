@@ -40,11 +40,15 @@ class FormSummary extends Component {
 
   _loadForms (props) {
     const { formTemplateId, session } = props;
-    getItems('forms',
-      { filter: { formTemplateId: formTemplateId, userId: session.userId },
-        select: 'modified userId', populate: true })
-    .then(forms => this.setState({ forms: forms }))
-    .catch(error => console.log('!!! FormSummary forms catch', error));
+    if (session) {
+      getItems('forms',
+        { filter: { formTemplateId: formTemplateId, userId: session.userId },
+          select: 'modified userId', populate: true })
+      .then(forms => this.setState({ forms: forms }))
+      .catch(error => console.log('!!! FormSummary forms catch', error));
+    } else {
+      this.setState({ forms: [] });
+    }
   }
 
   _onAdd () {
