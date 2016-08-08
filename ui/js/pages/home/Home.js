@@ -15,24 +15,28 @@ class Home extends Component {
   constructor () {
     super();
     this._signOut = this._signOut.bind(this);
+    this._siteReady = this._siteReady.bind(this);
     this.state = {};
   }
 
   componentDidMount () {
-    if (! this.props.site) {
+    const { site } = this.props;
+    if (! site) {
       getSite()
-      .then(site => {
-        if (site.homePageId) {
-          document.title = site.name;
-          return getItem('pages', site.homePageId,
-            { cache: true, populate: true });
-        } else {
-          return Promise.reject();
-        }
-      })
+      .then(this._siteReady)
       .catch(error => console.log('!!! Home catch', error));
     } else {
-      document.title = this.props.site.name;
+      this._siteReady(site);
+    }
+  }
+
+  _siteReady (site) {
+    const { page } = this.props;
+    document.title = site.name;
+    if (! page && site.homePageId) {
+      return getItem('pages', site.homePageId, { cache: true, populate: true });
+    } else {
+      return Promise.reject();
     }
   }
 
