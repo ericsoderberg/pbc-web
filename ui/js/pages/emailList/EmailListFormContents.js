@@ -41,8 +41,10 @@ export default class EmailListFormContents extends Component {
 
   _onChangeAddresses (event) {
     const { formState } = this.props;
-    let addresses = event.target.value.split(' ');
-    addresses.push(this.state.addAddress);
+    let addresses = event.target.value.split(/\s+/).filter(address => address);
+    if (this.state.addAddress) {
+      addresses.push(this.state.addAddress);
+    }
     formState.set('addresses', addresses.sort());
   }
 
