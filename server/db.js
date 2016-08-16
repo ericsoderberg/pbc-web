@@ -189,6 +189,7 @@ const messageSchema = Schema({
   created: Date,
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  dpId: String,
   files: [{
     _id: String,
     name: String,
