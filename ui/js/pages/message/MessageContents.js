@@ -35,7 +35,7 @@ export default class MessageContents extends Component {
     }
 
     let image;
-    if (message.image) {
+    if (! message.videoUrl && message.image) {
       image = (
         <Image image={message.image} full={true} />
       );
