@@ -40,7 +40,6 @@ if (false) {
     }
 
     const items = data.split("\n");
-    console.log('!!! found', items.length);
     items.filter(item => item).forEach(item => {
       item = JSON.parse(item);
 
@@ -116,6 +115,7 @@ if (false) {
     item._id = new mongoose.Types.ObjectId();
     item.created = item.created_at || undefined;
     item.modified = item.updated_at || undefined;
+    item.series = true;
     item.name = item.title;
     item.path = item.url || undefined;
     item.text = item.description || undefined;
@@ -143,7 +143,6 @@ if (false) {
     }
 
     const items = data.split("\n");
-    console.log('!!! found', items.length, 'messages');
     items.filter(item => item).forEach(item => {
       item = JSON.parse(item);
 
@@ -185,6 +184,22 @@ if (false) {
       console.log('!!! saved', item.name);
       message.save()
       .catch(error => console.log(error));
+    });
+  });
+}
+
+// Message series date
+
+if (false) {
+  const Message = mongoose.model('Message');
+  Message.find().exists('series').exec().then(seriesMessages => {
+    seriesMessages.forEach(seriesMessage => {
+      Message.findOne({ seriesId: seriesMessage.id }).sort('date').exec().then(message => {
+        seriesMessage.date = message.date;
+        console.log('!!! set', seriesMessage.name, seriesMessage.date);
+        seriesMessage.save()
+        .catch(error => console.log(error));
+      });
     });
   });
 }
