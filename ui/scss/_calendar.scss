@@ -114,19 +114,25 @@
 
 .calendar__event {
   a {
-    text-indent: - $half-unit;
-    padding: $quarter-unit $quarter-unit $quarter-unit ($half-unit + $quarter-unit);
+    // text-indent: - $half-unit;
+    // padding: $quarter-unit $quarter-unit $quarter-unit ($half-unit + $quarter-unit);
+    padding: $quarter-unit;
     display: block;
     color: #333;
   }
 }
 
 .calendar__event-time {
-  width: $unit * 3;
+  // width: $unit * 3;
   margin-right: $quarter-unit;
-  text-indent: 0;
-  color: #666;
+  // text-indent: 0;
+  color: $tertiary-color;
   display: inline-block;
+}
+
+.calendar__event-name {
+  display: block;
+  margin-left: $half-unit;
 }
 
 .calendar__nav {

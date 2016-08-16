@@ -5,8 +5,12 @@ import moment from 'moment';
 import { getCalendar, getItems } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Filter from '../../components/Filter';
+import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
+
+const LEFT_KEY = 37;
+const RIGHT_KEY = 39;
 
 export default class Calendar extends Component {
 
@@ -17,7 +21,8 @@ export default class Calendar extends Component {
     this._onChangeYear = this._onChangeYear.bind(this);
     this._onSearch = this._onSearch.bind(this);
     this._onFilter = this._onFilter.bind(this);
-    this.state = { calendar: { events: [] }, searchText: '' };
+    this._onKeyDown = this._onKeyDown.bind(this);
+    this.state = { calendar: { events: [] }, days: {}, searchText: '' };
   }
 
   componentDidMount () {
@@ -29,10 +34,16 @@ export default class Calendar extends Component {
     getItems('events', { distinct: 'calendar' })
     .then(response => this.setState({ filterOptions: response }))
     .catch(error => console.log('!!! Calendar filter catch', error));
+
+    window.addEventListener("keydown", this._onKeyDown);
   }
 
   componentWillReceiveProps (nextProps) {
     this._setFilter(nextProps);
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener("keydown", this._onKeyDown);
   }
 
   _setFilter (props) {
@@ -42,10 +53,39 @@ export default class Calendar extends Component {
   }
 
   _get () {
-    getCalendar({ date: this.state.date, searchText: this.state.searchText,
-      filter: this.state.filter})
-    .then(response => this.setState({ calendar: response }))
-    .catch(error => console.log('!!! Calendar get catch', error));
+    this.setState({ loading: true });
+    // throttle gets when user is typing
+    clearTimeout(this._getTimer);
+    this._getTimer = setTimeout(() => {
+      getCalendar({ date: this.state.date, searchText: this.state.searchText,
+        filter: this.state.filter})
+      .then(calendar => {
+
+        // structure by day to make rendering more efficient
+        let days = {};
+        calendar.events.forEach(event => {
+          const day = moment(event.start).startOf('day').valueOf();
+          if (! days[day]) {
+            days[day] = [];
+          }
+          days[day].push(event);
+          if (event.dates) {
+            event.dates.forEach(date => {
+              const day2 = moment(date).startOf('day').valueOf();
+              if (day2 !== day) {
+                if (! days[day2]) {
+                  days[day2] = [];
+                }
+                days[day2].push(event);
+              }
+            });
+          }
+        });
+
+        this.setState({ calendar: calendar, days: days, loading: false });
+      })
+      .catch(error => console.log('!!! Calendar get catch', error));
+    }, 100);
   }
 
   _changeDate (date) {
@@ -81,6 +121,16 @@ export default class Calendar extends Component {
     this.context.router.replace({ pathname: '/calendar', search: search });
   }
 
+  _onKeyDown (event) {
+    const { calendar } = this.state;
+    const key = (event.keyCode ? event.keyCode : event.which);
+    if (LEFT_KEY === key) {
+      this.setState({ date: moment(calendar.previous) }, this._get);
+    } else if (RIGHT_KEY === key) {
+      this.setState({ date: moment(calendar.next) }, this._get);
+    }
+  }
+
   _renderDaysOfWeek () {
     const { calendar: { start } } = this.state;
     let result = [];
@@ -101,48 +151,29 @@ export default class Calendar extends Component {
     );
   }
 
-  _renderEvents (date, events) {
-    let result = [];
-    events.forEach(event => {
-
+  _renderEvents (date) {
+    const { days } = this.state;
+    const events = days[date.valueOf()];
+    return (events || []).map(event => {
       const start = moment(event.start);
-      let eventDate;
-      if (start.isSame(date, 'date')) {
-        eventDate = start;
-      } else if (event.dates) {
-        event.dates.some(date2 => {
-          eventDate = moment(date2);
-          if (! eventDate.isSame(date, 'date')) {
-            eventDate = undefined;
-          } else {
-            return true;
-          }
-        });
-      }
-
-      if (eventDate) {
-
-        let time;
-        if (eventDate.isSame(date, 'day')) {
-          time = (
-            <span className="calendar__event-time">
-              {start.format('h:mm a')}
-            </span>
-          );
-        }
-
-        result.push(
-          <li key={event._id} className="calendar__event">
-            <Link to={`/events/${event._id}`}>
-              {time}
-              {event.name}
-            </Link>
-          </li>
+      let time;
+      if (true || start.isSame(date, 'day')) {
+        time = (
+          <span className="calendar__event-time">
+            {start.format('h:mm a')}
+          </span>
         );
       }
 
+      return (
+        <li key={event._id} className="calendar__event">
+          <Link to={`/events/${event._id}`}>
+            {time}
+            <span className="calendar__event-name">{event.name}</span>
+          </Link>
+        </li>
+      );
     });
-    return result;
   }
 
   _renderWeeks () {
@@ -150,9 +181,8 @@ export default class Calendar extends Component {
     let weeks = [];
     let today = moment();
     let focus = moment(calendar.date);
-    let date = moment(calendar.start);
+    let date = moment(calendar.start).startOf('day');
     let end = moment(calendar.end);
-    let events = calendar.events.slice(0);
     let days, previous;
 
     while (date.isSameOrBefore(end)) {
@@ -163,7 +193,7 @@ export default class Calendar extends Component {
         }
         days = [];
       }
-      const dayEvents = this._renderEvents(date, events);
+      const dayEvents = this._renderEvents(date, days);
 
       let classNames = ['calendar__day'];
       if (date.isSame(today, 'date')) {
@@ -201,10 +231,11 @@ export default class Calendar extends Component {
   }
 
   render () {
-    const { calendar, filterOptions, searchText, filter } = this.state;
+    const { calendar, filterOptions, searchText, filter, loading } = this.state;
     const date = moment(calendar.date);
     const daysOfWeek = this._renderDaysOfWeek();
-    const weeks = this._renderWeeks();
+    const weeks = loading ? undefined : this._renderWeeks();
+    const loadingIndicator = loading ? <Loading /> : undefined;
 
     let filterAction;
     if (filterOptions && filterOptions.length > 1) {
@@ -270,6 +301,7 @@ export default class Calendar extends Component {
             {daysOfWeek}
           </div>
           {weeks}
+          {loadingIndicator}
         </div>
       </main>
     );
