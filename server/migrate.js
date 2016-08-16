@@ -203,3 +203,59 @@ if (false) {
     });
   });
 }
+
+// Event + Resource
+
+if (false) {
+  const Event = mongoose.model('Event');
+  const Resource = mongoose.model('Resource');
+
+  let resources = {};
+  loadCategoryArray('resources').filter(item => item).forEach(item => {
+    // convert for schema
+    item._id = new mongoose.Types.ObjectId();
+    item.created = item.created_at || undefined;
+    item.modified = item.updated_at || undefined;
+
+    const resource = new Resource(item);
+    resource.save()
+    .catch(error => console.log(error));
+
+    resources[item.id] = item;
+  });
+
+  let reservations = {};
+  loadCategoryArray('reservations').filter(item => item).forEach(item => {
+    if (! reservations[item.event_id]) {
+      reservations[item.event_id] = [];
+    }
+    reservations[item.event_id].push(resources[item.resource_id]._id);
+  });
+
+  const data = loadCategoryArray('events').filter(item => item);
+  // organize non-master events by master id
+  const slaveEvents = {};
+  data.filter(item => item.master_id && item.master_id !== item.id)
+  .forEach(item => {
+    if (! slaveEvents[item.master_id]) {
+      slaveEvents[item.master_id] = [];
+    }
+    slaveEvents[item.master_id].push(item);
+  });
+
+  data.filter(item => ! item.master_id || item.master_id === item.id)
+  .forEach(item => {
+    // convert for schema
+    item.created = item.created_at;
+    item.modified = item.updated_at;
+    item.text = item.notes;
+    item.start = item.start_at;
+    item.end = item.stop_at;
+    item.dates = (slaveEvents[item.id] || []).map(item2 => item2.start_at);
+    item.resourceIds = (reservations[item.id] || []);
+
+    const event = new Event(item);
+    event.save()
+    .catch(error => console.log(error));
+  });
+}
