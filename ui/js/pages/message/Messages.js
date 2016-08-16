@@ -5,6 +5,11 @@ import { getItems } from '../../actions';
 import List from '../../components/List';
 import MessageItem from './MessageItem';
 
+class MessagesMessageItem extends MessageItem {};
+MessagesMessageItem.defaultProps = {
+  detailsForMostRecent: true
+};
+
 export default class Messages extends Component {
 
   constructor () {
@@ -38,7 +43,7 @@ export default class Messages extends Component {
       <List location={location} homer={true}
         category="messages" title="Messages" path="/messages"
         filter={filter} select="name path verses date" sort="-date"
-        Item={MessageItem} marker={marker} />
+        Item={MessagesMessageItem} marker={marker} />
     );
   }
 };

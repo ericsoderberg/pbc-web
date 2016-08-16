@@ -70,7 +70,8 @@ button.item__container {
 }
 
 .item--primary {
-  border-top: $unit solid $hover-background;
+  border-top: $half-unit solid $nav-background-color;
+  border-bottom: $half-unit solid $nav-background-color;
 }
 
 .box--row {
