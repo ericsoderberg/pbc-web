@@ -5,6 +5,7 @@ import { getItems } from '../actions';
 import PageHeader from './PageHeader';
 import Filter from './Filter';
 import Stored from './Stored';
+import Loading from './Loading';
 
 class List extends Component {
 
@@ -12,19 +13,25 @@ class List extends Component {
     super(props);
     this._onSearch = this._onSearch.bind(this);
     this._onFilter = this._onFilter.bind(this);
-    this.state = { items: [], searchText: '' };
+    this._onScroll = this._onScroll.bind(this);
+    this.state = { items: [], search: '' };
   }
 
   componentDidMount () {
     document.title = this.props.title;
-    this._setFilter(this.props);
+    this._setFilterAndSearch(this.props);
+    window.addEventListener('scroll', this._onScroll);
   }
 
   componentWillReceiveProps (nextProps) {
-    this._setFilter(nextProps);
+    this._setFilterAndSearch(nextProps);
   }
 
-  _setFilter (props) {
+  componentWillUnmount () {
+    window.removeEventListener('scroll', this._onScroll);
+  }
+
+  _setFilterAndSearch (props) {
     let filter, filterValue;
     if (props.filter) {
       filterValue = props.location.query[props.filter.property];
@@ -33,46 +40,93 @@ class List extends Component {
         filter[props.filter.property] = filterValue;
       }
     }
-    this.setState({ filter: filter, filterValue: filterValue }, this._get);
+    const search = props.location.query.search || '';
+    this.setState({ filter, filterValue, search }, this._get);
   }
 
   _get () {
     const { category, populate, select, sort } = this.props;
-    const { filter } = this.state;
-    getItems(category, { sort, filter, select, populate })
-    .then(response => this.setState({ items: response }))
-    .catch(error => console.log('!!! List catch', error));
+    const { filter, search } = this.state;
+    // throttle gets when user is typing
+    clearTimeout(this._getTimer);
+    this._getTimer = setTimeout(() => {
+      getItems(category, { sort, filter, search, select, populate })
+      .then(response => this.setState({
+        items: response, mightHaveMore: response.length >= 20
+      }))
+      .catch(error => console.log('!!! List catch', error));
+    }, 100);
+  }
+
+  _nav (options) {
+    const { filter: { property } } = this.props;
+    const search = options.hasOwnProperty('search') ?
+      options.search : this.state.search || undefined;
+    const filterValue = options.hasOwnProperty('filterValue') ?
+      options.filterValue : this.state.filterValue || undefined;
+
+    const searchParams = [];
+    if (filterValue) {
+      searchParams.push(`${property}=${encodeURIComponent(filterValue)}`);
+    }
+    if (search) {
+      searchParams.push(`search=${encodeURIComponent(search)}`);
+    }
+
+    this.context.router.replace({
+      pathname: window.location.pathname,
+      search: `?${searchParams.join('&')}`
+    });
+  }
+
+  _onMore () {
+    const { category, populate, select, sort } = this.props;
+    const { filter, search } = this.state;
+    this.setState({ loadingMore: true }, () => {
+      const skip = this.state.items.length;
+      getItems(category, { sort, filter, search, select, populate, skip })
+      .then(response => {
+        let items = this.state.items.concat(response);
+        this.setState({
+          items: items,
+          loadingMore: false,
+          mightHaveMore: (items.length % 20 === 0)
+        });
+      })
+      .catch(error => console.log('!!! List more catch', error));
+    });
+  }
+
+  _onScroll () {
+    const { mightHaveMore, loadingMore } = this.state;
+    if (mightHaveMore && ! loadingMore) {
+      const more = this.refs.more;
+      if (more) {
+        const rect = more.getBoundingClientRect();
+        if (rect.top <= window.innerHeight) {
+          this._onMore();
+        }
+      }
+    }
   }
 
   _onSearch (event) {
-    const searchText = event.target.value;
-    clearTimeout(this._searchTimer);
-    this._searchTimer = setTimeout(() => {
-      getItems(this.props.category, {
-        sort: this.props.sort,
-        search: searchText,
-        populate: this.props.populate
-      })
-      .then(response => this.setState({ items: response }))
-      .catch(error => console.log('!!! List search catch', error));
-    }, 100);
-    this.setState({ searchText: searchText });
+    const search = event.target.value;
+    this._nav({ search: search });
   }
 
   _onFilter (event) {
-    const { filter: { property } } = this.props;
-    const value = event.target.value;
-    const search = (value && ! value.match(/^all$/i)) ? `?${property}=${value}` : undefined;
-    this.context.router.replace({
-      pathname: window.location.pathname,
-      search: search
-    });
+    let filterValue = event.target.value;
+    if (filterValue.match(/^all$/i)) {
+      filterValue = undefined;
+    }
+    this._nav({ filterValue });
   }
 
   render () {
     const { Item, path, title, marker, sort, session, filter,
       homer } = this.props;
-    const { searchText, filterValue } = this.state;
+    const { search, filterValue, mightHaveMore, loadingMore } = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
@@ -118,14 +172,22 @@ class List extends Component {
       );
     }
 
+    let more;
+    if (loadingMore) {
+      more = <Loading />;
+    } else if (mightHaveMore) {
+      more = <div ref="more"></div>;
+    }
+
     return (
       <main>
         <PageHeader title={title} homer={homer}
-          searchText={searchText} onSearch={this._onSearch}
+          searchText={search} onSearch={this._onSearch}
           actions={[filterAction, addControl]} />
         <ul className="list">
           {items}
         </ul>
+        {more}
       </main>
     );
   }

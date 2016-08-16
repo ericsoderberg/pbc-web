@@ -1,6 +1,7 @@
 "use strict";
 import express from 'express';
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
 // import { ObjectID } from 'mongodb';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
@@ -220,6 +221,9 @@ const register = (category, modelName, options={}) => {
         query.limit(parseInt(req.query.limit, 10));
       } else {
         query.limit(20);
+      }
+      if (req.query.skip) {
+        query.skip(parseInt(req.query.skip, 10));
       }
       query.exec()
       .then(docs => res.json(docs))

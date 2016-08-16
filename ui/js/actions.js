@@ -102,6 +102,9 @@ export function getItems (category, options={}) {
   if (options.limit) {
     params.push(`limit=${encodeURIComponent(options.limit)}`);
   }
+  if (options.skip) {
+    params.push(`skip=${encodeURIComponent(options.skip)}`);
+  }
   const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })
