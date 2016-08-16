@@ -9,6 +9,12 @@
   background-color: $hover-background;
 }
 
+.list__count {
+  margin: $unit;
+  text-align: center;
+  color: $tertiary-color;
+}
+
 .marker {
   display: flex;
   flex-direction: row;

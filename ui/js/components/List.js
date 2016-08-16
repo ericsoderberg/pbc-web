@@ -59,7 +59,7 @@ class List extends Component {
   }
 
   _nav (options) {
-    const { filter: { property } } = this.props;
+    const { filter } = this.props;
     const search = options.hasOwnProperty('search') ?
       options.search : this.state.search || undefined;
     const filterValue = options.hasOwnProperty('filterValue') ?
@@ -67,7 +67,7 @@ class List extends Component {
 
     const searchParams = [];
     if (filterValue) {
-      searchParams.push(`${property}=${encodeURIComponent(filterValue)}`);
+      searchParams.push(`${filter.property}=${encodeURIComponent(filterValue)}`);
     }
     if (search) {
       searchParams.push(`search=${encodeURIComponent(search)}`);
@@ -90,7 +90,7 @@ class List extends Component {
         this.setState({
           items: items,
           loadingMore: false,
-          mightHaveMore: (items.length % 20 === 0)
+          mightHaveMore: (response.length === 20)
         });
       })
       .catch(error => console.log('!!! List more catch', error));
@@ -177,6 +177,8 @@ class List extends Component {
       more = <Loading />;
     } else if (mightHaveMore) {
       more = <div ref="more"></div>;
+    } else if (items.length > 20) {
+      more = <div className="list__count">{items.length}</div>;
     }
 
     return (
