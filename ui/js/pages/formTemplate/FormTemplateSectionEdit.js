@@ -107,19 +107,19 @@ export default class FormTemplateSectionEdit extends Component {
 
       return (
         <div key={index}>
-          <div className="form__fields-header">
-            <h4 className="form__fields-header-label"
+          <div className="form-item">
+            <button type="button" className="button-plain"
               onClick={this._toggleField(field._id || field.id)}>
-              {field.name || field.type}
-            </h4>
-            <span className="form__fields-header-actions">
+              <h4>{field.name || field.type}</h4>
+            </button>
+            <div className="box--row">
               {raise}
               {lower}
               <button type="button" className="button-icon"
                 onClick={formState.removeAt('fields', index)}>
                 <TrashIcon />
               </button>
-            </span>
+            </div>
           </div>
           {edit}
         </div>
@@ -150,7 +150,7 @@ export default class FormTemplateSectionEdit extends Component {
     } else {
 
       add = (
-        <div className="form__fields-header">
+        <div className="form-item">
           <button type="button" className="button-icon"
             onClick={() => this.setState({ expandAdd: true })}>
             <AddIcon />

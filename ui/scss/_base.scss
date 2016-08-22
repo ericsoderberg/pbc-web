@@ -37,7 +37,8 @@ a,
 .button-right,
 .button-left,
 .button-icon,
-.button-header {
+.button-header,
+.button-plain {
   outline: none;
   border-radius: 0;
   border: none;
@@ -52,6 +53,21 @@ a,
   color: $control-color;
   font-size: 20px;
   text-align: center;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+}
+
+.button-plain {
+  padding: 0 $unit;
+  line-height: $double-unit;
+  font-size: inherit;
+  text-align: inherit;
+  background-color: transparent;
+  // background-color: $header-background-color;;
+  // color: $control-color;
 
   &:hover {
     background-color: $control-hover-background;

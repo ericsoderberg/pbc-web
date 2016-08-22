@@ -81,7 +81,7 @@ button.item__container {
     flex-direction: row;
     align-items: center;
 
-    > *:not(:last-child) {
+    > *:not(:last-child):not(.button-icon) {
       margin-right: $half-unit;
     }
   }

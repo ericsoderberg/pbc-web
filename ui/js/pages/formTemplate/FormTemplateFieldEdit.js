@@ -96,16 +96,16 @@ export default class FormTemplateFieldEdit extends Component {
 
       return (
         <div key={index}>
-          <div className="form__fields-header">
+          <div className="form-item">
             <legend>{`Option ${index + 1}`}</legend>
-            <span className="form__fields-header-actions">
+            <div className="box--row">
               {raise}
               {lower}
               <button type="button" className="button-icon"
                 onClick={formState.removeAt('options', index)}>
                 <TrashIcon />
               </button>
-            </span>
+            </div>
           </div>
           <FormTemplateOptionEdit key={index} option={option} index={index}
             onChange={formState.changeAt('options', index)} />

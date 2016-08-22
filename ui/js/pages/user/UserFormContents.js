@@ -42,7 +42,7 @@ export default class UserFormContents extends Component {
   }
 
   _getDomains () {
-    getItems('domains')
+    getItems('domains', { sort: 'name' })
     .then(response => this.setState({ domains: response }))
     .catch(error => console.log('UserFormContents domains catch', error));
   }
@@ -150,7 +150,7 @@ export default class UserFormContents extends Component {
 
     let relations = (user.relations || []).map((relation, index) => (
       <div key={index}>
-        <div className="form__fields-header">
+        <div className="form-item">
           <h4>{relation.name}</h4>
           <button type="button" className="button-icon"
             onClick={formState.removeAt('relations', index)}>
@@ -190,7 +190,7 @@ export default class UserFormContents extends Component {
       }
       return (
         <div key={index}>
-          <div className="form__fields-header">
+          <div className="form-item">
             {value}
             <button type="button" className="button-icon"
               onClick={this._removeEmailList(index)}>
@@ -236,24 +236,24 @@ export default class UserFormContents extends Component {
 
         {adminFields}
 
-        <div className="form__fields-section">
-          <div className="form__fields-header">
+        <div className="form-section">
+          <div className="form-item">
             <h3>Family</h3>
             {relations.length === 0 ? addRelationControl : undefined}
           </div>
           {relations}
-          <div className="form__fields-footer">
+          <div className="form-item">
             {relations.length > 0 ? addRelationControl : undefined}
           </div>
         </div>
 
-        <div className="form__fields-section">
-          <div className="form__fields-header">
+        <div className="form-section">
+          <div className="form-item">
             <h3>Email Lists</h3>
             {emailLists.length === 0 ? addEmailListControl : undefined}
           </div>
           {emailLists}
-          <div className="form__fields-footer">
+          <div className="form-item">
             {emailLists.length > 0 ? addEmailListControl : undefined}
           </div>
         </div>

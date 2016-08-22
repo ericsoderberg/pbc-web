@@ -46,7 +46,7 @@ export default class PageFormContents extends Component {
     const { formState, session } = this.props;
     this.refs.name.focus();
     if (session.administrator) {
-      getItems('domains')
+      getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.log('PageFormContents catch', error));
     } else if (session.administratorDomainId) {
@@ -113,19 +113,19 @@ export default class PageFormContents extends Component {
 
       return (
         <div key={index}>
-          <div className="form__fields-header">
-            <h4 className="form__fields-header-label"
+          <div type="button" className="form-item">
+            <button className="button-plain"
               onClick={this._toggleSection(section._id || section.id)}>
-              {section.type}
-            </h4>
-            <span className="form__fields-header-actions">
+              <h4>{section.type}</h4>
+            </button>
+            <div className="box--row">
               {raise}
               {lower}
               <button type="button" className="button-icon"
                 onClick={formState.removeAt('sections', index)}>
                 <TrashIcon />
               </button>
-            </span>
+            </div>
           </div>
           {edit}
         </div>
@@ -156,7 +156,7 @@ export default class PageFormContents extends Component {
     } else {
 
       add = (
-        <div className="form__fields-header">
+        <div className="form-item">
           <button type="button" className="button-icon"
             onClick={() => this.setState({ expandAdd: true })}>
             <AddIcon />

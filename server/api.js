@@ -898,6 +898,11 @@ router.get('/files', (req, res) => {
       if (error) {
         res.status(400).json(error);
       } else {
+        let start = 0;
+        if (req.query.skip) {
+          start = parseInt(req.query.skip, 10);
+        }
+        files = files.slice(start, start + 20);
         files = files.map(id => ({ _id: id }));
         res.status(200).json(files);
       }

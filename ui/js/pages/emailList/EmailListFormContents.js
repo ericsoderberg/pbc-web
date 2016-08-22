@@ -21,7 +21,7 @@ export default class EmailListFormContents extends Component {
   componentDidMount () {
     const { formState, session } = this.props;
     if (session.administrator) {
-      getItems('domains')
+      getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.log('EmailListFormContents catch', error));
     } else if (session.administratorDomainId) {
@@ -109,7 +109,7 @@ export default class EmailListFormContents extends Component {
         details = address.address;
       }
       return (
-        <li key={index} className="form__fields-header">
+        <li key={index} className="form-item">
           {details}
           <button type="button" className="button-icon"
             onClick={formState.removeAt('addresses', index)}>
@@ -122,7 +122,7 @@ export default class EmailListFormContents extends Component {
     let search;
     if (this.state.searchText || addresses.length > 1) {
       search = (
-        <div className="form__fields-header email-list__search">
+        <div className="form-item email-list__search">
           <input value={this.state.searchText} placeholder="Search"
             onChange={this._onSearch} />
         </div>
@@ -149,8 +149,8 @@ export default class EmailListFormContents extends Component {
           {administeredBy}
         </fieldset>
 
-        <div className="form__fields-section">
-          <div className="form__fields-header">
+        <div className="form-section">
+          <div className="form-item">
             <h3>Email addresses</h3>
             <input name="add" placeholder="Address to add"
               value={this.state.addAddress}

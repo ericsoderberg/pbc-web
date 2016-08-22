@@ -23,7 +23,7 @@ export default class NewsletterFormContents extends Component {
     .catch(error => console.log('!!! NewsletterFormContents calendars catch', error));
 
     if (session.administrator) {
-      getItems('domains')
+      getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.log('NewsletterFormContents domains catch', error));
     } else if (session.administratorDomainId) {

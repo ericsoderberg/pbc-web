@@ -21,7 +21,7 @@ export default class FormTemplateFormContents extends Component {
   componentDidMount () {
     const { formState, session } = this.props;
     if (session.administrator) {
-      getItems('domains')
+      getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.log('FormTemplateFormContents catch', error));
     } else if (session.administratorDomainId) {
@@ -67,6 +67,7 @@ export default class FormTemplateFormContents extends Component {
     });
 
     const sections = (formTemplate.sections || []).map((section, index) => {
+      let className;
 
       const raise = (index === 0 ? undefined : (
         <button type="button" className="button-icon"
@@ -83,20 +84,21 @@ export default class FormTemplateFormContents extends Component {
 
       let header;
       if (formTemplate.sections.length > 1) {
+        className = "form-section";
         header = (
-          <div className="form__fields-header">
-            <h4 className="form__fields-header-label"
+          <div className="form-item">
+            <button type="button" className="button-plain"
               onClick={this._toggleSection(section._id || section.id)}>
-              {section.name || `Section ${index + 1}`}
-            </h4>
-            <span className="form__fields-header-actions">
+              <h4>{section.name || `Section ${index + 1}`}</h4>
+            </button>
+            <div className="box--row">
               {raise}
               {lower}
               <button type="button" className="button-icon"
                 onClick={formState.removeAt('sections', index)}>
                 <TrashIcon />
               </button>
-            </span>
+            </div>
           </div>
         );
       }
@@ -112,7 +114,7 @@ export default class FormTemplateFormContents extends Component {
       }
 
       return (
-        <div key={index}>
+        <div key={index} className={className}>
           {header}
           {edit}
         </div>
