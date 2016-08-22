@@ -303,6 +303,20 @@ export function deleteFile (id) {
   .then(processStatus);
 }
 
+// Email lists
+
+export function postSubscribe (emailList, addresses) {
+  return fetch(`/api/email-lists/${emailList._id}/subscribe`, {
+    method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
+  .then(processStatus);
+}
+
+export function postUnsubscribe (emailList, addresses) {
+  return fetch(`/api/email-lists/${emailList._id}/unsubscribe`, {
+    method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
+  .then(processStatus);
+}
+
 // Search
 
 export function getSearch (searchText) {

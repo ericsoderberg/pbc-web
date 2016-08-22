@@ -21,6 +21,13 @@ export default class Edit extends Component {
 
   _onUpdate (item) {
     putItem(this.props.category, item)
+    .then(response => {
+      if (this.props.onUpdate) {
+        return this.props.onUpdate(item);
+      } else {
+        return response;
+      }
+    })
     .then(response => this.context.router.goBack())
     .catch(error => this.setState({ error: error }));
   }
@@ -47,6 +54,7 @@ export default class Edit extends Component {
 Edit.propTypes = {
   category: PropTypes.string.isRequired,
   FormContents: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
   }).isRequired,

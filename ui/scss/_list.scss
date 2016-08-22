@@ -90,3 +90,16 @@ button.item__container {
     flex-direction: column;
   }
 }
+
+.email-list__search {
+  margin-top: $unit;
+}
+
+.email-list__address {
+  flex: 1;
+  margin-right: $half-unit;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

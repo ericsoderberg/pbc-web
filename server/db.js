@@ -4,7 +4,7 @@ const { Types: { ObjectId } } = Schema;
 
 const DATABASE = 'pbc';
 const USER = 'pbc';
-const PASSWORD = 'pbc';
+const PASSWORD = 'pbc'; /// !!! change to get from environment variable
 
 // Schemas
 
@@ -33,6 +33,13 @@ const userSchema = Schema({
   created: Date,
   email: {type: String, required: true, unique: true},
   encryptedPassword: {type: String, required: true},
+  relations: [{
+    birthday: Date,
+    grade: String,
+    name: String,
+    notes: String,
+    relationship: String
+  }],
   modified: Date,
   name: {type: String, required: true},
   path: String,
@@ -241,11 +248,17 @@ const newsletterSchema = Schema({
 mongoose.model('Newsletter', newsletterSchema);
 
 const emailListSchema = Schema({
-  addresses: [String],
+  addresses: [{
+    address: String,
+    state: { type: String,
+      enum: ['pending', 'ok', 'bouncing', 'disabled']
+    }
+  }],
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true, unique: true},
+  public: Boolean,
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

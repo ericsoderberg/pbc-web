@@ -332,13 +332,94 @@ register('forms', 'Form', {
   }
 });
 
+// Email lists
+
+const populateEmailList = (emailList) => {
+  const User = mongoose.model('User');
+
+  let promises = [Promise.resolve(emailList)];
+  emailList.addresses.forEach(address => {
+    promises.push(User.findOne({ email: address.address }).select('name').exec());
+  });
+
+  return Promise.all(promises)
+  .then(docs => {
+    let emailListData = docs[0].toObject();
+    emailListData.addresses.forEach((address, index) => {
+      const user = docs[1 + index];
+      address.userId = { _id: user._id, name: user.name };
+    });
+    emailListData.addresses.sort((a, b) => {
+      const aa = a.address.toLowerCase();
+      const ba = b.address.toLowerCase();
+      return (aa < ba ? -1 : (aa > ba ? 1 : 0));
+    });
+    return emailListData;
+  });
+};
+
 register('email-lists', 'EmailList', {
   authorize: {
     index: authorizedForDomain
   },
   transform: {
-    put: unsetDomainIfNeeded
+    put: unsetDomainIfNeeded,
+    get: (emailList, req) => {
+      if (emailList) {
+        return populateEmailList(emailList);
+      }
+      return emailList;
+    }
   }
+});
+
+router.post('/email-lists/:id/subscribe', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    const id = req.params.id;
+    const EmailList = mongoose.model('EmailList');
+    // normalize addresses
+    const addresses = req.body.map(a => (
+      typeof a === 'string' ? { address: a } : a
+    ));
+    EmailList.findOne({ _id: id })
+    .exec()
+    .then(doc => {
+      addresses.forEach(address => {
+        if (! doc.addresses.some(a => a.address === address.address)) {
+          doc.addresses.push(address);
+        }
+      });
+      doc.modified = new Date();
+      return doc.save();
+    })
+    .then(doc => res.status(200).send())
+    // TODO: update mailman
+    .catch(error => res.status(400).json(error));
+  });
+});
+
+router.post('/email-lists/:id/unsubscribe', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    const id = req.params.id;
+    const EmailList = mongoose.model('EmailList');
+    // normalize addresses
+    const addresses = req.body.map(a => (
+      typeof a === 'string' ? { address: a } : a
+    ));
+    EmailList.findOne({ _id: id })
+    .exec()
+    .then(doc => {
+      addresses.forEach(address => {
+        doc.addresses = doc.addresses.filter(a => a.address !== address.address);
+      });
+      doc.modified = new Date();
+      return doc.save();
+    })
+    .then(doc => res.status(200).send())
+    .catch(error => res.status(400).json(error));
+  });
 });
 
 register('domains', 'Domain', {
@@ -674,7 +755,7 @@ function resourceIdsWithEvents (events) {
 
 function resourcesWithEvents (resourceIdsEvents) {
   const Resource = mongoose.model('Resource');
-  return Resource.find({}).exec()
+  return Resource.find({}).sort('name').exec()
   .then(resources => {
     // Decorate with the overlapping events used by the resources.
     return resources.map(resource => {

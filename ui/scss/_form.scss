@@ -54,15 +54,38 @@
   }
 }
 
-.form__fields-header {
+.form__fields-section {
+  padding-bottom: $unit;
+
+  > .form__fields-header:first-child {
+    border-top: 1px solid $border-color;
+  }
+}
+
+.form__fields-header,
+.form__fields-footer {
   max-width: $form-width;
   margin: 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  // padding: 0 $unit;
+  line-height: $double-unit;
 
+  > h1,
+  > h2,
+  > h3,
+  > h4 {
+    margin: 0;
+    padding-right: $half-unit;
+  }
+
+  > input {
+    flex: 1;
+  }
+}
+
+.form__fields-header {
   + .form__fields,
   + * .form__fields {
     margin-top: 0;
@@ -72,8 +95,8 @@
 .form__fields-header-label {
   flex: 1 0 auto;
   margin: 0;
-  padding: ($unit * 0.6667) $half-unit;
-  height: $double-unit;
+  // padding: ($unit * 0.6667) $half-unit;
+  // height: $double-unit;
   cursor: pointer;
 
   &:hover {
@@ -111,7 +134,8 @@
 
   input:not([type="checkbox"]):not([type="radio"]),
   select,
-  textarea {
+  textarea,
+  .select-search {
     width: 100%;
 
     &:focus {
@@ -345,13 +369,74 @@
   margin: $quarter-unit 0;
 }
 
+// select-search
+
+.select-search {
+  position: relative;
+  display: inline-block;
+  flex: 1;
+}
+
+.select-search__value {
+  height: $double-unit;
+  line-height: $double-unit;
+}
+
+.select-search__control {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.select-search__drop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background-color: $background-color;
+  text-align: left;
+  border-style: none solid solid;
+  border-width: 1px;
+  border-color: $border-color;
+}
+
+.select-search--empty {
+  .select-search__drop {
+    top: 0;
+  }
+}
+
+.select-search__input {
+  width: 100%;
+}
+
+.select-search__suggestion {
+  line-height: $unit;
+  padding: $quarter-unit $unit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+}
+
+.choice {
+  display: flex;
+  flex-direction: row;
+  justify-content: 'start';
+  align-items: center;
+}
+
 .choice--disabled {
   background-color: $secondary-background-color;
   color: $tertiary-color;
 }
 
-.used-by {
-  margin-left: $half-unit;
+.choice__note {
+  margin: 0 $half-unit;
+  flex: 1;
+  text-align: right;
 }
 
 .image-field__image {
