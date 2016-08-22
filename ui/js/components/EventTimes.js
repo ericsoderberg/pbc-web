@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react';
 import moment from 'moment';
 
 const EventTimes = (props) => {
-  const { event } = props;
+  const { event, reverse } = props;
   const start = moment(event.start);
 
   let dates;
@@ -52,17 +52,28 @@ const EventTimes = (props) => {
     });
   }
 
-  return (
-    <div className="event-times">
-      <span className="event-times__dates">{dates}</span>
-      <span className="event-times__separator">@</span>
-      <span className="event-times__times">{times}</span>
-    </div>
-  );
+  if (reverse) {
+    return (
+      <div className="event-times">
+        <span className="event-times__dates">{dates}</span>
+        <span className="event-times__separator">@</span>
+        <span className="event-times__times">{times}</span>
+      </div>
+    );
+  } else {
+    return (
+      <div className="event-times">
+        <span className="event-times__times">{times}</span>
+        <span className="event-times__separator"></span>
+        <span className="event-times__dates">{dates}</span>
+      </div>
+    );
+  }
 };
 
 EventTimes.propTypes = {
-  event: PropTypes.any.isRequired
+  event: PropTypes.any.isRequired,
+  reverse: PropTypes.bool
 };
 
 export default EventTimes;

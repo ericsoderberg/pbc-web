@@ -189,43 +189,6 @@
   }
 }
 
-.search {
-
-  @media all and (min-width: 700px) {
-    flex: 1 0 auto;
-
-    .search__input {
-      margin: 0;
-      padding: 0 $half-unit;
-      height: $double-unit;
-      background-color: transparent;
-      font-size: 1.4rem;
-      width: 100%;
-    }
-
-    .search__control {
-      display: none;
-    }
-  }
-
-  @media all and (max-width: 699px) {
-    .search__input {
-      display: none;
-    }
-  }
-}
-
-.search--active {
-  .search__input {
-    display: block;
-    position: absolute;
-    top: $double-unit;
-    left: 0;
-    max-width: round($unit * 24);
-    width: 100vw;
-  }
-}
-
 .filter {
 
   @media all and (min-width: 700px) {

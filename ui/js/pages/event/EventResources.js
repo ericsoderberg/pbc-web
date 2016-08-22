@@ -32,7 +32,7 @@ export default class EventResources extends Component {
         const events = resource.events.map(event => (
           <a key={event._id} href={`/events/${event._id}`}>{event.name}</a>
         ));
-        usedBy = <span className="used-by">Used by {events}</span>;
+        usedBy = <span className="choice__note">Used by {events}</span>;
       }
       return (
         <div key={resource._id} className={classNames.join(' ')}>

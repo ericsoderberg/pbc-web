@@ -3,32 +3,77 @@ import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 import { getUnavailableDates } from '../../actions';
 
+const NUMBER_OF_WEEKS = 52;
+
 export default class EventDates extends Component {
 
   constructor () {
     super();
-    this.state = { unavailableDates: [] };
+    const today = moment().startOf('day');
+    const start = moment(today).subtract(1, 'month').startOf('week');
+    const end = moment(start).add(NUMBER_OF_WEEKS, 'weeks');
+    this.state = {
+      start: start, end: end, unavailableDates: [], weekDayChecked: {}
+    };
   }
 
   componentDidMount () {
-    const event = this.props.formState.object;
+    const { formState } = this.props;
+    const event = formState.object;
     if (event.resourceIds && event.resourceIds.length > 0) {
       getUnavailableDates(event)
       .then(unavailableDates => unavailableDates.map(date => moment(date)))
       .then(unavailableDates => this.setState({ unavailableDates: unavailableDates }))
       .catch(error => console.log('!!! EventDates catch', error));
     }
+    // Prune out any dates before the start date
+    const dates = event.dates.filter(date => date.isBefore(this.state.start));
+    formState.set('dates', dates);
+  }
+
+  _toggleWeekDay (day) {
+    return () => {
+      const { formState } = this.props;
+      const event = formState.object;
+      const { start, end } = this.state;
+
+      let weekDayChecked = { ...this.state.weekDayChecked };
+      weekDayChecked[day] = ! weekDayChecked[day];
+      this.setState({ weekDayChecked: weekDayChecked });
+
+      let dates;
+      if (weekDayChecked[day]) {
+        // add all dates on the same day of the week
+        dates = [];
+        let date = moment(start).add(day, 'days');
+        while (date < end) {
+          if (! event.dates.some(date2 => date2.isSame(date, 'day'))) {
+            dates.push(moment(date));
+          }
+          date.add(1, 'week');
+        }
+        dates = dates.concat(event.dates);
+      } else {
+        // remove all dates on the same day of the week
+        dates = event.dates.filter(date => date.day() !== day);
+      }
+      formState.set('dates', dates);
+    };
   }
 
   _renderHeader () {
+    const { weekDayChecked } = this.state;
     let days = [];
     let date = moment().startOf('week');
     while (days.length < 7) {
       const name = date.format('ddd');
+      const day = date.day();
       days.push(
         <div key={name} className="calendar__day">
           <div className="calendar__day-date">
-            <input type="checkbox" /><label>{name}</label>
+            <input type="checkbox" checked={weekDayChecked[day] || false}
+              onChange={this._toggleWeekDay(day)} />
+            <label>{name}</label>
           </div>
         </div>
       );
@@ -44,13 +89,14 @@ export default class EventDates extends Component {
   _renderDays () {
     const { formState } = this.props;
     const event = formState.object;
+    const { start, end } = this.state;
 
     let weeks = [];
     let days = [];
     const today = moment().startOf('day');
-    let date = moment(today).subtract(1, 'month').startOf('week');
+    let date = moment(start);
 
-    while (weeks.length < 53) {
+    while (date.isBefore(end)) {
       const name = date.format(date.date() === 1 ? 'MMM D' : 'D');
       const classNames = ['calendar__day'];
       if (date.isSame(today, 'day')) {
@@ -84,7 +130,7 @@ export default class EventDates extends Component {
         days = [];
       }
 
-      date = date.add(1, 'day');
+      date.add(1, 'day');
     }
     return weeks;
   }

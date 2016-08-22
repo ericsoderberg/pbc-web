@@ -35,6 +35,7 @@ export default class Search extends Component {
     if (active) {
       classNames.push('search--active');
     }
+
     return (
       <div className={classNames.join(' ')}>
         <input ref="input" className="search__input" placeholder="Search"

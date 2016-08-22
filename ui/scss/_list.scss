@@ -91,6 +91,13 @@ button.item__container {
   }
 }
 
+.box--between {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .email-list__search {
   margin-top: $unit;
 }

@@ -148,7 +148,8 @@
     margin: $half-unit;
   }
 
-  .input {
+  .input,
+  .select-search__value {
     padding: $half-unit;
     flex: 1;
   }
@@ -379,7 +380,7 @@
 
 .select-search__value {
   height: $double-unit;
-  line-height: $double-unit;
+  line-height: 24px;
 }
 
 .select-search__control {

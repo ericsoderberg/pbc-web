@@ -140,6 +140,8 @@ const register = (category, modelName, options={}) => {
       } else {
         addPopulate(query, populate);
       }
+    } else if (options.populate && options.populate.get) {
+      addPopulate(query, options.populate.get);
     }
     query.exec()
     .then(doc => (transform.get ? transform.get(doc, req) : doc))

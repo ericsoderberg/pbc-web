@@ -22,7 +22,7 @@ const EventContents = (props) => {
       {text}
       <div className="section__container">
         <div className="text section">
-          <EventTimes event={event} />
+          <EventTimes event={event} reverse={true} />
         </div>
       </div>
       {map}
