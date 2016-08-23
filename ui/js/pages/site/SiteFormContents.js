@@ -1,31 +1,19 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
+import SelectSearch from '../../components/SelectSearch';
 import CloseIcon from '../../icons/Close';
 
 export default class SiteFormContents extends Component {
 
-  constructor () {
-    super();
-    this.state = { pages: [] };
-  }
-
   componentDidMount () {
     this.refs.name.focus();
-    getItems('pages', { sort: 'name' })
-    .then(response => this.setState({ pages: response }));
   }
 
   render () {
     const { formState } = this.props;
     const site = formState.object;
-
-    const pages = this.state.pages.map(page => (
-      <option key={page._id} label={page.name} value={page._id} />
-    ));
-    pages.unshift(<option key={0} />);
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
@@ -54,10 +42,12 @@ export default class SiteFormContents extends Component {
         <ImageField label="Logo" name="logo"
           formState={formState} property="logo" />
         <FormField label="Home page">
-          <select name="homePageId" value={site.homePageId || ''}
-            onChange={formState.change('homePageId')}>
-            {pages}
-          </select>
+          <SelectSearch category="pages"
+            options={{ select: 'name', sort: 'name' }}
+            value={(site.homePageId || {}).name}
+            onChange={(suggestion) =>
+              formState.change('homePageId')({
+                _id: suggestion._id, name: suggestion.name })} />
         </FormField>
         <FormField name="email" label="Email">
           <input name="email" value={site.email || ''}

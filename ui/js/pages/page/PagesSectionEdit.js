@@ -1,12 +1,12 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
+import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
-import CloseIcon from '../../icons/Close';
+import TrashIcon from '../../icons/Trash';
 import SectionFields from './SectionFields';
 
 class SubPageEdit extends Component {
@@ -28,13 +28,6 @@ class SubPageEdit extends Component {
     const { index, onRemove, onRaise, onLower } = this.props;
     const { formState } = this.state;
     const pageSummary = formState.object;
-    const pageId = typeof pageSummary.id === 'object' ? pageSummary.id._id :
-      pageSummary.id;
-
-    const pages = this.props.pages.map(page => (
-      <option key={page._id} label={page.name} value={page._id} />
-    ));
-    pages.unshift(<option key={0} />);
 
     const raise = (onRaise ? (
       <button type="button" className="button-icon" onClick={onRaise}>
@@ -49,24 +42,23 @@ class SubPageEdit extends Component {
 
     return (
       <div>
-        <div className="form__fields-header">
-          <span className="form__fields-header-label">
-            {`page ${index + 1}`}
-          </span>
-          <span className="form__fields-header-actions">
+        <div className="form-item">
+          <h5>{`page ${index + 1}`}</h5>
+          <div className="box--row">
             {raise}
             {lower}
             <button type="button" className="button-icon"
               onClick={onRemove}>
-              <CloseIcon secondary={true} />
+              <TrashIcon />
             </button>
-          </span>
+          </div>
         </div>
         <FormField label="Page">
-          <select name={`id-${index}`} value={pageId || ''}
-            onChange={formState.change('id')}>
-            {pages}
-          </select>
+          <SelectSearch category="pages"
+            value={pageSummary.id.name || ''}
+            onChange={(suggestion) =>
+              formState.change('id')({
+                _id: suggestion._id, name: suggestion.name })} />
         </FormField>
         <ImageField key="image" label="Image" name={`image-${index}`}
           formState={formState} property="image" />
@@ -82,7 +74,6 @@ SubPageEdit.propTypes = {
   onRaise: PropTypes.func,
   onLower: PropTypes.func,
   onRemove: PropTypes.func.isRequired,
-  pages: PropTypes.array.isRequired,
   pageSummary: PropTypes.object.isRequired
 };
 
@@ -94,12 +85,7 @@ export default class PagesSectionEdit extends Component {
     this._onChangePage = this._onChangePage.bind(this);
     this._onRemovePage = this._onRemovePage.bind(this);
     const { section, onChange } = props;
-    this.state = { formState: new FormState(section, onChange), pages: [] };
-  }
-
-  componentDidMount () {
-    getItems('pages', { sort: 'name' })
-    .then(pages => this.setState({ pages: pages }));
+    this.state = { formState: new FormState(section, onChange) };
   }
 
   componentWillReceiveProps (nextProps) {
@@ -138,7 +124,6 @@ export default class PagesSectionEdit extends Component {
     const subPages = pages.map((pageSummary, index) => {
       return (
       <SubPageEdit key={index} pageSummary={pageSummary} index={index}
-        pages={this.state.pages}
         onRaise={index > 0 ?
           formState.swapWith('pages', index, index-1) : undefined}
         onLower={index < (pages.length - 1) ?
@@ -152,10 +137,8 @@ export default class PagesSectionEdit extends Component {
         <fieldset className="form__fields">
           <SectionFields formState={formState} />
           {subPages}
-          <div className="form__fields-header">
-            <span className="form__fields-header-label">
-              {`page ${subPages.length + 1}`}
-            </span>
+          <div className="form-item">
+            <h5>{`page ${subPages.length + 1}`}</h5>
           </div>
           <FormField>
             <div className="form__tabs">

@@ -1,27 +1,26 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
-import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
 import SectionFields from './SectionFields';
 
+const Suggestion = (props) => (
+  <div className="box--between">
+    <span>{props.item.name}</span>
+    <span className="secondary">
+      {moment(props.item.start).format('MMM YYYY')}
+    </span>
+  </div>
+);
+
 export default class EventSectionEdit extends Component {
 
   constructor (props) {
     super(props);
-    this._onSearch = this._onSearch.bind(this);
     const { section, onChange } = props;
-    this.state = {
-      formState: new FormState(section, onChange),
-      events: [],
-      searchText: ''
-    };
-  }
-
-  componentDidMount () {
-    this._get();
+    this.state = { formState: new FormState(section, onChange) };
   }
 
   componentWillReceiveProps (nextProps) {
@@ -30,46 +29,20 @@ export default class EventSectionEdit extends Component {
     });
   }
 
-  _get (searchText) {
-    clearTimeout(this._getTimer);
-    this._getTimer = setTimeout(() => {
-      getItems('events',
-        { search: searchText, select: 'name start', sort: '-start' })
-      .then(events => this.setState({ events: events }));
-    }, 100);
-  }
-
-  _onSearch (searchText) {
-    this.setState({ searchText: searchText });
-    this._get(searchText);
-  }
-
   render () {
-    const { formState, events } = this.state;
+    const { formState } = this.state;
     const section = formState.object;
-
-    const suggestions = events.map(event => ({
-      label: (
-        <div className="box--between">
-          <span>{event.name}</span>
-          <span className="secondary">
-            {moment(event.start).format('MMM YYYY')}
-          </span>
-        </div>
-      ),
-      name: event.name,
-      id: event._id
-    }));
 
     return (
       <fieldset className="form__fields">
         <FormField label="Event">
-          <SelectSearch value={section.eventId.name || ''}
-            onSearch={this._onSearch}
+          <SelectSearch category="events"
+            options={{select: 'name start', sort: '-start'}}
+            Suggestion={Suggestion}
+            value={section.eventId.name || ''}
             onChange={(suggestion) =>
               formState.change('eventId')({
-                _id: suggestion.id, name: suggestion.name })}
-            suggestions={suggestions} />
+                _id: suggestion._id, name: suggestion.name })} />
         </FormField>
         <FormField>
           <input name="navigable" type="checkbox"

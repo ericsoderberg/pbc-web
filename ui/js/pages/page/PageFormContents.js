@@ -114,7 +114,7 @@ export default class PageFormContents extends Component {
       return (
         <div key={index}>
           <div type="button" className="form-item">
-            <button className="button-plain"
+            <button type="button" className="button-plain"
               onClick={this._toggleSection(section._id || section.id)}>
               <h4>{section.type}</h4>
             </button>

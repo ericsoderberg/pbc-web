@@ -31,7 +31,8 @@ class FormSummary extends Component {
   _load (props) {
     const { formTemplate, formTemplateId } = props;
     if (! formTemplate) {
-      getItem('form-templates', formTemplateId, { select: 'name' })
+      getItem('form-templates', formTemplateId._id || formTemplateId,
+        { select: 'name' })
       .then(formTemplate => this.setState({ formTemplate: formTemplate }))
       .catch(error => console.log('!!! FormSummary formTemplate catch', error));
     }
@@ -41,9 +42,13 @@ class FormSummary extends Component {
   _loadForms (props) {
     const { formTemplateId, session } = props;
     if (session) {
-      getItems('forms',
-        { filter: { formTemplateId: formTemplateId, userId: session.userId },
-          select: 'modified userId', populate: true })
+      getItems('forms',{
+        filter: {
+          formTemplateId: (formTemplateId._id || formTemplateId),
+          userId: session.userId
+        },
+        select: 'modified userId', populate: true
+      })
       .then(forms => this.setState({ forms: forms }))
       .catch(error => console.log('!!! FormSummary forms catch', error));
     } else {
@@ -80,7 +85,7 @@ class FormSummary extends Component {
     } else if (adding || forms.length === 0) {
       const onCancel = forms.length > 0 ? this._onCancel : undefined;
       contents = (
-        <FormAdd formTemplateId={formTemplateId}
+        <FormAdd formTemplateId={formTemplateId._id || formTemplateId}
           onDone={this._onDone} onCancel={onCancel} />
       );
     } else if (editId) {
@@ -120,7 +125,8 @@ class FormSummary extends Component {
 
 FormSummary.propTypes = {
   formTemplate: PropTypes.object,
-  formTemplateId: PropTypes.string.isRequired,
+  formTemplateId: PropTypes.oneOfType([
+    PropTypes.string, PropTypes.object]).isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,

@@ -14,11 +14,9 @@ export default class UserFormContents extends Component {
   constructor () {
     super();
     this._onAddEmailList = this._onAddEmailList.bind(this);
-    this._onSearchEmailLists = this._onSearchEmailLists.bind(this);
     this.state = {
       domains: [],
-      newRelationId: 1,
-      emailListSuggestions: undefined
+      newRelationId: 1
     };
   }
 
@@ -50,28 +48,12 @@ export default class UserFormContents extends Component {
   _getEmailLists (props) {
     const { formState } = props;
     const user = formState.object;
-    getItems('email-lists', { filter: { 'addresses.address': { $eq: user.email } } })
+    getItems('email-lists', {
+      filter: { 'addresses.address': { $eq: user.email } },
+      sort: 'name'
+    })
     .then(response => formState.set('emailLists', response))
     .catch(error => console.log('UserFormContents email lists catch', error));
-  }
-
-  _onSearchEmailLists (searchText) {
-    const { formState } = this.props;
-    const user = formState.object;
-    getItems('email-lists', { search: searchText })
-    .then(response => {
-      // map for use with SelectSearch
-      const emailLists = response
-      .filter(emailList => ! user.emailLists.some(emailList2 => (
-        emailList2.name === emailList.name
-      )))
-      .map(emailList => {
-        emailList.label = emailList.name;
-        return emailList;
-      });
-      this.setState({ emailListSuggestions: emailLists });
-    })
-    .catch(error => console.log('UserFormContents search email lists catch', error));
   }
 
   _addRelation () {
@@ -114,7 +96,6 @@ export default class UserFormContents extends Component {
 
   render () {
     const { formState, session } = this.props;
-    const { emailListSuggestions } = this.state;
     const user = formState.object;
 
     const textHelp = (
@@ -175,10 +156,8 @@ export default class UserFormContents extends Component {
       let value;
       if (emailList.subscribe) {
         value = (
-          <SelectSearch value={emailList.name}
-            active={! emailList.name}
-            onSearch={this._onSearchEmailLists}
-            suggestions={emailListSuggestions}
+          <SelectSearch category="email-lists" exclude={user.emailLists}
+            value={emailList.name} active={! emailList.name}
             onChange={this._setEmailList(index)} />
         );
       } else {

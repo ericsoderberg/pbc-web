@@ -34,7 +34,8 @@ class Home extends Component {
     const { page } = this.props;
     document.title = site.name;
     if (! page && site.homePageId) {
-      return getItem('pages', site.homePageId, { cache: true, populate: true });
+      return getItem('pages', site.homePageId._id,
+        { cache: true, populate: true });
     } else {
       return Promise.reject();
     }
@@ -155,7 +156,7 @@ Home.contextTypes = {
 const select = (state, props) => {
   let page;
   if (state.site && state.pages) {
-    page = state.pages[state.site.homePageId];
+    page = state.pages[state.site.homePageId._id];
   }
   return {
     page: page,

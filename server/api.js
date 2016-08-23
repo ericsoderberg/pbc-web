@@ -485,7 +485,8 @@ register('pages', 'Page', {
       {
         path: 'sections.eventId',
         select: 'name path start end dates times address location'
-      }
+      },
+      { path: 'sections.formTemplateId', select: 'name' }
     ]
   },
   transform: {
@@ -628,6 +629,7 @@ register('newsletters', 'Newsletter', {
 router.get('/site', (req, res) => {
   const Doc = mongoose.model('Site');
   Doc.findOne({})
+  .populate({ path: 'homePageId', select: 'name' })
   .exec()
   .then(doc => res.json(doc))
   .catch(error => res.status(400).json(error));
@@ -854,6 +856,9 @@ router.post('/events/unavailable-dates', (req, res) => {
 });
 
 register('events', 'Event', {
+  populate: {
+    get: { path: 'primaryEventId', select: 'name path' }
+  },
   transform: {
     put: unsetDomainIfNeeded
   }

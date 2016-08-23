@@ -4,8 +4,18 @@ import moment from 'moment';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DateTime from '../../components/DateTime';
+import SelectSearch from '../../components/SelectSearch';
 import EventDates from './EventDates';
 import EventResources from './EventResources';
+
+const Suggestion = (props) => (
+  <div className="box--between">
+    <span>{props.item.name}</span>
+    <span className="secondary">
+      {moment(props.item.start).format('MMM Do YYYY')}
+    </span>
+  </div>
+);
 
 class EventFormFields extends Component {
 
@@ -13,15 +23,11 @@ class EventFormFields extends Component {
     super();
     this._onStartChange = this._onStartChange.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
-    this.state = { events: [], domains: [] };
+    this.state = { domains: [] };
   }
 
   componentDidMount () {
     const { formState, session } = this.props;
-
-    getItems('events', { dates: { $gt: {} } })
-    .then(response => this.setState({ events: response }))
-    .catch(error => console.log('EventFormContents catch', error));
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
@@ -63,16 +69,15 @@ class EventFormFields extends Component {
 
     let primaryEvent;
     if (! event.dates || event.dates.length === 0) {
-      let events = this.state.events.map(event => (
-        <option key={event._id} label={event.name} value={event._id} />
-      ));
-      events.unshift(<option key={0} />);
       primaryEvent = (
         <FormField label="Primary event" help="For recurring event one-offs">
-          <select name="primaryEventId" value={event.primaryEventId || ''}
-            onChange={formState.change('primaryEventId')}>
-            {events}
-          </select>
+          <SelectSearch category="events"
+            options={{select: 'name start', sort: '-start'}}
+            Suggestion={Suggestion}
+            value={(event.primaryEventId || {}).name || ''}
+            onChange={(suggestion) =>
+              formState.change('primaryEventId')({
+                _id: suggestion._id, name: suggestion.name })} />
         </FormField>
       );
     }

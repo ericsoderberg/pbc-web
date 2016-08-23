@@ -4,6 +4,7 @@ import { getItems, postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import DateTime from '../../components/DateTime';
+import SelectSearch from '../../components/SelectSearch';
 import CloseIcon from '../../icons/Close';
 
 export default class MessageFormContents extends Component {
@@ -12,17 +13,12 @@ export default class MessageFormContents extends Component {
     super();
     this._onAddFile = this._onAddFile.bind(this);
     this._renderFileField = this._renderFileField.bind(this);
-    this.state = { series: [], domains: [] };
+    this.state = { domains: [] };
   }
 
   componentDidMount () {
     const { formState, session } = this.props;
     this.refs.name.focus();
-
-    // get the possible series to connect to
-    getItems('messages', { filter: { series: true }, select: 'name library' })
-    .then(series => this.setState({ series: series }))
-    .catch(error => console.log('!!! MessageFormContents catch', error));
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
@@ -114,16 +110,14 @@ export default class MessageFormContents extends Component {
 
     let seriesField;
     if (! message.series) {
-      const options = this.state.series.map(message => (
-        <option key={message._id} label={message.name} value={message._id} />
-      ));
-      options.unshift(<option key={0} />);
       seriesField = (
         <FormField name="seriesId" label="In Series">
-          <select name="seriesId" value={message.seriesId || ''}
-            onChange={formState.change('seriesId')}>
-            {options}
-          </select>
+          <SelectSearch category="messages"
+            options={{filter: { series: true }}}
+            value={(message.seriesId || {}).name || ''}
+            onChange={(suggestion) =>
+              formState.change('seriesId')({
+                _id: suggestion._id, name: suggestion.name })} />
         </FormField>
       );
     }

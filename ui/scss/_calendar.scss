@@ -119,6 +119,12 @@
     padding: $quarter-unit;
     display: block;
     color: #333;
+    text-decoration: none;
+
+    &:hover {
+      background-color: $control-hover-background;
+      color: $active-color;
+    }
   }
 }
 

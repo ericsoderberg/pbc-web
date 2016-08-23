@@ -184,6 +184,7 @@
   .input,
   .select-search__value {
     padding: $half-unit;
+    line-height: $unit;
     flex: 1;
   }
 }
@@ -413,7 +414,7 @@
 
 .select-search__value {
   height: $double-unit;
-  line-height: 24px;
+  // line-height: $double-unit;
 }
 
 .select-search__control {

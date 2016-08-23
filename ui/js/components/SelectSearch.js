@@ -1,6 +1,7 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
 import React, { Component, PropTypes } from 'react';
+import { getItems } from '../actions';
 import KeyboardAccelerators from '../utils/KeyboardAccelerators';
 import SearchIcon from '../icons/Search';
 
@@ -9,7 +10,6 @@ export default class SelectSearch extends Component {
   constructor(props) {
     super(props);
 
-    this._onActivate = this._onActivate.bind(this);
     this._onDeactivate = this._onDeactivate.bind(this);
     this._onToggle = this._onToggle.bind(this);
     this._onSelect = this._onSelect.bind(this);
@@ -35,11 +35,6 @@ export default class SelectSearch extends Component {
     this._activation(false);
   }
 
-  _onActivate (event) {
-    event.preventDefault();
-    this.setState({ active: true });
-  }
-
   _onToggle (event) {
     event.preventDefault();
     this.setState({ active: ! this.state.active });
@@ -58,14 +53,8 @@ export default class SelectSearch extends Component {
 
   _onDeactivate (event) {
     if (! this._isDescendant(this.refs.component, event.target)) {
-      this.setState({ active: false, cursor: -1 });
+      this.setState({ active: false });
     }
-  }
-
-  _onSearch (event) {
-    const searchText = event.target.value;
-    this.setState({ searchText: searchText });
-    this.props.onSearch(searchText);
   }
 
   _onSelect (suggestion) {
@@ -73,12 +62,24 @@ export default class SelectSearch extends Component {
     this.props.onChange(suggestion);
   }
 
-  _activation (active) {
+  _onSearch (event) {
+    const searchText = event.target.value;
+    this.setState({ searchText: searchText });
+    const { category, exclude, options } = this.props;
+    getItems(category,
+      { select: 'name', sort: 'name', ...(options || {}), search: searchText })
+    .then(response => {
+      const suggestions = response
+      .filter(item => ! (exclude || []).some(item2 => item._id === item2._id));
+      this.setState({ suggestions: suggestions });
+    })
+    .catch(error => console.log('SelectSearch catch', error));
+  }
 
-    var listeners = {
+  _activation (active) {
+    const listeners = {
       esc: this._onDeactivate,
-      tab: this._onDeactivate,
-      enter: this._onSelectDate
+      tab: this._onDeactivate
     };
 
     if (active) {
@@ -92,8 +93,8 @@ export default class SelectSearch extends Component {
   }
 
   render () {
-    const { className } = this.props;
-    const { active, searchText } = this.state;
+    const { className, Suggestion } = this.props;
+    const { active, searchText, suggestions } = this.state;
     let classes = ['select-search'];
     if (active) {
       classes.push('select-search--active');
@@ -104,7 +105,7 @@ export default class SelectSearch extends Component {
 
     let value = this.props.value;
     if (typeof this.props.value === 'object') {
-      value = value.label;
+      value = value.name;
     }
     if (! value) {
       classes.push('select-search--empty');
@@ -112,17 +113,18 @@ export default class SelectSearch extends Component {
 
     let details;
     if (active) {
-      let suggestions = (this.props.suggestions || []).map((suggestion, index) => (
+      let suggests = (suggestions || []).map((suggestion, index) => (
         <div key={index} className="select-search__suggestion"
           onClick={this._onSelect.bind(this, suggestion)}>
-          {suggestion.label || suggestion}
+          {Suggestion ? <Suggestion item={suggestion} /> : suggestion.name}
         </div>
       ));
       details = (
         <div className={'select-search__drop'}>
-          <input ref="input" className="select-search__input" placeholder="Search"
+          <input ref="input" className="select-search__input"
+            placeholder="Search"
             value={searchText} onChange={this._onSearch} />
-          {suggestions}
+          {suggests}
         </div>
       );
     }
@@ -145,18 +147,17 @@ export default class SelectSearch extends Component {
 
 SelectSearch.propTypes = {
   active: PropTypes.bool,
+  category: PropTypes.string,
+  exclude: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string
+  })),
   onChange: PropTypes.func,
-  onSearch: PropTypes.func,
-  suggestions: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      label: PropTypes.node.isRequired
-    })
-  ])),
+  options: PropTypes.object,
+  Suggestion: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.shape({
-      label: PropTypes.node.isRequired
+      name: PropTypes.node.isRequired
     })
   ])
 };
