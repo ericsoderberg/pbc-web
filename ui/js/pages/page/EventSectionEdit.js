@@ -39,7 +39,7 @@ export default class EventSectionEdit extends Component {
           <SelectSearch category="events"
             options={{select: 'name start', sort: '-start'}}
             Suggestion={Suggestion}
-            value={section.eventId.name || ''}
+            value={(section.eventId || {}).name || ''}
             onChange={(suggestion) =>
               formState.change('eventId')({
                 _id: suggestion._id, name: suggestion.name })} />
