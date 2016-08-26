@@ -4,6 +4,7 @@ import { postSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
+import Button from '../../components/Button';
 import FormState from '../../utils/FormState';
 
 export default class SignIn extends Component {
@@ -12,7 +13,6 @@ export default class SignIn extends Component {
     super(props);
     this._onCancel = this._onCancel.bind(this);
     this._onSignIn = this._onSignIn.bind(this);
-    this._onSignUp = this._onSignUp.bind(this);
     this._setSession = this._setSession.bind(this);
     const session = { email: '', password: '' };
     this.state = { formState: new FormState(session, this._setSession) };
@@ -29,13 +29,8 @@ export default class SignIn extends Component {
   _onSignIn (event) {
     event.preventDefault();
     postSession(this.state.formState.object)
-      .then(response => this.context.router.goBack())
+      .then(response => this.context.router.push('/'))
       .catch(error => this.setState({ error: error }));
-  }
-
-  _onSignUp (event) {
-    event.preventDefault();
-    this.context.router.push('/sign-up');
   }
 
   _setSession (session) {
@@ -71,9 +66,9 @@ export default class SignIn extends Component {
             <button type="submit" className="button" onClick={this._onSignIn}>
               Sign In
             </button>
-            <button className="button" onClick={this._onSignUp}>
+            <Button path="/sign-up" secondary={true}>
               Sign Up
-            </button>
+            </Button>
           </footer>
         </form>
       </div>
