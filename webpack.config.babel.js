@@ -1,6 +1,24 @@
 import webpack from 'webpack';
 import path from 'path';
 
+var mode = process.env.NODE_ENV || 'production';
+var PRODUCTION = (mode === 'production');
+var DEVELOPMENT = (mode === 'development');
+
+var plugins = [new webpack.ProvidePlugin({
+  'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+})];
+if (PRODUCTION) {
+  plugins.push(new webpack.optimize.OccurenceOrderPlugin());
+  plugins.push(new webpack.optimize.UglifyJsPlugin({
+    compress: {
+      warnings: false
+    }
+  }));
+} else if (DEVELOPMENT) {
+  plugins.push(new webpack.HotModuleReplacementPlugin());
+}
+
 const config = {
   entry: {
     app: [
@@ -16,20 +34,20 @@ const config = {
     publicPath: '/'
   },
 
-  devtool: 'eval',
-  devServer: {
+  devtool: DEVELOPMENT ? 'eval' : undefined,
+  devServer: DEVELOPMENT ? {
     hot: true,
     proxy: {
       "/api/*": 'http://localhost:8091'
     }
-  },
+  } : undefined,
 
   module: {
     loaders: [
       {
         test: /\.js$/,
         loader: 'babel',
-        exclude: /(node_modules|bower_components|ui\/lib)/
+        exclude: /(node_modules|ui\/lib)/
       },
       {
         test: /\.json$/,
@@ -62,12 +80,7 @@ const config = {
     ]
   },
 
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.ProvidePlugin({
-      'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
-    })
-  ],
+  plugins: plugins,
 
   resolve : {
     extensions:
