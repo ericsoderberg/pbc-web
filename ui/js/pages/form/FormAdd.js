@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getItem, postItem } from '../../actions';
+import { getItem, postItem, haveSession, setSession } from '../../actions';
 import Loading from '../../components/Loading';
 import FormContents from './FormContents';
 import { setFormError, clearFormError } from './FormUtils';
@@ -46,8 +46,21 @@ export default class FormAdd extends Component {
     } else {
       form.domainId = formTemplate.domainId;
       postItem('forms', form)
+      .then(response => {
+        // if we didn't have a session and we created one as part of adding,
+        // remember it.
+        if (! haveSession() && response.token) {
+          console.log('!!! FormAdd set session', response);
+          setSession(response);
+        }
+        return {};
+      })
       .then(response => onDone ? onDone() : this.context.router.goBack())
-      .catch(error => this.setState({ error: error }));
+      .catch(error => {
+        console.log('!!! FormAdd post error', error);
+        this.setState({ error: error });
+      })
+      .catch(error => console.log('!!! FormAdd post 2', error));
     }
   }
 

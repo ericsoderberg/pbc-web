@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { getSite, getItem, deleteSession } from '../../actions';
 import PageContents from '../page/PageContents';
 import FacebookIcon from '../../icons/Facebook';
@@ -52,10 +53,18 @@ class Home extends Component {
     let sessionControl;
     if (session && session.token) {
       sessionControl = (
-        <a className="home__sign-out" onClick={this._signOut}>
-          <span className="link__text">Sign Out</span>
-        </a>
+        <div className="box--row">
+          <Link to={`/users/${session.userId}/edit`}>{session.name}</Link>
+            <a className="home__sign-out" onClick={this._signOut}>
+              <span className="link__text">Sign Out</span>
+            </a>
+        </div>
       );
+      // sessionControl = (
+      //   <a className="home__sign-out" onClick={this._signOut}>
+      //     <span className="link__text">Sign Out</span>
+      //   </a>
+      // );
     } else {
       sessionControl = (
         <Button path="/sign-in">

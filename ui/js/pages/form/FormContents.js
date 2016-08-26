@@ -166,14 +166,15 @@ export default class FormContents extends Component {
 
   render () {
     const { formTemplate, error } = this.props;
+    console.log('!!! FormContents render', error);
 
     let formError;
-    if (error && typeof error === 'string') {
+    if (error && (typeof error === 'string' || error.error)) {
       formError = <FormError message={error} />;
     }
 
     const sections =
-    (formTemplate.sections || []).map(this._renderTemplateSection);
+      (formTemplate.sections || []).map(this._renderTemplateSection);
 
     return (
       <div>

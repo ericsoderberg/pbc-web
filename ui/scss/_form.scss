@@ -29,11 +29,13 @@
 
 .form-error {
   height: 0;
+  max-width: $form-width;
+  margin: 0 auto;
 }
 
 .form-error--active {
   background-color: #ffe8e8;
-  padding: $unit;
+  padding: 1px $unit;
   height: auto;
 }
 
@@ -137,15 +139,15 @@
 //     color: $active-color;
 //   }
 // }
-//
-// .form__text {
-//   max-width: $form-width;
-//   margin: 0 auto;
-//
-//   .text {
-//     padding: 0;
-//   }
-// }
+
+.form__text {
+  max-width: $form-width;
+  margin: 0 auto;
+
+  .text {
+    padding: 0;
+  }
+}
 
 .form-field {
   position: relative;

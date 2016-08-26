@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import markdownToJSX from 'markdown-to-jsx';
 
 export default class FormError extends Component {
 
@@ -18,7 +19,7 @@ export default class FormError extends Component {
     return (
       <div className={classes.join(' ')}>
         <div className="form-error__message">
-          {text}
+          {markdownToJSX(text || '')}
         </div>
       </div>
     );

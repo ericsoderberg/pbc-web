@@ -25,7 +25,8 @@ router.post('/sessions', (req, res) => {
   User.findOne({ email: email })
   .exec()
   .then(user => {
-    if (user && bcrypt.compareSync(password, user.encryptedPassword)) {
+    if (user && user.encryptedPassword &&
+      bcrypt.compareSync(password, user.encryptedPassword)) {
       const session = new Session({
         administrator: user.administrator,
         administratorDomainId: user.administratorDomainId,
@@ -100,6 +101,18 @@ function authorizedForDomain (session) {
   }
 }
 
+function authorizedForDomainOrSelf (session) {
+  if (session && session.administrator) {
+    return {};
+  } else if (session && session.administratorDomainId) {
+    return { domainId: session.administratorDomainId };
+  } else if (session) {
+    return { userId: session.userId };
+  } else {
+    return { name: false };
+  }
+}
+
 function unsetDomainIfNeeded (data) {
   if (! data.domainId) {
     delete data.domainId;
@@ -120,134 +133,148 @@ function addPopulate (query, populate) {
 
 const register = (category, modelName, options={}) => {
   const transform = options.transform || {};
+  let methods = options.methods || ['get', 'put', 'delete', 'index', 'post'];
+  if (options.omit) {
+    methods = methods.filter(m => ! options.omit.some(o => o === m));
+  }
 
-  router.get(`/${category}/:id`, (req, res) => {
-    const id = req.params.id;
-    const Doc = mongoose.model(modelName);
-    const criteria = ID_REGEXP.test(id) ?
-      {_id: id} : {path: id};
-    let query = Doc.findOne(criteria);
-    if (req.query.select) {
-      query.select(req.query.select);
-    }
-    if (req.query.populate) {
-      const populate = JSON.parse(req.query.populate);
-      if (true === populate) {
-        // populate from options and transform
-        if (options.populate && options.populate.get) {
-          addPopulate(query, options.populate.get);
-        }
-      } else {
-        addPopulate(query, populate);
-      }
-    } else if (options.populate && options.populate.get) {
-      addPopulate(query, options.populate.get);
-    }
-    query.exec()
-    .then(doc => (transform.get ? transform.get(doc, req) : doc))
-    .then(doc => res.json(doc))
-    .catch(error => res.status(400).json(error));
-  });
-
-  router.put(`/${category}/:id`, (req, res) => {
-    authorize(req, res)
-    .then(session => {
+  if (methods.indexOf('get') >= 0) {
+    router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
-      let data = req.body;
-      data.modified = new Date();
-      data.userId = session.userId;
-      data = (transform.put ? transform.put(data, session) : data);
-      Doc.findOneAndUpdate({ _id: id }, data)
-      .exec()
-      .then(doc => res.status(200).json(doc))
-      .catch(error => res.status(400).json(error));
-    });
-  });
-
-  router.delete(`/${category}/:id`, (req, res) => {
-    authorize(req, res)
-    .then(session => {
-      const id = req.params.id;
-      const Doc = mongoose.model(modelName);
-      Doc.findById(id)
-      .exec()
-      .then(doc => {
-        doc.remove()
-          .then(doc => res.status(200).send());
-      })
-      .catch(error => res.status(400).json(error));
-    });
-  });
-
-  router.get(`/${category}`, (req, res) => {
-    authorize(req, res, false)
-    .then(session => {
-      const Doc = mongoose.model(modelName);
-      const search = options.search || ['name'];
-      let query = Doc.find();
-      if (options.authorize && options.authorize.index) {
-        query.find(options.authorize.index(session));
-      }
-      if (req.query.search) {
-        const exp = new RegExp(req.query.search, 'i');
-        query.or(search.map(propertyName => {
-          let obj = {};
-          obj[propertyName] = exp;
-          return obj;
-        }));
-      }
-      if (req.query.filter) {
-        query.find(JSON.parse(req.query.filter));
-      }
-      if (req.query.sort) {
-        query.sort(req.query.sort);
-      }
+      const criteria = ID_REGEXP.test(id) ?
+        {_id: id} : {path: id};
+      let query = Doc.findOne(criteria);
       if (req.query.select) {
         query.select(req.query.select);
       }
       if (req.query.populate) {
         const populate = JSON.parse(req.query.populate);
         if (true === populate) {
-          // populate from options
-          if (options.populate && options.populate.index) {
-            addPopulate(query, options.populate.index);
+          // populate from options and transform
+          if (options.populate && options.populate.get) {
+            addPopulate(query, options.populate.get);
           }
         } else {
           addPopulate(query, populate);
         }
-      }
-      if (req.query.distinct) {
-        query.distinct(req.query.distinct);
-      } else if (req.query.limit) {
-        query.limit(parseInt(req.query.limit, 10));
-      } else {
-        query.limit(20);
-      }
-      if (req.query.skip) {
-        query.skip(parseInt(req.query.skip, 10));
+      } else if (options.populate && options.populate.get) {
+        addPopulate(query, options.populate.get);
       }
       query.exec()
-      .then(docs => res.json(docs))
+      .then(doc => (transform.get ? transform.get(doc, req) : doc))
+      .then(doc => res.json(doc))
       .catch(error => res.status(400).json(error));
     });
-  });
+  }
 
-  router.post(`/${category}`, (req, res) => {
-    authorize(req, res)
-    .then(session => {
-      const Doc = mongoose.model(modelName);
-      let data = req.body;
-      data.created = new Date();
-      data.modified = data.created;
-      data.userId = session.userId;
-      data = (transform.post ? transform.post(data, session) : data);
-      const doc = new Doc(data);
-      doc.save()
-      .then(doc => res.status(200).json(doc))
-      .catch(error => res.status(400).json(error));
+  if (methods.indexOf('put') >= 0) {
+    router.put(`/${category}/:id`, (req, res) => {
+      authorize(req, res)
+      .then(session => {
+        const id = req.params.id;
+        const Doc = mongoose.model(modelName);
+        let data = req.body;
+        data.modified = new Date();
+        data.userId = session.userId;
+        data = (transform.put ? transform.put(data, session) : data);
+        Doc.findOneAndUpdate({ _id: id }, data)
+        .exec()
+        .then(doc => res.status(200).json(doc))
+        .catch(error => res.status(400).json(error));
+      });
     });
-  });
+  }
+
+  if (methods.indexOf('delete') >= 0) {
+    router.delete(`/${category}/:id`, (req, res) => {
+      authorize(req, res)
+      .then(session => {
+        const id = req.params.id;
+        const Doc = mongoose.model(modelName);
+        Doc.findById(id)
+        .exec()
+        .then(doc => {
+          doc.remove()
+            .then(doc => res.status(200).send());
+        })
+        .catch(error => res.status(400).json(error));
+      });
+    });
+  }
+
+  if (methods.indexOf('index') >= 0) {
+    router.get(`/${category}`, (req, res) => {
+      authorize(req, res, false)
+      .then(session => {
+        const Doc = mongoose.model(modelName);
+        const search = options.search || ['name'];
+        let query = Doc.find();
+        if (options.authorize && options.authorize.index) {
+          query.find(options.authorize.index(session));
+        }
+        if (req.query.search) {
+          const exp = new RegExp(req.query.search, 'i');
+          query.or(search.map(propertyName => {
+            let obj = {};
+            obj[propertyName] = exp;
+            return obj;
+          }));
+        }
+        if (req.query.filter) {
+          query.find(JSON.parse(req.query.filter));
+        }
+        if (req.query.sort) {
+          query.sort(req.query.sort);
+        }
+        if (req.query.select) {
+          query.select(req.query.select);
+        }
+        if (req.query.populate) {
+          const populate = JSON.parse(req.query.populate);
+          if (true === populate) {
+            // populate from options
+            if (options.populate && options.populate.index) {
+              addPopulate(query, options.populate.index);
+            }
+          } else {
+            addPopulate(query, populate);
+          }
+        }
+        if (req.query.distinct) {
+          query.distinct(req.query.distinct);
+        } else if (req.query.limit) {
+          query.limit(parseInt(req.query.limit, 10));
+        } else {
+          query.limit(20);
+        }
+        if (req.query.skip) {
+          query.skip(parseInt(req.query.skip, 10));
+        }
+        query.exec()
+        .then(docs => res.json(docs))
+        .catch(error => res.status(400).json(error));
+      });
+    });
+  }
+
+  if (methods.indexOf('post') >= 0) {
+    router.post(`/${category}`, (req, res) => {
+      authorize(req, res)
+      .then(session => {
+        const Doc = mongoose.model(modelName);
+        let data = req.body;
+        data.created = new Date();
+        data.modified = data.created;
+        data.userId = session.userId;
+        data = (transform.post ? transform.post(data, session) : data);
+        const doc = new Doc(data);
+        doc.save()
+        .then(doc => res.status(200).json(doc))
+        .catch(error => res.status(400).json(error));
+      });
+    });
+  }
 };
 
 // User
@@ -267,9 +294,26 @@ router.post('/users/sign-up', (req, res) => {
     data.administrator = 0 === count;
     const doc = new User(data);
     doc.save()
-    .then(doc => res.status(200).json(doc))
-    .catch(error => res.status(400).json(error));
-  });
+    .then(doc => res.status(200).json(doc));
+  })
+  .catch(error => res.status(400).json(error));
+});
+
+router.post('/users/forgot-password', (req, res) => {
+  let data = req.body;
+  const User = mongoose.model('User');
+  // make sure we have a user with this email
+  User.findOne({ email: data.email }).exec()
+  .then(user => {
+    if (! user) {
+      return Promise.reject({
+        error: 'There is no account with that email address' });
+    }
+    // TODO: send an email with password reset instructions
+    console.log('!!! TODO: send email about resetting password');
+  })
+  .then(() => res.status(200).send({}))
+  .catch(error => res.status(400).json(error));
 });
 
 const encryptPassword = (data) => {
@@ -321,8 +365,9 @@ register('form-templates', 'FormTemplate', {
 
 register('forms', 'Form', {
   authorize: {
-    index: authorizedForDomain
+    index: authorizedForDomainOrSelf
   },
+  omit: ['post'], // special handling for POST of form
   populate: {
     index: [
       { path: 'userId', select: 'name' },
@@ -332,6 +377,103 @@ register('forms', 'Form', {
   transform: {
     put: unsetDomainIfNeeded
   }
+});
+
+function formValueForFieldName (formTemplate, form, fieldName) {
+  let result;
+  formTemplate.sections.some(section => {
+    return section.fields.some(field => {
+      if (field.name && field.name.toLowerCase() === fieldName.toLowerCase()) {
+        return form.fields.some(field2 => {
+          if (field._id.equals(field2.fieldId)) {
+            result = field2.value;
+            return true;
+          }
+        });
+      }
+    });
+  });
+  return result;
+}
+
+const FORM_SIGN_IN_MESSAGE = '[Sign In](/sign-in) to be able to submit this form.';
+
+router.post(`/forms`, (req, res) => {
+  authorize(req, res, false)
+  .then(session => {
+    if (session) {
+      return session;
+    }
+    console.log('!!! no session, load template');
+    // we don't have a session, try to create one
+    // get the form template so we can see what the field names are
+    const FormTemplate = mongoose.model('FormTemplate');
+    const data = req.body;
+    return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
+    .then(formTemplate => {
+
+      const email = formValueForFieldName(formTemplate, data, 'email');
+      const name = formValueForFieldName(formTemplate, data, 'name');
+      if (! email || ! name) {
+        console.log('!!! No email or name');
+        return Promise.reject({ error: FORM_SIGN_IN_MESSAGE});
+      }
+
+      // see if we have an account for this email already
+      console.log('!!! have email, look for user', email);
+      const User = mongoose.model('User');
+      return User.findOne({ email: email }).exec()
+      .then(user => {
+        if (user) {
+          console.log('!!! already have a user');
+          return Promise.reject({ error: FORM_SIGN_IN_MESSAGE});
+        }
+        console.log('!!! no user, create one');
+
+        // create a new user
+        const now = new Date();
+        user = new User({
+          created: now,
+          email: email,
+          modified: now,
+          name: name
+        });
+        return user.save();
+      })
+      .then(user => {
+        // create a new session
+        const Session = mongoose.model('Session');
+        const session = new Session({
+          email: user.email,
+          name: user.name,
+          token: hat(), // better to encrypt this before storing it, someday
+          userId: user._id
+        });
+        return session.save();
+      });
+    });
+  })
+  .then(session => {
+    const Form = mongoose.model('Form');
+    let data = req.body;
+    data.created = new Date();
+    data.modified = data.created;
+    data.userId = session.userId;
+    const form = new Form(data);
+    return form.save()
+    .then(doc => {
+      if (! session.loginAt) {
+        // we created this session here, return it
+        res.status(200).json(session);
+      } else {
+        res.status(200).send({});
+      }
+    });
+  })
+  .catch(error => {
+    console.log('!!! post form catch', error);
+    res.status(400).json(error);
+  });
 });
 
 // Email lists

@@ -29,7 +29,7 @@ export default class SignIn extends Component {
   _onSignIn (event) {
     event.preventDefault();
     postSession(this.state.formState.object)
-      .then(response => this.context.router.push('/'))
+      .then(response => this.context.router.goBack())
       .catch(error => this.setState({ error: error }));
   }
 
@@ -66,6 +66,9 @@ export default class SignIn extends Component {
             <button type="submit" className="button" onClick={this._onSignIn}>
               Sign In
             </button>
+            <Button path="/forgot-password" secondary={true}>
+              Forgot Password
+            </Button>
             <Button path="/sign-up" secondary={true}>
               Sign Up
             </Button>

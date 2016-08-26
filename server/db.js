@@ -32,7 +32,7 @@ const userSchema = Schema({
   avatar: image,
   created: Date,
   email: {type: String, required: true, unique: true},
-  encryptedPassword: {type: String, required: true},
+  encryptedPassword: String,
   relations: [{
     birthday: Date,
     grade: String,

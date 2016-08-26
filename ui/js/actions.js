@@ -16,8 +16,11 @@ const processStatus = (response) => {
 };
 
 // Session
+export function haveSession () {
+  return _sessionId ? true : false;
+}
 
-const setSession = (session) => {
+export function setSession (session) {
   _sessionId = session._id;
   _headers.Authorization = `Token token=${session.token}`;
   dispatch(state => ({ ...state, session: session }));
@@ -25,7 +28,7 @@ const setSession = (session) => {
   return session;
 };
 
-const clearSession = (object) => {
+export function clearSession (object) {
   _sessionId = undefined;
   delete _headers.Authorization;
   dispatch(state => ({ session: undefined }));
@@ -188,6 +191,14 @@ export function deleteItem (category, id) {
 export function postSignUp (user) {
   return fetch('/api/users/sign-up', {
     method: 'POST', headers: _headers, body: JSON.stringify(user) })
+  .then(processStatus)
+  .then(response => response.json());
+}
+
+export function postForgotPassword (email) {
+  console.log('!!! postForgotPassword', email);
+  return fetch('/api/users/forgot-password', {
+    method: 'POST', headers: _headers, body: JSON.stringify({ email: email }) })
   .then(processStatus)
   .then(response => response.json());
 }
