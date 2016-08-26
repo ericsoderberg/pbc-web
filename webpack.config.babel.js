@@ -9,7 +9,7 @@ var plugins = [new webpack.ProvidePlugin({
   'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
 })];
 if (PRODUCTION) {
-  plugins.push(new webpack.optimize.OccurenceOrderPlugin());
+  // plugins.push(new webpack.optimize.OccurenceOrderPlugin());
   plugins.push(new webpack.optimize.UglifyJsPlugin({
     compress: {
       warnings: false

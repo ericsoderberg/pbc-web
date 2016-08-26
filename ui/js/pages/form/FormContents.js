@@ -166,7 +166,6 @@ export default class FormContents extends Component {
 
   render () {
     const { formTemplate, error } = this.props;
-    console.log('!!! FormContents render', error);
 
     let formError;
     if (error && (typeof error === 'string' || error.error)) {
