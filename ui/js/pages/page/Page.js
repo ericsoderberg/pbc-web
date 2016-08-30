@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
@@ -25,16 +26,24 @@ class Page extends Component {
 
   render () {
     const { page } = this.props;
+
+    let actions;
     let contents;
     if (page) {
       contents = <PageContents item={page} />;
+      actions = (
+        <Link to={`/pages/${page._id}/map`}
+          className="a-header">
+          Map
+        </Link>
+      );
     } else {
       contents = <Loading />;
     }
 
     return (
       <main>
-        <ItemHeader category="pages" item={page} />
+        <ItemHeader category="pages" item={page} actions={actions} />
         {contents}
       </main>
     );

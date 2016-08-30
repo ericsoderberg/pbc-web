@@ -72,9 +72,17 @@ export function deleteSession () {
 function cacheAdd (category, item) {
   dispatch(state => {
     let cache = { ...(state[category] || {}) };
-    cache[item.path || item._id] = item;
+    // also store the id -> path mapping so we can remove cached paths
+    // when we only have an id
+    let paths = { ...(state[`${category}-paths`] || {}) };
+    cache[item._id] = item;
+    if (item.path) {
+      cache[item.path] = item;
+      paths[item._id] = item.path;
+    }
     const nextState = { ...state };
     nextState[category] = cache;
+    nextState[`${category}-paths`] = paths;
     return nextState;
   });
 }
@@ -82,10 +90,13 @@ function cacheAdd (category, item) {
 function cacheRemove (category, item) {
   dispatch(state => {
     let cache = { ...(state[category] || {}) };
+    let paths = { ...(state[`${category}-paths`] || {}) };
     delete cache[item.path];
     delete cache[item._id];
+    delete paths[item._id];
     const nextState = { ...state };
     nextState[category] = cache;
+    nextState[`${category}-paths`] = paths;
     return nextState;
   });
 }
@@ -194,6 +205,11 @@ export function deleteItem (category, id) {
 //   });
 // }
 
+export function getPageMap (id) {
+  return fetch(`/api/pages/${id}/map`, { method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
+
 // User
 
 export function postSignUp (user) {
@@ -218,7 +234,7 @@ export function getSite () {
   .then(site => {
     dispatch(state => ({ ...state, site: site }));
     return site;
-  });;
+  });
 }
 
 export function postSite (site) {

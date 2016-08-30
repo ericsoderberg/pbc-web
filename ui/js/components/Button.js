@@ -18,7 +18,7 @@ export default class Button extends Component {
   }
 
   render () {
-    const { children, circle, label, left, path, right, secondary,
+    const { children, circle, className, label, left, path, right, secondary,
       tag } = this.props;
     const Tag = tag || (path ? 'a' : 'button');
 
@@ -49,6 +49,9 @@ export default class Button extends Component {
     }
     if (secondary) {
       classNames.push('button--secondary');
+    }
+    if (className) {
+      classNames.push(className);
     }
 
     let href, onClick;

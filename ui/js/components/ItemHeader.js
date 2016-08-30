@@ -19,6 +19,7 @@ class ItemHeader extends Component {
     const copyItem = { ...item };
     copyItem.name += ' - Copy';
     delete copyItem._id;
+    delete copyItem.path;
     postItem(category, copyItem)
     .then(newItem => {
       this.context.router.push(`/${category}/${newItem._id}/edit`);
@@ -35,11 +36,12 @@ class ItemHeader extends Component {
         session.administratorDomainId === item.domainId))) {
       actions = (
         <nav className="page-header__actions">
+          {this.props.actions}
           <a href={`/${category}/add`} className="a-header"
             onClick={this._onCopy}>
             Copy
           </a>
-          <Link to={`/${category}/${item.path || item._id}/edit`}
+          <Link to={`/${category}/${item._id}/edit`}
             className="a-header">
             Edit
           </Link>
@@ -54,6 +56,7 @@ class ItemHeader extends Component {
 };
 
 ItemHeader.propTypes = {
+  actions: PropTypes.node,
   category: PropTypes.string.isRequired,
   item: PropTypes.object,
   session: PropTypes.shape({

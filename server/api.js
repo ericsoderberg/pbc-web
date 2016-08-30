@@ -637,6 +637,59 @@ register('domains', 'Domain', {
 
 // Pages
 
+function addParents (page, pages) {
+  page.parents = [];
+  Object.keys(pages).forEach(id => {
+    const parent = pages[id];
+    if (parent.children.some(childId => childId.equals(page._id))) {
+      addParents(parent, pages);
+      // don't care about children of parents
+      parent.children = [];
+      page.parents.push(parent);
+    }
+  });
+}
+
+function addChildren (page, pages) {
+  page.children = page.children.map(childId => {
+    let child = pages[childId];
+    addChildren(child, pages);
+    return child;
+  });
+}
+
+router.get('/pages/:id/map', (req, res) => {
+  authorize(req, res)
+  .then(session => {
+    const Page = mongoose.model('Page');
+    return Page.find({})
+    .select('name sections')
+    .populate({ path: 'sections.pages.id', select: 'name path' })
+    .exec();
+  })
+  .then(docs => {
+    // generate an object keyed by page id and containing page references
+    const pages = {};
+    docs.forEach(doc => {
+      let children = [];
+      doc.sections.filter(s => 'pages' === s.type)
+      .forEach(s => s.pages.forEach(p => children.push(p.id._id)));
+      let page = { _id: doc._id, children: children, name: doc.name };
+      pages[doc._id] = page;
+    });
+    return pages;
+  })
+  .then(pages => {
+    const id = req.params.id;
+    let map = pages[id];
+    addParents(map, pages);
+    addChildren(map, pages);
+    return map;
+  })
+  .then(map => res.status(200).json(map))
+  .catch(error => res.status(400).json(error));
+});
+
 const PAGE_MESSAGE_FIELDS = 'path name verses author date image series seriesId';
 
 const populatePage = (page) => {

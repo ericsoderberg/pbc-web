@@ -25,7 +25,12 @@ export default class PageHeader extends Component {
   }
 
   _onBack () {
-    this.context.router.goBack();
+    const { back } = this.props;
+    if (typeof back === 'string') {
+      this.context.router.push(back);
+    } else {
+      this.context.router.goBack();
+    }
   }
 
   render () {
@@ -102,7 +107,7 @@ export default class PageHeader extends Component {
 
 PageHeader.propTypes = {
   actions: PropTypes.node,
-  back: PropTypes.bool,
+  back: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   color: PropTypes.string,
   focusOnSearch: PropTypes.bool,
   form: PropTypes.bool,

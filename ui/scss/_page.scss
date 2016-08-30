@@ -517,3 +517,27 @@
     }
   }
 }
+
+.page-map {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-map__row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: $half-unit;
+  border-top: 1px solid $border-color;
+
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.page-map__page {
+  display: inline-block;
+  // padding: $unit;
+  margin: $half-unit;
+}
