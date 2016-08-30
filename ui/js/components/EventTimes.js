@@ -5,16 +5,28 @@ import moment from 'moment';
 const EventTimes = (props) => {
   const { event, reverse } = props;
   const start = moment(event.start);
+  const yesterday = moment().subtract(1, 'day');
 
   let dates;
   if (event.dates && event.dates.length > 0) {
     // distinguish multiple days in the same week from the same day across weeks
     if (moment(event.dates[0]).day() === start.day()) {
-      dates = (
-        <span className="event-times__date">
-          {start.format('dddd[s]')}
-        </span>
-      );
+      // find the next date
+      let nextDate;
+      event.dates.forEach(date => {
+        date = moment(date);
+        if (date.isAfter(yesterday) &&
+          (! nextDate || date.isBefore(nextDate))) {
+          nextDate = date;
+        }
+      });
+      if (nextDate) {
+        dates = (
+          <span className="event-times__date">
+            {nextDate.format('MMMM Do')}
+          </span>
+        );
+      }
     } else {
       dates = [
         <span key="1" className="event-times__date">
@@ -34,22 +46,25 @@ const EventTimes = (props) => {
     );
   }
 
-  let times = [
-    <span key="first" className="event-times__time">
-      {start.format('h:mm a')}
-    </span>
-  ];
-  if (event.times && event.times.length > 0) {
-    event.times.forEach((time, index) => {
-      times.push(
-        <span key={index} className="event-times__separator">&</span>
-      );
-      times.push(
-        <span key={time.start} className="event-times__time">
-          {moment(time.start).format('h:mm a')}
-        </span>
-      );
-    });
+  let times;
+  if (dates) {
+    times = [
+      <span key="first" className="event-times__time">
+        {start.format('h:mm a')}
+      </span>
+    ];
+    if (event.times && event.times.length > 0) {
+      event.times.forEach((time, index) => {
+        times.push(
+          <span key={index} className="event-times__separator">&</span>
+        );
+        times.push(
+          <span key={time.start} className="event-times__time">
+            {moment(time.start).format('h:mm a')}
+          </span>
+        );
+      });
+    }
   }
 
   if (reverse) {
