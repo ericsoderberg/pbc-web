@@ -8,8 +8,15 @@ import hat from 'hat';
 import moment from 'moment';
 import fs from 'fs';
 import rmdir from 'rimraf';
+import nodemailer from 'nodemailer';
+import { markdown } from 'nodemailer-markdown';
 import './db';
 import { render as renderNewsletter } from './newsletter';
+
+const transporter = nodemailer.createTransport({
+  direct: true
+});
+transporter.use('compile', markdown());
 
 const FILES_PATH = 'public/files';
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
@@ -18,31 +25,55 @@ const router = express.Router();
 
 // Session
 
+function createSession (user) {
+  const Session = mongoose.model('Session');
+  const data = {
+    administrator: user.administrator,
+    administratorDomainId: user.administratorDomainId,
+    email: user.email,
+    loginAt: new Date(),
+    name: user.name,
+    token: hat(), // better to encrypt this before storing it, someday
+    userId: user._id
+  };
+  const session = new Session(data);
+  return session.save();
+}
+
 router.post('/sessions', (req, res) => {
   const User = mongoose.model('User');
-  const Session = mongoose.model('Session');
   const { email, password } = req.body;
   User.findOne({ email: email })
   .exec()
   .then(user => {
     if (user && user.encryptedPassword &&
       bcrypt.compareSync(password, user.encryptedPassword)) {
-      const session = new Session({
-        administrator: user.administrator,
-        administratorDomainId: user.administratorDomainId,
-        email: email,
-        loginAt: new Date(),
-        name: user.name,
-        token: hat(), // better to encrypt this before storing it, someday
-        userId: user._id
-      });
-      session.save()
-      .then(response => res.status(200).json(session))
-      .catch(error => res.status(400).json(error));
+      return createSession(user);
     } else {
-      res.status(401).json({error: "Invalid email or password"});
+      return Promise.reject();
     }
-  });
+  })
+  .then(session => res.status(200).json(session))
+  .catch(error => res.status(401).json({error: "Invalid email or password"}));
+});
+
+// This is used when resetting a password
+router.post('/sessions/token', (req, res) => {
+  const User = mongoose.model('User');
+  const { token } = req.body;
+  const date = moment().subtract(2, 'hours');
+  User.findOne({
+    temporaryToken: token,
+    modified: { $gt: date.toString() }
+  }).exec()
+  .then(user => {
+    user.temporaryToken = undefined;
+    user.verified = true;
+    return user.save();
+  })
+  .then(user => createSession(user))
+  .then(session => res.status(200).json(session))
+  .catch(error => res.status(400).json({}));
 });
 
 router.delete('/sessions/:id', (req, res) => {
@@ -132,7 +163,8 @@ function addPopulate (query, populate) {
 }
 
 const register = (category, modelName, options={}) => {
-  const transform = options.transform || {};
+  const transformIn = options.transformIn || {};
+  const transformOut = options.transformOut || {};
   let methods = options.methods || ['get', 'put', 'delete', 'index', 'post'];
   if (options.omit) {
     methods = methods.filter(m => ! options.omit.some(o => o === m));
@@ -151,7 +183,7 @@ const register = (category, modelName, options={}) => {
       if (req.query.populate) {
         const populate = JSON.parse(req.query.populate);
         if (true === populate) {
-          // populate from options and transform
+          // populate from options
           if (options.populate && options.populate.get) {
             addPopulate(query, options.populate.get);
           }
@@ -162,7 +194,7 @@ const register = (category, modelName, options={}) => {
         addPopulate(query, options.populate.get);
       }
       query.exec()
-      .then(doc => (transform.get ? transform.get(doc, req) : doc))
+      .then(doc => (transformOut.get ? transformOut.get(doc, req) : doc))
       .then(doc => res.json(doc))
       .catch(error => res.status(400).json(error));
     });
@@ -177,9 +209,10 @@ const register = (category, modelName, options={}) => {
         let data = req.body;
         data.modified = new Date();
         data.userId = session.userId;
-        data = (transform.put ? transform.put(data, session) : data);
+        data = (transformIn.put ? transformIn.put(data, session) : data);
         Doc.findOneAndUpdate({ _id: id }, data)
         .exec()
+        .then(doc => (transformOut.put ? transformOut.put(doc, req) : doc))
         .then(doc => res.status(200).json(doc))
         .catch(error => res.status(400).json(error));
       });
@@ -252,6 +285,7 @@ const register = (category, modelName, options={}) => {
           query.skip(parseInt(req.query.skip, 10));
         }
         query.exec()
+        .then(docs => (transformOut.index ? transformOut.index(docs, req) : docs))
         .then(docs => res.json(docs))
         .catch(error => res.status(400).json(error));
       });
@@ -267,9 +301,10 @@ const register = (category, modelName, options={}) => {
         data.created = new Date();
         data.modified = data.created;
         data.userId = session.userId;
-        data = (transform.post ? transform.post(data, session) : data);
+        data = (transformIn.post ? transformIn.post(data, session) : data);
         const doc = new Doc(data);
         doc.save()
+        .then(doc => (transformOut.post ? transformOut.post(doc, req) : doc))
         .then(doc => res.status(200).json(doc))
         .catch(error => res.status(400).json(error));
       });
@@ -299,7 +334,13 @@ router.post('/users/sign-up', (req, res) => {
   .catch(error => res.status(400).json(error));
 });
 
-router.post('/users/forgot-password', (req, res) => {
+const VERIFY_INSTRUCTIONS = `
+# Sign in
+
+Click the link below to sign in. This link is valid for 2 hours.
+`;
+
+router.post('/users/verify-email', (req, res) => {
   let data = req.body;
   const User = mongoose.model('User');
   // make sure we have a user with this email
@@ -309,8 +350,22 @@ router.post('/users/forgot-password', (req, res) => {
       return Promise.reject({
         error: 'There is no account with that email address' });
     }
-    // TODO: send an email with password reset instructions
-    console.log('!!! TODO: send email about resetting password');
+    // generate a tempmorary authentication token
+    user.temporaryToken = hat();
+    user.modified = new Date();
+    return user.save()
+    .then(user => {
+      const url = `${req.protocol}://${req.get('Host')}` +
+        `/verify-email?token=${user.temporaryToken}`;
+      transporter.sendMail({
+        from: 'ericsoderberg@coconut.local',
+        to: user.email,
+        subject: 'Verify Email',
+        markdown: `${VERIFY_INSTRUCTIONS}\n\n[Sign In](${url})`
+      }, (err, info) => {
+        console.log('!!! sendMail', err, info);
+      });
+    });
   })
   .then(() => res.status(200).send({}))
   .catch(error => res.status(400).json(error));
@@ -333,7 +388,11 @@ register('users', 'User', {
     index: authorizedAdministrator
   },
   search: ['name', 'email'],
-  transform: {
+  transformIn: {
+    put: encryptPassword,
+    post: encryptPassword
+  },
+  transformOut: {
     get: (user) => {
       if (user) {
         user = user.toObject();
@@ -341,8 +400,13 @@ register('users', 'User', {
       }
       return user;
     },
-    put: encryptPassword,
-    post: encryptPassword
+    index: (users) => {
+      return users.map(doc => {
+        let user = doc.toObject();
+        delete user.encryptedPassword;
+        return user;
+      });
+    }
   }
 });
 
@@ -358,7 +422,7 @@ register('form-templates', 'FormTemplate', {
   authorize: {
     index: authorizedForDomain
   },
-  transform: {
+  transformIn: {
     put: unsetDomainIfNeeded
   }
 });
@@ -374,7 +438,7 @@ register('forms', 'Form', {
       { path: 'formTemplateId', select: 'name domainId' }
     ]
   },
-  transform: {
+  transformIn: {
     put: unsetDomainIfNeeded
   }
 });
@@ -506,8 +570,10 @@ register('email-lists', 'EmailList', {
   authorize: {
     index: authorizedForDomain
   },
-  transform: {
-    put: unsetDomainIfNeeded,
+  transformIn: {
+    put: unsetDomainIfNeeded
+  },
+  transformOut: {
     get: (emailList, req) => {
       if (emailList) {
         return populateEmailList(emailList);
@@ -631,14 +697,16 @@ register('pages', 'Page', {
       { path: 'sections.formTemplateId', select: 'name' }
     ]
   },
-  transform: {
+  transformIn: {
+    put: unsetDomainIfNeeded
+  },
+  transformOut: {
     get: (page, req) => {
       if (page && req.query.populate) {
         return populatePage(page);
       }
       return page;
-    },
-    put: unsetDomainIfNeeded
+    }
   }
 });
 
@@ -683,14 +751,16 @@ register('messages', 'Message', {
   populate: {
     get: { path: 'seriesId', select: 'name path' }
   },
-  transform: {
+  transformIn: {
+    put: unsetDomainIfNeeded
+  },
+  transformOut: {
     get: (message, req) => {
       if (message && req.query.populate) {
         return populateMessage(message);
       }
       return message;
-    },
-    put: unsetDomainIfNeeded
+    }
   },
   search: ['name', 'author', 'verses']
 });
@@ -761,7 +831,7 @@ register('newsletters', 'Newsletter', {
   authorize: {
     index: authorizedForDomain
   },
-  transform: {
+  transformIn: {
     put: unsetDomainIfNeeded
   }
 });
@@ -1001,7 +1071,7 @@ register('events', 'Event', {
   populate: {
     get: { path: 'primaryEventId', select: 'name path' }
   },
-  transform: {
+  transformIn: {
     put: unsetDomainIfNeeded
   }
 });

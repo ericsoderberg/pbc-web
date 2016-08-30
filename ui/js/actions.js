@@ -51,6 +51,14 @@ export function postSession (session) {
   .then(setSession);
 }
 
+export function postSessionViaToken (session) {
+  return fetch('/api/sessions/token', {
+    method: 'POST', headers: _headers, body: JSON.stringify(session) })
+  .then(processStatus)
+  .then(response => response.json())
+  .then(setSession);
+}
+
 export function deleteSession () {
   return fetch(`/api/sessions/${_sessionId}`, {
     method: 'DELETE', headers: _headers })
@@ -195,9 +203,8 @@ export function postSignUp (user) {
   .then(response => response.json());
 }
 
-export function postForgotPassword (email) {
-  console.log('!!! postForgotPassword', email);
-  return fetch('/api/users/forgot-password', {
+export function postVerifyEmail (email) {
+  return fetch('/api/users/verify-email', {
     method: 'POST', headers: _headers, body: JSON.stringify({ email: email }) })
   .then(processStatus)
   .then(response => response.json());

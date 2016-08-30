@@ -33,6 +33,9 @@ const userSchema = Schema({
   created: Date,
   email: {type: String, required: true, unique: true},
   encryptedPassword: String,
+  modified: Date,
+  name: {type: String, required: true},
+  path: String,
   relations: [{
     birthday: Date,
     grade: String,
@@ -40,10 +43,9 @@ const userSchema = Schema({
     notes: String,
     relationship: String
   }],
-  modified: Date,
-  name: {type: String, required: true},
-  path: String,
-  text: String
+  temporaryToken: String,
+  text: String,
+  verified: Boolean
 });
 
 mongoose.model('User', userSchema);

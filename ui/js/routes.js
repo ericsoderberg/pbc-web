@@ -45,7 +45,7 @@ import Users from './pages/user/Users';
 import UserAdd from './pages/user/UserAdd';
 import User from './pages/user/User';
 import UserEdit from './pages/user/UserEdit';
-import UserForgotPassword from './pages/user/ForgotPassword';
+import UserVerifyEmail from './pages/user/VerifyEmail';
 import SiteEdit from './pages/site/SiteEdit';
 
 export default {
@@ -56,7 +56,7 @@ export default {
     { path: 'calendar', component: Calendar },
     { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },
-    { path: 'forgot-password', component: UserForgotPassword },
+    { path: 'verify-email', component: UserVerifyEmail },
     { path: 'users/add', component: UserAdd },
     { path: 'users/:id', component: User },
     { path: 'users/:id/edit', component: UserEdit },
