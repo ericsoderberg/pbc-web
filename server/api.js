@@ -80,13 +80,14 @@ router.delete('/sessions/:id', (req, res) => {
   authorize(req, res)
   .then(session => {
     const id = req.params.id;
-    if (session._id.equals(id)) { /// === doesn't seem to work
-      session.remove()
-      .then(() => res.status(200).send());
+    if (session._id.equals(id)) {
+      return session.remove();
     } else {
-      res.status(401).json({ error: 'Not authorized' });
+      Promise.reject();
     }
-  });
+  })
+  .then(() => res.status(200).send())
+  .catch(error => res.status(401).json({ error: 'Not authorized' }));
 });
 
 function authorize (req, res, required=true) {
@@ -227,10 +228,8 @@ const register = (category, modelName, options={}) => {
         const Doc = mongoose.model(modelName);
         Doc.findById(id)
         .exec()
-        .then(doc => {
-          doc.remove()
-            .then(doc => res.status(200).send());
-        })
+        .then(doc => doc.remove())
+        .then(doc => res.status(200).send())
         .catch(error => res.status(400).json(error));
       });
     });
@@ -328,9 +327,9 @@ router.post('/users/sign-up', (req, res) => {
     data.modified = data.created;
     data.administrator = 0 === count;
     const doc = new User(data);
-    doc.save()
-    .then(doc => res.status(200).json(doc));
+    return doc.save();
   })
+  .then(doc => res.status(200).json(doc))
   .catch(error => res.status(400).json(error));
 });
 
@@ -588,25 +587,24 @@ router.post('/email-lists/:id/subscribe', (req, res) => {
   .then(session => {
     const id = req.params.id;
     const EmailList = mongoose.model('EmailList');
+    return EmailList.findOne({ _id: id }).exec();
+  })
+  .then(doc => {
     // normalize addresses
     const addresses = req.body.map(a => (
       typeof a === 'string' ? { address: a } : a
     ));
-    EmailList.findOne({ _id: id })
-    .exec()
-    .then(doc => {
-      addresses.forEach(address => {
-        if (! doc.addresses.some(a => a.address === address.address)) {
-          doc.addresses.push(address);
-        }
-      });
-      doc.modified = new Date();
-      return doc.save();
-    })
-    .then(doc => res.status(200).send())
-    // TODO: update mailman
-    .catch(error => res.status(400).json(error));
-  });
+    addresses.forEach(address => {
+      if (! doc.addresses.some(a => a.address === address.address)) {
+        doc.addresses.push(address);
+      }
+    });
+    doc.modified = new Date();
+    return doc.save();
+  })
+  .then(doc => res.status(200).send())
+  // TODO: update mailman
+  .catch(error => res.status(400).json(error));
 });
 
 router.post('/email-lists/:id/unsubscribe', (req, res) => {
@@ -614,22 +612,21 @@ router.post('/email-lists/:id/unsubscribe', (req, res) => {
   .then(session => {
     const id = req.params.id;
     const EmailList = mongoose.model('EmailList');
+    return EmailList.findOne({ _id: id }).exec();
+  })
+  .then(doc => {
     // normalize addresses
     const addresses = req.body.map(a => (
       typeof a === 'string' ? { address: a } : a
     ));
-    EmailList.findOne({ _id: id })
-    .exec()
-    .then(doc => {
-      addresses.forEach(address => {
-        doc.addresses = doc.addresses.filter(a => a.address !== address.address);
-      });
-      doc.modified = new Date();
-      return doc.save();
-    })
-    .then(doc => res.status(200).send())
-    .catch(error => res.status(400).json(error));
-  });
+    addresses.forEach(address => {
+      doc.addresses = doc.addresses.filter(a => a.address !== address.address);
+    });
+    doc.modified = new Date();
+    return doc.save();
+  })
+  .then(doc => res.status(200).send())
+  .catch(error => res.status(400).json(error));
 });
 
 register('domains', 'Domain', {
@@ -855,12 +852,11 @@ router.post('/site', (req, res) => {
     data.modified = new Date();
     data.userId = session.userId;
     const doc = new Doc(data);
-    Doc.remove({})
-    .exec()
-    .then(() => doc.save())
-    .then(doc => res.status(200).json(doc))
-    .catch(error => res.status(400).json(error));
-  });
+    return Doc.remove({}).exec()
+    .then(() => doc.save());
+  })
+  .then(doc => res.status(200).json(doc))
+  .catch(error => res.status(400).json(error));
 });
 
 // Calendar
