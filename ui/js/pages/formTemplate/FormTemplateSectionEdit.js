@@ -1,7 +1,8 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
-import AddIcon from '../../icons/Add';
+import FormFieldAdd from '../../components/FormFieldAdd';
+import Button from '../../components/Button';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -17,7 +18,6 @@ export default class FormTemplateSectionEdit extends Component {
     super(props);
     const { section, onChange } = props;
     this.state = {
-      expandAdd: (! section || ! section.fields || section.fields.length === 0),
       expandedFields: {}, // _id or id
       formState: new FormState(section, onChange),
       newFieldId: 1
@@ -27,7 +27,6 @@ export default class FormTemplateSectionEdit extends Component {
   componentWillReceiveProps (nextProps) {
     const { section, onChange } = nextProps;
     this.setState({
-      expandAdd: (! section || ! section.fields || section.fields.length === 0),
       formState: new FormState(section, onChange)
     });
   }
@@ -55,7 +54,7 @@ export default class FormTemplateSectionEdit extends Component {
 
   render () {
     const { includeName, dependableFields } = this.props;
-    const { formState, expandedFields, expandAdd } = this.state;
+    const { formState, expandedFields } = this.state;
     const section = formState.object;
 
     let sectionFields;
@@ -126,45 +125,18 @@ export default class FormTemplateSectionEdit extends Component {
       );
     });
 
-    let add;
-    if (expandAdd) {
-
-      const addControls = FIELD_TYPES.map(type => (
-        <button key={type} type="button" className="button"
-          onClick={this._addField(type)}>
-          {type}
-        </button>
-      ));
-
-      add = (
-        <fieldset className="form__fields"
-          onClick={() => this.setState({ expandAdd: false })}>
-          <FormField label="Add field">
-            <div className="form__tabs">
-              {addControls}
-            </div>
-          </FormField>
-        </fieldset>
-      );
-
-    } else {
-
-      add = (
-        <div className="form-item">
-          <button type="button" className="button-icon"
-            onClick={() => this.setState({ expandAdd: true })}>
-            <AddIcon />
-          </button>
-        </div>
-      );
-
-    }
+    const addControls = FIELD_TYPES.map(type => (
+      <Button key={type} label={`Add ${type}`} secondary={true}
+        onClick={this._addField(type)} />
+    ));
 
     return (
       <div>
         {sectionFields}
         {fields}
-        {add}
+        <FormFieldAdd>
+          {addControls}
+        </FormFieldAdd>
       </div>
     );
   }

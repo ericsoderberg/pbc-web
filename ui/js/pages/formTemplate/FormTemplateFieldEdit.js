@@ -1,6 +1,8 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import FormFieldAdd from '../../components/FormFieldAdd';
+import Button from '../../components/Button';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -117,14 +119,10 @@ export default class FormTemplateFieldEdit extends Component {
     if ('choice' === field.type || 'choices' === field.type) {
       addOptionControl = (
         <fieldset className="form__fields">
-          <FormField>
-            <div className="form__tabs">
-              <button type="button" className="button button--secondary"
-                onClick={formState.addTo('options')}>
-                Add option
-              </button>
-            </div>
-          </FormField>
+          <FormFieldAdd>
+            <Button label="Add option" secondary={true}
+              onClick={formState.addTo('options')} />
+          </FormFieldAdd>
         </fieldset>
       );
     }

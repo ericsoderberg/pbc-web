@@ -93,7 +93,7 @@
 
   + .form__fields,
   + * > .form__fields:first-child {
-    margin-top: $unit;
+    margin-top: 0;
   }
 }
 
@@ -226,17 +226,29 @@
   max-width: $form-width - $double-unit;
 }
 
+.form-field-add {
+  display: flex;
+  flex-direction: column;
+  max-width: $form-width;
+  margin: 0 auto;
+}
+
+.form-field-add__control {
+  align-self: center;
+}
+
 .form__tabs {
   display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  // justify-content: stretch;
+  // flex-wrap: wrap;
   max-width: $form-width;
   margin: 0 auto;
 
-  > * {
-    flex: 1 0 auto;
-  }
+  // > * {
+  //   flex: 1 0 auto;
+  // }
 }
 
 .form__footer {

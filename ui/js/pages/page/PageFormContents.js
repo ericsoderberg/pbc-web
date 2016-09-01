@@ -2,7 +2,9 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
-import AddIcon from '../../icons/Add';
+import FormFieldAdd from '../../components/FormFieldAdd';
+import Button from '../../components/Button';
+// import AddIcon from '../../icons/Add';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -33,10 +35,8 @@ export default class PageFormContents extends Component {
 
   constructor (props) {
     super(props);
-    const { formState: { object: page } } = props;
     this.state = {
       domains: [],
-      expandAdd: (! page || ! page.sections || page.sections.length === 0),
       expandedSections: {}, // _id or id
       newSectionId: 1
     };
@@ -84,7 +84,7 @@ export default class PageFormContents extends Component {
 
   render () {
     const { formState, session } = this.props;
-    const { expandedSections, expandAdd } = this.state;
+    const { expandedSections } = this.state;
     const page = formState.object;
 
     const sections = (page.sections || []).map((section, index) => {
@@ -132,39 +132,10 @@ export default class PageFormContents extends Component {
       );
     });
 
-    let add;
-    if (expandAdd) {
-
-      const addControls = SECTION_TYPES.map(type => (
-        <button key={type} type="button" className="button"
-          onClick={this._addSection(type)}>
-          {type}
-        </button>
-      ));
-
-      add = (
-        <fieldset className="form__fields"
-          onClick={() => this.setState({ expandAdd: false })}>
-          <FormField label="Add section">
-            <div className="form__tabs">
-              {addControls}
-            </div>
-          </FormField>
-        </fieldset>
-      );
-
-    } else {
-
-      add = (
-        <div className="form-item">
-          <button type="button" className="button-icon"
-            onClick={() => this.setState({ expandAdd: true })}>
-            <AddIcon />
-          </button>
-        </div>
-      );
-
-    }
+    const addControls = SECTION_TYPES.map(type => (
+      <Button key={type} label={`Add ${type}`} secondary={true}
+        onClick={this._addSection(type)} />
+    ));
 
     let administeredBy;
     if (session.administrator) {
@@ -196,7 +167,9 @@ export default class PageFormContents extends Component {
           {administeredBy}
         </fieldset>
         {sections}
-        {add}
+        <FormFieldAdd>
+          {addControls}
+        </FormFieldAdd>
       </div>
     );
   }

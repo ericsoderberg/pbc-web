@@ -2,10 +2,11 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems, postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
+import FormFieldAdd from '../../components/FormFieldAdd';
 import ImageField from '../../components/ImageField';
 import DateTime from '../../components/DateTime';
 import SelectSearch from '../../components/SelectSearch';
-import CloseIcon from '../../icons/Close';
+import TrashIcon from '../../icons/Trash';
 
 export default class MessageFormContents extends Component {
 
@@ -68,7 +69,7 @@ export default class MessageFormContents extends Component {
     let closeControl = (
       <button type="button" className="button-icon"
         onClick={this.props.formState.removeAt('files', index)}>
-        <CloseIcon secondary={true} />
+        <TrashIcon secondary={true} />
       </button>
     );
 
@@ -183,14 +184,12 @@ export default class MessageFormContents extends Component {
               onChange={formState.change('videoUrl')}/>
           </FormField>
           {files}
-          <FormField>
-            <div className="form__tabs">
-              <button type="button" className="button button--secondary"
-                onClick={this._onAddFile}>
-                Add file
-              </button>
-            </div>
-          </FormField>
+          <FormFieldAdd>
+            <button type="button" className="button button--secondary"
+              onClick={this._onAddFile}>
+              Add file
+            </button>
+          </FormFieldAdd>
         </fieldset>
         <fieldset className="form__fields">
           {seriesField}

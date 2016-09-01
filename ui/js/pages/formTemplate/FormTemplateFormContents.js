@@ -2,6 +2,8 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
+import FormFieldAdd from '../../components/FormFieldAdd';
+import Button from '../../components/Button';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -157,14 +159,10 @@ export default class FormTemplateFormContents extends Component {
         </fieldset>
         {sections}
         <fieldset className="form__fields">
-          <FormField>
-            <div className="form__tabs">
-              <button type="button" className="button button--secondary"
-                onClick={this._addSection()}>
-                Add section
-              </button>
-            </div>
-          </FormField>
+          <FormFieldAdd>
+            <Button label="Add section" secondary={true}
+              onClick={this._addSection()} />
+          </FormFieldAdd>
         </fieldset>
       </div>
     );

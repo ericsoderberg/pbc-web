@@ -1,8 +1,10 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import FormFieldAdd from '../../components/FormFieldAdd';
 import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
+import Button from '../../components/Button';
 import FormState from '../../utils/FormState';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
@@ -55,7 +57,7 @@ class SubPageEdit extends Component {
         </div>
         <FormField label="Page">
           <SelectSearch category="pages"
-            value={pageSummary.id.name || ''}
+            value={pageSummary.id ? pageSummary.id.name : ''}
             onChange={(suggestion) =>
               formState.change('id')({
                 _id: suggestion._id, name: suggestion.name })} />
@@ -140,14 +142,10 @@ export default class PagesSectionEdit extends Component {
           <div className="form-item">
             <h5>{`page ${subPages.length + 1}`}</h5>
           </div>
-          <FormField>
-            <div className="form__tabs">
-              <button type="button" className="button button--secondary"
-                onClick={this._onAddPage}>
-                Add page
-              </button>
-            </div>
-          </FormField>
+          <FormFieldAdd>
+            <Button label="Add page" secondary={true}
+              onClick={this._onAddPage} />
+          </FormFieldAdd>
         </fieldset>
       </div>
     );

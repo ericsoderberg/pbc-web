@@ -1,6 +1,8 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import FormFieldAdd from '../../components/FormFieldAdd';
+import Button from '../../components/Button';
 import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
 import TrashIcon from '../../icons/Trash';
@@ -66,14 +68,10 @@ export default class SiteFormContents extends Component {
             onChange={formState.change('copyright')}/>
         </FormField>
         {socialLinks}
-        <FormField>
-          <div className="form__tabs">
-            <button type="button" className="button button--secondary"
-              onClick={formState.addTo('socialUrls', '')}>
-              Add social url
-            </button>
-          </div>
-        </FormField>
+        <FormFieldAdd>
+          <Button label="Add social url" secondary={true}
+            onClick={formState.addTo('socialUrls', '')} />
+        </FormFieldAdd>
       </fieldset>
     );
   }

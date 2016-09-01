@@ -18,12 +18,12 @@ export default class Button extends Component {
   }
 
   render () {
-    const { children, circle, className, label, left, path, right, secondary,
-      tag } = this.props;
+    const { children, circle, className, icon, label, left, path, plain, right,
+      secondary, tag, type } = this.props;
     const Tag = tag || (path ? 'a' : 'button');
 
     let classNames = [];
-    let contents = label || children;
+    let contents = label || icon || children;
     let arrow;
     if (circle) {
       classNames.push('button-circle');
@@ -44,6 +44,10 @@ export default class Button extends Component {
           <path d='M0,0 L24,12 L0,24 Z' />
         </svg>
       );
+    } else if (icon) {
+      classNames.push('button-icon');
+    } else if (plain) {
+      classNames.push('button-plain');
     } else {
       classNames.push(`button`);
     }
@@ -63,7 +67,8 @@ export default class Button extends Component {
     }
 
     return (
-      <Tag className={classNames.join(' ')} href={href} onClick={onClick}>
+      <Tag className={classNames.join(' ')} href={href} type={type}
+        onClick={onClick}>
         {contents}
         {arrow}
       </Tag>
@@ -73,10 +78,12 @@ export default class Button extends Component {
 
 Button.propTypes = {
   circle: PropTypes.bool,
+  icon: PropTypes.node,
   label: PropTypes.node,
   left: PropTypes.bool,
   onClick: PropTypes.func,
   path: PropTypes.string,
+  plain: PropTypes.bool,
   replaceHistory: PropTypes.bool,
   right: PropTypes.bool,
   secondary: PropTypes.bool,
