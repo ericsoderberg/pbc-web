@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
-import CloseIcon from '../../icons/Close';
+import TrashIcon from '../../icons/Trash';
 
 export default class SiteFormContents extends Component {
 
@@ -23,7 +23,7 @@ export default class SiteFormContents extends Component {
             closeControl={
               <button type="button" className="button-icon"
                 onClick={formState.removeAt('socialUrls', index)}>
-                <CloseIcon secondary={true} />
+                <TrashIcon secondary={true} />
               </button>
             }>
             <input name={`social-${index}`} value={url}

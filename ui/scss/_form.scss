@@ -191,6 +191,10 @@
   }
 }
 
+.form-field--closable {
+  padding-right: $double-unit;
+}
+
 .form-field--dragging {
   background-color: rgba(0, 0, 0, 0.3);
 }

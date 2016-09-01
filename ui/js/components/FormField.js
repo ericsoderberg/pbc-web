@@ -60,6 +60,7 @@ export default class FormField extends Component {
 
     let close;
     if (this.props.closeControl) {
+      classNames.push('form-field--closable');
       close = <div className="form-field__close">{this.props.closeControl}</div>;
     }
 
@@ -71,7 +72,6 @@ export default class FormField extends Component {
           <div>
             {help}
             {error}
-            {close}
           </div>
         </div>
       );
@@ -91,6 +91,7 @@ export default class FormField extends Component {
         onDragLeave={onDragLeave} onDrop={onDrop} >
         {labels}
         {this.props.children}
+        {close}
       </div>
     );
   }

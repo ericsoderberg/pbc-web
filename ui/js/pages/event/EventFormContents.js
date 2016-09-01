@@ -7,6 +7,7 @@ import DateTime from '../../components/DateTime';
 import SelectSearch from '../../components/SelectSearch';
 import EventDates from './EventDates';
 import EventResources from './EventResources';
+import TrashIcon from '../../icons/Trash';
 
 const Suggestion = (props) => (
   <div className="box--between">
@@ -86,10 +87,10 @@ class EventFormFields extends Component {
     if (event.times && event.times.length > 0) {
       otherTimes = event.times.map((time, index) => [
         <FormField key={`start-${index}`} label="Also starts"
-          help={
-            <button type="button" className="button--link"
+          closeControl={
+            <button type="button" className="button-icon"
               onClick={formState.removeAt('times', index)}>
-              Remove
+              <TrashIcon secondary={true} />
             </button>
           }>
           <DateTime format="h:mm a" name={`start-${index}`} step={15}
@@ -121,54 +122,58 @@ class EventFormFields extends Component {
     }
 
     return (
-      <fieldset className="form__fields">
-        <FormField label="Name">
-          <input ref="name" name="name" value={event.name || ''}
-            onChange={formState.change('name')}/>
-        </FormField>
-        <FormField label="Starts">
-          <DateTime format="M/D/YYYY h:mm a" name="start" step={15}
-            value={event.start || ''}
-            onChange={this._onStartChange} />
-        </FormField>
-        <FormField label="Ends">
-          <DateTime format="M/D/YYYY h:mm a" name="end" step={15}
-            value={event.end || ''}
-            onChange={formState.change('end')} />
-        </FormField>
-        <FormField label="Location">
-          <input name="location" value={event.location || ''}
-            onChange={formState.change('location')}/>
-        </FormField>
-        <FormField label="Address">
-          <input name="address" value={event.address || ''}
-            onChange={formState.change('address')}/>
-        </FormField>
-        <FormField label="Text">
-          <textarea ref="text" name="text" value={event.text || ''} rows={4}
-            onChange={formState.change('text')}/>
-        </FormField>
-        <FormField label="Calendar">
-          <input name="calendar" value={event.calendar || ''}
-            onChange={formState.change('calendar')}/>
-        </FormField>
-        <FormField label="Path" help="unique url name">
-          <input name="path" value={event.path || ''}
-            onChange={formState.change('path')}/>
-        </FormField>
-        {administeredBy}
-        {primaryEvent}
-        {otherTimes}
-        <FormField>
-          <div className="form__tabs">
-            <button type="button" className="button button--secondary"
-              onClick={formState.addTo('times',
-                { start: event.start, end: event.end })}>
-              Add other time
-            </button>
-          </div>
-        </FormField>
-      </fieldset>
+      <div>
+        <fieldset key="main" className="form__fields">
+          <FormField label="Name">
+            <input ref="name" name="name" value={event.name || ''}
+              onChange={formState.change('name')}/>
+          </FormField>
+          <FormField label="Starts">
+            <DateTime format="M/D/YYYY h:mm a" name="start" step={15}
+              value={event.start || ''}
+              onChange={this._onStartChange} />
+          </FormField>
+          <FormField label="Ends">
+            <DateTime format="M/D/YYYY h:mm a" name="end" step={15}
+              value={event.end || ''}
+              onChange={formState.change('end')} />
+          </FormField>
+          <FormField label="Location">
+            <input name="location" value={event.location || ''}
+              onChange={formState.change('location')}/>
+          </FormField>
+          <FormField label="Address">
+            <input name="address" value={event.address || ''}
+              onChange={formState.change('address')}/>
+          </FormField>
+          <FormField label="Text">
+            <textarea ref="text" name="text" value={event.text || ''} rows={4}
+              onChange={formState.change('text')}/>
+          </FormField>
+          <FormField label="Calendar">
+            <input name="calendar" value={event.calendar || ''}
+              onChange={formState.change('calendar')}/>
+          </FormField>
+          <FormField label="Path" help="unique url name">
+            <input name="path" value={event.path || ''}
+              onChange={formState.change('path')}/>
+          </FormField>
+          {administeredBy}
+          {primaryEvent}
+        </fieldset>
+        <fieldset className="form__fields">
+          {otherTimes}
+          <FormField>
+            <div className="form__tabs">
+              <button type="button" className="button button--secondary"
+                onClick={formState.addTo('times',
+                  { start: event.start, end: event.end })}>
+                Add other time
+              </button>
+            </div>
+          </FormField>
+        </fieldset>
+      </div>
     );
   }
 }
