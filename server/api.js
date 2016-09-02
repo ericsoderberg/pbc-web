@@ -229,7 +229,8 @@ const register = (category, modelName, options={}) => {
         Doc.findById(id)
         .exec()
         .then(doc => doc.remove())
-        .then(doc => res.status(200).send())
+        .then(doc => (transformOut.delete ? transformOut.delete(doc, req) : doc))
+        .then(() => res.status(200).send())
         .catch(error => res.status(400).json(error));
       });
     });
@@ -382,6 +383,13 @@ const encryptPassword = (data) => {
   return data;
 };
 
+const deleteUserRelated = (doc) => {
+  const Session = mongoose.model('Session');
+  Session.remove({ userId: doc._id }).exec();
+  // TODO: unsubscribe from EmailLists
+  return doc;
+};
+
 register('users', 'User', {
   authorize: {
     index: authorizedAdministrator
@@ -405,7 +413,8 @@ register('users', 'User', {
         delete user.encryptedPassword;
         return user;
       });
-    }
+    },
+    delete: deleteUserRelated
   }
 });
 
@@ -430,7 +439,7 @@ register('forms', 'Form', {
   authorize: {
     index: authorizedForDomainOrSelf
   },
-  omit: ['post'], // special handling for POST of form
+  omit: ['post'], // special handling for POST of form below
   populate: {
     index: [
       { path: 'userId', select: 'name' },

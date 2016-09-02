@@ -183,7 +183,7 @@ class List extends Component {
 
     return (
       <main>
-        <PageHeader title={title} homer={homer}
+        <PageHeader title={title} homer={homer} focusOnSearch={true}
           searchText={search} onSearch={this._onSearch}
           actions={[filterAction, addControl]} />
         <ul className="list">

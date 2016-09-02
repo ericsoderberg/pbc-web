@@ -117,7 +117,7 @@ mongoose.model('Event', eventSchema);
 const resourceSchema = Schema({
   created: Date,
   modified: Date,
-  name: String,
+  name: {type: String, required: true, unique: true},
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
@@ -137,8 +137,10 @@ const formTemplateFieldSchema = Schema({
   name: String,
   options: [formTemplateOptionSchema],
   required: Boolean,
-  type: { type: String,
-    enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions']
+  type: {
+    type: String,
+    enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions'],
+    required: true
   },
   value: String // unused?
 });
@@ -153,7 +155,7 @@ const formTemplateSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
-  name: String,
+  name: {type: String, required: true, unique: true},
   path: String,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
@@ -167,15 +169,17 @@ const formSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   fields: [{
-    fieldId: ObjectId,
+    fieldId: { type: Schema.Types.ObjectId, required: true },
     optionId: ObjectId, // choice
     optionIds: [ObjectId], // choices
     value: String
   }],
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate',
+    required: true },
   modified: Date,
+  name: String, // derived from appropriate field value
   paymentId: ObjectId,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   version: Number
 });
 
@@ -242,7 +246,7 @@ const newsletterSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   library: String,
   modified: Date,
-  name: String,
+  name: {type: String, required: true, unique: true},
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

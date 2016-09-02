@@ -47,6 +47,7 @@ a,
   cursor: pointer;
   text-decoration: none;
   transition: all 0.3s;
+  flex-shrink: 0;
 }
 
 .button {

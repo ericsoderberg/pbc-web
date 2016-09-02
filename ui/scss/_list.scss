@@ -61,6 +61,10 @@ button.item__container {
   }
 }
 
+.item--full {
+  padding: $quarter-unit 0;
+}
+
 .item__name {
   font-weight: 600;
 
@@ -96,6 +100,10 @@ button.item__container {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
+  > *:not(:last-child) {
+    margin-right: $quarter-unit;
+  }
 }
 
 .email-list__search {

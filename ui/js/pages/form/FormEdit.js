@@ -4,7 +4,7 @@ import { getItem, putItem, deleteItem } from '../../actions';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
 import FormContents from './FormContents';
-import { setFormError, clearFormError } from './FormUtils';
+import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
 export default class FormEdit extends Component {
 
@@ -42,7 +42,7 @@ export default class FormEdit extends Component {
     if (error) {
       this.setState({ error: error });
     } else {
-      form.domainId = formTemplate.domainId;
+      finalizeForm(formTemplate, form);
       putItem('forms', this.state.form)
       .then(response => onDone ? onDone() : this.context.router.goBack())
       .catch(error => this.setState({ error: error }));
@@ -75,12 +75,16 @@ export default class FormEdit extends Component {
 
   render () {
     const { form, formTemplate } = this.state;
+    let classNames = ['form'];
+    if (this.props.className) {
+      classNames.push(this.props.className);
+    }
 
     let result;
     if (form && formTemplate) {
 
       result = (
-        <form className="form" action={`/forms${form._id}`}
+        <form className={classNames.join(' ')} action={`/forms${form._id}`}
           onSubmit={this._onUpdate}>
           <FormContents form={form} formTemplate={formTemplate}
             onChange={this._onChange} />

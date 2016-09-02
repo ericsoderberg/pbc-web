@@ -513,3 +513,7 @@
   max-width: $form-width;
   margin: 0 auto;
 }
+
+.form-summary__container {
+  transition: min-height 2s;
+}

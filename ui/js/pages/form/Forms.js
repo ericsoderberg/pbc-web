@@ -14,7 +14,7 @@ const Item = (props) => {
       <div className="item">
         <span className="box--row">
           <span>{form.formTemplateId.name}</span>
-          <span>{form.userId.name}</span>
+          <span>{(form.userId || {}).name}</span>
         </span>
         <span>{moment(form.modified).format('MMM Do YYYY')}</span>
       </div>

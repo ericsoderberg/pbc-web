@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
 import Loading from '../../components/Loading';
 import FormContents from './FormContents';
-import { setFormError, clearFormError } from './FormUtils';
+import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
 export default class FormAdd extends Component {
 
@@ -44,7 +44,7 @@ export default class FormAdd extends Component {
     if (error) {
       this.setState({ error: error });
     } else {
-      form.domainId = formTemplate.domainId;
+      finalizeForm(formTemplate, form);
       postItem('forms', form)
       .then(response => {
         // if we didn't have a session and we created one as part of adding,
@@ -93,7 +93,8 @@ export default class FormAdd extends Component {
       }
 
       result = (
-        <form className={classNames.join(' ')} action={'/forms'} onSubmit={this._onAdd}>
+        <form className={classNames.join(' ')} action={'/forms'}
+          onSubmit={this._onAdd}>
           <FormContents form={form} formTemplate={formTemplate}
             onChange={this._onChange} error={error} />
           <footer className="form__footer">

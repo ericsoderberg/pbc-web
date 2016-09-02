@@ -1,12 +1,51 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+// import { findDOMNode } from 'react-dom';
+import moment from 'moment';
 import { getItems, getItem } from '../../actions';
 import Section from '../../components/Section';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
+import Button from '../../components/Button';
+import AddIcon from '../../icons/Add';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
-import FormItem from './FormItem';
+
+const LABEL = {
+  'Register': 'registered',
+  'Sign Up': 'signed up',
+  'Submit': 'submitted',
+  'Subscribe': 'subscribed'
+};
+
+const FormItem = (props) => {
+  const { className, distinguish, item: form, onClick, verb } = props;
+  const classNames = ['item__container', className];
+  const timestamp = moment(form.modified).format('MMM Do YYYY');
+  let message;
+  if (distinguish) {
+    message = `You ${verb} for ${form.name} on ${timestamp}`;
+  } else {
+    message = `You ${verb} on ${timestamp}`;
+  }
+
+  return (
+    <div className={classNames.join(' ')}>
+      <div className="item item--full">
+        <span>{message}</span>
+        <Button label="Change" plain={true} onClick={onClick} />
+      </div>
+    </div>
+  );
+
+};
+
+FormItem.propTypes = {
+  distinguish: PropTypes.bool,
+  item: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+  verb: PropTypes.string.isRequired
+};
 
 class FormSummary extends Component {
 
@@ -28,11 +67,23 @@ class FormSummary extends Component {
     }
   }
 
+  // componentDidUpdate () {
+  //   setTimeout(() => {
+  //     const container = findDOMNode(this.refs.container);
+  //     const child = container.childNodes[0];
+  //     const rect = child.getBoundingClientRect();
+  //     console.log('!!! componentDidUpdate', rect.height);
+  //     if (this.state.minHeight !== rect.height) {
+  //       this.setState({ minHeight: rect.height });
+  //     }
+  //   }, 10);
+  // }
+
   _load (props) {
     const { formTemplate, formTemplateId } = props;
     if (! formTemplate) {
       getItem('form-templates', formTemplateId._id || formTemplateId,
-        { select: 'name' })
+        { select: 'name submitLabel' })
       .then(formTemplate => this.setState({ formTemplate: formTemplate }))
       .catch(error => console.log('!!! FormSummary formTemplate catch', error));
     }
@@ -47,7 +98,7 @@ class FormSummary extends Component {
           formTemplateId: (formTemplateId._id || formTemplateId),
           userId: session.userId
         },
-        select: 'modified userId', populate: true
+        select: 'modified userId name', populate: true
       })
       .then(forms => this.setState({ forms: forms }))
       .catch(error => console.log('!!! FormSummary forms catch', error));
@@ -96,28 +147,30 @@ class FormSummary extends Component {
     } else {
       const items = forms.map(form => (
         <li key={form._id}>
-          <FormItem item={form} onClick={this._edit(form._id)} />
+          <FormItem item={form} onClick={this._edit(form._id)}
+            verb={LABEL[formTemplate.submitLabel || 'Submit']}
+            distinguish={forms.length > 1} />
         </li>
       ));
       contents = (
-        <div>
-          <div className="form-summary">
+        <div className="form-summary">
+          <div className="box--between">
             <h2>{formTemplate.name}</h2>
-            <ul className="list">
-              {items}
-            </ul>
-            <button type="button" className="button button--secondary"
-              onClick={this._onAdd}>
-              Add another
-            </button>
+            <Button plain={true} icon={<AddIcon />}
+              onClick={this._onAdd} />
           </div>
+          <ul className="list">
+            {items}
+          </ul>
         </div>
-      );
+    );
     }
 
     return (
       <Section color={color} full={full} plain={plain}>
-        {contents}
+        <div ref="container" className="form-summary__container">
+          {contents}
+        </div>
       </Section>
     );
   }
