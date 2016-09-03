@@ -72,10 +72,10 @@ const pageSectionSchema = Schema({
   }],
   text: String,       // text type
   type: { type: String,
-    enum: ['text', 'image', 'event', 'library', 'form', 'user', 'pages', 'video']
+    enum: ['text', 'image', 'event', 'library', 'form', 'person', 'pages', 'video']
   },
   url: String,        // video type
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }    // user type
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }    // person type
 });
 
 const pageSchema = Schema({

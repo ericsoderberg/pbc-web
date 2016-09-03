@@ -12,12 +12,12 @@ import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
 import EventSectionEdit from './EventSectionEdit';
 import LibrarySectionEdit from './LibrarySectionEdit';
-import UserSectionEdit from './UserSectionEdit';
+import PersonSectionEdit from './PersonSectionEdit';
 import PagesSectionEdit from './PagesSectionEdit';
 import VideoSectionEdit from './VideoSectionEdit';
 import FormSectionEdit from './FormSectionEdit';
 
-const SECTION_TYPES = ['text', 'image', 'event', 'library', 'user', 'pages',
+const SECTION_TYPES = ['text', 'image', 'event', 'library', 'person', 'pages',
   'video', 'form'];
 
 const SECTIONS = {
@@ -27,7 +27,7 @@ const SECTIONS = {
   library: LibrarySectionEdit,
   pages: PagesSectionEdit,
   text: TextSectionEdit,
-  user: UserSectionEdit,
+  person: PersonSectionEdit,
   video: VideoSectionEdit
 };
 

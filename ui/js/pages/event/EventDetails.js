@@ -24,6 +24,7 @@ export default class EventDetails extends Component {
     super();
     this._onStartChange = this._onStartChange.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
+    this._onChangePrimaryEvent = this._onChangePrimaryEvent.bind(this);
     this.state = { domains: [] };
   }
 
@@ -64,6 +65,17 @@ export default class EventDetails extends Component {
     };
   }
 
+  _onChangePrimaryEvent (suggestion) {
+    const { formState } = this.props;
+    let value;
+    if (suggestion) {
+      value = { _id: suggestion._id, name: suggestion.name };
+    } else {
+      value = undefined;
+    }
+    formState.set('primaryEventId', value);
+  }
+
   render () {
     const { formState, session } = this.props;
     const event = formState.object;
@@ -74,11 +86,9 @@ export default class EventDetails extends Component {
         <FormField label="Primary event" help="For recurring event one-offs">
           <SelectSearch category="events"
             options={{select: 'name start', sort: '-start'}}
-            Suggestion={Suggestion}
+            Suggestion={Suggestion} clearable={true}
             value={(event.primaryEventId || {}).name || ''}
-            onChange={(suggestion) =>
-              formState.change('primaryEventId')({
-                _id: suggestion._id, name: suggestion.name })} />
+            onChange={this._onChangePrimaryEvent} />
         </FormField>
       );
     }

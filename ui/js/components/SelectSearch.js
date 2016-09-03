@@ -2,8 +2,10 @@
 
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../actions';
+import Button from './Button';
 import KeyboardAccelerators from '../utils/KeyboardAccelerators';
 import SearchIcon from '../icons/Search';
+import CloseIcon from '../icons/Close';
 
 export default class SelectSearch extends Component {
 
@@ -93,7 +95,7 @@ export default class SelectSearch extends Component {
   }
 
   render () {
-    const { className, Suggestion } = this.props;
+    const { className, clearable, Suggestion } = this.props;
     const { active, searchText, suggestions } = this.state;
     let classes = ['select-search'];
     if (active) {
@@ -107,8 +109,12 @@ export default class SelectSearch extends Component {
     if (typeof this.props.value === 'object') {
       value = value.name;
     }
-    if (! value) {
-      classes.push('select-search--empty');
+    let clearControl;
+    if (clearable && value) {
+      clearControl = (
+        <Button className="select-search__clear" icon={<CloseIcon />}
+          onClick={this._onSelect.bind(this, undefined)} />
+      );
     }
 
     let details;
@@ -131,13 +137,12 @@ export default class SelectSearch extends Component {
 
     return (
       <div ref="component" className={classes.join(' ')}>
-        <div className={'select-search__value'}>
-          {value}
+        <div className="select-search__header">
+          <input className="select-search__value" disabled={true} value={value} />
+          {clearControl}
+          <Button className="select-search__control" icon={<SearchIcon />}
+            onClick={this._onToggle} />
         </div>
-        <button className="select-search__control button-icon"
-          onClick={this._onToggle}>
-          <SearchIcon />
-        </button>
         {details}
       </div>
     );
@@ -148,6 +153,7 @@ export default class SelectSearch extends Component {
 SelectSearch.propTypes = {
   active: PropTypes.bool,
   category: PropTypes.string,
+  clearable: PropTypes.bool,
   exclude: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string
   })),

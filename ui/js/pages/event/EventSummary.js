@@ -77,7 +77,7 @@ export default class EventSummary extends Component {
 };
 
 EventSummary.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   navigable: PropTypes.bool,
   ...Section.propTypes
 };

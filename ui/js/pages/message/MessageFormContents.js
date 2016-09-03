@@ -14,6 +14,7 @@ export default class MessageFormContents extends Component {
     super();
     this._onAddFile = this._onAddFile.bind(this);
     this._renderFileField = this._renderFileField.bind(this);
+    this._onChangeSeries = this._onChangeSeries.bind(this);
     this.state = { domains: [] };
   }
 
@@ -65,6 +66,17 @@ export default class MessageFormContents extends Component {
     };
   }
 
+  _onChangeSeries (suggestion) {
+    const { formState } = this.props;
+    let value;
+    if (suggestion) {
+      value = { _id: suggestion._id, name: suggestion.name };
+    } else {
+      value = undefined;
+    }
+    formState.set('seriesId', value);
+  }
+
   _renderFileField (file, index) {
     let closeControl = (
       <button type="button" className="button-icon"
@@ -113,12 +125,10 @@ export default class MessageFormContents extends Component {
     if (! message.series) {
       seriesField = (
         <FormField name="seriesId" label="In Series">
-          <SelectSearch category="messages"
+          <SelectSearch category="messages" clearable={true}
             options={{filter: { series: true }}}
             value={(message.seriesId || {}).name || ''}
-            onChange={(suggestion) =>
-              formState.change('seriesId')({
-                _id: suggestion._id, name: suggestion.name })} />
+            onChange={this._onChangeSeries} />
         </FormField>
       );
     }

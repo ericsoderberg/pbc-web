@@ -241,16 +241,16 @@ const register = (category, modelName, options={}) => {
       authorize(req, res, false)
       .then(session => {
         const Doc = mongoose.model(modelName);
-        const search = options.search || ['name'];
+        const searchProperties = options.searchProperties || ['name'];
         let query = Doc.find();
         if (options.authorize && options.authorize.index) {
           query.find(options.authorize.index(session));
         }
         if (req.query.search) {
           const exp = new RegExp(req.query.search, 'i');
-          query.or(search.map(propertyName => {
+          query.or(searchProperties.map(property => {
             let obj = {};
-            obj[propertyName] = exp;
+            obj[property] = exp;
             return obj;
           }));
         }
@@ -394,7 +394,7 @@ register('users', 'User', {
   authorize: {
     index: authorizedAdministrator
   },
-  search: ['name', 'email'],
+  searchProperties: ['name', 'email'],
   transformIn: {
     put: encryptPassword,
     post: encryptPassword
@@ -821,7 +821,7 @@ register('messages', 'Message', {
       return message;
     }
   },
-  search: ['name', 'author', 'verses']
+  searchProperties: ['name', 'author', 'verses']
 });
 
 // Newsletter

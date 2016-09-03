@@ -1,21 +1,16 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
+import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
 import SectionFields from './SectionFields';
 
-export default class UserSectionEdit extends Component {
+export default class PersonSectionEdit extends Component {
 
   constructor (props) {
     super(props);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange), users: [] };
-  }
-
-  componentDidMount () {
-    getItems('users')
-    .then(users => this.setState({ users: users }));
   }
 
   componentWillReceiveProps (nextProps) {
@@ -28,18 +23,15 @@ export default class UserSectionEdit extends Component {
     const { formState } = this.state;
     const section = formState.object;
 
-    const users = this.state.users.map(user => (
-      <option key={user._id} label={user.name} value={user._id} />
-    ));
-    users.unshift(<option key={0} />);
-
     return (
       <fieldset className="form__fields">
-        <FormField name="user" label="User">
-          <select name="objectId" value={section.userId || ''}
-            onChange={formState.change('userId')}>
-            {users}
-          </select>
+        <FormField name="user" label="Person">
+          <SelectSearch category="users"
+            options={{ select: 'name' }}
+            value={(section.userId || {}).name || ''}
+            onChange={(suggestion) =>
+              formState.change('userId')({
+                _id: suggestion._id, name: suggestion.name })} />
         </FormField>
         <SectionFields formState={formState} />
       </fieldset>
@@ -47,7 +39,7 @@ export default class UserSectionEdit extends Component {
   }
 };
 
-UserSectionEdit.defaultProps = {
+PersonSectionEdit.defaultProps = {
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
 };

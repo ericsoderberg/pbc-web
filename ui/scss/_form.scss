@@ -167,7 +167,7 @@
     }
   }
 
-  input:not([type="checkbox"]):not([type="radio"]),
+  input:not([type="checkbox"]):not([type="radio"]):not(.select-search__input),
   select,
   textarea,
   .select-search {
@@ -435,17 +435,13 @@
   // line-height: $double-unit;
 }
 
-.select-search__control {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
 .select-search__drop {
   position: absolute;
   left: 0;
   right: 0;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
   background-color: $background-color;
   text-align: left;
   border-style: none solid solid;
@@ -453,19 +449,22 @@
   border-color: $border-color;
 }
 
-.select-search--empty {
-  .select-search__drop {
-    top: 0;
+.select-search__header {
+  display: flex;
+  flex-direction: row;
+
+  > .button-icon {
+    flex: 0 0 auto;
   }
 }
 
 .select-search__input {
-  width: 100%;
+  flex: 1;
 }
 
 .select-search__suggestion {
   line-height: $unit;
-  padding: $quarter-unit $unit;
+  padding: $quarter-unit $half-unit;
   cursor: pointer;
 
   &:hover {
