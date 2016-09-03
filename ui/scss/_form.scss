@@ -515,5 +515,10 @@
 }
 
 .form-summary__container {
-  transition: min-height 2s;
+  transition: height 1s;
+  overflow: auto;
+
+  > * {
+    animation: fadein 1s;
+  }
 }

@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-// import { findDOMNode } from 'react-dom';
+import { findDOMNode } from 'react-dom';
 import moment from 'moment';
 import { getItems, getItem } from '../../actions';
 import Section from '../../components/Section';
@@ -54,7 +54,8 @@ class FormSummary extends Component {
     this._onAdd = this._onAdd.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this._onDone = this._onDone.bind(this);
-    this.state = { };
+    this._layout = this._layout.bind(this);
+    this.state = { height: 100, pad: 100 };
   }
 
   componentDidMount () {
@@ -67,17 +68,26 @@ class FormSummary extends Component {
     }
   }
 
-  // componentDidUpdate () {
-  //   setTimeout(() => {
-  //     const container = findDOMNode(this.refs.container);
-  //     const child = container.childNodes[0];
-  //     const rect = child.getBoundingClientRect();
-  //     console.log('!!! componentDidUpdate', rect.height);
-  //     if (this.state.minHeight !== rect.height) {
-  //       this.setState({ minHeight: rect.height });
-  //     }
-  //   }, 10);
-  // }
+  componentDidUpdate () {
+    clearTimeout(this._layoutTimer);
+    this._layoutTimer = setTimeout(this._layout, 100);
+  }
+
+  componentWillUnmount () {
+    clearTimeout(this._layoutTimer);
+  }
+
+  _layout () {
+    const container = findDOMNode(this.refs.container);
+    const child = container.childNodes[0];
+    const rect = child.getBoundingClientRect();
+    if (this.state.height !== rect.height) {
+      const style = window.getComputedStyle(container, null);
+      const pad = parseInt(style.paddingTop, 10) +
+        parseInt(style.paddingBottom, 10);
+      this.setState({ height: rect.height, pad: pad });
+    }
+  }
 
   _load (props) {
     const { formTemplate, formTemplateId } = props;
@@ -128,7 +138,7 @@ class FormSummary extends Component {
 
   render () {
     const { color, full, plain, formTemplateId } = this.props;
-    const { formTemplate, forms, adding, editId } = this.state;
+    const { formTemplate, forms, adding, editId, height, pad } = this.state;
 
     let contents;
     if (! forms || ! formTemplate) {
@@ -168,7 +178,8 @@ class FormSummary extends Component {
 
     return (
       <Section color={color} full={full} plain={plain}>
-        <div ref="container" className="form-summary__container">
+        <div ref="container" className="form-summary__container"
+          style={{ height: height + pad }}>
           {contents}
         </div>
       </Section>
