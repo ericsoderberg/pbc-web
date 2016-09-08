@@ -28,6 +28,7 @@ function formValueForFieldName (formTemplate, form, fieldName) {
 }
 
 export default function (router) {
+
   register(router, 'forms', 'Form', {
     authorize: {
       index: authorizedForDomainOrSelf
@@ -48,19 +49,21 @@ export default function (router) {
   });
 
   router.post(`/forms`, (req, res) => {
-    authorize(req, res, false)
+    authorize(req, res, false) // don't require session yet
     .then(session => {
-      if (session) {
-        return session;
-      }
-      console.log('!!! no session, load template');
-      // we don't have a session, try to create one
-      // get the form template so we can see what the field names are
-      const FormTemplate = mongoose.model('FormTemplate');
       const data = req.body;
+      const FormTemplate = mongoose.model('FormTemplate');
       return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
-      .then(formTemplate => {
-
+      .then(formTemplate => ({
+        formTemplate: formTemplate,
+        session: session
+      }));
+    })
+    .then(context => {
+      const { session, formTemplate } = context;
+      const data = req.body;
+      if (! session) {
+        // we don't have a session, try to create one
         const email = formValueForFieldName(formTemplate, data, 'email');
         const name = formValueForFieldName(formTemplate, data, 'name');
         if (! email || ! name) {
@@ -69,7 +72,7 @@ export default function (router) {
         }
 
         // see if we have an account for this email already
-        console.log('!!! have email, look for user', email);
+        console.log('!!! have an email, look for user', email);
         const User = mongoose.model('User');
         return User.findOne({ email: email }).exec()
         .then(user => {
@@ -99,15 +102,26 @@ export default function (router) {
             userId: user._id
           });
           return session.save();
-        });
-      });
+        })
+        .then(session => ({
+          formTemplate: formTemplate,
+          session: session
+        }));
+      }
     })
-    .then(session => {
+    .then(context => {
+      const { session, formTemplate } = context;
       const Form = mongoose.model('Form');
       let data = req.body;
       data.created = new Date();
       data.modified = data.created;
-      data.userId = session.userId;
+      // Allow an administrator to set the userId. Otherwise, set it to
+      // the current session user
+      if (! data.userId ||
+        ! (session.administrator || (formTemplate.domainId &&
+          formTemplate.domainId.equals(session.administratorDomainId)))) {
+        data.userId = session.userId;
+      }
       const form = new Form(data);
       return form.save()
       .then(doc => {
@@ -132,8 +146,8 @@ export default function (router) {
       const Form = mongoose.model('Form');
       return Form.findOne({ _id: id }).exec()
       .then(form => {
-        // get the FormTemplate so we can validate it hasn't changed and so
-        // we can check the domainId for authorization
+        // Get the FormTemplate so we can validate it hasn't changed and so
+        // we can check the domainId for authorization.
         const FormTemplate = mongoose.model('FormTemplate');
         return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
         .then(formTemplate => {
@@ -141,6 +155,8 @@ export default function (router) {
           if (! formTemplate._id.equals(data.formTemplateId)) {
             return Promise.reject({ error: 'Mismatched template' });
           }
+          // Allow an administrator to set the userId. Otherwise, set it to
+          // the current session user
           if (! data.userId ||
             ! (session.administrator || (formTemplate.domainId &&
               formTemplate.domainId.equals(session.administratorDomainId)))) {
