@@ -187,6 +187,10 @@ export default class UserFormContents extends Component {
       </button>
     );
 
+    const formPath = `/forms?` +
+      `userId=${encodeURIComponent(user._id)}` +
+      `&userId-name=${encodeURIComponent(user.name)}`;
+
     return (
       <div>
         <fieldset className="form__fields">
@@ -234,6 +238,13 @@ export default class UserFormContents extends Component {
           {emailLists}
           <div className="form-item">
             {emailLists.length > 0 ? addEmailListControl : undefined}
+          </div>
+        </div>
+
+        <div className="form-section">
+          <div className="form-item">
+            <h3>Forms</h3>
+            <Link to={formPath}>Filled out forms</Link>
           </div>
         </div>
       </div>

@@ -95,7 +95,7 @@ export default class SelectSearch extends Component {
   }
 
   render () {
-    const { className, clearable, Suggestion } = this.props;
+    const { className, clearable, placeholder, Suggestion } = this.props;
     const { active, searchText, suggestions } = this.state;
     let classes = ['select-search'];
     if (active) {
@@ -137,11 +137,11 @@ export default class SelectSearch extends Component {
 
     return (
       <div ref="component" className={classes.join(' ')}>
-        <div className="select-search__header">
-          <input className="select-search__value" disabled={true} value={value} />
+        <div className="select-search__header" onClick={this._onToggle}>
+          <input className="select-search__value" disabled={true}
+            placeholder={placeholder} value={value} />
           {clearControl}
-          <Button className="select-search__control" icon={<SearchIcon />}
-            onClick={this._onToggle} />
+          <Button className="select-search__control" icon={<SearchIcon />} />
         </div>
         {details}
       </div>
@@ -159,6 +159,7 @@ SelectSearch.propTypes = {
   })),
   onChange: PropTypes.func,
   options: PropTypes.object,
+  placeholder: PropTypes.string,
   Suggestion: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,

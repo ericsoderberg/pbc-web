@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
@@ -139,8 +140,15 @@ export default class FormTemplateFormContents extends Component {
       );
     }
 
+    const formPath = `/forms?` +
+      `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
+      `&formTemplateId-name=${encodeURIComponent(formTemplate.name)}`;
+
     return (
       <div>
+        <div className="form-item">
+          <Link to={formPath}>Filled out forms</Link>
+        </div>
         <fieldset className="form__fields">
           <FormField label="Form name">
             <input name="name" value={formTemplate.name || ''}

@@ -432,6 +432,7 @@
 
 .select-search__value {
   height: $double-unit;
+  flex: 1;
   // line-height: $double-unit;
 }
 
@@ -452,6 +453,7 @@
 .select-search__header {
   display: flex;
   flex-direction: row;
+  align-items: center;
 
   > .button-icon {
     flex: 0 0 auto;

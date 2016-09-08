@@ -2,9 +2,18 @@
 import React, { Component, PropTypes } from 'react';
 import FormError from '../../components/FormError';
 import FormField from '../../components/FormField';
+import SelectSearch from '../../components/SelectSearch';
 import Text from '../../components/Text';
+import Stored from '../../components/Stored';
 
-export default class FormContents extends Component {
+const UserSuggestion = (props) => (
+  <div className="box--between">
+    <span>{props.item.name}</span>
+    <span className="secondary">{props.item.email}</span>
+  </div>
+);
+
+class FormContents extends Component {
 
   constructor () {
     super();
@@ -165,7 +174,7 @@ export default class FormContents extends Component {
   }
 
   render () {
-    const { formTemplate, error } = this.props;
+    const { form, formTemplate, error, session } = this.props;
 
     let formError;
     if (error && (typeof error === 'string' || error.error)) {
@@ -175,10 +184,30 @@ export default class FormContents extends Component {
     const sections =
       (formTemplate.sections || []).map(this._renderTemplateSection);
 
+    let user;
+    if (session.administrator || (formTemplate.domainId &&
+      session.administratorDomainId === formTemplate.domainId)) {
+      user = (
+        <fieldset className="form__fields">
+          <FormField label="Person" help="the person to submit this form for">
+            <SelectSearch category="users"
+              options={{select: 'name email', sort: 'name'}}
+              Suggestion={UserSuggestion}
+              value={(form.userId || session).name || ''}
+              onChange={(suggestion) => {
+                form.userId = suggestion;
+                this.props.onChange(form);
+              }} />
+          </FormField>
+        </fieldset>
+      );
+    }
+
     return (
       <div>
         {formError}
         {sections}
+        {user}
       </div>
     );
   }
@@ -192,5 +221,16 @@ FormContents.propTypes = {
   formTemplate: PropTypes.shape({
     sections: PropTypes.arrayOf(PropTypes.object)
   }).isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  session: PropTypes.shape({
+    administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string,
+    name: PropTypes.string
+  }).isRequired
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(FormContents, select);

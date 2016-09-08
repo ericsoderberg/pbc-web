@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { getItems } from '../actions';
 import PageHeader from './PageHeader';
 import Filter from './Filter';
+import SelectSearch from './SelectSearch';
 import Stored from './Stored';
 import Loading from './Loading';
 
@@ -12,45 +13,51 @@ class List extends Component {
   constructor (props) {
     super(props);
     this._onSearch = this._onSearch.bind(this);
-    this._onFilter = this._onFilter.bind(this);
     this._onScroll = this._onScroll.bind(this);
-    this.state = { items: [], search: '' };
+    this.state = { items: [], searchText: '' };
   }
 
   componentDidMount () {
     document.title = this.props.title;
-    this._setFilterAndSearch(this.props);
+    this._setStateFromLocation(this.props);
     window.addEventListener('scroll', this._onScroll);
   }
 
   componentWillReceiveProps (nextProps) {
-    this._setFilterAndSearch(nextProps);
+    this._setStateFromLocation(nextProps);
   }
 
   componentWillUnmount () {
     window.removeEventListener('scroll', this._onScroll);
   }
 
-  _setFilterAndSearch (props) {
-    let filter, filterValue;
-    if (props.filter) {
-      filterValue = props.location.query[props.filter.property];
-      if (filterValue) {
-        filter = {};
-        filter[props.filter.property] = filterValue;
-      }
+  _setStateFromLocation (props) {
+    let filter, filterNames;
+    if (props.filters) {
+      filter = {};
+      filterNames = {};
+      props.filters.forEach(aFilter => {
+        const value = props.location.query[aFilter.property];
+        if (value) {
+          filter[aFilter.property] = value;
+          const name = props.location.query[`${aFilter.property}-name`];
+          if (name) {
+            filterNames[value] = name;
+          }
+        }
+      });
     }
-    const search = props.location.query.search || '';
-    this.setState({ filter, filterValue, search }, this._get);
+    const searchText = props.location.query.search || '';
+    this.setState({ filter, filterNames, searchText }, this._get);
   }
 
   _get () {
     const { category, populate, select, sort } = this.props;
-    const { filter, search } = this.state;
+    const { filter, searchText } = this.state;
     // throttle gets when user is typing
     clearTimeout(this._getTimer);
     this._getTimer = setTimeout(() => {
-      getItems(category, { sort, filter, search, select, populate })
+      getItems(category, { sort, filter, search: searchText, select, populate })
       .then(response => this.setState({
         items: response, mightHaveMore: response.length >= 20
       }))
@@ -58,19 +65,41 @@ class List extends Component {
     }, 100);
   }
 
-  _nav (options) {
-    const { filter } = this.props;
-    const search = options.hasOwnProperty('search') ?
-      options.search : this.state.search || undefined;
-    const filterValue = options.hasOwnProperty('filterValue') ?
-      options.filterValue : this.state.filterValue || undefined;
+  _setLocation (options) {
+    const { filters } = this.props;
+    const { filterNames } = this.state;
+    let searchParams = [];
 
-    const searchParams = [];
-    if (filterValue) {
-      searchParams.push(`${filter.property}=${encodeURIComponent(filterValue)}`);
+    const searchText = options.hasOwnProperty('searchText') ?
+      options.searchText : this.state.searchText || undefined;
+    if (searchText) {
+      searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
-    if (search) {
-      searchParams.push(`search=${encodeURIComponent(search)}`);
+
+    if (filters) {
+      filters.forEach(filter => {
+        const property = filter.property;
+        let value, name;
+        if (options.hasOwnProperty(property)) {
+          if (typeof options[property] === 'object') {
+            value = options[property]._id;
+            name = options[property].name;
+          } else {
+            value = options[property];
+          }
+        } else if (this.state.filter.hasOwnProperty(property)) {
+          value = this.state.filter[property];
+          if (filterNames[value]) {
+            name = filterNames[value];
+          }
+        }
+        if (value) {
+          searchParams.push(`${property}=${encodeURIComponent(value)}`);
+          if (name) {
+            searchParams.push(`${property}-name=${encodeURIComponent(name)}`);
+          }
+        }
+      });
     }
 
     this.context.router.replace({
@@ -81,10 +110,11 @@ class List extends Component {
 
   _onMore () {
     const { category, populate, select, sort } = this.props;
-    const { filter, search } = this.state;
+    const { filter, searchText } = this.state;
     this.setState({ loadingMore: true }, () => {
       const skip = this.state.items.length;
-      getItems(category, { sort, filter, search, select, populate, skip })
+      getItems(category, { sort, filter, search: searchText, select,
+        populate, skip })
       .then(response => {
         let items = this.state.items.concat(response);
         this.setState({
@@ -111,22 +141,35 @@ class List extends Component {
   }
 
   _onSearch (event) {
-    const search = event.target.value;
-    this._nav({ search: search });
+    const searchText = event.target.value;
+    this._setLocation({ searchText: searchText });
   }
 
-  _onFilter (event) {
-    let filterValue = event.target.value;
-    if (filterValue.match(/^all$/i)) {
-      filterValue = undefined;
-    }
-    this._nav({ filterValue });
+  _filter (property) {
+    return (event) => {
+      let value = event.target.value;
+      if (value.match(/^all$/i)) {
+        value = undefined;
+      }
+      let options = {};
+      options[property] = value;
+      this._setLocation(options);
+    };
+  }
+
+  _select (property) {
+    return (suggestion) => {
+      let options = {};
+      options[property] = suggestion;
+      this._setLocation(options);
+    };
   }
 
   render () {
-    const { Item, path, title, marker, sort, session, filter,
-      homer } = this.props;
-    const { search, filterValue, mightHaveMore, loadingMore } = this.state;
+    const { addIfFilter, Item, path, title, marker, sort, session, filters,
+      search, homer } = this.props;
+    const { searchText, filter, filterNames, mightHaveMore, loadingMore }
+      = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
@@ -146,6 +189,7 @@ class List extends Component {
         </li>
       );
     });
+
     if (-1 !== markerIndex) {
       items.splice(markerIndex, 0, (
         <li key="marker">
@@ -156,20 +200,45 @@ class List extends Component {
       ));
     }
 
-    let addControl;
-    if (session && (session.administrator || session.administratorDomainId)) {
-      addControl = (
-        <Link key="add" to={`${path}/add`} className="a-header">Add</Link>
+    let actions = [];
+
+    if (filters) {
+      filters.forEach(aFilter => {
+        let value = (filter || {})[aFilter.property] || '';
+        if (aFilter.options) {
+          actions.push(
+            <Filter key={aFilter.property} options={aFilter.options}
+              value={value}
+              onChange={this._filter(aFilter.property)} />
+          );
+        } else {
+          if (value) {
+            value = filterNames[value] || value;
+          }
+          actions.push(
+            <SelectSearch key={aFilter.property} category={aFilter.category}
+              options={{select: 'name', sort: 'name'}} clearable={true}
+              placeholder={aFilter.allLabel} value={value}
+              onChange={this._select(aFilter.property)} />
+          );
+        }
+      });
+    }
+
+    if ((! addIfFilter || (filter || {})[addIfFilter]) && session &&
+      (session.administrator || session.administratorDomainId)) {
+      let addPath = `${path}/add`;
+      if (addIfFilter) {
+        addPath += `?${addIfFilter}=${encodeURIComponent(filter[addIfFilter])}`;
+      }
+      actions.push(
+        <Link key="add" to={addPath} className="a-header">Add</Link>
       );
     }
 
-    let filterAction;
-    if (filter && filter.options && filter.options.length > 0) {
-      filterAction = (
-        <Filter key="filter" options={filter.options}
-          value={filterValue}
-          onChange={this._onFilter} />
-      );
+    let onSearch;
+    if (search) {
+      onSearch = this._onSearch;
     }
 
     let more;
@@ -184,8 +253,7 @@ class List extends Component {
     return (
       <main>
         <PageHeader title={title} homer={homer} focusOnSearch={true}
-          searchText={search} onSearch={this._onSearch}
-          actions={[filterAction, addControl]} />
+          searchText={searchText} onSearch={onSearch} actions={actions} />
         <ul className="list">
           {items}
         </ul>
@@ -196,17 +264,20 @@ class List extends Component {
 };
 
 List.propTypes = {
+  addIfFilter: PropTypes.string,
   category: PropTypes.string,
-  filter: PropTypes.shape({
-    property: PropTypes.string.isRequired,
+  filters: PropTypes.arrayOf(PropTypes.shape({
+    allLabel: PropTypes.string.isRequired,
+    category: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.shape({
         label: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired
       })
-    ])).isRequired
-  }),
+    ])),
+    property: PropTypes.string.isRequired
+  })),
   homer: PropTypes.bool,
   Item: PropTypes.func.isRequired,
   marker: PropTypes.shape({
@@ -215,6 +286,7 @@ List.propTypes = {
     value: PropTypes.any
   }),
   path: PropTypes.string,
+  search: PropTypes.bool,
   select: PropTypes.string,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
@@ -225,6 +297,7 @@ List.propTypes = {
 };
 
 List.defaultProps = {
+  search: true,
   sort: 'name'
 };
 

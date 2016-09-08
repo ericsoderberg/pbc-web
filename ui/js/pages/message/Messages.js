@@ -27,7 +27,8 @@ export default class Messages extends Component {
     const { location } = this.props;
     const { filterOptions } = this.state;
 
-    const filter = { property: "library", options: filterOptions };
+    const filter = { property: "library", options: filterOptions,
+      allLabel: 'All libraries' };
 
     const marker = {
       property: 'date',
@@ -42,7 +43,7 @@ export default class Messages extends Component {
     return (
       <List location={location} homer={true}
         category="messages" title="Messages" path="/messages"
-        filter={filter} select="name path verses date" sort="-date"
+        filters={[filter]} select="name path verses date" sort="-date"
         Item={MessagesMessageItem} marker={marker} />
     );
   }

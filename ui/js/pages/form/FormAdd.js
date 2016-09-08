@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
+import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
@@ -13,8 +14,7 @@ export default class FormAdd extends Component {
     this._onChange = this._onChange.bind(this);
     this.state = {
       form: {
-        fields: [],
-        formTemplateId: props.formTemplateId
+        fields: []
       }
     };
   }
@@ -30,8 +30,13 @@ export default class FormAdd extends Component {
   }
 
   _load (props) {
-    getItem('form-templates', props.formTemplateId)
-    .then(formTemplate => this.setState({ formTemplate: formTemplate }))
+    const formTemplateId =
+      props.formTemplateId || props.location.query.formTemplateId;
+    getItem('form-templates', formTemplateId)
+    .then(formTemplate => this.setState({
+      form: { fields: [], formTemplateId: formTemplate._id },
+      formTemplate: formTemplate
+    }))
     .catch(error => console.log("!!! FormAdd catch", error));
   }
 
@@ -85,10 +90,12 @@ export default class FormAdd extends Component {
       let cancelControl;
       if (onCancel) {
         cancelControl = (
-          <button type="button" className="button button--secondary"
-            onClick={onCancel}>
-            Cancel
-          </button>
+          <Button secondary={true} label="Cancel" onClick={onCancel} />
+        );
+      } else if (this.props.location.query.formTemplateId) {
+        cancelControl = (
+          <Button secondary={true} label="Cancel"
+            onClick={() => this.context.router.goBack()} />
         );
       }
 
@@ -114,7 +121,7 @@ export default class FormAdd extends Component {
 };
 
 FormAdd.propTypes = {
-  formTemplateId: PropTypes.string.isRequired,
+  formTemplateId: PropTypes.string,
   formTemplate: PropTypes.object,
   onCancel: PropTypes.func,
   onDone: PropTypes.func
