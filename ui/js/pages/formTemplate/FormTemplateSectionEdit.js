@@ -59,7 +59,11 @@ export default class FormTemplateSectionEdit extends Component {
 
     let sectionFields;
     if (includeName) {
-      let dependsOnOptions = dependableFields.map(dependableField => (
+      let dependsOnOptions = dependableFields
+      .filter(dependableField => (
+        dependableField.sectionId !== (section._id || section.id)
+      ))
+      .map(dependableField => (
         <option key={dependableField.id} label={dependableField.name}
           value={dependableField.id} />
       ));

@@ -62,10 +62,13 @@ export default class FormTemplateFormContents extends Component {
     let dependableFields = [];
     (formTemplate.sections || []).forEach(section => {
       (section.fields || []).forEach(field => {
-        dependableFields.push({
-          id: field._id || field.id,
-          name: field.name
-        });
+        if ('instructions' !== field.type) {
+          dependableFields.push({
+            id: field._id || field.id,
+            name: field.name,
+            sectionId: section._id || section.id
+          });
+        }
       });
     });
 

@@ -127,7 +127,11 @@ export default class FormTemplateFieldEdit extends Component {
       );
     }
 
-    let dependsOnOptions = dependableFields.map(dependableField => (
+    let dependsOnOptions = dependableFields
+    .filter(dependableField => (
+      dependableField.id !== (field._id || field.id)
+    ))
+    .map(dependableField => (
       <option key={dependableField.id} label={dependableField.name}
         value={dependableField.id} />
     ));
