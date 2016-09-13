@@ -106,7 +106,12 @@ export default (router, category, modelName, options={}) => {
           }));
         }
         if (req.query.filter) {
-          query.find(JSON.parse(req.query.filter));
+          let filter = JSON.parse(req.query.filter);
+          if (typeof filter === 'string') {
+            // need double de-escape, first to de-string and then to de-stringify
+            filter = JSON.parse(filter);
+          }
+          query.find(filter);
         }
         if (req.query.sort) {
           query.sort(req.query.sort);

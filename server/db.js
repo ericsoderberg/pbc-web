@@ -156,7 +156,6 @@ const formTemplateSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true, unique: true},
-  path: String,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },

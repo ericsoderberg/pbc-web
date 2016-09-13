@@ -143,23 +143,24 @@ export default class FormTemplateFormContents extends Component {
       );
     }
 
-    const formPath = `/forms?` +
+    const formsPath = `/forms?` +
       `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
       `&formTemplateId-name=${encodeURIComponent(formTemplate.name)}`;
+    const pageFilter = { 'sections.formTemplateId': formTemplate._id };
+    const pagesPath = `/pages?` +
+      `filter=${encodeURIComponent(JSON.stringify(pageFilter))}` +
+      `&filter-name=${encodeURIComponent('Pages including ' + formTemplate.name)}`;
 
     return (
       <div>
         <div className="form-item">
-          <Link to={formPath}>Filled out forms</Link>
+          <Link to={formsPath}>Filled out forms</Link>
+          <Link to={pagesPath}>Pages including</Link>
         </div>
         <fieldset className="form__fields">
           <FormField label="Form name">
             <input name="name" value={formTemplate.name || ''}
               onChange={formState.change('name')}/>
-          </FormField>
-          <FormField label="Form path">
-            <input name="path" value={formTemplate.path || ''}
-              onChange={formState.change('path')}/>
           </FormField>
           <FormField label="Submit button label">
             <input name="submitLabel"

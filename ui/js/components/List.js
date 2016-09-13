@@ -46,6 +46,8 @@ class List extends Component {
           }
         }
       });
+    } else {
+      filter = props.location.query.filter;
     }
     const searchText = props.location.query.search || '';
     this.setState({ filter, filterNames, searchText }, this._get);

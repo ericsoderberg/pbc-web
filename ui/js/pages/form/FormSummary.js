@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
+import { Link } from 'react-router';
 import moment from 'moment';
 import { getItems, getItem } from '../../actions';
 import Section from '../../components/Section';
@@ -137,7 +138,7 @@ class FormSummary extends Component {
   }
 
   render () {
-    const { color, full, plain, formTemplateId } = this.props;
+    const { color, full, plain, formTemplateId, session } = this.props;
     const { formTemplate, forms, adding, editId, height, pad } = this.state;
 
     let contents;
@@ -162,10 +163,18 @@ class FormSummary extends Component {
             distinguish={forms.length > 1} />
         </li>
       ));
+      let heading = formTemplate.name;
+      if (session.administrator) {
+        heading = (
+          <Link to={`/form-templates/${formTemplate.formTemplateId}/edit`}>
+            {formTemplate.name}
+          </Link>
+        );
+      }
       contents = (
         <div className="form-summary">
           <div className="box--between">
-            <h2>{formTemplate.name}</h2>
+            <h2>{heading}</h2>
             <Button plain={true} icon={<AddIcon />}
               onClick={this._onAdd} />
           </div>
