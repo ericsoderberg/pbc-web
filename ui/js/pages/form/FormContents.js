@@ -15,11 +15,26 @@ const UserSuggestion = (props) => (
 
 class FormContents extends Component {
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this._renderTemplateSection = this._renderTemplateSection.bind(this);
     this._renderTemplateField = this._renderTemplateField.bind(this);
-    this.state = {};
+    this.state = { fieldsSet: this._fieldsSetFromProps(props) };
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.setState({ fieldsSet: this._fieldsSetFromProps(nextProps) });
+  }
+
+  _fieldsSetFromProps (props) {
+    let fieldsSet = {};
+    props.form.fields.forEach(field => {
+      if (field.value || field.optionId ||
+        (field.optionIds && field.optionIds.length > 0)) {
+        fieldsSet[field.fieldId] = true;
+      }
+    });
+    return fieldsSet;
   }
 
   _fieldIndex (id) {
@@ -155,6 +170,7 @@ class FormContents extends Component {
   }
 
   _renderTemplateSection (templateSection, index) {
+    const { fieldsSet } = this.state;
     let name;
     if (templateSection.name) {
       name = (
@@ -163,8 +179,11 @@ class FormContents extends Component {
         </div>
       );
     }
-    const fields =
-      (templateSection.fields || []).map(this._renderTemplateField);
+    const fields = (templateSection.fields || [])
+    .filter(templateField => (
+      ! templateField.dependsOnId || fieldsSet[templateField.dependsOnId]
+    ))
+    .map(this._renderTemplateField);
     return (
       <fieldset key={index} className="form-fields">
         {name}
@@ -175,14 +194,16 @@ class FormContents extends Component {
 
   render () {
     const { form, formTemplate, error, session } = this.props;
+    const { fieldsSet } = this.state;
 
     let formError;
     if (error && (typeof error === 'string' || error.error)) {
       formError = <FormError message={error} />;
     }
 
-    const sections =
-      (formTemplate.sections || []).map(this._renderTemplateSection);
+    const sections = (formTemplate.sections || [])
+    .filter(section => ! section.dependsOnId || fieldsSet[section.dependsOnId])
+    .map(this._renderTemplateSection);
 
     let user;
     if (session.administrator || (formTemplate.domainId &&
