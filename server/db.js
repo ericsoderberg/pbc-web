@@ -152,6 +152,7 @@ const formTemplateSectionSchema = Schema({
 });
 
 const formTemplateSchema = Schema({
+  authenticate: Boolean,
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,

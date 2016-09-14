@@ -206,8 +206,8 @@ class FormContents extends Component {
     .map(this._renderTemplateSection);
 
     let user;
-    if (session.administrator || (formTemplate.domainId &&
-      session.administratorDomainId === formTemplate.domainId)) {
+    if (session && (session.administrator || (formTemplate.domainId &&
+      session.administratorDomainId === formTemplate.domainId))) {
       user = (
         <fieldset className="form__fields">
           <FormField label="Person" help="the person to submit this form for">
@@ -247,7 +247,7 @@ FormContents.propTypes = {
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
     name: PropTypes.string
-  }).isRequired
+  })
 };
 
 const select = (state, props) => ({

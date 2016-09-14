@@ -167,6 +167,12 @@ export default class FormTemplateFormContents extends Component {
               value={formTemplate.submitLabel || 'Submit'}
               onChange={formState.change('submitLabel')}/>
           </FormField>
+          <FormField>
+            <input name="authenticate" type="checkbox"
+              checked={formTemplate.authenticate || false}
+              onChange={formState.toggle('authenticate')}/>
+            <label htmlFor="authenticate">authenticate</label>
+          </FormField>
           {administeredBy}
         </fieldset>
         {sections}

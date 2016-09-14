@@ -92,7 +92,8 @@ export default class FormAdd extends Component {
         cancelControl = (
           <Button secondary={true} label="Cancel" onClick={onCancel} />
         );
-      } else if (this.props.location.query.formTemplateId) {
+      } else if (this.props.location &&
+        this.props.location.query.formTemplateId) {
         cancelControl = (
           <Button secondary={true} label="Cancel"
             onClick={() => this.context.router.goBack()} />

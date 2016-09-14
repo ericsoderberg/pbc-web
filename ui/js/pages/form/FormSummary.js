@@ -78,23 +78,11 @@ class FormSummary extends Component {
     clearTimeout(this._layoutTimer);
   }
 
-  _layout () {
-    const container = findDOMNode(this.refs.container);
-    const child = container.childNodes[0];
-    const rect = child.getBoundingClientRect();
-    if (this.state.height !== rect.height) {
-      const style = window.getComputedStyle(container, null);
-      const pad = parseInt(style.paddingTop, 10) +
-        parseInt(style.paddingBottom, 10);
-      this.setState({ height: rect.height, pad: pad });
-    }
-  }
-
   _load (props) {
     const { formTemplate, formTemplateId } = props;
     if (! formTemplate) {
       getItem('form-templates', formTemplateId._id || formTemplateId,
-        { select: 'name submitLabel' })
+        { select: 'name submitLabel authenticate' })
       .then(formTemplate => this.setState({ formTemplate: formTemplate }))
       .catch(error => console.log('!!! FormSummary formTemplate catch', error));
     }
@@ -115,6 +103,18 @@ class FormSummary extends Component {
       .catch(error => console.log('!!! FormSummary forms catch', error));
     } else {
       this.setState({ forms: [] });
+    }
+  }
+
+  _layout () {
+    const container = findDOMNode(this.refs.container);
+    const child = container.childNodes[0];
+    const rect = child.getBoundingClientRect();
+    if (this.state.height !== rect.height) {
+      const style = window.getComputedStyle(container, null);
+      const pad = parseInt(style.paddingTop, 10) +
+        parseInt(style.paddingBottom, 10);
+      this.setState({ height: rect.height, pad: pad });
     }
   }
 
@@ -145,6 +145,14 @@ class FormSummary extends Component {
     let contents;
     if (! forms || ! formTemplate) {
       contents = <Loading />;
+    } else if (! session && formTemplate.authenticate) {
+      contents = (
+        <div className="form-summary">
+          <h2>{formTemplate.name}</h2>
+          <p>You must sign in to fill out this form.</p>
+          <Link className="link-button" to="/sign-in" >Sign In</Link>
+        </div>
+      );
     } else if (adding || forms.length === 0) {
       const onCancel = forms.length > 0 ? this._onCancel : undefined;
       contents = (
@@ -188,6 +196,7 @@ class FormSummary extends Component {
           );
         }
       }
+
       contents = (
         <div className="form-summary">
           <div className="box--between">

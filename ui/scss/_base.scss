@@ -50,12 +50,14 @@ a,
   flex-shrink: 0;
 }
 
-.button {
+.button,
+.link-button {
   padding: $half-unit $unit;
   background-color: $control-background-color;
   color: $control-color;
   font-size: 20px;
   text-align: center;
+  text-decoration: none;
 
   &:hover {
     background-color: $control-hover-background;
