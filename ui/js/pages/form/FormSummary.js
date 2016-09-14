@@ -139,7 +139,8 @@ class FormSummary extends Component {
 
   render () {
     const { color, full, plain, formTemplateId, session } = this.props;
-    const { formTemplate, forms, adding, editId, height, pad } = this.state;
+    const { formTemplate, forms, adding, editId, height, pad, showAdminLinks }
+      = this.state;
 
     let contents;
     if (! forms || ! formTemplate) {
@@ -163,21 +164,37 @@ class FormSummary extends Component {
             distinguish={forms.length > 1} />
         </li>
       ));
-      let heading = formTemplate.name;
+
+      let heading = <h2>{formTemplate.name}</h2>;
+      let links;
       if (session.administrator) {
         heading = (
-          <Link to={`/form-templates/${formTemplate.formTemplateId}/edit`}>
+          <h2 onClick={() => (
+              this.setState({ showAdminLinks: ! this.state.showAdminLinks })
+            )}>
             {formTemplate.name}
-          </Link>
+          </h2>
         );
+        if (showAdminLinks) {
+          const editPath = `/form-templates/${formTemplate._id}/edit`;
+          const formsPath = `/forms?` +
+            `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
+            `&formTemplateId-name=${encodeURIComponent(formTemplate.name)}`;
+          links = (
+            <div className="box--between">
+              <Link to={formsPath}>All forms</Link>
+              <Link to={editPath}>Edit template</Link>
+            </div>
+          );
+        }
       }
       contents = (
         <div className="form-summary">
           <div className="box--between">
-            <h2>{heading}</h2>
-            <Button plain={true} icon={<AddIcon />}
-              onClick={this._onAdd} />
+            {heading}
+            <Button plain={true} icon={<AddIcon />} onClick={this._onAdd} />
           </div>
+          {links}
           <ul className="list">
             {items}
           </ul>
