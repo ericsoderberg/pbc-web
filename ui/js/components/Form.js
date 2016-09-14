@@ -6,7 +6,7 @@ import FormState from '../utils/FormState';
 import ConfirmRemove from './ConfirmRemove';
 import Stored from './Stored';
 
-export default class Form extends Component {
+class Form extends Component {
 
   constructor (props) {
     super(props);

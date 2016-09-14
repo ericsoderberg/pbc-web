@@ -67,5 +67,3 @@ MessageItem.propTypes = {
 MessageItem.defaultProps = {
   detailsForMostRecent: false
 };
-
-export default MessageItem;
