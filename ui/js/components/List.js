@@ -5,8 +5,10 @@ import { getItems } from '../actions';
 import PageHeader from './PageHeader';
 import Filter from './Filter';
 import SelectSearch from './SelectSearch';
+import Button from './Button';
 import Stored from './Stored';
 import Loading from './Loading';
+import CloseIcon from '../icons/Close';
 
 class List extends Component {
 
@@ -14,6 +16,7 @@ class List extends Component {
     super(props);
     this._onSearch = this._onSearch.bind(this);
     this._onScroll = this._onScroll.bind(this);
+    this._removeFilter = this._removeFilter.bind(this);
     this.state = { items: [], searchText: '' };
   }
 
@@ -32,7 +35,11 @@ class List extends Component {
   }
 
   _setStateFromLocation (props) {
-    let filter, filterNames;
+    let filter, filterNames, filterName;
+    if (props.location.query.filter) {
+      filter = props.location.query.filter;
+      filterName = props.location.query['filter-name'];
+    }
     if (props.filters) {
       filter = {};
       filterNames = {};
@@ -46,11 +53,9 @@ class List extends Component {
           }
         }
       });
-    } else {
-      filter = props.location.query.filter;
     }
     const searchText = props.location.query.search || '';
-    this.setState({ filter, filterNames, searchText }, this._get);
+    this.setState({ filter, filterName, filterNames, searchText }, this._get);
   }
 
   _get () {
@@ -68,7 +73,7 @@ class List extends Component {
   }
 
   _setLocation (options) {
-    const { filters } = this.props;
+    const { filters, location } = this.props;
     const { filterNames } = this.state;
     let searchParams = [];
 
@@ -102,6 +107,11 @@ class List extends Component {
           }
         }
       });
+    }
+
+    if (location.query.filter) {
+      searchParams.push(`filter=${location.query.filter}`);
+      searchParams.push(`filter-name=${location.query.filterName}`);
     }
 
     this.context.router.replace({
@@ -167,11 +177,17 @@ class List extends Component {
     };
   }
 
+  _removeFilter () {
+    this.context.router.replace({
+      pathname: window.location.pathname
+    });
+  }
+
   render () {
     const { addIfFilter, Item, path, title, marker, sort, session, filters,
       search, homer } = this.props;
-    const { searchText, filter, filterNames, mightHaveMore, loadingMore }
-      = this.state;
+    const { searchText, filter, filterName, filterNames, mightHaveMore,
+      loadingMore } = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
@@ -202,13 +218,12 @@ class List extends Component {
       ));
     }
 
-    let actions = [];
-
+    let filterItems = [];
     if (filters) {
       filters.forEach(aFilter => {
         let value = (filter || {})[aFilter.property] || '';
         if (aFilter.options) {
-          actions.push(
+          filterItems.push(
             <Filter key={aFilter.property} options={aFilter.options}
               value={value}
               onChange={this._filter(aFilter.property)} />
@@ -217,7 +232,7 @@ class List extends Component {
           if (value) {
             value = filterNames[value] || value;
           }
-          actions.push(
+          filterItems.push(
             <SelectSearch key={aFilter.property} category={aFilter.category}
               options={{select: 'name', sort: 'name'}} clearable={true}
               placeholder={aFilter.allLabel} value={value}
@@ -227,6 +242,17 @@ class List extends Component {
       });
     }
 
+    if (filterName) {
+      filterItems.push(
+        <div key="filter" className="box--row">
+          <span>{filterName}</span>
+          <Button icon={<CloseIcon />} plain={true}
+            onClick={this._removeFilter} />
+        </div>
+      );
+    }
+
+    let actions = [];
     if ((! addIfFilter || (filter || {})[addIfFilter]) && session &&
       (session.administrator || session.administratorDomainId)) {
       let addPath = `${path}/add`;
@@ -256,6 +282,9 @@ class List extends Component {
       <main>
         <PageHeader title={title} homer={homer} focusOnSearch={true}
           searchText={searchText} onSearch={onSearch} actions={actions} />
+        <div className="list__header">
+          {filterItems}
+        </div>
         <ul className="list">
           {items}
         </ul>

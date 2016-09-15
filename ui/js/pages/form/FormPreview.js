@@ -33,7 +33,7 @@ export default class FormPreview extends Component {
         <PageHeader />
         <form className="form" onSubmit={this._onSubmit}>
           <FormContents form={form} formTemplate={formTemplate}
-            onChange={this._onChange} />
+            full={false} onChange={this._onChange} />
           <footer className="form__footer">
             <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}

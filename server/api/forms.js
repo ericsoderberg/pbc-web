@@ -107,6 +107,8 @@ export default function (router) {
           formTemplate: formTemplate,
           session: session
         }));
+      } else {
+        return context;
       }
     })
     .then(context => {

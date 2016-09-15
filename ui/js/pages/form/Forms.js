@@ -15,7 +15,9 @@ const Item = (props) => {
           <span>{form.formTemplateId.name}</span>
           <span>{(form.userId || {}).name}</span>
         </span>
-        <span>{moment(form.modified).format('MMM Do YYYY')}</span>
+        <span className="secondary">
+          {moment(form.modified).format('MMM Do YYYY')}
+        </span>
       </div>
     </Link>
   );
@@ -32,7 +34,7 @@ export default class Forms extends Component {
 
     return (
       <List location={location}
-        category="forms" title="Forms" path="/forms" search={false}
+        category="forms" title="Forms" path="/forms"
         filters={[{
           property: 'formTemplateId', category: 'form-templates',
           allLabel: 'All templates'

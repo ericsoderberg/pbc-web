@@ -147,9 +147,10 @@ export default class FormTemplateFormContents extends Component {
       `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
       `&formTemplateId-name=${encodeURIComponent(formTemplate.name)}`;
     const pageFilter = { 'sections.formTemplateId': formTemplate._id };
+    const pageFilterLabel = `Including the ${formTemplate.name} form`;
     const pagesPath = `/pages?` +
       `filter=${encodeURIComponent(JSON.stringify(pageFilter))}` +
-      `&filter-name=${encodeURIComponent('Pages including ' + formTemplate.name)}`;
+      `&filter-name=${encodeURIComponent(pageFilterLabel)}`;
 
     return (
       <div>

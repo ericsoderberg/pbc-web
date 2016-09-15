@@ -15,6 +15,25 @@
   color: $tertiary-color;
 }
 
+.list__header {
+  display: flex;
+  background-color: $header-background-color;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: flex-end;
+
+    > * {
+      margin: 0 $unit;
+      flex: 0 1 auto;
+    }
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
+}
+
 .marker {
   display: flex;
   flex-direction: row;

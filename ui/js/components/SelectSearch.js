@@ -4,7 +4,8 @@ import React, { Component, PropTypes } from 'react';
 import { getItems } from '../actions';
 import Button from './Button';
 import KeyboardAccelerators from '../utils/KeyboardAccelerators';
-import SearchIcon from '../icons/Search';
+import DownIcon from '../icons/Down';
+import UpIcon from '../icons/Up';
 import CloseIcon from '../icons/Close';
 
 export default class SelectSearch extends Component {
@@ -118,7 +119,9 @@ export default class SelectSearch extends Component {
     }
 
     let details;
+    let Icon = DownIcon;
     if (active) {
+      Icon = UpIcon;
       let suggests = (suggestions || []).map((suggestion, index) => (
         <div key={index} className="select-search__suggestion"
           onClick={this._onSelect.bind(this, suggestion)}>
@@ -141,7 +144,7 @@ export default class SelectSearch extends Component {
           <input className="select-search__value" disabled={true}
             placeholder={placeholder} value={value} />
           {clearControl}
-          <Button className="select-search__control" icon={<SearchIcon />} />
+          <Button className="select-search__control" icon={<Icon />} />
         </div>
         {details}
       </div>
