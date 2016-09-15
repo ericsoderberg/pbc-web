@@ -92,18 +92,24 @@ export default (router, category, modelName, options={}) => {
       authorize(req, res, false)
       .then(session => {
         const Doc = mongoose.model(modelName);
-        const searchProperties = options.searchProperties || ['name'];
+        const searchProperties = options.searchProperties || 'name';
         let query = Doc.find();
         if (options.authorize && options.authorize.index) {
           query.find(options.authorize.index(session));
         }
         if (req.query.search) {
           const exp = new RegExp(req.query.search, 'i');
-          query.or(searchProperties.map(property => {
+          if (Array.isArray(searchProperties)) {
+            query.or(searchProperties.map(property => {
+              let obj = {};
+              obj[property] = exp;
+              return obj;
+            }));
+          } else {
             let obj = {};
-            obj[property] = exp;
-            return obj;
-          }));
+            obj[searchProperties] = exp;
+            query.find(obj);
+          }
         }
         if (req.query.filter) {
           let filter = JSON.parse(req.query.filter);
