@@ -111,7 +111,7 @@ class List extends Component {
 
     if (location.query.filter) {
       searchParams.push(`filter=${location.query.filter}`);
-      searchParams.push(`filter-name=${location.query.filterName}`);
+      searchParams.push(`filter-name=${location.query['filter-name']}`);
     }
 
     this.context.router.replace({
