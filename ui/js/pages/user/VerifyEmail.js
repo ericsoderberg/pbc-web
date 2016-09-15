@@ -68,7 +68,7 @@ class VerifyEmail extends Component {
 
     return (
       <div className="form__container">
-        <form className="form" action="/api/users/sign-up" onSubmit={this._onSignUp}>
+        <form className="form" action="/api/users/sign-up">
           <PageHeader title="Verify Email" actions={cancelControl} />
           <FormError message={errorMessage} />
           <fieldset className="form__fields">
@@ -96,13 +96,14 @@ class VerifyEmail extends Component {
   }
 
   _renderPending () {
+    const { email } = this.state;
     return (
       <div className="form__container">
         <div className="form">
           <PageHeader title="Verify Email" />
           <fieldset className="form__fields">
             <div className="form__text">
-              We've sent you an email. Check your email for a message
+              We've sent an email to {email}. Check your email for a message
               with the subject 'Verify Email' and click the link in it to sign in.
             </div>
           </fieldset>
@@ -154,7 +155,6 @@ class VerifyEmail extends Component {
 
   render () {
     const { state } = this.state;
-    console.log('!!! VerifyEmail render', state);
 
     switch (state) {
       case 'prompt':

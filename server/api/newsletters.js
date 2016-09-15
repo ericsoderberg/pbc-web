@@ -1,21 +1,14 @@
 "use strict";
 import mongoose from 'mongoose';
 import moment from 'moment';
-import nodemailer from 'nodemailer';
-import { markdown } from 'nodemailer-markdown';
 import { authorizedForDomain, unsetDomainIfNeeded } from './auth';
 import register from './register';
 
 import { render as renderNewsletter } from './newsletter';
 
-const transporter = nodemailer.createTransport({
-  direct: true
-});
-transporter.use('compile', markdown());
-
 // /api/newsletters
 
-export default function (router) {
+export default function (router, transporter) {
 
   router.post('/newsletters/render', (req, res) => {
     const Newsletter = mongoose.model('Newsletter');

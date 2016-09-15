@@ -7,12 +7,6 @@ import { authorizedAdministrator } from './auth';
 
 // /api/users
 
-const VERIFY_INSTRUCTIONS = `
-# Sign in
-
-Click the link below to sign in. This link is valid for 2 hours.
-`;
-
 const encryptPassword = (data) => {
   if (data.password) {
     data.encryptedPassword = bcrypt.hashSync(data.password, 10);
@@ -32,7 +26,7 @@ const deleteUserRelated = (doc) => {
   return doc;
 };
 
-export default function (router) {
+export default function (router, transporter) {
   router.post('/users/sign-up', (req, res) => {
     let data = req.body;
     const User = mongoose.model('User');
@@ -63,6 +57,7 @@ export default function (router) {
   router.post('/users/verify-email', (req, res) => {
     let data = req.body;
     const User = mongoose.model('User');
+    const Site = mongoose.model('Site');
     // make sure we have a user with this email
     User.findOne({ email: data.email }).exec()
     .then(user => {
@@ -75,15 +70,27 @@ export default function (router) {
       user.modified = new Date();
       return user.save()
       .then(user => {
-        const url = `${req.protocol}://${req.get('Host')}` +
-          `/verify-email?token=${user.temporaryToken}`;
-        transporter.sendMail({
-          from: 'ericsoderberg@coconut.local',
-          to: user.email,
-          subject: 'Verify Email',
-          markdown: `${VERIFY_INSTRUCTIONS}\n\n[Sign In](${url})`
-        }, (err, info) => {
-          console.log('!!! sendMail', err, info);
+        return Site.findOne({}).exec()
+        .then(site => {
+          const url = `${req.protocol}://${req.get('Host')}` +
+            `/verify-email?token=${user.temporaryToken}`;
+          const instructions =
+`# ${site.name}
+
+The link below is valid for 2 hours from the time this message was sent.
+It will allow sign you in to the ${site.name} web site.
+
+
+[Sign In](${url})
+`;
+          transporter.sendMail({
+            from: site.email,
+            to: user.email,
+            subject: 'Verify Email',
+            markdown: instructions
+          }, (err, info) => {
+            console.log('!!! sendMail', err, info);
+          });
         });
       });
     })

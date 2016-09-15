@@ -3,6 +3,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 import './db';
+import nodemailer from 'nodemailer';
+import { markdown } from 'nodemailer-markdown';
+
+// TOOD: determine where to send email from via environment variable
+const transporter = nodemailer.createTransport({ direct: true });
+transporter.use('compile', markdown());
 
 const router = express.Router();
 
@@ -11,7 +17,7 @@ sessions(router);
 import site from './api/site';
 site(router);
 import users from './api/users';
-users(router);
+users(router, transporter);
 import domains from './api/domains';
 domains(router);
 import resources from './api/resources';
@@ -29,7 +35,7 @@ events(router);
 import calendar from './api/calendar';
 calendar(router);
 import newsletters from './api/newsletters';
-newsletters(router);
+newsletters(router, transporter);
 import files from './api/files';
 files(router);
 import search from './api/search';
