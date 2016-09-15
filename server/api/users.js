@@ -50,7 +50,14 @@ export default function (router) {
       return doc.save();
     })
     .then(doc => res.status(200).json(doc))
-    .catch(error => res.status(400).json(error));
+    .catch(error => {
+      error = error.toJSON();
+      delete error.op.encryptedPassword;
+      if (error.errmsg.match(/^E11000/)) {
+        error.errmsg = "An account with that email address already exists.";
+      }
+      return res.status(400).json(error);
+    });
   });
 
   router.post('/users/verify-email', (req, res) => {
