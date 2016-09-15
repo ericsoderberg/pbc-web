@@ -193,7 +193,7 @@ class FormContents extends Component {
   }
 
   render () {
-    const { form, formTemplate, error, session } = this.props;
+    const { form, formTemplate, full, error, session } = this.props;
     const { fieldsSet } = this.state;
 
     let formError;
@@ -206,7 +206,7 @@ class FormContents extends Component {
     .map(this._renderTemplateSection);
 
     let user;
-    if (session && (session.administrator || (formTemplate.domainId &&
+    if (full && session && (session.administrator || (formTemplate.domainId &&
       session.administratorDomainId === formTemplate.domainId))) {
       user = (
         <fieldset className="form__fields">
@@ -242,6 +242,7 @@ FormContents.propTypes = {
   formTemplate: PropTypes.shape({
     sections: PropTypes.arrayOf(PropTypes.object)
   }).isRequired,
+  full: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,

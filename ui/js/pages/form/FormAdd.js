@@ -77,7 +77,7 @@ export default class FormAdd extends Component {
   }
 
   render () {
-    const { onCancel } = this.props;
+    const { onCancel, full } = this.props;
     const { form, formTemplate, error } = this.state;
     let classNames = ['form'];
     if (this.props.className) {
@@ -104,7 +104,7 @@ export default class FormAdd extends Component {
         <form className={classNames.join(' ')} action={'/forms'}
           onSubmit={this._onAdd}>
           <FormContents form={form} formTemplate={formTemplate}
-            onChange={this._onChange} error={error} />
+            full={full} onChange={this._onChange} error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}
@@ -124,8 +124,13 @@ export default class FormAdd extends Component {
 FormAdd.propTypes = {
   formTemplateId: PropTypes.string,
   formTemplate: PropTypes.object,
+  full: PropTypes.bool,
   onCancel: PropTypes.func,
   onDone: PropTypes.func
+};
+
+FormAdd.defaultProps = {
+  full: true
 };
 
 FormAdd.contextTypes = {

@@ -9,6 +9,8 @@ import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import Button from '../../components/Button';
 import AddIcon from '../../icons/Add';
+import DownIcon from '../../icons/Down';
+import UpIcon from '../../icons/Up';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
 
@@ -157,11 +159,11 @@ class FormSummary extends Component {
       const onCancel = forms.length > 0 ? this._onCancel : undefined;
       contents = (
         <FormAdd formTemplateId={formTemplateId._id || formTemplateId}
-          onDone={this._onDone} onCancel={onCancel} />
+          full={false} onDone={this._onDone} onCancel={onCancel} />
       );
     } else if (editId) {
       contents = (
-        <FormEdit id={editId}
+        <FormEdit id={editId} full={false}
           onDone={this._onDone} onCancel={this._onCancel} />
       );
     } else {
@@ -173,17 +175,12 @@ class FormSummary extends Component {
         </li>
       ));
 
-      let heading = <h2>{formTemplate.name}</h2>;
+      let menu;
       let links;
       if (session.administrator) {
-        heading = (
-          <h2 onClick={() => (
-              this.setState({ showAdminLinks: ! this.state.showAdminLinks })
-            )}>
-            {formTemplate.name}
-          </h2>
-        );
+        let MenuIcon = DownIcon;
         if (showAdminLinks) {
+          MenuIcon = UpIcon;
           const editPath = `/form-templates/${formTemplate._id}/edit`;
           const formsPath = `/forms?` +
             `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
@@ -195,12 +192,20 @@ class FormSummary extends Component {
             </div>
           );
         }
+        menu = (
+          <Button plain={true} icon={<MenuIcon />} onClick={() => (
+              this.setState({ showAdminLinks: ! this.state.showAdminLinks })
+            )} />
+        );
       }
 
       contents = (
         <div className="form-summary">
           <div className="box--between">
-            {heading}
+            <div className="box--row">
+              <h2>{formTemplate.name}</h2>
+              {menu}
+            </div>
             <Button plain={true} icon={<AddIcon />} onClick={this._onAdd} />
           </div>
           {links}

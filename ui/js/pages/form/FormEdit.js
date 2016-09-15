@@ -74,6 +74,7 @@ export default class FormEdit extends Component {
   }
 
   render () {
+    const { full } = this.props;
     const { form, formTemplate } = this.state;
     let classNames = ['form'];
     if (this.props.className) {
@@ -87,7 +88,7 @@ export default class FormEdit extends Component {
         <form className={classNames.join(' ')} action={`/forms${form._id}`}
           onSubmit={this._onUpdate}>
           <FormContents form={form} formTemplate={formTemplate}
-            onChange={this._onChange} />
+            full={full} onChange={this._onChange} />
           <footer className="form__footer">
             <button type="submit" className="button">Update</button>
             <ConfirmRemove onConfirm={this._onRemove} />
@@ -107,12 +108,17 @@ export default class FormEdit extends Component {
 };
 
 FormEdit.propTypes = {
+  full: PropTypes.bool,
   id: PropTypes.string,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
   })
+};
+
+FormEdit.defaultProps = {
+  full: true
 };
 
 FormEdit.contextTypes = {
