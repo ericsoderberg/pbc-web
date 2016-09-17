@@ -276,10 +276,10 @@ mongoose.model('EmailList', emailListSchema);
 const opts = { user: USER, pass: PASSWORD,  auth: { authdb: 'admin' } };
 mongoose.connect(`mongodb://localhost/${DATABASE}`, opts, (error) => {
   if (error) {
-    console.log('!!! connection error', error);
+    console.log('mongoose connect error', error);
   }
 });
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'mongoose connection error:'));
 
 // export default db;

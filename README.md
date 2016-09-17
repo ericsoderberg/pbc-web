@@ -5,7 +5,7 @@ PBC web site version 4.0
 ## Get Started
 
 ```
-git clone git@github.com-ericsoderberg:ericsoderberg/pbc-web.git
+git clone https://github.com/ericsoderberg/pbc-web.git
 ```
 ```
 cd pbc-web
