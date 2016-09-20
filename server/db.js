@@ -231,7 +231,7 @@ const messageSchema = Schema({
     type: { type: String }
   }],
   image: image,
-  library: { type: Schema.Types.ObjectId, ref: 'Library' },
+  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
   name: String,
   path: String,
