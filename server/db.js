@@ -197,6 +197,27 @@ const paymentSchema = Schema({
 
 mongoose.model('Payment', paymentSchema);
 
+const podcastSchema = Schema({
+  category: String,
+  description: String,
+  image: image,
+  subCategory: String,
+  subtitle: String,
+  summary: String,
+  title: String
+});
+
+const librarySchema = Schema({
+  created: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  modified: Date,
+  name: {type: String, required: true},
+  podcast: podcastSchema,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+});
+
+mongoose.model('Library', librarySchema);
+
 const messageSchema = Schema({
   author: String,
   created: Date,
@@ -210,7 +231,7 @@ const messageSchema = Schema({
     type: { type: String }
   }],
   image: image,
-  library: String,
+  library: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
   name: String,
   path: String,

@@ -28,6 +28,8 @@ import forms from './api/forms';
 forms(router);
 import emailLists from './api/emailLists';
 emailLists(router);
+import libraries from './api/libraries';
+libraries(router);
 import messages from './api/messages';
 messages(router);
 import events from './api/events';

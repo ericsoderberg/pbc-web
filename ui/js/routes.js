@@ -21,6 +21,10 @@ import FormTemplates from './pages/formTemplate/FormTemplates';
 import FormTemplateAdd from './pages/formTemplate/FormTemplateAdd';
 import FormTemplate from './pages/formTemplate/FormTemplate';
 import FormTemplateEdit from './pages/formTemplate/FormTemplateEdit';
+import Libraries from './pages/library/Libraries';
+import LibraryAdd from './pages/library/LibraryAdd';
+import Library from './pages/library/Library';
+import LibraryEdit from './pages/library/LibraryEdit';
 import Messages from './pages/message/Messages';
 import MessageAdd from './pages/message/MessageAdd';
 import Message from './pages/message/Message';
@@ -86,6 +90,10 @@ export default {
     { path: 'form-templates/:id', component:  FormTemplate },
     { path: 'form-templates/:id/edit', component:  FormTemplateEdit },
     { path: 'form-templates', component: FormTemplates },
+    { path: 'libraries/add', component: LibraryAdd },
+    { path: 'libraries/:id', component: Library },
+    { path: 'libraries/:id/edit', component: LibraryEdit },
+    { path: 'libraries', component: Libraries },
     { path: 'messages/add', component: MessageAdd },
     { path: 'messages/:id', component: Message },
     { path: 'messages/:id/edit', component: MessageEdit },
