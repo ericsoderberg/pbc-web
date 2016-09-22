@@ -18,8 +18,14 @@ export default class Messages extends Component {
   }
 
   componentDidMount () {
-    getItems('messages', { distinct: 'library' })
-    .then(response => this.setState({ filterOptions: response }))
+    getItems('libraries', { select: 'name' })
+    .then(response => this.setState({
+      // convert to options format with label and value
+      filterOptions: response.map(library => ({
+        label: library.name,
+        value: library._id
+      }))
+    }))
     .catch(error => console.log('!!! Messages catch', error));
   }
 
@@ -27,7 +33,7 @@ export default class Messages extends Component {
     const { location } = this.props;
     const { filterOptions } = this.state;
 
-    const filter = { property: "library", options: filterOptions,
+    const filter = { property: "libraryId", options: filterOptions,
       allLabel: 'All libraries' };
 
     const marker = {

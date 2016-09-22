@@ -22,7 +22,7 @@ export default class Filter extends Component {
   }
 
   render () {
-    const { onChange, value, options } = this.props;
+    const { allLabel, onChange, value, options } = this.props;
     const { active } = this.state;
     let classNames = ['filter'];
     if (active) {
@@ -34,7 +34,7 @@ export default class Filter extends Component {
         {option.label || option}
       </option>
     ));
-    optionElements.unshift(<option key="_all">All</option>);
+    optionElements.unshift(<option key="_all" value="">{allLabel}</option>);
 
     return (
       <div className={classNames.join(' ')}>
@@ -51,6 +51,7 @@ export default class Filter extends Component {
 };
 
 Filter.propTypes = {
+  allLabel: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
   options: PropTypes.arrayOf(PropTypes.oneOfType([
@@ -60,4 +61,8 @@ Filter.propTypes = {
       value: PropTypes.string.isRequired
     })
   ])).isRequired
+};
+
+Filter.defaultProps = {
+  allLabel: 'All'
 };

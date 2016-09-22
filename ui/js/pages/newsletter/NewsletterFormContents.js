@@ -14,9 +14,9 @@ export default class NewsletterFormContents extends Component {
   componentDidMount () {
     const { formState, session } = this.props;
 
-    getItems('messages', { distinct: 'library' })
-    .then(libraries => this.setState({ libraries: libraries }))
-    .catch(error => console.log('!!! NewsletterFormContents libraries catch', error));
+    getItems('libraries', { sort: 'name' })
+    .then(response => this.setState({ libraries: response }))
+    .catch(error => console.log('NewsletterFormContents libraries catch', error));
 
     getItems('events', { distinct: 'calendar' })
     .then(calendars => this.setState({ calendars: calendars }))
@@ -35,10 +35,10 @@ export default class NewsletterFormContents extends Component {
     const { formState, session } = this.props;
     const newsletter = formState.object;
 
-    const libraries = this.state.libraries.map(library => (
-      <option key={library} label={library} value={library} />
+    let libraryOptions = this.state.libraries.map(library => (
+      <option key={library._id} label={library.name} value={library._id} />
     ));
-    libraries.unshift(<option key={0} />);
+    libraryOptions.unshift(<option key={0} />);
 
     const calendars = this.state.calendars.map(calendar => (
       <option key={calendar} label={calendar} value={calendar} />
@@ -77,9 +77,9 @@ export default class NewsletterFormContents extends Component {
             onChange={formState.change('text')}/>
         </FormField>
         <FormField label="Library">
-          <select name="library" value={newsletter.library || ''}
-            onChange={formState.change('library')}>
-            {libraries}
+          <select name="libraryId" value={newsletter.libraryId || ''}
+            onChange={formState.change('libraryId')}>
+            {libraryOptions}
           </select>
         </FormField>
         <FormField label="Calendar">

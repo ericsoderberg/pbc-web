@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
-import { authorize, authorizedForDomain, unsetDomainIfNeeded } from './auth';
+import { authorize, authorizedForDomain } from './auth';
+import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
 // /api/email-lists

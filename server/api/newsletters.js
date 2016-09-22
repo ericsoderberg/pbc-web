@@ -1,12 +1,20 @@
 "use strict";
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorizedForDomain, unsetDomainIfNeeded } from './auth';
+import { authorizedForDomain } from './auth';
+import { unsetDomainIfNeeded } from './domains';
+import { unsetLibraryIfNeeded } from './libraries';
 import register from './register';
 
 import { render as renderNewsletter } from './newsletter';
 
 // /api/newsletters
+
+const unsetReferences = (data) => {
+  data = unsetLibraryIfNeeded(data);
+  data = unsetDomainIfNeeded(data);
+  return data;
+};
 
 export default function (router, transporter) {
 
@@ -75,7 +83,7 @@ export default function (router, transporter) {
       index: authorizedForDomain
     },
     transformIn: {
-      put: unsetDomainIfNeeded
+      put: unsetReferences
     }
   });
 }

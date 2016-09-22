@@ -15,7 +15,7 @@ export default class MessageFormContents extends Component {
     this._onAddFile = this._onAddFile.bind(this);
     this._renderFileField = this._renderFileField.bind(this);
     this._onChangeSeries = this._onChangeSeries.bind(this);
-    this.state = { domains: [] };
+    this.state = { domains: [], libraries: [] };
   }
 
   componentDidMount () {
@@ -25,10 +25,13 @@ export default class MessageFormContents extends Component {
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('MessageFormContents catch', error));
+      .catch(error => console.log('MessageFormContents domains catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
+    getItems('libraries', { sort: 'name' })
+    .then(response => this.setState({ libraries: response }))
+    .catch(error => console.log('MessageFormContents libraries catch', error));
   }
 
   _onAddFile () {
@@ -161,6 +164,11 @@ export default class MessageFormContents extends Component {
       );
     }
 
+    let libraryOptions = this.state.libraries.map(library => (
+      <option key={library._id} label={library.name} value={library._id} />
+    ));
+    libraryOptions.unshift(<option key={0} />);
+
     return (
       <div>
         <fieldset className="form__fields">
@@ -205,8 +213,10 @@ export default class MessageFormContents extends Component {
           {seriesField}
           {nonSeriesField}
           <FormField label="Library">
-            <input name="library" value={message.library || ''}
-              onChange={formState.change('library')}/>
+            <select name="libraryId" value={message.libraryId || ''}
+              onChange={formState.change('libraryId')}>
+              {libraryOptions}
+            </select>
           </FormField>
           <FormField name="path" label="Path" help="unique url name">
             <input name="path" value={message.path || ''}

@@ -225,7 +225,7 @@ class List extends Component {
         if (aFilter.options) {
           filterItems.push(
             <Filter key={aFilter.property} options={aFilter.options}
-              value={value}
+              allLabel={aFilter.allLabel} value={value}
               onChange={this._filter(aFilter.property)} />
           );
         } else {

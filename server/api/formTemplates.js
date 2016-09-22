@@ -1,6 +1,7 @@
 "use strict";
 import register from './register';
-import { authorizedForDomain, unsetDomainIfNeeded } from './auth';
+import { authorizedForDomain } from './auth';
+import { unsetDomainIfNeeded } from './domains';
 
 // /api/form-templates
 

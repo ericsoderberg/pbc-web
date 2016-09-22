@@ -11,3 +11,14 @@ export default function (router) {
     }
   });
 }
+
+export function unsetDomainIfNeeded (data) {
+  if (! data.domainId) {
+    delete data.domainId;
+    if (! data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.domainId = '';
+  }
+  return data;
+}

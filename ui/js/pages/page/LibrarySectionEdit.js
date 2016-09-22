@@ -14,8 +14,9 @@ export default class LibrarySectionEdit extends Component {
   }
 
   componentDidMount () {
-    getItems('messages', { distinct: 'library' })
-    .then(libraries => this.setState({ libraries: libraries }));
+    getItems('libraries', { sort: 'name' })
+    .then(response => this.setState({ libraries: response }))
+    .catch(error => console.log('LibrarySectionEdit catch', error));
   }
 
   componentWillReceiveProps (nextProps) {
@@ -26,16 +27,16 @@ export default class LibrarySectionEdit extends Component {
     const { formState } = this.state;
     const section = formState.object;
 
-    const libraries = this.state.libraries.map(library => (
-      <option key={library} label={library} value={library} />
+    const libraryOptions = this.state.libraries.map(library => (
+      <option key={library._id} label={library.name} value={library._id} />
     ));
 
     return (
       <fieldset className="form__fields">
         <FormField label="Library">
-          <select name="library" value={section.name || ''}
-            onChange={formState.change('name')}>
-            {libraries}
+          <select name="libraryId" value={section.libraryId || ''}
+            onChange={formState.change('libraryId')}>
+            {libraryOptions}
           </select>
         </FormField>
         <SectionFields formState={formState} />

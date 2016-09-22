@@ -1,8 +1,8 @@
 "use strict";
 import mongoose from 'mongoose';
 import hat from 'hat';
-import { authorize, authorizedForDomainOrSelf, unsetDomainIfNeeded }
-  from './auth';
+import { authorize, authorizedForDomainOrSelf } from './auth';
+import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
 // /api/forms

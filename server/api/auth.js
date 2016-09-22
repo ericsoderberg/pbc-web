@@ -55,11 +55,3 @@ export function authorizedForDomainOrSelf (session) {
     return { name: false };
   }
 }
-
-export function unsetDomainIfNeeded (data) {
-  if (! data.domainId) {
-    delete data.domainId;
-    data.$unset = { domainId: '' };
-  }
-  return data;
-}

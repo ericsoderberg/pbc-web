@@ -61,10 +61,10 @@ mongoose.model('Domain', domainSchema);
 const pageSectionSchema = Schema({
   color: String,
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },  // event type
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },   // form type
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' }, // form type
   full: Boolean,
   image: image,       // image type
-  name: String,       // library type
+  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' }, // library type
   navigable: Boolean, // event type
   pages: [{           // pages type
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
@@ -265,7 +265,7 @@ const newsletterSchema = Schema({
   created: Date,
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  library: String,
+  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
   name: {type: String, required: true, unique: true},
   text: String,

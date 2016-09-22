@@ -1,7 +1,8 @@
 "use strict";
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize, unsetDomainIfNeeded } from './auth';
+import { authorize } from './auth';
+import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
 // /api/events
@@ -125,7 +126,7 @@ function eventDates (event) {
 }
 
 export default function (router) {
-  
+
   router.post('/events/resources', (req, res) => {
     authorize(req, res)
     // Get all events that overlap this event.

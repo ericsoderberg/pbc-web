@@ -11,3 +11,14 @@ export default function (router) {
     }
   });
 }
+
+export function unsetLibraryIfNeeded (data) {
+  if (! data.libraryId) {
+    delete data.libraryId;
+    if (! data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.libraryId = '';
+  }
+  return data;
+}

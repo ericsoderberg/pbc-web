@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
-import { unsetDomainIfNeeded } from './auth';
+import { unsetDomainIfNeeded } from './domains';
+import { unsetLibraryIfNeeded } from './libraries';
 import register from './register';
 
 // Messages
@@ -40,13 +41,19 @@ const populateMessage = (message) => {
   });
 };
 
+const unsetReferences = (data) => {
+  data = unsetLibraryIfNeeded(data);
+  data = unsetDomainIfNeeded(data);
+  return data;
+};
+
 export default function (router) {
   register(router, 'messages', 'Message', {
     populate: {
       get: { path: 'seriesId', select: 'name path' }
     },
     transformIn: {
-      put: unsetDomainIfNeeded
+      put: unsetReferences
     },
     transformOut: {
       get: (message, req) => {
