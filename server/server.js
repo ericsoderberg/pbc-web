@@ -8,6 +8,7 @@ import busboy from 'connect-busboy';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import api from './api';
+import rss from './rss';
 
 const PORT = 8091;
 const app = express();
@@ -20,6 +21,7 @@ app.use(compression())
   .use(busboy())
   .use('', router)
   .use('/api', api)
+  .use('/', rss)
   .use('/', express.static(path.join(__dirname, '/../dist')))
   .get('/*', function (req, res) {
     res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
