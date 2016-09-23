@@ -30,7 +30,7 @@ export default class FormPreview extends Component {
     const { form } = this.state;
     return (
       <main className="page-preview">
-        <PageHeader />
+        <PageHeader title="Preview" />
         <form className="form" onSubmit={this._onSubmit}>
           <FormContents form={form} formTemplate={formTemplate}
             full={false} onChange={this._onChange} />

@@ -11,7 +11,7 @@ export default class EventPreview extends Component {
 
     return (
       <main className="page-preview">
-        <PageHeader />
+        <PageHeader title="Preview" />
         <EventContents item={event} />
       </main>
     );

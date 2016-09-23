@@ -53,7 +53,7 @@ class Home extends Component {
     let sessionControl;
     if (session && session.token) {
       sessionControl = (
-        <div className="box--row">
+        <div className="home__session">
           <Link to={`/users/${session.userId}/edit`}>{session.name}</Link>
             <a className="home__sign-out" onClick={this._signOut}>
               <span className="link__text">Sign Out</span>
@@ -119,7 +119,9 @@ class Home extends Component {
         <div className="footer__links">
           <div className="home__brand">
             {logo}
-            {socialLinks}
+            <div className="home__social">
+              {socialLinks}
+            </div>
           </div>
           {sessionControl}
         </div>

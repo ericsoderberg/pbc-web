@@ -202,7 +202,7 @@ class FormSummary extends Component {
       contents = (
         <div className="form-summary">
           <div className="box--between">
-            <div className="box--row">
+            <div className="box--row box--static">
               <h2>{formTemplate.name}</h2>
               {menu}
             </div>

@@ -31,6 +31,7 @@
 
   @media all and (max-width: 699px) {
     flex-direction: column;
+    align-items: flex-end;
   }
 }
 
@@ -99,18 +100,22 @@ button.item__container {
 
 .box--row {
   display: flex;
+  flex-direction: row;
+  align-items: center;
 
-  @media all and (min-width: 700px) {
-    flex-direction: row;
-    align-items: center;
-
-    > *:not(:last-child):not(.button-icon):not(.link-icon) {
-      margin-right: $half-unit;
-    }
+  > *:not(:last-child):not(.button-icon):not(.link-icon) {
+    margin-right: $half-unit;
   }
 
-  @media all and (max-width: 699px) {
-    flex-direction: column;
+  &:not(.box--static) {
+    @media all and (max-width: 699px) {
+      flex-direction: column;
+      align-items: stretch;
+
+      > *:not(:last-child):not(.button-icon):not(.link-icon) {
+        margin-right: 0;
+      }
+    }
   }
 }
 

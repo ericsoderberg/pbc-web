@@ -244,7 +244,7 @@ class List extends Component {
 
     if (filterName) {
       filterItems.push(
-        <div key="filter" className="box--row">
+        <div key="filter" className="box--row box--static">
           <span>{filterName}</span>
           <Button icon={<CloseIcon />} plain={true}
             onClick={this._removeFilter} />

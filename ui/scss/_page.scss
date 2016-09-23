@@ -1,7 +1,10 @@
 
 .page-preview {
-  min-width: $form-width;
-  border-left: 1px solid $nav-background-color;
+
+  @media all and (min-width: 700px) {
+    min-width: $form-width;
+    border-left: 1px solid $nav-background-color;
+  }
 
   .form {
     padding: 0 $unit;
@@ -404,10 +407,13 @@
   color: $tertiary-color;
 }
 
-.event-times__date,
-.event-times__time {
-  white-space: nowrap;
+.event-times__date {
   display: inline-block;
+}
+
+.event-times__time {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .footer {
@@ -481,23 +487,27 @@
 .home__brand {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
 
   @media all and (max-width: 699px) {
+    flex-direction: column;
     margin-bottom: $unit;
   }
+}
+
+.home__social {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
   > * {
     flex: 0 0 auto;
-    margin: 0 $half-unit;
+    margin: $half-unit;
+  }
 
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
+  @media all and (max-width: 699px) {
+    margin-top: $unit;
   }
 }
 
@@ -514,6 +524,27 @@
     @media all and (max-width: 699px) {
       padding: $half-unit $unit;
       text-align: center;
+    }
+  }
+}
+
+.home__session {
+  display: flex;
+  align-items: center;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+
+    a:last-child {
+      margin-left: $unit;
+    }
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+
+    a:last-child {
+      margin-top: $unit;
     }
   }
 }

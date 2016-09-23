@@ -17,7 +17,7 @@ export default class NewsletterPreview extends Component {
 
     return (
       <main className="page-preview">
-        <PageHeader actions={sendControl}/>
+        <PageHeader title="Preview" actions={sendControl} />
         <NewsletterContents item={newsletter} />
       </main>
     );

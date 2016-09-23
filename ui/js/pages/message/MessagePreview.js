@@ -10,7 +10,7 @@ export default class MessagePreview extends Component {
 
     return (
       <main className="page-preview">
-        <PageHeader />
+        <PageHeader title="Preview" />
         <MessageContents item={message} />
       </main>
     );

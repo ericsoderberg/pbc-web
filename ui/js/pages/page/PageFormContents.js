@@ -118,7 +118,7 @@ export default class PageFormContents extends Component {
               onClick={this._toggleSection(section._id || section.id)}>
               <h4>{section.type}</h4>
             </button>
-            <div className="box--row">
+            <div className="box--row box--static">
               {raise}
               {lower}
               <button type="button" className="button-icon"
