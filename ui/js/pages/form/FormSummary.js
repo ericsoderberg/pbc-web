@@ -73,7 +73,7 @@ class FormSummary extends Component {
 
   componentDidUpdate () {
     clearTimeout(this._layoutTimer);
-    this._layoutTimer = setTimeout(this._layout, 100);
+    this._layoutTimer = setTimeout(this._layout, 200);
   }
 
   componentWillUnmount () {
