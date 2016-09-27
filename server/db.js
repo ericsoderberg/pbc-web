@@ -2,9 +2,9 @@
 import mongoose, { Schema } from 'mongoose';
 const { Types: { ObjectId } } = Schema;
 
-const DATABASE = 'pbc';
-const USER = 'pbc';
-const PASSWORD = 'pbc'; /// !!! change to get from environment variable
+const DATABASE = process.env.DATABASE || 'pbc';
+const USER = process.env.DATABASE_USER || 'pbc';
+const PASSWORD = process.env.DATABASE_PASSWORD || 'pbc';
 
 // Schemas
 

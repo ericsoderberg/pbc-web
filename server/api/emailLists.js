@@ -4,6 +4,8 @@ import { authorize, authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
+const MAILMAN_DIR = process.env.MAILMAN_DIR || '/usr/lib/mailman/bin';
+
 // /api/email-lists
 
 const populateEmailList = (emailList) => {

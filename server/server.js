@@ -10,7 +10,7 @@ import path from 'path';
 import api from './api';
 import rss from './rss';
 
-const PORT = 8091;
+const PORT = process.env.PORT || 8091;
 const app = express();
 const router = express.Router();
 

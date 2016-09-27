@@ -6,8 +6,18 @@ import './db';
 import nodemailer from 'nodemailer';
 import { markdown } from 'nodemailer-markdown';
 
-// TOOD: determine where to send email from via environment variable
-const transporter = nodemailer.createTransport({ direct: true });
+const TRANSPORT_OPTIONS = {
+  host: process.env.SMTP_HOST || 'localhost',
+  port: process.env.SMTP_PORT || 25,
+  tls: { rejectUnauthorized: false }
+};
+if (process.env.SMTP_USER) {
+  TRANSPORT_OPTIONS.auth = {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD
+  };
+}
+const transporter = nodemailer.createTransport(TRANSPORT_OPTIONS);
 transporter.use('compile', markdown());
 
 const router = express.Router();
