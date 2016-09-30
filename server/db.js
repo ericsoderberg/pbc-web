@@ -27,6 +27,7 @@ const sessionSchema = Schema({
 export const Session = mongoose.model('Session', sessionSchema);
 
 const userSchema = Schema({
+  address: String,
   administrator: Boolean,
   administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   avatar: image,
@@ -35,7 +36,9 @@ const userSchema = Schema({
   encryptedPassword: String,
   modified: Date,
   name: {type: String, required: true},
+  oldId: Number,
   path: String,
+  phone: String,
   relations: [{
     birthday: Date,
     grade: String,
@@ -83,6 +86,7 @@ const pageSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: String,
+  oldId: Number,
   path: String,
   sections: [pageSectionSchema],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
@@ -100,6 +104,7 @@ const eventSchema = Schema({
   location: String, // room, house owner's name, etc.
   modified: Date,
   name: String,
+  oldId: Number,
   path: String,
   primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' }, // set in one-off cases
   resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }], // resources
@@ -118,6 +123,7 @@ const resourceSchema = Schema({
   created: Date,
   modified: Date,
   name: {type: String, required: true, unique: true},
+  oldId: Number,
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
@@ -157,6 +163,7 @@ const formTemplateSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true, unique: true},
+  oldId: Number,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -178,6 +185,7 @@ const formSchema = Schema({
     required: true },
   modified: Date,
   name: String, // derived from appropriate field value
+  oldId: Number,
   paymentId: ObjectId,
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   version: Number
@@ -190,6 +198,7 @@ const paymentSchema = Schema({
   created: Date,
   method: String,
   modified: Date,
+  oldId: Number,
   received: Date,
   sent: Date,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
@@ -234,6 +243,7 @@ const messageSchema = Schema({
   libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
   name: String,
+  oldId: Number,
   path: String,
   series: Boolean,
   seriesId: { type: Schema.Types.ObjectId, ref: 'Message' },
@@ -244,6 +254,15 @@ const messageSchema = Schema({
 });
 
 mongoose.model('Message', messageSchema);
+
+const oldFileSchema = Schema({
+  oldId: {type: String, required: true, unique: true},
+  name: String,
+  size: Number,
+  type: { type: String }
+});
+
+mongoose.model('OldFile', oldFileSchema);
 
 const siteSchema = Schema({
   address: String,

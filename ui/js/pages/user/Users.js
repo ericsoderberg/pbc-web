@@ -29,5 +29,6 @@ Users.defaultProps = {
   category: 'users',
   Item: Item,
   path: '/users',
+  sort: 'name email',
   title: 'People'
 };
