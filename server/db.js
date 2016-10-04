@@ -178,6 +178,7 @@ mongoose.model('FormTemplate', formTemplateSchema);
 const paymentSchema = Schema({
   amount: Number,
   created: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   notes: String,
   method: String,
   modified: Date,

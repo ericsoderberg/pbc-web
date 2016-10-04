@@ -17,6 +17,7 @@ const DOMAIN_ADMIN_ROUTES = [
   { label: 'Newsletters', path: '/newsletters' },
   { label: 'Forms', path: '/forms' },
   { label: 'Form Templates', path: '/form-templates' },
+  { label: 'Payments', path: '/payments' },
   { label: 'Email Lists', path: '/email-lists' }
 ];
 

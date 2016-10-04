@@ -38,6 +38,9 @@ import PageMap from './pages/page/PageMap';
 import PageAdd from './pages/page/PageAdd';
 import Page from './pages/page/Page';
 import PageEdit from './pages/page/PageEdit';
+import PaymentAdd from './pages/payment/PaymentAdd';
+import PaymentEdit from './pages/payment/PaymentEdit';
+import Payments from './pages/payment/Payments';
 import Resources from './pages/resource/Resources';
 import ResourceAdd from './pages/resource/ResourceAdd';
 import Resource from './pages/resource/Resource';
@@ -90,6 +93,9 @@ export default {
     { path: 'form-templates/:id', component:  FormTemplate },
     { path: 'form-templates/:id/edit', component:  FormTemplateEdit },
     { path: 'form-templates', component: FormTemplates },
+    { path: 'payments/add', component: PaymentAdd },
+    { path: 'payments/:id/edit', component: PaymentEdit },
+    { path: 'payments', component: Payments },
     { path: 'libraries/add', component: LibraryAdd },
     { path: 'libraries/:id', component: Library },
     { path: 'libraries/:id/edit', component: LibraryEdit },

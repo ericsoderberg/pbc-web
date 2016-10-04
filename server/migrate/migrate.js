@@ -9,9 +9,9 @@ import events from './events';
 import forms from './forms';
 
 Promise.resolve()
-// .then(() => users())
-// .then(() => messages())
-// .then(() => events())
+.then(() => users())
+.then(() => messages())
+.then(() => events())
 .then(() => forms())
 .then(() => console.log(`!!! Finished`))
 .catch(error => console.log(error));

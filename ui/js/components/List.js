@@ -39,8 +39,7 @@ class List extends Component {
     if (props.location.query.filter) {
       filter = props.location.query.filter;
       filterName = props.location.query['filter-name'];
-    }
-    if (props.filters) {
+    } else if (props.filters) {
       filter = {};
       filterNames = {};
       props.filters.forEach(aFilter => {
