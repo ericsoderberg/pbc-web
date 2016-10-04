@@ -8,7 +8,7 @@ export function setFormError (formTemplate, form) {
       if (templateField.required) {
         // see if we have it
         if (! form.fields.some(field => (
-          field.fieldId === templateField._id && field.value))) {
+          field.templateFieldId === templateField._id && field.value))) {
           if (! error) {
             error = {};
           }
@@ -27,7 +27,7 @@ export function clearFormError (formTemplate, form, error) {
       if (templateField.required) {
         // see if we have it
         if (form.fields.some(field => (
-          field.fieldId === templateField._id && field.value))) {
+          field.templateFieldId === templateField._id && field.value))) {
           delete error[templateField._id];
         }
       }
@@ -42,7 +42,7 @@ export function finalizeForm (formTemplate, form) {
     section.fields.some(templateField => {
       if (templateField.name && templateField.name.match(/name/i)) {
         form.fields.some(field => {
-          if (field.fieldId === templateField._id) {
+          if (field.templateFieldId === templateField._id) {
             form.name = field.value;
             return true;
           }

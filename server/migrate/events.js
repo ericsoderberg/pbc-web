@@ -60,7 +60,6 @@ export default function () {
         resource = new Resource(item);
         return resource.save()
         .then(resource => {
-          resources[item.id] = resource;
           return saved(resource, results.resources);
         })
         .catch(error => errored(error, results.resources));

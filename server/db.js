@@ -132,6 +132,7 @@ mongoose.model('Resource', resourceSchema);
 
 const formTemplateOptionSchema = Schema({
   name: String,
+  oldId: Number,
   value: String
 });
 
@@ -141,6 +142,7 @@ const formTemplateFieldSchema = Schema({
   limit: Number,
   monetary: Boolean,
   name: String,
+  oldId: Number,
   options: [formTemplateOptionSchema],
   required: Boolean,
   type: {
@@ -154,7 +156,8 @@ const formTemplateFieldSchema = Schema({
 const formTemplateSectionSchema = Schema({
   dependsOnId: ObjectId,
   fields: [formTemplateFieldSchema],
-  name: String
+  name: String,
+  oldId: Number
 });
 
 const formTemplateSchema = Schema({
@@ -172,13 +175,29 @@ const formTemplateSchema = Schema({
 
 mongoose.model('FormTemplate', formTemplateSchema);
 
+const paymentSchema = Schema({
+  amount: Number,
+  created: Date,
+  notes: String,
+  method: String,
+  modified: Date,
+  oldId: Number,
+  received: Date,
+  sent: Date,
+  temporaryToken: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+});
+
+mongoose.model('Payment', paymentSchema);
+
 const formSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   fields: [{
-    fieldId: { type: Schema.Types.ObjectId, required: true },
-    optionId: ObjectId, // choice
-    optionIds: [ObjectId], // choices
+    oldId: Number,
+    optionId: ObjectId, // choice, formTemplateFieldOption
+    optionIds: [ObjectId], // choices, formTemplateFieldOption
+    templateFieldId: { type: Schema.Types.ObjectId, required: true },
     value: String
   }],
   formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate',
@@ -186,25 +205,12 @@ const formSchema = Schema({
   modified: Date,
   name: String, // derived from appropriate field value
   oldId: Number,
-  paymentId: ObjectId,
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  paymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
   version: Number
 });
 
 mongoose.model('Form', formSchema);
-
-const paymentSchema = Schema({
-  amount: Number,
-  created: Date,
-  method: String,
-  modified: Date,
-  oldId: Number,
-  received: Date,
-  sent: Date,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
-});
-
-mongoose.model('Payment', paymentSchema);
 
 const podcastSchema = Schema({
   category: String,

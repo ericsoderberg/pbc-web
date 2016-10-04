@@ -31,7 +31,7 @@ class FormContents extends Component {
     props.form.fields.forEach(field => {
       if (field.value || field.optionId ||
         (field.optionIds && field.optionIds.length > 0)) {
-        fieldsSet[field.fieldId] = true;
+        fieldsSet[field.templateFieldId] = true;
       }
     });
     return fieldsSet;
@@ -41,7 +41,7 @@ class FormContents extends Component {
     const { form: { fields } } = this.props;
     let result = -1;
     fields.some((field, index) => {
-      if (field.fieldId === id) {
+      if (field.templateFieldId === id) {
         result = index;
         return true;
       }
@@ -52,7 +52,7 @@ class FormContents extends Component {
   _change (templateFieldId) {
     return (event) => {
       const value = event.target.value;
-      const nextField = { fieldId: templateFieldId, value: value };
+      const nextField = { templateFieldId: templateFieldId, value: value };
       let form = { ...this.props.form };
       let fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
@@ -68,7 +68,7 @@ class FormContents extends Component {
 
   _setOption (templateFieldId, optionId) {
     return (event) => {
-      const nextField = { fieldId: templateFieldId, optionId: optionId };
+      const nextField = { templateFieldId: templateFieldId, optionId: optionId };
       let form = { ...this.props.form };
       let fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
@@ -88,7 +88,7 @@ class FormContents extends Component {
       let fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
       if (index === -1) {
-        fields.push({ fieldId: templateFieldId, optionIds: [optionId] });
+        fields.push({ templateFieldId: templateFieldId, optionIds: [optionId] });
       } else {
         let optionIds = fields[index].optionIds.slice(0);
         let optionIndex = optionIds.indexOf(optionId);
@@ -97,7 +97,7 @@ class FormContents extends Component {
         } else {
           optionIds.splice(optionIndex, 1);
         }
-        fields[index] = { fieldId: templateFieldId, optionIds: optionIds };
+        fields[index] = { templateFieldId: templateFieldId, optionIds: optionIds };
       }
       form.fields = fields;
       this.props.onChange(form);
