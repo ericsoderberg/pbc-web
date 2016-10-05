@@ -80,17 +80,12 @@ function normalizeForm (item, fields, options, formTemplates, payments,
 
   item.fields = fields[item.id].map(field => {
     const templateField = templateFields[field.form_field_id];
-    if (!templateField && field.id === 112931) {
-      console.log('!!! item', item);
-      console.log('!!! field', field);
-      console.log('!!! template', template);
-    }
     field.oldId = field.id;
     field.templateFieldId = templateField._id;
 
     if (options[field.id]) {
       // map options ids
-      let templateOptions = {}; // filledFieldOption.id => templateOption doc
+      let templateOptions = {}; // filled_field_option.id => templateOption doc
       templateField.options.forEach(option => {
         templateOptions[option.oldId] = option;
       });
@@ -105,9 +100,9 @@ function normalizeForm (item, fields, options, formTemplates, payments,
       if ('choice' === templateField.type) {
         const option = options[field.id][0];
         if (! templateOptions[option.form_field_option_id]) logContext();
-        item.option = templateOptions[option.form_field_option_id]._id;
+        field.optionId = templateOptions[option.form_field_option_id]._id;
       } else {
-        item.options = options[field.id].map(option => {
+        field.optionIds = options[field.id].map(option => {
           if (! templateOptions[option.form_field_option_id]) logContext();
           return templateOptions[option.form_field_option_id]._id;
         });
