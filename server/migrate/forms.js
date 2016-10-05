@@ -20,6 +20,7 @@ const FIELD_TYPES = {
 function normalizeField (item, options) {
   item.oldId = item.id;
   item.type = FIELD_TYPES[item.field_type];
+  item.value = item.unit_value;
   item.options = (options[item.id] || []).map(option => {
     option.oldId = option.id;
     return option;

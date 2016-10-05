@@ -28,7 +28,7 @@ export default class FormTemplateFieldEdit extends Component {
     const { formState } = this.state;
     const field = formState.object;
 
-    let name, help, required, monetary;
+    let name, help, value, required, monetary, scholarship, limit;
 
     if ('line' === field.type || 'choice' === field.type ||
       'count' === field.type) {
@@ -38,6 +38,40 @@ export default class FormTemplateFieldEdit extends Component {
             checked={field.monetary || false}
             onChange={formState.toggle('monetary')}/>
           <label htmlFor="monetary">Monetary</label>
+        </FormField>
+      );
+    }
+
+    if ('count' === field.type) {
+      let prefix;
+      if (field.monetary) {
+        prefix = <span className="prefix">$</span>;
+      }
+      value = (
+        <FormField label="Unit value">
+          <div className="box--row">
+            {prefix}
+            <input name="value" value={field.value || ''}
+              onChange={formState.change('value')}/>
+          </div>
+        </FormField>
+      );
+
+      limit = (
+        <FormField label="Total available">
+          <input name="limit" type="number" min="0" value={field.limit || ''}
+            onChange={formState.change('limit')}/>
+        </FormField>
+      );
+    }
+
+    if ('line' === field.type && field.monetary) {
+      scholarship = (
+        <FormField>
+          <input name="scholarship" type="checkbox"
+            checked={field.scholarship || false}
+            onChange={formState.toggle('scholarship')}/>
+          <label htmlFor="scholarship">Scholarship</label>
         </FormField>
       );
     }
@@ -150,8 +184,11 @@ export default class FormTemplateFieldEdit extends Component {
         <fieldset className="form__fields">
           {name}
           {help}
+          {value}
+          {limit}
           {required}
           {monetary}
+          {scholarship}
           {dependsOn}
         </fieldset>
         {options}

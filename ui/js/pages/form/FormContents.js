@@ -116,6 +116,15 @@ class FormContents extends Component {
         <input name={templateField.name} value={field.value || ''} type="text"
           onChange={this._change(templateField._id)} />
       );
+      if (templateField.monetary) {
+        const prefix = templateField.scholarship ? '- $' : '$';
+        contents = (
+          <div className="box--row">
+            <span className="prefix">{prefix}</span>
+            {contents}
+          </div>
+        );
+      }
     } else if ('lines' === templateField.type) {
       contents = (
         <textarea name={templateField.name} value={field.value || ''}
@@ -142,9 +151,21 @@ class FormContents extends Component {
       ));
     } else if ('count' === templateField.type) {
       contents = (
-        <input name={templateField.name} value={field.value || ''} type="text"
+        <input name={templateField.name} type="number" min="0"
+          value={field.value || ''}
           onChange={this._change(templateField._id)} />
       );
+      if (templateField.value) {
+        const prefix =
+          `${templateField.monetary ? '$' : ''}${templateField.value}`;
+        contents = (
+          <div className="box--row">
+            <span className="prefix">{prefix}</span>
+            <span className="prefix">x</span>
+            {contents}
+          </div>
+        );
+      }
     }
 
     return (

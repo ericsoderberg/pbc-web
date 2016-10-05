@@ -146,6 +146,13 @@
     line-height: $unit;
     flex: 1;
   }
+
+  .box--row > .prefix {
+    flex: 0 0 auto;
+    margin-left: $half-unit;
+    margin-right: 0;
+    color: $secondary-color;
+  }
 }
 
 .form-field--closable {
@@ -166,6 +173,14 @@
   + .form__tabs {
     margin-top: $quarter-unit;
   }
+}
+
+.form-field__annotations {
+  text-align: right;
+}
+
+.form-field__label {
+  margin-right: $half-unit;
 }
 
 .form-field__error {
@@ -210,6 +225,7 @@
   @media all and (min-width: 700px) {
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     max-width: $form-width;
     margin: $unit auto 0;
     padding-bottom: $unit;

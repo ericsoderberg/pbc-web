@@ -174,6 +174,12 @@ export default class FormTemplateFormContents extends Component {
               onChange={formState.toggle('authenticate')}/>
             <label htmlFor="authenticate">authenticate</label>
           </FormField>
+          <FormField>
+            <input name="payable" type="checkbox"
+              checked={formTemplate.payable || false}
+              onChange={formState.toggle('payable')}/>
+            <label htmlFor="payable">accept payment</label>
+          </FormField>
           {administeredBy}
         </fieldset>
         {sections}

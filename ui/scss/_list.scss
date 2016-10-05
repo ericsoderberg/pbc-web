@@ -103,8 +103,14 @@ button.item__container {
   flex-direction: row;
   align-items: center;
 
-  > *:not(:last-child):not(.button-icon):not(.link-icon) {
+  > * {
     margin-right: $half-unit;
+  }
+
+  > *:last-child,
+  > .button-icon,
+  > .link-icon {
+    margin-right: 0;
   }
 
   &:not(.box--static) {

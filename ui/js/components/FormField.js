@@ -69,7 +69,7 @@ export default class FormField extends Component {
       labels = (
         <div className="form-field__labels">
           {label}
-          <div>
+          <div className="form-field__annotations">
             {help}
             {error}
           </div>

@@ -131,6 +131,8 @@ const resourceSchema = Schema({
 mongoose.model('Resource', resourceSchema);
 
 const formTemplateOptionSchema = Schema({
+  disabled: Boolean,
+  limit: Number,
   name: String,
   oldId: Number,
   value: String
@@ -145,12 +147,13 @@ const formTemplateFieldSchema = Schema({
   oldId: Number,
   options: [formTemplateOptionSchema],
   required: Boolean,
+  scholarship: Boolean, // negates form field value
   type: {
     type: String,
     enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions'],
     required: true
   },
-  value: String // unused?
+  value: String // for monetary + type='count'
 });
 
 const formTemplateSectionSchema = Schema({
@@ -167,6 +170,7 @@ const formTemplateSchema = Schema({
   modified: Date,
   name: {type: String, required: true, unique: true},
   oldId: Number,
+  payable: Boolean,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },

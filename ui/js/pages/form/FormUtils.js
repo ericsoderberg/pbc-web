@@ -53,3 +53,30 @@ export function finalizeForm (formTemplate, form) {
   });
   form.domainId = formTemplate.domainId;
 }
+
+export function calculateTotal (formTemplate, form) {
+  let total = 0;
+  formTemplate.sections.forEach(section => {
+    section.fields.forEach(templateField => {
+      if (templateField.monetary) {
+        // see if we have it
+        form.fields.some(field => {
+          if (field.templateFieldId === templateField._id) {
+            if ('count' === templateField.type) {
+              total += templateField.value * field.value;
+            } else if ('line' === templateField.type) {
+              if (templateField.scholarship) {
+                total -= field.value;
+              } else {
+                total += field.value;
+              }
+            }
+            return true;
+          }
+        });
+        return true;
+      }
+    });
+  });
+  return Math.max(0, total);
+}
