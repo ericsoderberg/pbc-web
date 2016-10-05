@@ -140,6 +140,7 @@ const formTemplateOptionSchema = Schema({
 
 const formTemplateFieldSchema = Schema({
   dependsOnId: ObjectId,
+  discount: Boolean, // negates form field value
   help: String,
   limit: Number,
   monetary: Boolean,
@@ -147,7 +148,6 @@ const formTemplateFieldSchema = Schema({
   oldId: Number,
   options: [formTemplateOptionSchema],
   required: Boolean,
-  scholarship: Boolean, // negates form field value
   type: {
     type: String,
     enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions'],

@@ -63,12 +63,13 @@ export function calculateTotal (formTemplate, form) {
         form.fields.some(field => {
           if (field.templateFieldId === templateField._id) {
             if ('count' === templateField.type) {
-              total += templateField.value * field.value;
+              total += (parseInt(templateField.value, 10) *
+                parseInt(field.value, 10));
             } else if ('line' === templateField.type) {
-              if (templateField.scholarship) {
-                total -= field.value;
+              if (templateField.discount) {
+                total -= parseInt(field.value, 10);
               } else {
-                total += field.value;
+                total += parseInt(field.value, 10);
               }
             }
             return true;

@@ -28,7 +28,7 @@ export default class FormTemplateFieldEdit extends Component {
     const { formState } = this.state;
     const field = formState.object;
 
-    let name, help, value, required, monetary, scholarship, limit;
+    let name, help, value, required, monetary, discount, limit;
 
     if ('line' === field.type || 'choice' === field.type ||
       'count' === field.type) {
@@ -66,12 +66,12 @@ export default class FormTemplateFieldEdit extends Component {
     }
 
     if ('line' === field.type && field.monetary) {
-      scholarship = (
+      discount = (
         <FormField>
-          <input name="scholarship" type="checkbox"
-            checked={field.scholarship || false}
-            onChange={formState.toggle('scholarship')}/>
-          <label htmlFor="scholarship">Scholarship</label>
+          <input name="discount" type="checkbox"
+            checked={field.discount || false}
+            onChange={formState.toggle('discount')}/>
+          <label htmlFor="discount">Discount</label>
         </FormField>
       );
     }
@@ -188,7 +188,7 @@ export default class FormTemplateFieldEdit extends Component {
           {limit}
           {required}
           {monetary}
-          {scholarship}
+          {discount}
           {dependsOn}
         </fieldset>
         {options}
