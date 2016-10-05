@@ -27,7 +27,7 @@ export default class FormSectionEdit extends Component {
       <fieldset className="form__fields">
         <FormField name="formTemplateId" label="Form template">
           <SelectSearch category="form-templates"
-            value={section.formTemplateId.name || ''}
+            value={(section.formTemplateId || {}).name || ''}
             onChange={(suggestion) =>
               formState.change('formTemplateId')({
                 _id: suggestion._id, name: suggestion.name })} />

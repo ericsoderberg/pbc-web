@@ -8,7 +8,7 @@ export default class Add extends Component {
   constructor (props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
-    this.state = { };
+    this.state = { item: props.default };
   }
 
   componentDidMount () {
@@ -49,6 +49,7 @@ export default class Add extends Component {
 
 Add.propTypes = {
   category: PropTypes.string.isRequired,
+  default: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
   onAdd: PropTypes.func,
   Preview: PropTypes.func,

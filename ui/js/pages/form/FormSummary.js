@@ -82,7 +82,7 @@ class FormSummary extends Component {
 
   _load (props) {
     const { formTemplate, formTemplateId } = props;
-    if (! formTemplate) {
+    if (formTemplateId && ! formTemplate) {
       getItem('form-templates', formTemplateId._id || formTemplateId,
         { select: 'name submitLabel authenticate' })
       .then(formTemplate => this.setState({ formTemplate: formTemplate }))
@@ -93,7 +93,7 @@ class FormSummary extends Component {
 
   _loadForms (props) {
     const { formTemplateId, session } = props;
-    if (session) {
+    if (formTemplateId && session) {
       getItems('forms',{
         filter: {
           formTemplateId: (formTemplateId._id || formTemplateId),
@@ -145,7 +145,7 @@ class FormSummary extends Component {
       = this.state;
 
     let contents;
-    if (! forms || ! formTemplate) {
+    if (! formTemplateId || ! forms || ! formTemplate) {
       contents = <Loading />;
     } else if (! session && formTemplate.authenticate) {
       contents = (
@@ -230,7 +230,7 @@ class FormSummary extends Component {
 FormSummary.propTypes = {
   formTemplate: PropTypes.object,
   formTemplateId: PropTypes.oneOfType([
-    PropTypes.string, PropTypes.object]).isRequired,
+    PropTypes.string, PropTypes.object]),
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,

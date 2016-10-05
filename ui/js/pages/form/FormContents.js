@@ -105,22 +105,28 @@ class FormContents extends Component {
   }
 
   _renderFormField (templateField, index) {
-    const { form: { fields } } = this.props;
+    const { form: { fields }, session } = this.props;
     const error = this.props.error || {};
     const fieldIndex = this._fieldIndex(templateField._id);
     const field = fields[fieldIndex] || {};
 
     let contents;
     if ('line' === templateField.type) {
+      let defaultValue = '';
+      if (session && 'Name' === templateField.name) {
+        defaultValue = session.name;
+      } else if (session && 'Email' === templateField.name) {
+        defaultValue = session.email;
+      }
       contents = (
-        <input name={templateField.name} value={field.value || ''} type="text"
+        <input name={templateField.name} type="text"
+          value={field.value || defaultValue}
           onChange={this._change(templateField._id)} />
       );
       if (templateField.monetary) {
-        const prefix = templateField.scholarship ? '- $' : '$';
         contents = (
           <div className="box--row">
-            <span className="prefix">{prefix}</span>
+            <span className="prefix">$</span>
             {contents}
           </div>
         );
@@ -152,7 +158,7 @@ class FormContents extends Component {
     } else if ('count' === templateField.type) {
       contents = (
         <input name={templateField.name} type="number" min="0"
-          value={field.value || ''}
+          value={field.value || 0}
           onChange={this._change(templateField._id)} />
       );
       if (templateField.value) {
