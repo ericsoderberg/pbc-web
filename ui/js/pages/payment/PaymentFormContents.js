@@ -84,8 +84,11 @@ class PaymentFormContents extends Component {
         </div>
         <fieldset className="form__fields">
           <FormField label="Name">
-            $<input name="amount" type="text" value={payment.amount || ''}
-              onChange={formState.change('amount')}/>
+            <div className="box--row">
+              <span className="prefix">$</span>
+              <input name="amount" type="text" value={payment.amount || ''}
+                onChange={formState.change('amount')}/>
+            </div>
           </FormField>
           <FormField label="Sent date">
             <DateTime format="M/D/YYYY" name="sent"
