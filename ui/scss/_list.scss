@@ -21,7 +21,8 @@
 
   @media all and (min-width: 700px) {
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
 
     > * {
       margin: 0 $unit;

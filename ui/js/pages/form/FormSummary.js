@@ -9,8 +9,7 @@ import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import Button from '../../components/Button';
 import AddIcon from '../../icons/Add';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
+import RightIcon from '../../icons/Right';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
 
@@ -94,7 +93,7 @@ class FormSummary extends Component {
   _loadForms (props) {
     const { formTemplateId, session } = props;
     if (formTemplateId && session) {
-      getItems('forms',{
+      getItems('forms', {
         filter: {
           formTemplateId: (formTemplateId._id || formTemplateId),
           userId: session.userId
@@ -141,8 +140,7 @@ class FormSummary extends Component {
 
   render () {
     const { color, full, plain, formTemplateId, session } = this.props;
-    const { formTemplate, forms, adding, editId, height, pad, showAdminLinks }
-      = this.state;
+    const { formTemplate, forms, adding, editId, height, pad } = this.state;
 
     let contents;
     if (! formTemplateId || ! forms || ! formTemplate) {
@@ -178,24 +176,9 @@ class FormSummary extends Component {
       let menu;
       let links;
       if (session.administrator) {
-        let MenuIcon = DownIcon;
-        if (showAdminLinks) {
-          MenuIcon = UpIcon;
-          const editPath = `/form-templates/${formTemplate._id}/edit`;
-          const formsPath = `/forms?` +
-            `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
-            `&formTemplateId-name=${encodeURIComponent(formTemplate.name)}`;
-          links = (
-            <div className="box--between">
-              <Link to={formsPath}>All forms</Link>
-              <Link to={editPath}>Edit template</Link>
-            </div>
-          );
-        }
+        const formTemplatePath = `/form-templates/${formTemplate._id}`;
         menu = (
-          <Button plain={true} icon={<MenuIcon />} onClick={() => (
-              this.setState({ showAdminLinks: ! this.state.showAdminLinks })
-            )} />
+          <Link to={formTemplatePath}><RightIcon /></Link>
         );
       }
 

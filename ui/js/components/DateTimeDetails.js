@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 
-const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEK_DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const DATE_REGEXP = new RegExp('[MDY]');
 const TIME_REGEXP = new RegExp('[hHmsa]');
 
@@ -111,12 +111,14 @@ export default class DateTimeDetails extends Component {
 
     return [
       <header key="header" className="date-time__header">
-        <button type="button" className="button date-time__previous"
+        <button type="button"
+          className="button button-plain date-time__previous"
           onClick={this._onPrevious.bind(this, 'month')}>&lt;</button>
         <span className="date-time__title">
           {value.format('MMMM YYYY')}
         </span>
-        <button type="button" className="button date-time__next"
+        <button type="button"
+          className="button button-plain date-time__next"
           onClick={this._onNext.bind(this, 'month')}>&gt;</button>
       </header>,
       <div key="grid" className="date-time__grid">
@@ -129,7 +131,8 @@ export default class DateTimeDetails extends Component {
           </tbody>
         </table>
       </div>,
-      <button key="today" type="button" className="button date-time__today"
+      <button key="today" type="button"
+        className="button button--secondary date-time__today"
         onClick={this._onToday}>Today</button>
     ];
   }

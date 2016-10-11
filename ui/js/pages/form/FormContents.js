@@ -1,5 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
+import moment from 'moment';
 import FormError from '../../components/FormError';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
@@ -105,22 +107,16 @@ class FormContents extends Component {
   }
 
   _renderFormField (templateField, index) {
-    const { form: { fields }, session } = this.props;
+    const { form: { fields } } = this.props;
     const error = this.props.error || {};
     const fieldIndex = this._fieldIndex(templateField._id);
     const field = fields[fieldIndex] || {};
 
     let contents;
     if ('line' === templateField.type) {
-      let defaultValue = '';
-      if (session && 'Name' === templateField.name) {
-        defaultValue = session.name;
-      } else if (session && 'Email' === templateField.name) {
-        defaultValue = session.email;
-      }
       contents = (
         <input name={templateField.name} type="text"
-          value={field.value || defaultValue}
+          value={field.value || ''}
           onChange={this._change(templateField._id)} />
       );
       if (templateField.monetary) {
@@ -137,24 +133,30 @@ class FormContents extends Component {
           onChange={this._change(templateField._id)} />
       );
     } else if ('choice' === templateField.type) {
-      contents = (templateField.options || []).map((option, index) => (
-        <div key={index}>
-          <input name={templateField.name} type="radio"
-            checked={field.optionId === option._id}
-            onChange={this._setOption(templateField._id, option._id)}/>
-          <label htmlFor={templateField.name}>{option.name}</label>
-        </div>
-      ));
+      contents = (templateField.options || []).map((option, index) => {
+        const name = templateField.monetary ? `$ ${option.name}` : option.name;
+        return (
+          <div key={index}>
+            <input name={templateField.name} type="radio"
+              checked={field.optionId === option._id}
+              onChange={this._setOption(templateField._id, option._id)}/>
+            <label htmlFor={templateField.name}>{name}</label>
+          </div>
+        );
+      });
     } else if ('choices' === templateField.type) {
       const optionIds = field.optionIds || [];
-      contents = (templateField.options || []).map((option, index) => (
-        <div key={index}>
-          <input name={templateField.name} type="checkbox"
-            checked={optionIds.indexOf(option._id) !== -1}
-            onChange={this._toggleOption(templateField._id, option._id)}/>
-          <label htmlFor={templateField.name}>{option.name}</label>
-        </div>
-      ));
+      contents = (templateField.options || []).map((option, index) => {
+        const name = templateField.monetary ? `$ ${option.name}` : option.name;
+        return (
+          <div key={index}>
+            <input name={templateField.name} type="checkbox"
+              checked={optionIds.indexOf(option._id) !== -1}
+              onChange={this._toggleOption(templateField._id, option._id)}/>
+            <label htmlFor={templateField.name}>{name}</label>
+          </div>
+        );
+      });
     } else if ('count' === templateField.type) {
       contents = (
         <input name={templateField.name} type="number" min="0"
@@ -232,11 +234,22 @@ class FormContents extends Component {
     .filter(section => ! section.dependsOnId || fieldsSet[section.dependsOnId])
     .map(this._renderTemplateSection);
 
-    let user;
+    let admin;
     if (full && session && (session.administrator || (formTemplate.domainId &&
       session.administratorDomainId === formTemplate.domainId))) {
-      user = (
+      let added;
+      if (form.created) {
+        added = (
+          <div className="form-item secondary">
+            First added {moment(form.created).format('MMM Do YYYY')}
+          </div>
+        );
+      }
+      admin = (
         <fieldset className="form__fields">
+          <div className="form__text">
+            <h3>Administrative</h3>
+          </div>
           <FormField label="Person" help="the person to submit this form for">
             <SelectSearch category="users"
               options={{select: 'name email', sort: 'name'}}
@@ -247,6 +260,12 @@ class FormContents extends Component {
                 this.props.onChange(form);
               }} />
           </FormField>
+          {added}
+          <div className="form-item">
+            <Link to={`/form-templates/${formTemplate._id}`}>
+              {formTemplate.name} form template
+            </Link>
+          </div>
         </fieldset>
       );
     }
@@ -255,7 +274,7 @@ class FormContents extends Component {
       <div>
         {formError}
         {sections}
-        {user}
+        {admin}
       </div>
     );
   }

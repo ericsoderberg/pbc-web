@@ -3,11 +3,12 @@ import React, { Component, PropTypes } from 'react';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
+import Stored from '../../components/Stored';
 import FormContents from './FormContents';
 import FormTotal from './FormTotal';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
-export default class FormAdd extends Component {
+class FormAdd extends Component {
 
   constructor (props) {
     super(props);
@@ -33,11 +34,27 @@ export default class FormAdd extends Component {
   _load (props) {
     const formTemplateId =
       props.formTemplateId || props.location.query.formTemplateId;
+    const session = props.session;
     getItem('form-templates', formTemplateId)
-    .then(formTemplate => this.setState({
-      form: { fields: [], formTemplateId: formTemplate._id },
-      formTemplate: formTemplate
-    }))
+    .then(formTemplate => {
+      let fields = [];
+      // pre-fill out name and email from session, if possible
+      if (session) {
+        formTemplate.sections.forEach(section => {
+          section.fields.forEach(field => {
+            if ('Name' === field.name) {
+              fields.push({ templateFieldId: field._id, value: session.name });
+            } else if ('Email' === field.name) {
+              fields.push({ templateFieldId: field._id, value: session.email });
+            }
+          });
+        });
+      }
+      this.setState({
+        form: { fields: fields, formTemplateId: formTemplate._id },
+        formTemplate: formTemplate
+      });
+    })
     .catch(error => console.log("!!! FormAdd catch", error));
   }
 
@@ -143,3 +160,9 @@ FormAdd.defaultProps = {
 FormAdd.contextTypes = {
   router: PropTypes.any
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(FormAdd, select);

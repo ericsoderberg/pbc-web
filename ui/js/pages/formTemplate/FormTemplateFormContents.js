@@ -1,6 +1,5 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
@@ -143,21 +142,8 @@ export default class FormTemplateFormContents extends Component {
       );
     }
 
-    const formsPath = `/forms?` +
-      `formTemplateId=${encodeURIComponent(formTemplate._id)}` +
-      `&formTemplateId-name=${encodeURIComponent(formTemplate.name)}`;
-    const pageFilter = { 'sections.formTemplateId': formTemplate._id };
-    const pageFilterLabel = `Including the ${formTemplate.name} form`;
-    const pagesPath = `/pages?` +
-      `filter=${encodeURIComponent(JSON.stringify(pageFilter))}` +
-      `&filter-name=${encodeURIComponent(pageFilterLabel)}`;
-
     return (
       <div>
-        <div className="form-item">
-          <Link to={formsPath}>Filled out forms</Link>
-          <Link to={pagesPath}>Pages including</Link>
-        </div>
         <fieldset className="form__fields">
           <FormField label="Form name">
             <input name="name" value={formTemplate.name || ''}

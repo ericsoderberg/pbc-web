@@ -1,27 +1,13 @@
 "use strict";
-import React from 'react';
-import { Link } from 'react-router';
 import List from '../../components/List';
-
-const Item = (props) => {
-  const { className, item: page } = props;
-  let classNames = ['item__container', className];
-  return (
-    <Link className={classNames.join(' ')}
-      to={page.path || `/pages/${page._id}`}>
-      <div className="item">
-        <span className="item__name">{page.name}</span>
-      </div>
-    </Link>
-  );
-};
+import PageItem from './PageItem';
 
 export default class Pages extends List {};
 
 Pages.defaultProps = {
   ...List.defaultProps,
   category: 'pages',
-  Item: Item,
+  Item: PageItem,
   path: '/pages',
   select: 'name path',
   title: 'Pages'

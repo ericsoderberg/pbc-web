@@ -205,12 +205,15 @@ export default class DateTime extends Component {
   }
 
   render () {
-    const { className, format, id, name } = this.props;
+    const { className, format, id, inline, name } = this.props;
     const { active } = this.state;
     let { value } = this.props;
     let classes = ['date-time'];
     if (active) {
       classes.push('date-time--active');
+    }
+    if (inline) {
+      classes.push('date-time--inline');
     }
     if (className) {
       classes.push(className);
@@ -221,7 +224,7 @@ export default class DateTime extends Component {
     }
 
     let details;
-    if (active) {
+    if (active || inline) {
       details = (
         <DateTimeDetails format={this.props.format} value={this.state.current}
           step={this.props.step} onChange={this._notify}/>
@@ -243,6 +246,7 @@ export default class DateTime extends Component {
 DateTime.propTypes = {
   format: PropTypes.string,
   id: PropTypes.string,
+  inline: PropTypes.bool,
   name: PropTypes.string,
   onChange: PropTypes.func,
   step: PropTypes.number,

@@ -32,8 +32,7 @@ const FormItem = (props) => {
     );
   } else {
     result = (
-      <Link className={classNames.join(' ')}
-        to={`/forms/${form._id}/edit`}>
+      <Link className={classNames.join(' ')} to={`/forms/${form._id}/edit`}>
         {contents}
       </Link>
     );

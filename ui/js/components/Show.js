@@ -38,7 +38,7 @@ export default class Show extends Component {
   }
 
   render () {
-    const { category, Contents, title } = this.props;
+    const { actions, category, Contents, title } = this.props;
     const { item } = this.state;
 
     let contents;
@@ -50,7 +50,8 @@ export default class Show extends Component {
 
     return (
       <main>
-        <ItemHeader title={title} category={category} item={item} />
+        <ItemHeader title={title} category={category} item={item}
+          actions={actions} />
         {contents}
       </main>
     );
@@ -58,6 +59,7 @@ export default class Show extends Component {
 };
 
 Show.propTypes = {
+  actions: PropTypes.node,
   category: PropTypes.string.isRequired,
   Contents: PropTypes.func.isRequired,
   item: PropTypes.object,
