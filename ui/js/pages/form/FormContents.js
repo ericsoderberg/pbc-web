@@ -21,14 +21,14 @@ class FormContents extends Component {
     super(props);
     this._renderTemplateSection = this._renderTemplateSection.bind(this);
     this._renderTemplateField = this._renderTemplateField.bind(this);
-    this.state = { fieldsSet: this._fieldsSetFromProps(props) };
+    this.state = this._stateFromProps(props);
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ fieldsSet: this._fieldsSetFromProps(nextProps) });
+    this.setState(this._stateFromProps(nextProps));
   }
 
-  _fieldsSetFromProps (props) {
+  _stateFromProps (props) {
     let fieldsSet = {};
     props.form.fields.forEach(field => {
       if (field.value || field.optionId ||
@@ -36,7 +36,11 @@ class FormContents extends Component {
         fieldsSet[field.templateFieldId] = true;
       }
     });
-    return fieldsSet;
+    const administrator = (props.session &&
+      (props.session.administrator || (
+        (props.formTemplate && props.formTemplate.domainId &&
+        props.session.administratorDomainId === props.formTemplate.domainId))));
+    return { administrator: administrator, fieldsSet: fieldsSet };
   }
 
   _fieldIndex (id) {
@@ -223,7 +227,7 @@ class FormContents extends Component {
 
   render () {
     const { form, formTemplate, full, error, session } = this.props;
-    const { fieldsSet } = this.state;
+    const { administrator, fieldsSet } = this.state;
 
     let formError;
     if (error && (typeof error === 'string' || error.error)) {
@@ -231,12 +235,14 @@ class FormContents extends Component {
     }
 
     const sections = (formTemplate.sections || [])
-    .filter(section => ! section.dependsOnId || fieldsSet[section.dependsOnId])
+    .filter(section => (
+      (! section.dependsOnId || fieldsSet[section.dependsOnId]) &&
+      (! section.administrative || (full && administrator))
+    ))
     .map(this._renderTemplateSection);
 
     let admin;
-    if (full && session && (session.administrator || (formTemplate.domainId &&
-      session.administratorDomainId === formTemplate.domainId))) {
+    if (full && administrator) {
       let added;
       if (form.created) {
         added = (

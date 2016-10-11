@@ -157,6 +157,7 @@ const formTemplateFieldSchema = Schema({
 });
 
 const formTemplateSectionSchema = Schema({
+  administrative: Boolean,
   dependsOnId: ObjectId,
   fields: [formTemplateFieldSchema],
   name: String,

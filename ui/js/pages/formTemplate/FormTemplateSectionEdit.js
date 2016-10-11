@@ -80,6 +80,12 @@ export default class FormTemplateSectionEdit extends Component {
               {dependsOnOptions}
             </select>
           </FormField>
+          <FormField>
+            <input name="administrative" type="checkbox"
+              checked={section.administrative || false}
+              onChange={formState.toggle('administrative')}/>
+            <label htmlFor="administrative">administrative</label>
+          </FormField>
         </fieldset>
       );
     }
