@@ -6,6 +6,7 @@ import EventTimes from '../../components/EventTimes';
 import Section from '../../components/Section';
 import Map from '../../components/Map';
 import Button from '../../components/Button';
+import Loading from '../../components/Loading';
 
 export default class EventSummary extends Component {
 
@@ -39,30 +40,33 @@ export default class EventSummary extends Component {
     const { color, full, plain, navigable } = this.props;
     const { event } = this.state;
 
-    let contents;
-    if (false === navigable) {
-      contents = (
-        <div className="event-summary__summary">
-          <h2>{event.name}</h2>
-          <EventTimes event={event} reverse={true} />
-        </div>
-      );
-    } else {
-      contents = (
-        <Link to={`/events/${event._id}`} className="event-summary__summary">
-          <Button right={true}>{event.name}</Button>
-          <EventTimes event={event} reverse={true} />
-        </Link>
-      );
-    }
+    let contents, map;
+    if (event) {
+      if (false === navigable) {
+        contents = (
+          <div className="event-summary__summary">
+            <h2>{event.name}</h2>
+            <EventTimes event={event} reverse={true} />
+          </div>
+        );
+      } else {
+        contents = (
+          <Link to={`/events/${event._id}`} className="event-summary__summary">
+            <Button right={true}>{event.name}</Button>
+            <EventTimes event={event} reverse={true} />
+          </Link>
+        );
+      }
 
-    let map;
-    if (event.address) {
-      map = (
-        <div className="event-summary__map">
-          <Map address={event.address} plain={true} />
-        </div>
-      );
+      if (event.address) {
+        map = (
+          <div className="event-summary__map">
+            <Map address={event.address} plain={true} />
+          </div>
+        );
+      }
+    } else {
+      contents = <Loading />;
     }
 
     return (
