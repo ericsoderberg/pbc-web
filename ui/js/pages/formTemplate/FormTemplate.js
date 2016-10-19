@@ -281,6 +281,7 @@ export default class FormTemplate extends Component {
   _renderCells (form) {
     const { formTemplate, sortFieldId } = this.state;
     const templateFieldMap = formTemplate.fieldMap;
+
     let cells = [];
     form.fields.forEach(field => {
       const templateField = templateFieldMap[field.templateFieldId];
@@ -296,12 +297,12 @@ export default class FormTemplate extends Component {
       }
 
       cells[templateField.index] = (
-        <td key={field._id} className={classes}>{contents}</td>
+        <td key={field._id} className={classes}>{contents}&nbsp;</td>
       );
     });
 
     cells = formTemplate.columnFields.map((templateField, index) => (
-      cells[index] || <td key={index} />));
+      cells[index] || <td key={index}>&nbsp;</td>));
 
     let classes = 'secondary';
     if (sortFieldId === 'created') {
