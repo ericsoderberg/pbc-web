@@ -442,6 +442,13 @@ export default class FormTemplate extends Component {
       </nav>
     );
 
+    actions.push(
+      <nav key="add" className="page-header__actions">
+        <Link to={`forms/add?formTemplateId=${encodeURIComponent(id)}`}
+          className="a-header">Add</Link>
+      </nav>
+    );
+
     let title;
     let contents;
     if (formTemplate) {
@@ -452,13 +459,6 @@ export default class FormTemplate extends Component {
     } else {
       contents = <Loading />;
     }
-
-    const add = (
-      <div className="text">
-        <Link to={`forms/add?formTemplateId=${encodeURIComponent(id)}`}
-          className="a-header">Add</Link>
-      </div>
-    );
 
     let pageContext;
     if (pages.length > 0) {
@@ -482,7 +482,6 @@ export default class FormTemplate extends Component {
         <ItemHeader category="form-templates" item={formTemplate}
           title={title} actions={actions} />
         {contents}
-        {add}
         {pageContext}
       </main>
     );
