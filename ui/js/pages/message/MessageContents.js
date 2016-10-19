@@ -82,14 +82,15 @@ export default class MessageContents extends Component {
     if (message.nextMessage) {
       nextMessage = this._renderMessageNav(message.nextMessage, 'next');
     } else {
-      nextMessage = <span></span>;
+      nextMessage = <span />;
     }
 
     let previousMessage;
     if (message.previousMessage) {
-      previousMessage = this._renderMessageNav(message.previousMessage, 'previous');
+      previousMessage =
+        this._renderMessageNav(message.previousMessage, 'previous');
     } else {
-      previousMessage = <span></span>;
+      previousMessage = <span />;
     }
 
     let attributes;
@@ -113,18 +114,20 @@ export default class MessageContents extends Component {
 
       let date;
       if (message.date) {
-        // The date could be a partial string, a moment object, or an ISO-8601 string
+        // The date could be a partial string, a moment object,
+        // or an ISO-8601 string
         let dateProperty = message.date;
         if (typeof dateProperty === 'string') {
           if (dateProperty.match(/.+T.+Z/)) {
             dateProperty = moment(dateProperty);
           } else {
-            dateProperty = moment(dateProperty, 'M/D/YYYY'); // match MessageFormContents
+            // match MessageFormContents
+            dateProperty = moment(dateProperty, 'M/D/YYYY');
           }
         }
         if (dateProperty) {
           date = [
-            <dt key="t">Author</dt>,
+            <dt key="t">Date</dt>,
             <dd key="d">{dateProperty.format('MMMM Do YYYY')}</dd>
           ];
         }
@@ -143,10 +146,14 @@ export default class MessageContents extends Component {
       }
 
       let library;
-      if (message.library) {
+      if (message.libraryId) {
         library = [
           <dt key="t">Library</dt>,
-          <dd key="d">{message.library}</dd>
+          <dd key="d">
+            <Link to={`/libraries/${message.libraryId._id}`}>
+              {message.libraryId.name}
+            </Link>
+          </dd>
         ];
       }
 

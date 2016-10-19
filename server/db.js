@@ -63,11 +63,15 @@ mongoose.model('Domain', domainSchema);
 
 const pageSectionSchema = Schema({
   color: String,
-  eventId: { type: Schema.Types.ObjectId, ref: 'Event' },  // event type
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' }, // form type
+  // event type
+  eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
+  // form type
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   full: Boolean,
-  image: image,       // image type
-  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' }, // library type
+  // image type
+  image: image,
+  // library type
+  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   navigable: Boolean, // event type
   pages: [{           // pages type
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
@@ -75,7 +79,9 @@ const pageSectionSchema = Schema({
   }],
   text: String,       // text type
   type: { type: String,
-    enum: ['text', 'image', 'event', 'library', 'form', 'person', 'pages', 'video']
+    enum: [
+      'text', 'image', 'event', 'library', 'form', 'person', 'pages', 'video'
+    ]
   },
   url: String,        // video type
   userId: { type: Schema.Types.ObjectId, ref: 'User' }    // person type
@@ -106,8 +112,9 @@ const eventSchema = Schema({
   name: String,
   oldId: Number,
   path: String,
-  primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' }, // set in one-off cases
-  resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }], // resources
+  // set in one-off cases
+  primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' },
+  resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }],
   start: Date,
   text: String,
   times: [{
@@ -233,6 +240,7 @@ const librarySchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true},
+  path: String,
   podcast: podcastSchema,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

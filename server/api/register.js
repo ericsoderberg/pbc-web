@@ -80,7 +80,8 @@ export default (router, category, modelName, options={}) => {
         Doc.findById(id)
         .exec()
         .then(doc => doc.remove())
-        .then(doc => (transformOut.delete ? transformOut.delete(doc, req) : doc))
+        .then(doc => (transformOut.delete ?
+          transformOut.delete(doc, req) : doc))
         .then(() => res.status(200).send())
         .catch(error => res.status(400).json(error));
       });
@@ -114,7 +115,8 @@ export default (router, category, modelName, options={}) => {
         if (req.query.filter) {
           let filter = JSON.parse(req.query.filter);
           if (typeof filter === 'string') {
-            // need double de-escape, first to de-string and then to de-stringify
+            // need double de-escape,
+            // first to de-string and then to de-stringify
             filter = JSON.parse(filter);
           }
           query.find(filter);
@@ -147,7 +149,8 @@ export default (router, category, modelName, options={}) => {
           query.skip(parseInt(req.query.skip, 10));
         }
         query.exec()
-        .then(docs => (transformOut.index ? transformOut.index(docs, req) : docs))
+        .then(docs => (transformOut.index ?
+          transformOut.index(docs, req) : docs))
         .then(docs => res.json(docs))
         .catch(error => res.status(400).json(error));
       });

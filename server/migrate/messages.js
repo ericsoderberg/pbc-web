@@ -4,8 +4,11 @@ mongoose.Promise = global.Promise;
 import '../db';
 import { imageData, loadCategoryObject, loadCategoryArray, copyFile }
   from './utils';
+import results from './results';
 
 // Message
+
+const LIBRARY_NAME = 'Sermons';
 
 function normalizeOldFile (item) {
   item._id = new mongoose.Types.ObjectId();
@@ -16,11 +19,12 @@ function normalizeOldFile (item) {
   return item;
 }
 
-function normalizeMessageSet (item, authors) {
+function normalizeMessageSet (item, mainLibrary, authors) {
   item._id = new mongoose.Types.ObjectId();
   item.oldId = item.id;
   item.created = item.created_at || undefined;
   item.modified = item.updated_at || undefined;
+  item.libraryId = mainLibrary._id;
   item.series = true;
   item.name = item.title;
   item.path = item.url || undefined;
@@ -38,10 +42,12 @@ function normalizeMessageSet (item, authors) {
   return item;
 }
 
-function normalizeMessage (item, authors, messageFiles, messageSets) {
+function normalizeMessage (item, mainLibrary, authors, messageFiles,
+  messageSets) {
   item.oldId = item.id;
   item.created = item.created_at || undefined;
   item.modified = item.updated_at || undefined;
+  item.libraryId = mainLibrary._id;
   item.name = item.title;
   item.path = item.url || undefined;
   item.text = item.description || undefined;
@@ -75,117 +81,114 @@ function normalizeMessage (item, authors, messageFiles, messageSets) {
   return item;
 }
 
-function saved (doc, results) {
-  results.saved += 1;
-  return doc;
-}
-
-function copied (doc, results) {
-  results.copied += 1;
-  return doc;
-}
-
-function skipped (doc, results) {
-  results.skipped += 1;
-  return doc;
-}
-
-function errored (error, context, results) {
-  console.log('!!! error', context, error);
-  results.errors += 1;
-}
-
 function fileToOldFile (item, results) {
   const OldFile = mongoose.model('OldFile');
   return OldFile.findOne({ oldId: item.id }).exec()
   .then(oldFile => {
     if (oldFile) {
-      return skipped(oldFile, results.files);
+      return results.skipped('OldFile', oldFile);
     } else {
       item = normalizeOldFile(item);
       // copy before saving
-      return copyFile(item)
+      return copyFile(item, `message_files/${item.id}/${item.file_file_name}`)
       .then(() => {
-        copied(oldFile, results.files);
+        results.copied('OldFile', oldFile);
         oldFile = new OldFile(item);
         return oldFile.save()
-        .then(oldFile => saved(oldFile, results.files))
-        .catch(error => errored(error, 'save OldFile', results.files));
+        .then(oldFile => results.saved('OldFile', oldFile))
+        .catch(error => results.errored('OldFile', oldFile, error));
       })
-      .catch(error => errored(error, 'copy file', results.files));
+      .catch(error => results.errored('OldFile', item, error));
     }
   });
 }
 
 export default function () {
+  const Library = mongoose.model('Library');
   const Message = mongoose.model('Message');
-  let prePromises = [];
-  let results = { saved: 0, skipped: 0, errors: 0,
-    files: { copied: 0, saved: 0, skipped: 0, errors: 0 } };
 
-  // pre-load authors, message_files, and message_sets
+  // load authors
   const authors = loadCategoryObject('authors');
-
-  // copy files and remember files per message
+  let mainLibrary; // doc
   let messageFiles = {};  // oldId => [doc, ...]
-  let sequentialFilePromise = Promise.resolve();
-  console.log('!!! load files');
-  loadCategoryArray('message_files').forEach((item, index) => {
-    if (! messageFiles[item.message_id]) {
-      messageFiles[item.message_id] = [];
-    }
-    const name = item.file_file_name;
-    // only copy actual files, not external videos
-    if (! name) {
-      // so message can map video url
-      messageFiles[item.message_id].push(item);
-    } else {
-      // run file copies sequentially to avoid running out of file descriptors
-      sequentialFilePromise = sequentialFilePromise
-      .then(() => {
-        if (99 === (index % 100)) console.log(index + 1);
-        return fileToOldFile(item, results)
-        .then(oldFile => messageFiles[item.message_id].push(oldFile))
-        .catch(error => errored(error, 'to OldFile', results.files));
-      });
-    }
-  });
-  prePromises.push(sequentialFilePromise);
-
   let messageSets = {}; // oldId => doc
-  console.log('!!! load sets');
-  loadCategoryArray('message_sets').forEach(item => {
-    item = normalizeMessageSet(item, authors);
-    const promise = Message.findOne({ oldId: item.oldId }).exec()
-    .then(message => {
-      if (message) {
-        return skipped(message, results);
-      } else {
-        const message = new Message(item);
-        return message.save()
-        .then(message => saved(message, results))
-        .catch(error => errored(error, 'message set', results));
-      }
-    })
-    .then(message => messageSets[item.id] = message);
-    prePromises.push(promise);
-  });
 
-  // Once we've got all of the files and series setup, do the single messages
-  return Promise.all(prePromises).then(() => {
-    console.log('!!! load messages');
-    let messagePromises = [];
-    loadCategoryArray('messages').filter(item => item).forEach(item => {
-      item = normalizeMessage(item, authors, messageFiles, messageSets);
+  // create library, if needed
+  return Library.findOne({ name: LIBRARY_NAME }).exec()
+  .then(library => {
+    if (library) {
+      return results.skipped('Library', library);
+    } else {
+      const library = new Library({ name: LIBRARY_NAME });
+      return library.save()
+      .then(library => results.saved('Library', library))
+      .catch(error => results.errored('Library', library, error));
+    }
+  })
+  .then(library => mainLibrary = library)
+  .then(() => {
+    // copy files and remember files per message
+    let sequentialFilePromise = Promise.resolve();
+    console.log('!!! load files');
+    loadCategoryArray('message_files').forEach((item, index) => {
+      if (! messageFiles[item.message_id]) {
+        messageFiles[item.message_id] = [];
+      }
+      const name = item.file_file_name;
+      // only copy actual files, not external videos
+      if (! name) {
+        // so message can map video url
+        messageFiles[item.message_id].push(item);
+      } else {
+        // run file copies sequentially to avoid running out of file descriptors
+        sequentialFilePromise = sequentialFilePromise
+        .then(() => {
+          if (99 === (index % 100)) console.log(index + 1);
+          return fileToOldFile(item, results)
+          .then(oldFile => messageFiles[item.message_id].push(oldFile))
+          .catch(error => results.errored('OldFile', item, error));
+        });
+      }
+    });
+    return sequentialFilePromise;
+  })
+  .then(() => {
+    console.log('!!! load sets');
+    let messageSetPromises = [];
+    loadCategoryArray('message_sets').forEach(item => {
+      item = normalizeMessageSet(item, mainLibrary, authors);
       const promise = Message.findOne({ oldId: item.oldId }).exec()
       .then(message => {
         if (message) {
-          return skipped(message, results);
+          return results.skipped('Message', message);
         } else {
           const message = new Message(item);
           return message.save()
-          .then(message => saved(message, results))
-          .catch(error => errored(error, 'message', results));
+          .then(message => results.saved('Message', message))
+          .catch(error => results.errored('Message', message, error));
+        }
+      })
+      .then(message => messageSets[item.id] = message);
+      messageSetPromises.push(promise);
+    });
+    return Promise.all(messageSetPromises);
+  })
+  .then(() => {
+    // Once we've got all of the files and series setup, do the single messages
+    console.log('!!! load messages');
+    let messagePromises = [];
+    loadCategoryArray('messages').filter(item => item).forEach(item => {
+      item = normalizeMessage(item, mainLibrary, authors, messageFiles,
+        messageSets);
+      const promise = Message.findOne({ oldId: item.oldId }).exec()
+      .then(message => {
+        if (message) {
+          return results.skipped('Message', message);
+        } else {
+          const message = new Message(item);
+          return message.save()
+          .then(message => results.saved('Message', message))
+          .catch(error => results.errored('Message', message, error));
         }
       });
       messagePromises.push(promise);
@@ -211,6 +214,6 @@ export default function () {
       return Promise.all(seriesPromises);
     });
   })
-  .then(() => console.log('!!! Message', results))
-  .catch(error => console.log('!!! Message catch', error));
+  .then(() => console.log('!!! messages done'))
+  .catch(error => console.log('!!! messages catch', error, error.stack));
 }

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 import '../db';
 import { loadCategoryArray } from './utils';
+import results from './results';
 
 // Event + Resource
 
@@ -25,63 +26,46 @@ function normalizeEvent (item, slaveEvents, reservations) {
   return item;
 }
 
-function saved (doc, results) {
-  results.saved += 1;
-  return doc;
-}
-
-function skipped (doc, results) {
-  results.skipped += 1;
-  return doc;
-}
-
-function errored (error, context, results) {
-  console.log('!!! error', context, error);
-  results.errors += 1;
-}
-
 export default function () {
   const Event = mongoose.model('Event');
   const Resource = mongoose.model('Resource');
-  let prePromises = [];
-  let results = {
-    events: { saved: 0, skipped: 0, errors: 0 },
-    resources: { saved: 0, skipped: 0, errors: 0 }
-  };
 
   let resources = {}; // oldId => doc
-  loadCategoryArray('resources').forEach(item => {
-    const promise = Resource.findOne({ oldId: item.id }).exec()
-    .then(resource => {
-      if (resource) {
-        return skipped(resource, results.resources);
-      } else {
-        item = normalizeResource(item);
-        resource = new Resource(item);
-        return resource.save()
-        .then(resource => {
-          return saved(resource, results.resources);
-        })
-        .catch(error => errored(error, results.resources));
-      }
-    })
-    .then(resource => resources[item.id] = resource);
-    prePromises.push(promise);
-  });
-
-  const eventsData = loadCategoryArray('events');
-  // organize non-master events by master id
   const slaveEvents = {};
-  eventsData.filter(item => item.master_id && item.master_id !== item.id)
-  .forEach(item => {
-    if (! slaveEvents[item.master_id]) {
-      slaveEvents[item.master_id] = [];
-    }
-    slaveEvents[item.master_id].push(item);
-  });
-
   let reservations = {};
-  return Promise.all(prePromises)
+  const eventsData = loadCategoryArray('events');
+
+  return Promise.resolve()
+  .then(() => {
+    let resourcePromises = [];
+    loadCategoryArray('resources').forEach(item => {
+      const promise = Resource.findOne({ oldId: item.id }).exec()
+      .then(resource => {
+        if (resource) {
+          return results.skipped('Resource', resource);
+        } else {
+          item = normalizeResource(item);
+          resource = new Resource(item);
+          return resource.save()
+          .then(resource => results.saved('Resource', resource))
+          .catch(error => results.errored('Resource', resource, error));
+        }
+      })
+      .then(resource => resources[item.id] = resource);
+      resourcePromises.push(promise);
+    });
+    return Promise.all(resourcePromises);
+  })
+  .then(() => {
+    // organize non-master events by master id
+    eventsData.filter(item => item.master_id && item.master_id !== item.id)
+    .forEach(item => {
+      if (! slaveEvents[item.master_id]) {
+        slaveEvents[item.master_id] = [];
+      }
+      slaveEvents[item.master_id].push(item);
+    });
+  })
   .then(() => {
     loadCategoryArray('reservations').forEach(item => {
       if (! reservations[item.event_id]) {
@@ -97,19 +81,19 @@ export default function () {
       const promise = Event.findOne({ oldId: item.id }).exec()
       .then(event => {
         if (event) {
-          return skipped(event, results.events);
+          return results.skipped('Event', event);
         } else {
           item = normalizeEvent(item, slaveEvents, reservations);
           event = new Event(item);
           return event.save()
-          .then(event => saved(event, results.events))
-          .catch(error => errored(error, results.events));
+          .then(event => results.saved('Event', event))
+          .catch(error => results.errored('Event', event, error));
         }
       });
       promises.push(promise);
     });
     return Promise.all(promises);
   })
-  .then(() => console.log('!!! Event', results))
-  .catch(error => console.log('!!! Event catch', error));
+  .then(() => console.log('!!! events done'))
+  .catch(error => console.log('!!! events catch', error, error.stack));
 }

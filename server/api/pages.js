@@ -42,7 +42,7 @@ const populatePage = (page) => {
   .forEach(section => {
     promises.push(
       Message.findOne({
-        library: section.name,
+        libraryId: section.libraryId,
         date: { $gt: date.toString() },
         series: { $ne: true }
       })
@@ -117,6 +117,7 @@ export default function (router) {
           path: 'sections.eventId',
           select: 'name path start end dates times address location'
         },
+        { path: 'sections.libraryId', select: 'name path' },
         { path: 'sections.formTemplateId', select: 'name' }
       ]
     },

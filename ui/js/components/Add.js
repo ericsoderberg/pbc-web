@@ -15,6 +15,12 @@ export default class Add extends Component {
     document.title = this.props.title;
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.default && ! this.props.default) {
+      this.setState({ item: nextProps.default });
+    }
+  }
+
   _onAdd (item) {
     const { category, showable } = this.props;
     postItem(category, item)

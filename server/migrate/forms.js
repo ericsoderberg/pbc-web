@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 import '../db';
 import { loadCategoryArray } from './utils';
+import results from './results';
 
 // FormTemplate + Form
 
@@ -122,32 +123,11 @@ function normalizeForm (item, fields, options, formTemplates, payments,
   return item;
 }
 
-function saved (doc, results) {
-  results.saved += 1;
-  return doc;
-}
-
-function skipped (doc, results) {
-  results.skipped += 1;
-  return doc;
-}
-
-function errored (error, context, results) {
-  console.log('!!! error', context, error);
-  results.errors += 1;
-  throw error;
-}
-
 export default function () {
   const FormTemplate = mongoose.model('FormTemplate');
   const User = mongoose.model('User');
   const Payment = mongoose.model('Payment');
   const Form = mongoose.model('Form');
-  let results = {
-    formTemplates: { saved: 0, skipped: 0, errors: 0 },
-    forms: { saved: 0, skipped: 0, errors: 0 },
-    payments: { saved: 0, skipped: 0, errors: 0 }
-  };
 
   let formTemplates = {}; // oldId => doc
   let payments = {}; // oldId => doc
@@ -155,7 +135,7 @@ export default function () {
 
   return Promise.resolve()
   .then(() => {
-    console.log('!!! FormTemplates');
+    console.log('!!! load forms');
     let options = {}; // old field.id => [item ...]
     loadCategoryArray('form_field_options').forEach(item => {
       if (! options[item.form_field_id]) {
@@ -195,7 +175,7 @@ export default function () {
       promises.push(FormTemplate.findOne({ oldId: item.id }).exec()
       .then(formTemplate => {
         if (formTemplate) {
-          return skipped(formTemplate, results.formTemplates);
+          return results.skipped('FormTemplate', formTemplate);
         } else {
           while (names[item.name] && names[item.name] !== item.id) {
             item.name = `${item.name} 2`;
@@ -204,9 +184,8 @@ export default function () {
             formFields, options);
           formTemplate = new FormTemplate(item);
           return formTemplate.save()
-          .then(formTemplate => saved(formTemplate, results.formTemplates))
-          .catch(error => errored(error, 'save FormTemplate',
-            results.formTemplates));
+          .then(formTemplate => results.saved('FormTemplate', formTemplate))
+          .catch(error => results.errored('FormTemplate', formTemplate, error));
         }
       })
       .then(formTemplate => formTemplates[item.id] = formTemplate));
@@ -214,7 +193,7 @@ export default function () {
     return Promise.all(promises);
   })
   .then(() => {
-    console.log('!!! Users');
+    console.log('!!! find Users');
     // load Users so we can may ids
     return User.find({}).select('oldId').exec()
     .then(users => {
@@ -226,20 +205,20 @@ export default function () {
     });
   })
   .then(() => {
-    console.log('!!! Payments');
+    console.log('!!! load payments');
     // User ids have been mapped, now do payments
     const promises = [];
     loadCategoryArray('payments').forEach(item => {
       promises.push(Payment.findOne({ oldId: item.id }).exec()
       .then(payment => {
         if (payment) {
-          return skipped(payment, results.payments);
+          return results.skipped('Payment', payment);
         } else {
           item = normalizePayment(item, userIds);
           payment = new Payment(item);
           return payment.save()
-          .then(payment => saved(payment, results.payments))
-          .catch(error => errored(error, 'save Payment', results.payments));
+          .then(payment => results.saved('Payment', payment))
+          .catch(error => results.errored('Payment', payment, error));
         }
       })
       .then(payment => payments[item.id] = payment));
@@ -247,7 +226,7 @@ export default function () {
     return Promise.all(promises);
   })
   .then(() => {
-    console.log('!!! Forms');
+    console.log('!!! load filled forms');
     // Form templates and payments have been saved, now do forms
 
     let options = {}; // old filled_field.id => [item ...]
@@ -271,19 +250,19 @@ export default function () {
       promises.push(Form.findOne({ oldId: item.id }).exec()
       .then(form => {
         if (form) {
-          return skipped(form, results.forms);
+          return results.skipped('Form', form);
         } else {
           item = normalizeForm(item, fields, options, formTemplates, payments,
             userIds);
           form = new Form(item);
           return form.save()
-          .then(form => saved(form, results.forms))
-          .catch(error => errored(error, 'save Form', results.forms));
+          .then(form => results.saved('Form', form))
+          .catch(error => results.errored('Form', form, error));
         }
       }));
     });
     return Promise.all(promises);
   })
-  .then(() => console.log('!!! Form', results))
-  .catch(error => console.log('!!! Form catch', error, error.stack, results));
+  .then(() => console.log('!!! forms done'))
+  .catch(error => console.log('!!! forms catch', error, error.stack));
 }

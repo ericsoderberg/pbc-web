@@ -11,6 +11,7 @@ import Loading from '../../components/Loading';
 import PageItem from '../page/PageItem';
 
 const FIXED_FIELDS = ['created', 'modified'];
+const FiXED_LABELS = { created: 'Submitted', modified: 'Updated'};
 
 export default class FormTemplate extends Component {
 
@@ -253,7 +254,9 @@ export default class FormTemplate extends Component {
         (sortReverse ? 'sort sort--reverse' : 'sort') : undefined);
       cells.push(
         <th key={field.name} className={classes}
-          onClick={this._sortForms(field.name)}>{field.name}</th>
+          onClick={this._sortForms(field.name)}>
+          {FiXED_LABELS[field.name]}
+        </th>
       );
     }));
 
@@ -298,7 +301,7 @@ export default class FormTemplate extends Component {
     });
 
     cells = formTemplate.columnFields.map((templateField, index) => (
-      cells[index] || <td key={index}></td>));
+      cells[index] || <td key={index} />));
 
     let classes = 'secondary';
     if (sortFieldId === 'created') {
@@ -453,7 +456,7 @@ export default class FormTemplate extends Component {
     const add = (
       <div className="text">
         <Link to={`forms/add?formTemplateId=${encodeURIComponent(id)}`}
-          className="a-header">Fill Out</Link>
+          className="a-header">Add</Link>
       </div>
     );
 

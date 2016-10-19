@@ -7,7 +7,6 @@ import Stored from './Stored';
 const MAIN_ROUTES = [
   { label: 'Home', path: '/' },
   { label: 'Calendar', path: '/calendar' },
-  { label: 'Messages', path: '/messages' },
   { label: 'Search', path: '/search' }
 ];
 
@@ -51,7 +50,9 @@ class MainNav extends Component {
       }
       return (
         <li key={route.path}>
-          <Link to={route.path} className={classes.join(' ')}>{route.label}</Link>
+          <Link to={route.path} className={classes.join(' ')}>
+            {route.label}
+          </Link>
         </li>
       );
     });
@@ -83,7 +84,9 @@ class MainNav extends Component {
         adminLinks = this._renderLinks(ADMIN_ROUTES);
       }
     } else {
-      sessionControls = <Link className="main-nav__link" to="/sign-in" >Sign In</Link>;
+      sessionControls = (
+        <Link className="main-nav__link" to="/sign-in">Sign In</Link>
+      );
     }
 
     return (

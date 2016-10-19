@@ -60,6 +60,10 @@ export default class LibraryFormContents extends Component {
             <input ref="name" name="name" value={library.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
+          <FormField name="path" label="Path" help="unique url name">
+            <input name="path" value={library.path || ''}
+              onChange={formState.change('path')}/>
+          </FormField>
           {administeredBy}
           <FormField>
             <input name="podcast" type="checkbox"

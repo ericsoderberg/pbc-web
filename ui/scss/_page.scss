@@ -179,7 +179,7 @@
 
 @import 'audio';
 
-.library {
+.library-summary {
   overflow: hidden;
 
   > a {
@@ -201,7 +201,7 @@
   }
 }
 
-.library__message {
+.library-summary__message {
   position: relative;
   display: flex;
 
@@ -242,13 +242,13 @@
   }
 }
 
-.library__message--imaged {
+.library-summary__message--imaged {
   // margin-top: -4px;
   margin-top: $unit;
   margin-bottom: $unit;
 }
 
-.library__message-image {
+.library-summary__message-image {
   position: relative;
   min-width: 100%;
   // margin-bottom: -4px;

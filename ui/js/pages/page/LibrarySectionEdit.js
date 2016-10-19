@@ -20,7 +20,9 @@ export default class LibrarySectionEdit extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ formState: new FormState(nextProps.section, nextProps.onChange) });
+    this.setState({
+      formState: new FormState(nextProps.section, nextProps.onChange)
+    });
   }
 
   render () {
@@ -34,7 +36,7 @@ export default class LibrarySectionEdit extends Component {
     return (
       <fieldset className="form__fields">
         <FormField label="Library">
-          <select name="libraryId" value={section.libraryId || ''}
+          <select name="libraryId" value={(section.libraryId || {})._id || ''}
             onChange={formState.change('libraryId')}>
             {libraryOptions}
           </select>

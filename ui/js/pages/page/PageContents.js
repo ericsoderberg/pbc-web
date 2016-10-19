@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
 import EventSummary from '../event/EventSummary';
-import Library from '../message/Library';
+import LibrarySummary from '../library/LibrarySummary';
 import PageSummaries from './PageSummaries';
 import UserSummary from '../user/UserSummary';
 import Video from '../../components/Video';
@@ -23,8 +23,8 @@ const PageContents = (props) => {
       );
     } else if ('library' === section.type) {
       return (
-        <Library key={index} full={section.full} color={section.color}
-          name={section.name} message={section.message} />
+        <LibrarySummary key={index} full={section.full} color={section.color}
+          id={section.libraryId} message={section.message} />
       );
     } else if ('user' === section.type) {
       return (

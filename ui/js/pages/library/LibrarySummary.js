@@ -8,12 +8,16 @@ import Section from '../../components/Section';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
 
-export default class Library extends Component {
+export default class LibrarySummary extends Component {
 
   constructor (props) {
     super(props);
     this._onScroll = this._onScroll.bind(this);
-    this.state = { offset: 0, message: props.message };
+    this.state = {
+      offset: 0,
+      library: (typeof props.id === 'string' ? props.id : {}),
+      message: props.message
+    };
   }
 
   componentDidMount () {
@@ -22,7 +26,7 @@ export default class Library extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.props.name !== nextProps.name ||
+    if (this.props.id !== nextProps.id ||
       this.props.message !== nextProps.message) {
       this._load(nextProps);
     }
@@ -35,11 +39,23 @@ export default class Library extends Component {
   _load (props) {
     if (props.message) {
       this.setState({ message: props.message });
-    } else if (props.name) {
+    } else if (props.id) {
+
+      let libraryId;
+      if (typeof props.id === 'object') {
+        libraryId = props.id._id;
+        this.setState({ library: props.id });
+      } else {
+        libraryId = props.id;
+        getItem('libraries', props.id)
+        .then(library => this.setState({ library: library }))
+        .catch(error => console.log('!!! LibrarySummary library catch', error));
+      }
+
       let date = moment().subtract(1, 'day');
       getItems('messages', {
         filter: {
-          library: props.name,
+          libraryId: libraryId,
           date: { $gt: date.toString() }
         },
         sort: 'date',
@@ -55,7 +71,7 @@ export default class Library extends Component {
         }
       })
       .then(series => this.setState({ series: series }))
-      .catch(error => console.log('!!! Library catch', error));
+      .catch(error => console.log('!!! LibrarySummary messages catch', error));
     }
   }
 
@@ -70,7 +86,7 @@ export default class Library extends Component {
   }
 
   _renderSeries (series) {
-    let classNames = ['library__message'];
+    let classNames = ['library-summary__message'];
     let image;
     if (series.image) {
       const style = {
@@ -78,10 +94,10 @@ export default class Library extends Component {
         transform: `scale(${1 + (this.state.offset / 600)})`
       };
       image = (
-        <Image ref="image" className="library__message-image"
+        <Image ref="image" className="library-summary__message-image"
           image={series.image} plain={true} style={style} />
       );
-      classNames.push('library__message--imaged');
+      classNames.push('library-summary__message--imaged');
     }
 
     return (
@@ -96,7 +112,7 @@ export default class Library extends Component {
   }
 
   _renderMessage (message) {
-    let classNames = ['library__message'];
+    let classNames = ['library-summary__message'];
     let image;
     if (message.image) {
       const style = {
@@ -104,10 +120,10 @@ export default class Library extends Component {
         transform: `scale(${1 + (this.state.offset / 600)})`
       };
       image = (
-        <Image ref="image" className="library__message-image"
+        <Image ref="image" className="library-summary__message-image"
           image={message.image} plain={true} style={style} />
       );
-      classNames.push('library__message--imaged');
+      classNames.push('library-summary__message--imaged');
     }
 
     return (
@@ -122,10 +138,9 @@ export default class Library extends Component {
     );
   }
 
-  _renderLibrary () {
-    const { name } = this.props;
+  _renderLibrary (library) {
     return (
-      <Button path={`/messages?library=${name}`} right={true}>
+      <Button path={`/libraries/${library.path || library._id}`} right={true}>
         Messages
       </Button>
     );
@@ -133,7 +148,7 @@ export default class Library extends Component {
 
   render () {
     const { color, full } = this.props;
-    const { message } = this.state;
+    const { library, message } = this.state;
     let plain = full;
 
     let contents;
@@ -150,12 +165,12 @@ export default class Library extends Component {
         }
       }
     } else {
-      contents = this._renderLibrary();
+      contents = this._renderLibrary(library);
     }
 
     return (
       <Section color={color} full={full} plain={plain}>
-        <div className="library">
+        <div className="library-summary">
           {contents}
         </div>
       </Section>
@@ -163,8 +178,8 @@ export default class Library extends Component {
   }
 };
 
-Library.propTypes = {
+LibrarySummary.propTypes = {
   message: PropTypes.object,
-  name: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   ...Section.propTypes
 };

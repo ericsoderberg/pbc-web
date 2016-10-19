@@ -5,10 +5,8 @@ import { getItems } from '../actions';
 import PageHeader from './PageHeader';
 import Filter from './Filter';
 import SelectSearch from './SelectSearch';
-import Button from './Button';
 import Stored from './Stored';
 import Loading from './Loading';
-import CloseIcon from '../icons/Close';
 
 class List extends Component {
 
@@ -35,10 +33,11 @@ class List extends Component {
   }
 
   _setStateFromLocation (props) {
-    let filter, filterNames, filterName;
+    let filter, filterNames;
     if (props.location.query.filter) {
       filter = props.location.query.filter;
-      filterName = props.location.query['filter-name'];
+    } else if (props.filter) {
+      filter = props.filter;
     } else if (props.filters) {
       filter = {};
       filterNames = {};
@@ -54,7 +53,7 @@ class List extends Component {
       });
     }
     const searchText = props.location.query.search || '';
-    this.setState({ filter, filterName, filterNames, searchText }, this._get);
+    this.setState({ filter, filterNames, searchText }, this._get);
   }
 
   _get () {
@@ -82,7 +81,9 @@ class List extends Component {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
 
-    if (filters) {
+    if (location.query.filter) {
+      searchParams.push(`filter=${location.query.filter}`);
+    } else if (filters) {
       filters.forEach(filter => {
         const property = filter.property;
         let value, name;
@@ -106,11 +107,6 @@ class List extends Component {
           }
         }
       });
-    }
-
-    if (location.query.filter) {
-      searchParams.push(`filter=${location.query.filter}`);
-      searchParams.push(`filter-name=${location.query['filter-name']}`);
     }
 
     this.context.router.replace({
@@ -183,10 +179,13 @@ class List extends Component {
   }
 
   render () {
-    const { addIfFilter, Item, path, title, marker, sort, session, filters,
-      search, homer } = this.props;
-    const { searchText, filter, filterName, filterNames, mightHaveMore,
-      loadingMore } = this.state;
+    const {
+      actions, addIfFilter, Item, path, title, marker, sort, session,
+      filters, search, homer
+    } = this.props;
+    const {
+      searchText, filter, filterNames, mightHaveMore, loadingMore
+    } = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
@@ -241,26 +240,19 @@ class List extends Component {
       });
     }
 
-    if (filterName) {
-      filterItems.push(
-        <div key="filter" className="box--row box--static">
-          <span>{filterName}</span>
-          <Button icon={<CloseIcon />} plain={true}
-            onClick={this._removeFilter} />
-        </div>
-      );
-    }
-
-    let actions = [];
+    let listActions = [];
     if ((! addIfFilter || (filter || {})[addIfFilter]) && session &&
       (session.administrator || session.administratorDomainId)) {
       let addPath = `${path}/add`;
       if (addIfFilter) {
         addPath += `?${addIfFilter}=${encodeURIComponent(filter[addIfFilter])}`;
       }
-      actions.push(
+      listActions.push(
         <Link key="add" to={addPath} className="a-header">Add</Link>
       );
+    }
+    if (actions) {
+      listActions.push(actions);
     }
 
     let onSearch;
@@ -272,7 +264,7 @@ class List extends Component {
     if (loadingMore) {
       more = <Loading />;
     } else if (mightHaveMore) {
-      more = <div ref="more"></div>;
+      more = <div ref="more" />;
     } else if (items.length > 20) {
       more = <div className="list__count">{items.length}</div>;
     }
@@ -280,7 +272,7 @@ class List extends Component {
     return (
       <main>
         <PageHeader title={title} homer={homer} focusOnSearch={true}
-          searchText={searchText} onSearch={onSearch} actions={actions} />
+          searchText={searchText} onSearch={onSearch} actions={listActions} />
         <div className="list__header">
           {filterItems}
         </div>
@@ -294,8 +286,10 @@ class List extends Component {
 };
 
 List.propTypes = {
+  actions: PropTypes.node,
   addIfFilter: PropTypes.string,
   category: PropTypes.string,
+  filter: PropTypes.object,
   filters: PropTypes.arrayOf(PropTypes.shape({
     allLabel: PropTypes.string.isRequired,
     category: PropTypes.string,

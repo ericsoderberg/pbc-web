@@ -8,7 +8,7 @@ const Item = (props) => {
   let classNames = ['item__container', className];
   return (
     <Link className={classNames.join(' ')}
-      to={`/libraries/${library._id}/edit`}>
+      to={`/libraries/${library.path || library._id}`}>
       <div className="item">
         <span className="item__name">{library.name}</span>
       </div>

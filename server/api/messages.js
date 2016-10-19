@@ -12,7 +12,7 @@ const populateMessage = (message) => {
 
   // nextMessage
   const nextPromise = Doc.find({
-    library: message.library,
+    libraryId: message.libraryId,
     date: { $gt: message.date },
     series: { $ne: true }
   })
@@ -20,7 +20,7 @@ const populateMessage = (message) => {
 
   // previousMessage
   const previousPromise = Doc.find({
-    library: message.library,
+    libraryId: message.libraryId,
     date: { $lt: message.date },
     series: { $ne: true }
   })
@@ -50,7 +50,10 @@ const unsetReferences = (data) => {
 export default function (router) {
   register(router, 'messages', 'Message', {
     populate: {
-      get: { path: 'seriesId', select: 'name path' }
+      get: [
+        { path: 'seriesId', select: 'name path' },
+        { path: 'libraryId', select: 'name path' }
+      ]
     },
     transformIn: {
       put: unsetReferences

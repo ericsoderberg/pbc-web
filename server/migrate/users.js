@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 import '../db';
 import { imageData, loadCategoryArray } from './utils';
+import results from './results';
 
 // User
 
@@ -38,28 +39,24 @@ function normalizeUser (item) {
 export default function () {
   const User = mongoose.model('User');
   let promises = [];
-  let results = { saved: 0, skipped: 0, errors: 0 };
 
   loadCategoryArray('users').forEach(item => {
     const promise = User.findOne({ oldId: item.id }).exec()
     .then(user => {
       if (user) {
-        results.skipped += 1;
+        return results.skipped('User', user);
       } else {
         item = normalizeUser(item);
         const user = new User(item);
         return user.save()
-        .then(() => results.saved += 1)
-        .catch(error => {
-          console.log('!!! User save error', user, error);
-          results.errors += 1;
-        });
+        .then((user) => results.saved('User', user))
+        .catch(error => results.errored('User', user, error));
       }
     });
     promises.push(promise);
   });
 
   return Promise.all(promises)
-  .then(() => console.log('!!! User', results))
-  .catch(error => console.log('!!! User catch', error));
+  .then(() => console.log('!!! users done'))
+  .catch(error => console.log('!!! users catch', error, error.stack));
 }

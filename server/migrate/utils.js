@@ -35,10 +35,9 @@ export function loadCategoryArray (category) {
   });
 }
 
-export function copyFile (item) {
+export function copyFile (item, subPath) {
   return new Promise((resolve, reject) => {
-    const oldPath =
-      `${SOURCE_DIR}system/message_files/${item.id}/${item.file_file_name}`;
+    const oldPath = `${SOURCE_DIR}system/${subPath}`;
     if (! fs.existsSync(oldPath)) {
       reject(`!!! Missing ${oldPath}`);
     } else {
