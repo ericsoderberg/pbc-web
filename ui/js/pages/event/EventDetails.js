@@ -180,6 +180,12 @@ export default class EventDetails extends Component {
             <input name="path" value={event.path || ''}
               onChange={formState.change('path')}/>
           </FormField>
+          <FormField>
+            <input name="private" type="checkbox"
+              checked={event.private || false}
+              onChange={formState.toggle('private')}/>
+            <label htmlFor="private">private</label>
+          </FormField>
           {administeredBy}
           {primaryEvent}
         </fieldset>

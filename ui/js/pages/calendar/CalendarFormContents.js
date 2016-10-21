@@ -55,6 +55,12 @@ export default class CalendarFormContents extends Component {
             <input name="path" value={calendar.path || ''}
               onChange={formState.change('path')}/>
           </FormField>
+          <FormField>
+            <input name="private" type="checkbox"
+              checked={calendar.private || false}
+              onChange={formState.toggle('private')}/>
+            <label htmlFor="private">private</label>
+          </FormField>
           {administeredBy}
         </fieldset>
       </div>
