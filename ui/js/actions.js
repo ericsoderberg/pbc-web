@@ -288,6 +288,11 @@ export function getCalendar (options={}) {
   if (options.id) {
     params.push(`id=${encodeURIComponent(options.id)}`);
   }
+  if (options.ids) {
+    options.ids.forEach(id => {
+      params.push(`id=${encodeURIComponent(id)}`);
+    });
+  }
   const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/calendar${q}`, {
     method: 'GET', headers: _headers })

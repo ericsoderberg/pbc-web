@@ -234,6 +234,18 @@
   }
 }
 
+.filter-item {
+  padding: $quarter-unit 0;
+
+  > * {
+    flex: 0 0 auto;
+  }
+
+  > label {
+    white-space: nowrap;
+  }
+}
+
 .a-header,
 .button-header,
 .select-header {

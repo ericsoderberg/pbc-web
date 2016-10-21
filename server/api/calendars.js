@@ -24,13 +24,18 @@ export default function (router) {
     // if we have an id, get the calendar by _id or path
     let promise;
     if (id) {
-      const criteria = ID_REGEXP.test(id) ? {_id: id} : {path: id};
-      promise = Calendar.findOne(criteria).exec();
+      let criteria;
+      if (Array.isArray(id)) {
+        criteria = { $or: id.map(id2 => ({ _id: id2 })) };
+      } else {
+        criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+      }
+      promise = Calendar.find(criteria).exec();
     } else {
-      promise = Promise.resolve(undefined);
+      promise = Promise.resolve([]);
     }
 
-    promise.then(calendar => {
+    promise.then(calendars => {
       const date = moment(req.query.date || undefined);
       const start = moment(date).startOf('month').startOf('week');
       const end = moment(date).endOf('month').endOf('week');
@@ -46,14 +51,16 @@ export default function (router) {
         const exp = new RegExp(req.query.search, 'i');
         q.name = exp;
       }
-      if (calendar) {
-        q = { ...q, calendarId: calendar._id };
+      if (calendars.length > 0) {
+        q = { ...q,
+          $or: calendars.map(calendar => ( { calendarId: calendar._id }))
+        };
       }
       Event.find(q)
       .sort('start')
       .exec()
       .then(docs => {
-        calendar = (calendar ? calendar.toObject() : {});
+        const calendar = calendars.length === 1 ? calendars[0].toObject() : {};
         res.status(200).json({
           ...calendar,
           date: date,

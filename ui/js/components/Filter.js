@@ -42,7 +42,8 @@ export default class Filter extends Component {
           value={value} onChange={onChange} onBlur={this._onBlur}>
           {optionElements}
         </select>
-        <button className="filter__control button-icon" onClick={this._onActivate}>
+        <button className="filter__control button-icon"
+          onClick={this._onActivate}>
           <FilterIcon />
         </button>
       </div>

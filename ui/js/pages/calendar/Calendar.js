@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import moment from 'moment';
 import { getCalendar, getItems } from '../../actions';
 import PageHeader from '../../components/PageHeader';
-import Filter from '../../components/Filter';
+import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
@@ -22,9 +22,12 @@ export default class Calendar extends Component {
     this._onSearch = this._onSearch.bind(this);
     this._onFilter = this._onFilter.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
-    this._load = this._load.bind(this);
     this.state = {
-      calendar: { events: [] }, days: {}, calendars: [], searchText: ''
+      activeCalendars: {},
+      calendar: { events: [] },
+      days: {},
+      calendars: [],
+      searchText: ''
     };
   }
 
@@ -34,9 +37,9 @@ export default class Calendar extends Component {
     this._load(this.props);
 
     // Load the possible calendars
-    getItems('calendars', { select: 'name' })
+    getItems('calendars', { select: 'name', sort: 'name' })
     .then(calendars => this.setState({ calendars: calendars }))
-    .catch(error => console.log('!!! Calendar filter catch', error));
+    .catch(error => console.log('!!! Calendar calendars catch', error));
 
     window.addEventListener("keydown", this._onKeyDown);
   }
@@ -51,10 +54,12 @@ export default class Calendar extends Component {
     window.removeEventListener("keydown", this._onKeyDown);
   }
 
-  _load () {
+  _load (props) {
+    const { params: { id } } = this.props;
+    const { activeCalendars, date, searchText } = this.state;
     this.setState({ loading: true });
-    getCalendar({ date: this.state.date, searchText: this.state.searchText,
-      id: this.props.params.id})
+    const ids = Object.keys(activeCalendars);
+    getCalendar({ date, searchText, id, ids })
     .then(calendar => {
 
       // structure by day to make rendering more efficient
@@ -86,7 +91,7 @@ export default class Calendar extends Component {
   _throttledLoad () {
     // throttle gets when user is typing
     clearTimeout(this._getTimer);
-    this._getTimer = setTimeout(this._load, 100);
+    this._getTimer = setTimeout(this._load.bind(this, this.props), 100);
   }
 
   _changeDate (date) {
@@ -126,6 +131,19 @@ export default class Calendar extends Component {
     } else if (RIGHT_KEY === key) {
       this.setState({ date: moment(calendar.next) }, this._get);
     }
+  }
+
+  _toggleCalendar (id) {
+    return () => {
+      let nextActiveCalendars = { ...this.state.activeCalendars };
+      if (nextActiveCalendars[id]) {
+        delete nextActiveCalendars[id];
+      } else {
+        nextActiveCalendars[id] = true;
+      }
+      this.setState({ activeCalendars: nextActiveCalendars },
+        this._throttledLoad);
+    };
   }
 
   _renderDaysOfWeek () {
@@ -227,23 +245,46 @@ export default class Calendar extends Component {
     return weeks;
   }
 
+  _renderFilter () {
+    const { activeCalendars, calendars } = this.state;
+    const controls = calendars.map(calendar => (
+      <div key={calendar._id} className="filter-item box--row">
+        <input id={calendar._id} name={calendar._id} type="checkbox"
+          checked={activeCalendars[calendar._id] || false}
+          onChange={this._toggleCalendar(calendar._id)} />
+        <label htmlFor={calendar._id}>{calendar.name}</label>
+      </div>
+    ));
+    controls.unshift(
+      <div key="all" className="filter-item box--row">
+        <input id="all-calendars" name="all-calendars" type="checkbox"
+          checked={Object.keys(activeCalendars).length === 0}
+          onChange={() => this.setState({ activeCalendars: {} },
+            this._throttledLoad)} />
+        <label htmlFor="all-calendars">All</label>
+      </div>
+    );
+    return (
+      <div className="page-header__drop box--column">
+        {controls}
+      </div>
+    );
+  }
+
   render () {
     const { params: { id } } = this.props;
-    const { calendar, filterOptions, searchText, filter, loading } = this.state;
+    const { calendar, filterActive, searchText, loading } = this.state;
     const date = moment(calendar.date);
     const daysOfWeek = this._renderDaysOfWeek();
     const weeks = loading ? undefined : this._renderWeeks();
     const loadingIndicator = loading ? <Loading /> : undefined;
 
-    let actions = [];
-    if (filterOptions && filterOptions.length > 1) {
-      actions.push(
-        <Filter key='calendar' options={filterOptions}
-          value={filter ? filter.calendar : undefined}
-          onChange={this._onFilter} />
-      );
+    let filter;
+    if (filterActive) {
+      filter = this._renderFilter();
     }
 
+    let actions = [];
     if (id) {
       actions.push(
         <Link key="add" to={`/events/add?calendarId=${encodeURIComponent(id)}`}
@@ -252,6 +293,17 @@ export default class Calendar extends Component {
       actions.push(
         <Link key="edit" to={`/calendars/${id}/edit`}
           className="a-header">Edit</Link>
+      );
+    } else {
+      actions.push(
+        <nav key="filter" className="page-header__actions">
+          <span className="page-header__dropper">
+            <Button label="Calendars" className="button-header"
+              onClick={() => this.setState({
+                filterActive: ! this.state.filterActive})}/>
+            {filter}
+          </span>
+        </nav>
       );
     }
 

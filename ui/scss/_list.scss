@@ -126,6 +126,11 @@ button.item__container {
   }
 }
 
+.box--column {
+  display: flex;
+  flex-direction: column;
+}
+
 .box--between {
   display: flex;
   flex-direction: row;
