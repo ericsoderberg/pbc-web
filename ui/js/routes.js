@@ -1,6 +1,9 @@
 import App from './components/App';
 import Home from './pages/home/Home';
+import Calendars from './pages/calendar/Calendars';
+import CalendarAdd from './pages/calendar/CalendarAdd';
 import Calendar from './pages/calendar/Calendar';
+import CalendarEdit from './pages/calendar/CalendarEdit';
 import Domains from './pages/domain/Domains';
 import DomainAdd from './pages/domain/DomainAdd';
 import Domain from './pages/domain/Domain';
@@ -60,6 +63,10 @@ export default {
   component: App,
   indexRoute: { component: Home },
   childRoutes: [
+    { path: 'calendars/add', component: CalendarAdd },
+    { path: 'calendars/:id', component: Calendar },
+    { path: 'calendars/:id/edit', component: CalendarEdit },
+    { path: 'calendars', component: Calendars },
     { path: 'calendar', component: Calendar },
     { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },

@@ -25,7 +25,7 @@ export default class EventDetails extends Component {
     this._onStartChange = this._onStartChange.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
     this._onChangePrimaryEvent = this._onChangePrimaryEvent.bind(this);
-    this.state = { domains: [] };
+    this.state = { domains: [], calendars: [] };
   }
 
   componentDidMount () {
@@ -33,11 +33,15 @@ export default class EventDetails extends Component {
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
-      .then(response => this.setState({ domains: response }))
+      .then(domains => this.setState({ domains: domains }))
       .catch(error => console.log('EventFormContents catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
+
+    getItems('calendars', { sort: 'name' })
+    .then(calendars => this.setState({ calendars: calendars }))
+    .catch(error => console.log('EventFormContents calendars catch', error));
   }
 
   _onStartChange (start) {
@@ -78,6 +82,7 @@ export default class EventDetails extends Component {
 
   render () {
     const { formState, session } = this.props;
+    const { calendars, domains } = this.state;
     const event = formState.object;
 
     let primaryEvent;
@@ -117,19 +122,24 @@ export default class EventDetails extends Component {
 
     let administeredBy;
     if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
+      let domainOptions = domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
-      domains.unshift(<option key={0} />);
+      domainOptions.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by">
           <select name="domainId" value={event.domainId || ''}
             onChange={formState.change('domainId')}>
-            {domains}
+            {domainOptions}
           </select>
         </FormField>
       );
     }
+
+    let calendarOptions = calendars.map(calendar => (
+      <option key={calendar._id} label={calendar.name} value={calendar._id} />
+    ));
+    calendarOptions.unshift(<option key={0} />);
 
     return (
       <div>
@@ -161,8 +171,10 @@ export default class EventDetails extends Component {
               onChange={formState.change('text')}/>
           </FormField>
           <FormField label="Calendar">
-            <input name="calendar" value={event.calendar || ''}
-              onChange={formState.change('calendar')}/>
+            <select name="calendarId" value={event.calendarId || ''}
+              onChange={formState.change('calendarId')}>
+              {calendarOptions}
+            </select>
           </FormField>
           <FormField label="Path" help="unique url name">
             <input name="path" value={event.path || ''}

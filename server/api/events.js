@@ -67,7 +67,9 @@ function resourceIdsWithEvents (events) {
         if (! resourceIdsEvents[stringId]) {
           resourceIdsEvents[stringId] = [];
         }
-        resourceIdsEvents[stringId].push({ _id: event2._id, name: event2.name });
+        resourceIdsEvents[stringId].push(
+          { _id: event2._id, name: event2.name }
+        );
       });
     }
   });

@@ -24,6 +24,7 @@ const ADMIN_ROUTES = [
   { label: 'People', path: '/users' },
   { label: 'Resources', path: '/resources' },
   { label: 'Domains', path: '/domains' },
+  { label: 'Calendars', path: '/calendars' },
   { label: 'Libraries', path: '/libraries' },
   { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' }

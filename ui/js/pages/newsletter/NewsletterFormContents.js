@@ -15,17 +15,20 @@ export default class NewsletterFormContents extends Component {
     const { formState, session } = this.props;
 
     getItems('libraries', { sort: 'name' })
-    .then(response => this.setState({ libraries: response }))
-    .catch(error => console.log('NewsletterFormContents libraries catch', error));
+    .then(libraries => this.setState({ libraries: libraries }))
+    .catch(error => console.log('NewsletterFormContents libraries catch',
+      error));
 
-    getItems('events', { distinct: 'calendar' })
+    getItems('calendars', { sort: 'name' })
     .then(calendars => this.setState({ calendars: calendars }))
-    .catch(error => console.log('!!! NewsletterFormContents calendars catch', error));
+    .catch(error => console.log('NewsletterFormContents calendars catch',
+      error));
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
-      .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('NewsletterFormContents domains catch', error));
+      .then(domains => this.setState({ domains: domains }))
+      .catch(error => console.log('NewsletterFormContents domains catch',
+        error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
@@ -33,29 +36,30 @@ export default class NewsletterFormContents extends Component {
 
   render () {
     const { formState, session } = this.props;
+    const { calendars, domains, libraries } = this.state;
     const newsletter = formState.object;
 
-    let libraryOptions = this.state.libraries.map(library => (
+    let libraryOptions = libraries.map(library => (
       <option key={library._id} label={library.name} value={library._id} />
     ));
     libraryOptions.unshift(<option key={0} />);
 
-    const calendars = this.state.calendars.map(calendar => (
-      <option key={calendar} label={calendar} value={calendar} />
+    let calendarOptions = calendars.map(calendar => (
+      <option key={calendar._id} label={calendar.name} value={calendar._id} />
     ));
-    calendars.unshift(<option key={0} />);
+    calendarOptions.unshift(<option key={0} />);
 
     let administeredBy;
     if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
+      let domainOptions = domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
-      domains.unshift(<option key={0} />);
+      domainOptions.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by">
           <select name="domainId" value={newsletter.domainId || ''}
             onChange={formState.change('domainId')}>
-            {domains}
+            {domainOptions}
           </select>
         </FormField>
       );
@@ -83,9 +87,9 @@ export default class NewsletterFormContents extends Component {
           </select>
         </FormField>
         <FormField label="Calendar">
-          <select name="calendar" value={newsletter.calendar || ''}
-            onChange={formState.change('calendar')}>
-            {calendars}
+          <select name="calendarId" value={newsletter.calendarId || ''}
+            onChange={formState.change('calendarId')}>
+            {calendarOptions}
           </select>
         </FormField>
         <FormField label="Address">

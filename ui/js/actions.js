@@ -11,7 +11,8 @@ const processStatus = (response) => {
   if (response.ok) {
     return Promise.resolve(response);
   } else {
-    return response.json().then(json => Promise.reject(json || response.statusText));
+    return response.json()
+    .then(json => Promise.reject(json || response.statusText));
   }
 };
 
@@ -119,7 +120,9 @@ export function getItems (category, options={}) {
     params.push(`distinct=${encodeURIComponent(options.distinct)}`);
   }
   if (options.populate) {
-    params.push(`populate=${encodeURIComponent(JSON.stringify(options.populate))}`);
+    params.push(
+      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`
+    );
   }
   if (options.limit) {
     params.push(`limit=${encodeURIComponent(options.limit)}`);
@@ -147,7 +150,9 @@ export function getItem (category, id, options={}) {
     params.push(`select=${encodeURIComponent(options.select)}`);
   }
   if (options.populate) {
-    params.push(`populate=${encodeURIComponent(JSON.stringify(options.populate))}`);
+    params.push(
+      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`
+    );
   }
   const q = params.length > 0 ? `?${params.join('&')}`: '';
   return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
@@ -280,8 +285,8 @@ export function getCalendar (options={}) {
   if (options.date) {
     params.push(`date=${encodeURIComponent(options.date.toISOString())}`);
   }
-  if (options.filter) {
-    params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
+  if (options.id) {
+    params.push(`id=${encodeURIComponent(options.id)}`);
   }
   const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/calendar${q}`, {

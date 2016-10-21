@@ -100,9 +100,20 @@ const pageSchema = Schema({
 
 mongoose.model('Page', pageSchema);
 
+const calendarSchema = Schema({
+  created: Date,
+  domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  modified: Date,
+  name: {type: String, required: true},
+  path: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+});
+
+mongoose.model('Calendar', calendarSchema);
+
 const eventSchema = Schema({
   address: String, // mappable
-  calendar: String,
+  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   created: Date,
   dates: [Date],
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
@@ -300,7 +311,7 @@ mongoose.model('Site', siteSchema);
 
 const newsletterSchema = Schema({
   address: String,
-  calendar: String,
+  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   created: Date,
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },

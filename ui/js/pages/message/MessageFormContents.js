@@ -24,13 +24,14 @@ export default class MessageFormContents extends Component {
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
-      .then(response => this.setState({ domains: response }))
+      .then(domains => this.setState({ domains: domains }))
       .catch(error => console.log('MessageFormContents domains catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
+
     getItems('libraries', { sort: 'name' })
-    .then(response => this.setState({ libraries: response }))
+    .then(libraries => this.setState({ libraries: libraries }))
     .catch(error => console.log('MessageFormContents libraries catch', error));
   }
 
@@ -112,6 +113,7 @@ export default class MessageFormContents extends Component {
 
   render () {
     const { formState, session } = this.props;
+    const { domains, libraries } = this.state;
     const message = formState.object;
 
     const textHelp = (
@@ -150,21 +152,21 @@ export default class MessageFormContents extends Component {
 
     let administeredBy;
     if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
+      let domainOptions = domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
-      domains.unshift(<option key={0} />);
+      domainOptions.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by">
           <select name="domainId" value={message.domainId || ''}
             onChange={formState.change('domainId')}>
-            {domains}
+            {domainOptions}
           </select>
         </FormField>
       );
     }
 
-    let libraryOptions = this.state.libraries.map(library => (
+    let libraryOptions = libraries.map(library => (
       <option key={library._id} label={library.name} value={library._id} />
     ));
     libraryOptions.unshift(<option key={0} />);

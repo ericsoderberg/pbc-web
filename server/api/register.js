@@ -26,8 +26,7 @@ export default (router, category, modelName, options={}) => {
     router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       const Doc = mongoose.model(modelName);
-      const criteria = ID_REGEXP.test(id) ?
-        {_id: id} : {path: id};
+      const criteria = ID_REGEXP.test(id) ? {_id: id} : {path: id};
       let query = Doc.findOne(criteria);
       if (req.query.select) {
         query.select(req.query.select);

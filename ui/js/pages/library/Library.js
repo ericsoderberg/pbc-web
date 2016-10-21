@@ -78,7 +78,3 @@ Library.propTypes = {
     id: PropTypes.string.isRequired
   })
 };
-
-Library.contextTypes = {
-  router: PropTypes.any
-};
