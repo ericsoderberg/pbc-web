@@ -48,14 +48,23 @@ export default class PageMap extends Component {
   _renderMap () {
     const rows = this.state.rows.map((row, index) => {
       const pages = row.map(page => {
-        const path = `/pages/${page._id}/map`;
-        const secondary = ! this.context.router.isActive(path);
-        return (
-          <Button key={page._id} className="page-map__page"
-            secondary={secondary} path={path} replaceHistory={true}>
-            {page.name}
-          </Button>
-        );
+        const path = `/pages/${page._id}`;
+        if (this.context.router.isActive(`${path}/map`)) {
+          return (
+            <Button key={page._id} className="page-map__page"
+              right={true} path={path} replaceHistory={true}>
+              {page.name}
+            </Button>
+          );
+        } else {
+          return (
+            <Button key={page._id} className="page-map__page"
+              secondary={true} path={`${path}/map`}
+              replaceHistory={true}>
+              {page.name}
+            </Button>
+          );
+        }
       });
       return (
         <div key={index} className="page-map__row">

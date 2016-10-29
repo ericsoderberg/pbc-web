@@ -12,11 +12,11 @@ import pages from './pages';
 import results from './results';
 
 Promise.resolve()
-// .then(() => users())
-// .then(() => messages())
-// .then(() => libraries())
-// .then(() => events())
-// .then(() => forms())
+.then(() => users())
+.then(() => messages())
+.then(() => libraries())
+.then(() => events())
+.then(() => forms())
 .then(() => pages())
 .then(() => console.log(results.log()))
 .then(() => console.log(`!!! Finished`))

@@ -2,12 +2,12 @@
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 import '../db';
-import { loadCategoryArray } from './utils';
+import { imageData, loadCategoryArray } from './utils';
 import results from './results';
 
 // Page
 
-function normalizePage (item) {
+function normalizePage (item, contacts, userIds) {
   item.oldId = item.id;
   item.created = item.created_at || undefined;
   item.modified = item.updated_at || undefined;
@@ -18,14 +18,39 @@ function normalizePage (item) {
       type: 'text'
     });
   }
+  if (contacts[item.id]) {
+    const people = contacts[item.id].map(item2 => {
+      let image;
+      if (item2.portrait_file_name) {
+        image = {
+          data: imageData('portraits', item2.id, item2.portrait_file_name,
+            item2.portrait_content_type),
+          name: item2.portrait_file_name,
+          size: item2.portrait_file_size || undefined,
+          type: item2.portrait_content_type
+        };
+      }
+      return {
+        id: userIds[item2.user_id],
+        image: image,
+        text: `${item2.role ? '### ' + item2.role : ''} ${item2.bio}`
+      };
+    });
+    item.sections.push({
+      people: people,
+      type: 'people'
+    });
+  }
   return item;
 }
 
 export default function () {
   const Page = mongoose.model('Page');
+  const User = mongoose.model('User');
   let pages = {}; // oldId => doc
   let childOldIds = {}; // oldId => [oldId, ...]
   let contacts = {}; // oldId => item
+  let userIds = {}; // oldId => _id
   const pagesData = loadCategoryArray('pages');
 
   return Promise.resolve()
@@ -35,6 +60,18 @@ export default function () {
         contacts[item.page_id] = [];
       }
       contacts[item.page_id].push(item);
+    });
+  })
+  .then(() => {
+    console.log('!!! find Users');
+    // load Users so we can map ids
+    return User.find({}).select('oldId').exec()
+    .then(users => {
+      users.forEach(user => {
+        if (user.oldId) {
+          userIds[user.oldId] = user._id;
+        }
+      });
     });
   })
   .then(() => {
@@ -55,7 +92,7 @@ export default function () {
         if (page) {
           return results.skipped('Page', page);
         } else {
-          item = normalizePage(item);
+          item = normalizePage(item, contacts, userIds);
           page = new Page(item);
           return page.save()
           .then(page => results.saved('Page', page))

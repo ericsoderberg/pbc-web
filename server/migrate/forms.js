@@ -194,7 +194,7 @@ export default function () {
   })
   .then(() => {
     console.log('!!! find Users');
-    // load Users so we can may ids
+    // load Users so we can map ids
     return User.find({}).select('oldId').exec()
     .then(users => {
       users.forEach(user => {

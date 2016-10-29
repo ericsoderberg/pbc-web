@@ -10,8 +10,14 @@ export function descape (string) {
 }
 
 export function imageData (category, id, name, type) {
-  const binaryData =
-    fs.readFileSync(`${SOURCE_DIR}system/${category}/${id}/original/${name}`);
+  let binaryData;
+  if (fs.existsSync(`${SOURCE_DIR}optimized/${category}/${name}`)) {
+    binaryData =
+      fs.readFileSync(`${SOURCE_DIR}optimized/${category}/${name}`);
+  } else {
+    binaryData =
+      fs.readFileSync(`${SOURCE_DIR}system/${category}/${id}/original/${name}`);
+  }
   const base64Data = new Buffer(binaryData, 'binary').toString('base64');
   return `data:${type};base64,${base64Data}`;
 }

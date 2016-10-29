@@ -274,18 +274,16 @@
 }
 
 .person-summary {
-  max-width: 240px;
+  width: 240px;
+  text-decoration: none;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
 }
 
-// .person-summary__summary {
-//   padding: $unit 0;
-// }
-
 .person-summary__image {
-  max-width: $tile-width;
+  max-width: 100%;
 }
 
 .page-summaries,
@@ -296,10 +294,9 @@
     flex-direction: row;
     flex-wrap: wrap;
     max-width: $page-width;
-    margin: $double-unit auto;
 
     > * {
-      margin: $half-unit;
+      padding: $half-unit;
     }
   }
 
@@ -314,7 +311,24 @@
 }
 
 .page-summaries {
-  justify-content: center;
+  @media all and (min-width: 700px) {
+    justify-content: center;
+    margin: $double-unit auto;
+
+    > * {
+      margin: $half-unit;
+    }
+  }
+}
+
+.people-summaries {
+  @media all and (min-width: 700px) {
+    margin: 0 auto;
+
+    > * {
+      padding: $half-unit;
+    }
+  }
 }
 
 .page-tile {
