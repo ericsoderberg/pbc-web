@@ -5,7 +5,7 @@ import Image from '../../components/Image';
 import EventSummary from '../event/EventSummary';
 import LibrarySummary from '../library/LibrarySummary';
 import PageSummaries from './PageSummaries';
-import UserSummary from '../user/UserSummary';
+import PeopleSummary from './PeopleSummary';
 import Video from '../../components/Video';
 import FormSummary from '../form/FormSummary';
 
@@ -26,10 +26,10 @@ const PageContents = (props) => {
         <LibrarySummary key={index} full={section.full} color={section.color}
           id={section.libraryId} message={section.message} />
       );
-    } else if ('user' === section.type) {
+    } else if ('people' === section.type) {
       return (
-        <UserSummary key={index} full={section.full} color={section.color}
-          id={section.userId} />
+        <PeopleSummary key={index} full={section.full} color={section.color}
+          people={section.people} />
       );
     } else if ('pages' === section.type) {
       return (

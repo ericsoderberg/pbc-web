@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
+import TextHelp from '../../components/TextHelp';
 import AddIcon from '../../icons/Add';
 import TrashIcon from '../../icons/Trash';
 
@@ -62,7 +63,9 @@ export default class EmailListFormContents extends Component {
       const emailList = formState.object;
       const exp = new RegExp(searchText, 'i');
       addresses = emailList.addresses
-      .filter(address => exp.test(address.address) || exp.test(address.userId.name));
+      .filter(address => (
+        exp.test(address.address) || exp.test(address.userId.name)
+      ));
     }
     this.setState({ addresses: addresses, searchText: searchText });
   }
@@ -70,11 +73,6 @@ export default class EmailListFormContents extends Component {
   render () {
     const { formState, session } = this.props;
     const emailList = formState.object;
-
-    const textHelp = (
-      <a href="http://daringfireball.net/projects/markdown/syntax"
-        target="_blank">Markdown syntax</a>
-    );
 
     let administeredBy;
     if (session.administrator) {
@@ -136,7 +134,7 @@ export default class EmailListFormContents extends Component {
             <input name="name" value={emailList.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
-          <FormField name="text" label="Description" help={textHelp}>
+          <FormField name="text" label="Description" help={<TextHelp />}>
             <textarea name="text" value={emailList.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>

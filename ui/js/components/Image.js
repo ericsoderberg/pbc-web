@@ -4,8 +4,11 @@ import Section from './Section';
 
 export default class Image extends Component {
   render () {
-    const { image, full, plain, style } = this.props;
+    const { avatar, image, full, plain, style } = this.props;
     let classNames = ['image'];
+    if (avatar) {
+      classNames.push('image--avatar');
+    }
     if (this.props.className) {
       classNames.push(this.props.className);
     }
@@ -20,6 +23,7 @@ export default class Image extends Component {
 };
 
 Image.propTypes = {
+  avatar: PropTypes.bool,
   image: PropTypes.shape({
     data: PropTypes.string.isRequired
   }),

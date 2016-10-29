@@ -12,7 +12,7 @@ const Item = (props) => {
     <Link className={classNames.join(' ')} to={`/users/${user._id}`}>
       <div className="item">
         <span className="box--row">
-          <img className="avatar" src={user.avatar ? user.avatar.data : ''} />
+          <img className="avatar" src={user.image ? user.image.data : ''} />
           <span className="item__name">{user.name}</span>
           <span>{admin}</span>
         </span>

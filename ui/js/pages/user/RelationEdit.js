@@ -1,8 +1,9 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
-import FormState from '../../utils/FormState';
 import DateTime from '../../components/DateTime';
+import TextHelp from '../../components/TextHelp';
+import FormState from '../../utils/FormState';
 
 export default class RelationEdit extends Component {
 
@@ -13,17 +14,14 @@ export default class RelationEdit extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ formState: new FormState(nextProps.relation, nextProps.onChange) });
+    this.setState({
+      formState: new FormState(nextProps.relation, nextProps.onChange)
+    });
   }
 
   render () {
     const { formState } = this.state;
     const relation = formState.object;
-
-    const textHelp = (
-      <a href="http://daringfireball.net/projects/markdown/syntax"
-        target="_blank">Markdown syntax</a>
-    );
 
     return (
       <fieldset className="form__fields">
@@ -47,7 +45,7 @@ export default class RelationEdit extends Component {
             value={relation.grade || ''}
             onChange={formState.change('grade')}/>
         </FormField>
-        <FormField name="notes" label="Notes" help={textHelp}>
+        <FormField name="notes" label="Notes" help={<TextHelp />}>
           <textarea name="notes" value={relation.notes || ''} rows={4}
             onChange={formState.change('notes')}/>
         </FormField>

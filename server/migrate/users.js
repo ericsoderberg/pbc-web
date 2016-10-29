@@ -15,7 +15,7 @@ function normalizeUser (item) {
   item.created = item.created_at;
   item.modified = item.updated_at;
   if (item.portrait_file_size) {
-    item.avatar = {
+    item.image = {
       data: imageData('portraits', item.id, item.portrait_file_name,
         item.portrait_content_type),
       name: item.portrait_file_name,
@@ -23,7 +23,7 @@ function normalizeUser (item) {
       type: item.portrait_content_type
     };
   } else if (item.avatar_file_size) {
-    item.avatar = {
+    item.image = {
       data: imageData('avatars', item.id, item.avatar_file_name,
         item.portrait_content_type),
       name: item.avatar_file_name,

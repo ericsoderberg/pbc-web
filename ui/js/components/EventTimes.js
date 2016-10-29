@@ -79,7 +79,7 @@ const EventTimes = (props) => {
     return (
       <div className="event-times">
         <span className="event-times__times">{times}</span>
-        <span className="event-times__separator"></span>
+        <span className="event-times__separator" />
         <span className="event-times__dates">{dates}</span>
       </div>
     );

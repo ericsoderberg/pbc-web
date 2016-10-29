@@ -30,7 +30,7 @@ const userSchema = Schema({
   address: String,
   administrator: Boolean,
   administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  avatar: image,
+  image: image,
   created: Date,
   email: {type: String, required: true, unique: true},
   encryptedPassword: String,
@@ -72,19 +72,28 @@ const pageSectionSchema = Schema({
   image: image,
   // library type
   libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
-  navigable: Boolean, // event type
-  pages: [{           // pages type
+  // event type
+  navigable: Boolean,
+  // pages type
+  pages: [{
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
     image: image
   }],
-  text: String,       // text type
+  // people type
+  people: [{
+    id: { type: Schema.Types.ObjectId, ref: 'User' },
+    image: image,
+    text: String
+  }],
+  // text type
+  text: String,
   type: { type: String,
     enum: [
-      'text', 'image', 'event', 'library', 'form', 'person', 'pages', 'video'
+      'text', 'image', 'event', 'library', 'form', 'people', 'pages', 'video'
     ]
   },
-  url: String,        // video type
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }    // person type
+  // video type
+  url: String
 });
 
 const pageSchema = Schema({

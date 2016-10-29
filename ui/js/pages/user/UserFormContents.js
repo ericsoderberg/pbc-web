@@ -5,6 +5,7 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
+import TextHelp from '../../components/TextHelp';
 import AddIcon from '../../icons/Add';
 import TrashIcon from '../../icons/Trash';
 import RelationEdit from './RelationEdit';
@@ -97,11 +98,6 @@ export default class UserFormContents extends Component {
   render () {
     const { formState, session } = this.props;
     const user = formState.object;
-
-    const textHelp = (
-      <a href="http://daringfireball.net/projects/markdown/syntax"
-        target="_blank">Markdown syntax</a>
-    );
 
     let adminFields;
     if (session.administrator) {
@@ -209,9 +205,9 @@ export default class UserFormContents extends Component {
         </fieldset>
 
         <fieldset className="form__fields">
-          <ImageField label="Photo" name="avatar"
-            formState={formState} property="avatar" />
-          <FormField name="text" label="Text" help={textHelp}>
+          <ImageField label="Photo" name="image"
+            formState={formState} property="image" />
+          <FormField name="text" label="Text" help={<TextHelp />}>
             <textarea ref="text" name="text" value={user.text || ''} rows={8}
               onChange={formState.change('text')}/>
           </FormField>

@@ -13,8 +13,8 @@ const UserContents = (props) => {
   }
 
   let image;
-  if (user.avatar) {
-    image = <Image image={user.avatar} />;
+  if (user.image) {
+    image = <Image image={user.image} avatar={true} />;
   }
 
   return (

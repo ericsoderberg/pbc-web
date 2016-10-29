@@ -55,6 +55,11 @@
   &.image,
   > .image {
     width: 100%;
+
+    &.image--avatar {
+      width: auto;
+      max-height: $tile-width + (2 * $double-unit);
+    }
   }
 }
 
@@ -88,6 +93,16 @@
   max-width: $page-width;
   padding: $double-unit 0;
   margin: 0 auto;
+
+  > div { // markdown-to-jsx
+    p:first-child {
+      margin-top: 0;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .map {
@@ -258,36 +273,27 @@
   }
 }
 
-.user-summary {
+.person-summary {
+  max-width: 240px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
-.user-summary__summary {
-  display: flex;
-  flex-direction: column;
-  flex: 1 0 50%;
-  text-decoration: none;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  padding: $unit 0;
+// .person-summary__summary {
+//   padding: $unit 0;
+// }
 
-  h2 {
-    margin-top: 0;
-  }
+.person-summary__image {
+  max-width: $tile-width;
 }
 
-.user-summary__avatar {
-  flex: 0 0 20%;
-}
-
-.page-summaries {
+.page-summaries,
+.people-summaries {
   display: flex;
 
   @media all and (min-width: 700px) {
     flex-direction: row;
-    justify-content: space-between;
     flex-wrap: wrap;
     max-width: $page-width;
     margin: $double-unit auto;
@@ -305,6 +311,10 @@
       margin: $half-unit 0;
     }
   }
+}
+
+.page-summaries {
+  justify-content: center;
 }
 
 .page-tile {

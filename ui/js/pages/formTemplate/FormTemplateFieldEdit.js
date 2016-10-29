@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
+import TextHelp from '../../components/TextHelp';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -78,12 +79,8 @@ export default class FormTemplateFieldEdit extends Component {
 
     if ('instructions' === field.type) {
 
-      const textHelp = (
-        <a href="http://daringfireball.net/projects/markdown/syntax"
-          target="_blank">Markdown syntax</a>
-      );
       help = (
-        <FormField label="Help" help={textHelp}>
+        <FormField label="Help" help={<TextHelp />}>
           <textarea name="help" value={field.help || ''} rows={4}
             onChange={formState.change('help')} />
         </FormField>

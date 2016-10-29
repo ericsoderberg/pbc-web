@@ -4,7 +4,6 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
-// import AddIcon from '../../icons/Add';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -12,12 +11,12 @@ import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
 import EventSectionEdit from './EventSectionEdit';
 import LibrarySectionEdit from './LibrarySectionEdit';
-import PersonSectionEdit from './PersonSectionEdit';
+import PeopleSectionEdit from './PeopleSectionEdit';
 import PagesSectionEdit from './PagesSectionEdit';
 import VideoSectionEdit from './VideoSectionEdit';
 import FormSectionEdit from './FormSectionEdit';
 
-const SECTION_TYPES = ['text', 'image', 'event', 'library', 'person', 'pages',
+const SECTION_TYPES = ['text', 'image', 'event', 'library', 'people', 'pages',
   'video', 'form'];
 
 const SECTIONS = {
@@ -27,7 +26,7 @@ const SECTIONS = {
   library: LibrarySectionEdit,
   pages: PagesSectionEdit,
   text: TextSectionEdit,
-  person: PersonSectionEdit,
+  people: PeopleSectionEdit,
   video: VideoSectionEdit
 };
 

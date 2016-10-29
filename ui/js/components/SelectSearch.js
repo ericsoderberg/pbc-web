@@ -76,7 +76,7 @@ export default class SelectSearch extends Component {
       .filter(item => ! (exclude || []).some(item2 => item._id === item2._id));
       this.setState({ suggestions: suggestions });
     })
-    .catch(error => console.log('SelectSearch catch', error));
+    .catch(error => console.log('!!! SelectSearch catch', error));
   }
 
   _activation (active) {

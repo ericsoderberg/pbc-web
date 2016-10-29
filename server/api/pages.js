@@ -113,6 +113,7 @@ export default function (router) {
     populate: {
       get: [
         { path: 'sections.pages.id', select: 'name path' },
+        { path: 'sections.people.id', select: 'name image' },
         {
           path: 'sections.eventId',
           select: 'name path start end dates times address location'

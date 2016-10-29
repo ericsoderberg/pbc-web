@@ -15,15 +15,13 @@ class SubPageEdit extends Component {
 
   constructor (props) {
     super(props);
-    this.state = {
-      formState: new FormState(props.pageSummary, props.onChange)
-    };
+    const { onChange, pageSummary } = props;
+    this.state = { formState: new FormState(pageSummary, onChange) };
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({
-      formState: new FormState(nextProps.pageSummary, nextProps.onChange)
-    });
+    const { onChange, pageSummary } = nextProps;
+    this.setState({ formState: new FormState(pageSummary, onChange) });
   }
 
   render () {
@@ -85,15 +83,14 @@ export default class PagesSectionEdit extends Component {
     super(props);
     this._onAddPage = this._onAddPage.bind(this);
     this._onChangePage = this._onChangePage.bind(this);
-    this._onRemovePage = this._onRemovePage.bind(this);
+    // this._onRemovePage = this._onRemovePage.bind(this);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange) };
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({
-      formState: new FormState(nextProps.section, nextProps.onChange)
-    });
+    const { section, onChange } = nextProps;
+    this.setState({ formState: new FormState(section, onChange) });
   }
 
   _onAddPage () {
@@ -111,36 +108,39 @@ export default class PagesSectionEdit extends Component {
     formState.change('pages')(pages);
   }
 
-  _onRemovePage (index) {
-    const { formState } = this.state;
-    let pages = formState.object.pages.slice(0);
-    pages.splice(index, 1);
-    formState.change('pages')(pages);
-  }
+  // _onRemovePage (index) {
+  //   const { formState } = this.state;
+  //   let pages = formState.object.pages.slice(0);
+  //   pages.splice(index, 1);
+  //   formState.change('pages')(pages);
+  // }
 
   render () {
     const { formState } = this.state;
     const section = formState.object;
     const pages = section.pages || [{}];
 
-    const subPages = pages.map((pageSummary, index) => {
+    const edits = pages.map((pageSummary, index) => {
       return (
-      <SubPageEdit key={index} pageSummary={pageSummary} index={index}
-        onRaise={index > 0 ?
-          formState.swapWith('pages', index, index-1) : undefined}
-        onLower={index < (pages.length - 1) ?
-          formState.swapWith('pages', index, index+1) : undefined}
-        onChange={(nextPageSummary) => this._onChangePage(nextPageSummary, index)}
-        onRemove={formState.removeAt('pages', index)} />
-    );});
+        <SubPageEdit key={index} pageSummary={pageSummary} index={index}
+          onRaise={index > 0 ?
+            formState.swapWith('pages', index, index-1) : undefined}
+          onLower={index < (pages.length - 1) ?
+            formState.swapWith('pages', index, index+1) : undefined}
+          onChange={(nextPageSummary) => {
+            this._onChangePage(nextPageSummary, index);
+          }}
+          onRemove={formState.removeAt('pages', index)} />
+      );
+    });
 
     return (
       <div>
         <fieldset className="form__fields">
           <SectionFields formState={formState} />
-          {subPages}
+          {edits}
           <div className="form-item">
-            <h5>{`page ${subPages.length + 1}`}</h5>
+            <h5>{`page ${edits.length + 1}`}</h5>
           </div>
           <FormFieldAdd>
             <Button label="Add page" secondary={true}

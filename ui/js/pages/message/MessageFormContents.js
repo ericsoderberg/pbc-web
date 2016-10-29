@@ -6,6 +6,7 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import ImageField from '../../components/ImageField';
 import DateTime from '../../components/DateTime';
 import SelectSearch from '../../components/SelectSearch';
+import TextHelp from '../../components/TextHelp';
 import TrashIcon from '../../icons/Trash';
 
 export default class MessageFormContents extends Component {
@@ -116,11 +117,6 @@ export default class MessageFormContents extends Component {
     const { domains, libraries } = this.state;
     const message = formState.object;
 
-    const textHelp = (
-      <a href="http://daringfireball.net/projects/markdown/syntax"
-        target="_blank">Markdown syntax</a>
-    );
-
     let files;
     if (message.files) {
       files = message.files.map(this._renderFileField);
@@ -195,7 +191,7 @@ export default class MessageFormContents extends Component {
         <fieldset className="form__fields">
           <ImageField label="Image" name="image"
             formState={formState} property="image" />
-          <FormField name="text" label="Text" help={textHelp}>
+          <FormField name="text" label="Text" help={<TextHelp />}>
             <textarea ref="text" name="text" value={message.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
