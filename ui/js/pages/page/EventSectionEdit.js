@@ -4,7 +4,7 @@ import moment from 'moment';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
-import SectionFields from './SectionFields';
+import SectionEdit from './SectionEdit';
 
 const Suggestion = (props) => (
   <div className="box--between">
@@ -34,7 +34,7 @@ export default class EventSectionEdit extends Component {
     const section = formState.object;
 
     return (
-      <fieldset className="form__fields">
+      <SectionEdit formState={formState}>
         <FormField label="Event">
           <SelectSearch category="events"
             options={{select: 'name start', sort: '-start'}}
@@ -50,8 +50,7 @@ export default class EventSectionEdit extends Component {
             onChange={formState.toggle('navigable')}/>
           <label htmlFor="navigable">Navigable?</label>
         </FormField>
-        <SectionFields formState={formState} />
-      </fieldset>
+      </SectionEdit>
     );
   }
 };

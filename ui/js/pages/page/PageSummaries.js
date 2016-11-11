@@ -23,7 +23,7 @@ export default class PageSummaries extends Component {
 
   _load (props) {
     // When editing, we have id's but not names, get the names we need
-    props.pages.forEach(pageRef => {
+    (props.pages || []).forEach(pageRef => {
       if (typeof pageRef.id === 'string' &&
         ! this.state.pages[pageRef.id]) {
         getItem('pages', pageRef.id, { select: 'name path' })

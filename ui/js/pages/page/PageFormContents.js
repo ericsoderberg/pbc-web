@@ -4,41 +4,16 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
-import TrashIcon from '../../icons/Trash';
-import TextSectionEdit from './TextSectionEdit';
-import ImageSectionEdit from './ImageSectionEdit';
-import EventSectionEdit from './EventSectionEdit';
-import LibrarySectionEdit from './LibrarySectionEdit';
-import PeopleSectionEdit from './PeopleSectionEdit';
-import PagesSectionEdit from './PagesSectionEdit';
-import VideoSectionEdit from './VideoSectionEdit';
-import FormSectionEdit from './FormSectionEdit';
+import PageFormSection from './PageFormSection';
 
 const SECTION_TYPES = ['text', 'image', 'event', 'library', 'people', 'pages',
-  'video', 'form'];
-
-const SECTIONS = {
-  event: EventSectionEdit,
-  form: FormSectionEdit,
-  image: ImageSectionEdit,
-  library: LibrarySectionEdit,
-  pages: PagesSectionEdit,
-  text: TextSectionEdit,
-  people: PeopleSectionEdit,
-  video: VideoSectionEdit
-};
+  'video', 'form', 'files'];
 
 export default class PageFormContents extends Component {
 
   constructor (props) {
     super(props);
-    this.state = {
-      domains: [],
-      expandedSections: {}, // _id or id
-      newSectionId: 1
-    };
+    this.state = { domains: [], newSectionId: 1 };
   }
 
   componentDidMount () {
@@ -63,73 +38,19 @@ export default class PageFormContents extends Component {
   _addSection (type) {
     return this.props.formState.addTo('sections', () => {
       const id = this.state.newSectionId;
-      let expandedSections = { ...this.state.expandedSections };
-      expandedSections[id] = true;
-      this.setState({
-        expandedSections: expandedSections,
-        newSectionId: this.state.newSectionId + 1
-      });
+      this.setState({ newSectionId: this.state.newSectionId + 1 });
       return { type: type, id: id };
     });
   }
 
-  _toggleSection (id) {
-    return () => {
-      let expandedSections = { ...this.state.expandedSections };
-      expandedSections[id] = ! expandedSections[id];
-      this.setState({ expandedSections: expandedSections });
-    };
-  }
-
   render () {
     const { formState, session } = this.props;
-    const { expandedSections } = this.state;
     const page = formState.object;
 
-    const sections = (page.sections || []).map((section, index) => {
-      const Section = SECTIONS[section.type];
-
-      const raise = (index === 0 ? undefined : (
-        <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index-1)}>
-          <UpIcon />
-        </button>
-      ));
-      const lower = (index === (page.sections.length - 1) ? undefined : (
-        <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index+1)}>
-          <DownIcon />
-        </button>
-      ));
-
-      let edit;
-      if (expandedSections[section._id] || expandedSections[section.id]) {
-        edit = (
-          <Section section={section}
-            onChange={formState.changeAt('sections', index)} />
-        );
-      }
-
-      return (
-        <div key={index}>
-          <div type="button" className="form-item">
-            <button type="button" className="button-plain"
-              onClick={this._toggleSection(section._id || section.id)}>
-              <h4>{section.type}</h4>
-            </button>
-            <div className="box--row box--static">
-              {raise}
-              {lower}
-              <button type="button" className="button-icon"
-                onClick={formState.removeAt('sections', index)}>
-                <TrashIcon />
-              </button>
-            </div>
-          </div>
-          {edit}
-        </div>
-      );
-    });
+    const sections = (page.sections || []).map((section, index) => (
+      <PageFormSection key={index} formState={formState} section={section}
+        index={index} />
+    ));
 
     const addControls = SECTION_TYPES.map(type => (
       <Button key={type} label={`Add ${type}`} secondary={true}

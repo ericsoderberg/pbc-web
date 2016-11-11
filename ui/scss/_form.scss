@@ -198,6 +198,10 @@
   max-width: $form-width - $double-unit;
 }
 
+.form-item-add {
+  margin-top: $unit;
+}
+
 .form-field-add {
   display: flex;
   flex-direction: column;

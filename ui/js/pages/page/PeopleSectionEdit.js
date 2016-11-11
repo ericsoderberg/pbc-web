@@ -1,16 +1,11 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
-import FormFieldAdd from '../../components/FormFieldAdd';
 import FormState from '../../utils/FormState';
 import SelectSearch from '../../components/SelectSearch';
 import ImageField from '../../components/ImageField';
-import Button from '../../components/Button';
 import TextHelp from '../../components/TextHelp';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
-import TrashIcon from '../../icons/Trash';
-import SectionFields from './SectionFields';
+import SectionMultiEdit from './SectionMultiEdit';
 
 const Suggestion = (props) => (
   <div className="box--between">
@@ -19,48 +14,26 @@ const Suggestion = (props) => (
   </div>
 );
 
-class PersonEdit extends Component {
+class PeopleItemEdit extends Component {
 
   constructor (props) {
     super(props);
-    const { onChange, personSummary } = props;
-    this.state = { formState: new FormState(personSummary, onChange) };
+    const { onChange, item } = props;
+    this.state = { formState: new FormState(item, onChange) };
   }
 
   componentWillReceiveProps (nextProps) {
-    const { onChange, personSummary } = nextProps;
-    this.setState({ formState: new FormState(personSummary, onChange) });
+    const { onChange, item } = nextProps;
+    this.setState({ formState: new FormState(item, onChange) });
   }
 
   render () {
-    const { index, onRemove, onRaise, onLower } = this.props;
+    const { index } = this.props;
     const { formState } = this.state;
     const personSummary = formState.object;
 
-    const raise = (onRaise ? (
-      <button type="button" className="button-icon" onClick={onRaise}>
-        <UpIcon />
-      </button>
-    ) : undefined);
-    const lower = (onLower ? (
-      <button type="button" className="button-icon" onClick={onLower}>
-        <DownIcon />
-      </button>
-    ) : undefined);
-
     return (
       <div>
-        <div className="form-item">
-          <h5>{`person ${index + 1}`}</h5>
-          <div className="box--row">
-            {raise}
-            {lower}
-            <button type="button" className="button-icon"
-              onClick={onRemove}>
-              <TrashIcon />
-            </button>
-          </div>
-        </div>
         <FormField label="Person">
           <SelectSearch category="users"
             options={{select: 'name email image', sort: 'name'}}
@@ -72,36 +45,30 @@ class PersonEdit extends Component {
                 name: suggestion.name,
                 image: suggestion.image
               })} />
-          <FormField label="Text" help={<TextHelp />}>
-            <textarea name={`text-${index}`} rows={4}
-              value={personSummary.text || ''}
-              onChange={formState.change('text')}/>
-          </FormField>
-          <ImageField label="Image" name={`image-${index}`}
-            formState={formState} property="image" />
         </FormField>
+        <FormField label="Text" help={<TextHelp />}>
+          <textarea name={`text-${index}`} rows={4}
+            value={personSummary.text || ''}
+            onChange={formState.change('text')}/>
+        </FormField>
+        <ImageField label="Image" name={`image-${index}`}
+          formState={formState} property="image" />
       </div>
     );
   }
 
 }
 
-PersonEdit.propTypes = {
+PeopleItemEdit.propTypes = {
   index: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
-  onRaise: PropTypes.func,
-  onLower: PropTypes.func,
-  onRemove: PropTypes.func.isRequired,
-  personSummary: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired
 };
 
 export default class PeopleSectionEdit extends Component {
 
   constructor (props) {
     super(props);
-    this._onAddPerson = this._onAddPerson.bind(this);
-    this._onChangePerson = this._onChangePerson.bind(this);
-    // this._onRemovePerson = this._onRemovePerson.bind(this);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange) };
   }
@@ -111,61 +78,11 @@ export default class PeopleSectionEdit extends Component {
     this.setState({ formState: new FormState(section, onChange) });
   }
 
-  _onAddPerson () {
-    const { formState } = this.state;
-    const section = formState.object;
-    let people = (section.people || []).slice(0);
-    people.push({});
-    formState.set('people', people);
-  }
-
-  _onChangePerson (personSummary, index) {
-    const { formState } = this.state;
-    let people = (formState.object.people || []).slice(0);
-    people[index] = personSummary;
-    formState.change('people')(people);
-  }
-
-  // _onRemovePerson (index) {
-  //   const { formState } = this.state;
-  //   let people = formState.object.people.slice(0);
-  //   people.splice(index, 1);
-  //   formState.change('people')(people);
-  // }
-
   render () {
     const { formState } = this.state;
-    const section = formState.object;
-    const people = section.people || [{}];
-
-    const edits = people.map((personSummary, index) => {
-      return (
-        <PersonEdit key={index} personSummary={personSummary} index={index}
-          onRaise={index > 0 ?
-            formState.swapWith('people', index, index-1) : undefined}
-          onLower={index < (people.length - 1) ?
-            formState.swapWith('people', index, index+1) : undefined}
-          onChange={(nextPersonSummary) => {
-            this._onChangePerson(nextPersonSummary, index);
-          }}
-          onRemove={formState.removeAt('people', index)} />
-      );
-    });
-
     return (
-      <div>
-        <fieldset className="form__fields">
-          <SectionFields formState={formState} />
-          {edits}
-          <div className="form-item">
-            <h5>{`page ${edits.length + 1}`}</h5>
-          </div>
-          <FormFieldAdd>
-            <Button label="Add person" secondary={true}
-              onClick={this._onAddPerson} />
-          </FormFieldAdd>
-        </fieldset>
-      </div>
+      <SectionMultiEdit formState={formState} property='people' label='person'
+        ItemEdit={PeopleItemEdit} />
     );
   }
 };

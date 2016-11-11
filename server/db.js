@@ -65,6 +65,13 @@ const pageSectionSchema = Schema({
   color: String,
   // event type
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
+  // files type
+  files: [{
+    _id: String,
+    name: String,
+    size: Number,
+    type: { type: String }
+  }],
   // form type
   formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   full: Boolean,
@@ -89,7 +96,8 @@ const pageSectionSchema = Schema({
   text: String,
   type: { type: String,
     enum: [
-      'text', 'image', 'event', 'library', 'form', 'people', 'pages', 'video'
+      'event', 'files', 'form', 'image', 'library',  'people', 'pages',
+      'text', 'video'
     ]
   },
   // video type

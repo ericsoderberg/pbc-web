@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
-import SectionFields from './SectionFields';
+import SectionEdit from './SectionEdit';
 
 export default class ImageSectionEdit extends Component {
 
@@ -13,7 +13,9 @@ export default class ImageSectionEdit extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ formState: new FormState(nextProps.section, nextProps.onChange) });
+    this.setState({
+      formState: new FormState(nextProps.section, nextProps.onChange)
+    });
   }
 
   render () {
@@ -27,7 +29,7 @@ export default class ImageSectionEdit extends Component {
     );
 
     return (
-      <fieldset className="form__fields">
+      <SectionEdit formState={formState}>
         <FormField name="image" label="Image" help={imageHelp}
           onDrop={formState.dropFile('image')}>
           <img className="form-field__image"
@@ -35,8 +37,7 @@ export default class ImageSectionEdit extends Component {
           <input name="image" type="file"
             onChange={formState.changeFile('image')}/>
         </FormField>
-        <SectionFields formState={formState} />
-      </fieldset>
+      </SectionEdit>
     );
   }
 };

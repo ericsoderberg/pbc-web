@@ -8,6 +8,7 @@ import PageSummaries from './PageSummaries';
 import PeopleSummary from './PeopleSummary';
 import Video from '../../components/Video';
 import FormSummary from '../form/FormSummary';
+import FilesSummary from './FilesSummary';
 
 const PageContents = (props) => {
   const page = props.item;
@@ -45,6 +46,11 @@ const PageContents = (props) => {
       return (
         <FormSummary key={index} full={section.full} color={section.color}
           formTemplateId={section.formTemplateId} />
+      );
+    } else if ('files' === section.type) {
+      return (
+        <FilesSummary key={index} full={section.full} color={section.color}
+          files={section.files} />
       );
     } else {
       return 'TBD';

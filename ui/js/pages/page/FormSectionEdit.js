@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
-import SectionFields from './SectionFields';
+import SectionEdit from './SectionEdit';
 
 export default class FormSectionEdit extends Component {
 
@@ -24,7 +24,7 @@ export default class FormSectionEdit extends Component {
     const section = formState.object;
 
     return (
-      <fieldset className="form__fields">
+      <SectionEdit formState={formState}>
         <FormField name="formTemplateId" label="Form template">
           <SelectSearch category="form-templates"
             value={(section.formTemplateId || {}).name || ''}
@@ -32,8 +32,7 @@ export default class FormSectionEdit extends Component {
               formState.change('formTemplateId')({
                 _id: suggestion._id, name: suggestion.name })} />
         </FormField>
-        <SectionFields formState={formState} />
-      </fieldset>
+      </SectionEdit>
     );
   }
 };

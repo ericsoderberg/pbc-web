@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
-import SectionFields from './SectionFields';
+import SectionEdit from './SectionEdit';
 
 export default class LibrarySectionEdit extends Component {
 
@@ -34,15 +34,14 @@ export default class LibrarySectionEdit extends Component {
     ));
 
     return (
-      <fieldset className="form__fields">
+      <SectionEdit formState={formState}>
         <FormField label="Library">
           <select name="libraryId" value={(section.libraryId || {})._id || ''}
             onChange={formState.change('libraryId')}>
             {libraryOptions}
           </select>
         </FormField>
-        <SectionFields formState={formState} />
-      </fieldset>
+      </SectionEdit>
     );
   }
 };

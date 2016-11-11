@@ -426,6 +426,15 @@
   }
 }
 
+.file-summaries {
+  text-align: center;
+}
+
+.file-summary {
+  display: block;
+  margin: $half-unit 0;
+}
+
 .event-times__separator {
   margin: 0 $half-unit;
   color: $tertiary-color;
