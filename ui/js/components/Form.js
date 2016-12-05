@@ -21,7 +21,9 @@ class Form extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.item) {
-      this.setState({ formState: new FormState(nextProps.item, this._setItem) });
+      this.setState({
+        formState: new FormState(nextProps.item, this._setItem)
+      });
     }
   }
 
@@ -69,7 +71,7 @@ class Form extends Component {
         <form className="form" action={action} onSubmit={this._onSubmit}>
           <PageHeader title={title} actions={cancelControl} />
           <FormError message={error} />
-          <FormContents formState={this.state.formState} session={session} />
+          <FormContents formState={formState} session={session} />
           <footer className="form__footer">
             <button type="submit" className="button" onClick={this._onSubmit}>
               {submitLabel}

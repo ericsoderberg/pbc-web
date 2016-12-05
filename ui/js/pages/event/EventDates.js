@@ -26,7 +26,7 @@ export default class EventDates extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { formState: { object: event } } = this.props;
+    const { formState: { object: event } } = nextProps;
     if (event.dates) {
       let selectedDates = {};
       event.dates.forEach(date => {
@@ -102,7 +102,7 @@ export default class EventDates extends Component {
         dates = dates.concat(event.dates);
       } else {
         // remove all dates on the same day of the week
-        dates = event.dates.filter(date => date.day() !== day);
+        dates = event.dates.filter(date => moment(date).day() !== day);
       }
       formState.set('dates', dates);
     };
