@@ -75,13 +75,15 @@ export default function (router, transporter) {
           const url = `${req.protocol}://${req.get('Host')}` +
             `/verify-email?token=${user.temporaryToken}`;
           const instructions =
-`# ${site.name}
+`## Email verififcation for ${site.name}
 
 The link below is valid for 2 hours from the time this message was sent.
 It will allow sign you in to the ${site.name} web site.
 
 
-[Sign In](${url})
+# [Verify email](${url})
+
+
 `;
           transporter.sendMail({
             from: site.email,

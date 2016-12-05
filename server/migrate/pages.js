@@ -112,11 +112,15 @@ export default function () {
     pagesData.forEach(item => {
       if (childOldIds[item.id]) {
         let page = pages[item.id];
-        page.sections.push({
-          pages: childOldIds[item.id].map(oldId => ({ id: pages[oldId]._id })),
-          type: 'pages'
-        });
-        linkPromises.push(page.save());
+        // check to see if we've already done this
+        if (! page.sections.some(s => 'pages' === s.type)) {
+          page.sections.push({
+            pages: childOldIds[item.id].map(oldId => ({
+              id: pages[oldId]._id })),
+            type: 'pages'
+          });
+          linkPromises.push(page.save());
+        }
       }
     });
     return Promise.all(linkPromises);
