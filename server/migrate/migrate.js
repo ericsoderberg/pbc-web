@@ -19,5 +19,5 @@ Promise.resolve()
 .then(() => forms())
 .then(() => pages())
 .then(() => console.log(results.log()))
-.then(() => console.log(`!!! Finished`))
+.then(() => console.log(`Finished`))
 .catch(error => console.log(error));

@@ -4,7 +4,7 @@ import fs from 'fs';
 import rmdir from 'rimraf';
 import { authorize } from './auth';
 
-const FILES_PATH = 'public/files';
+export var FILES_PATH = 'public/files';
 
 // /api/files
 
@@ -63,16 +63,17 @@ export default function (router) {
     .then(session => {
       const id = new mongoose.Types.ObjectId();
       let fstream;
-      req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-        const dir = `${FILES_PATH}/${id}`;
-        fs.mkdir(dir, () => {
-          fstream = fs.createWriteStream(`${dir}/${filename}`);
-          file.pipe(fstream);
-          fstream.on('close', function () {
-            res.json({ _id: id, name: filename, type: mimetype });
+      req.busboy.on('file',
+        function (fieldname, file, filename, encoding, mimetype) {
+          const dir = `${FILES_PATH}/${id}`;
+          fs.mkdir(dir, () => {
+            fstream = fs.createWriteStream(`${dir}/${filename}`);
+            file.pipe(fstream);
+            fstream.on('close', function () {
+              res.json({ _id: id, name: filename, type: mimetype });
+            });
           });
         });
-      });
       req.pipe(req.busboy);
     });
   });
