@@ -10,9 +10,11 @@ const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 export default function (router) {
 
-  register(router, 'calendars', 'Calendar', {
-    authorize: {
-      index: authorizedAdministrator
+  register(router, {
+    category: 'calendars',
+    modelName: 'Calendar',
+    index: {
+      authorize: authorizedAdministrator
     }
   });
 

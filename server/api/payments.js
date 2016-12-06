@@ -6,21 +6,23 @@ import { unsetDomainIfNeeded } from './domains';
 // /api/payments
 
 export default function (router) {
-  register(router, 'payments', 'Payment', {
-    authorize: {
-      index: authorizedForDomainOrSelf
-    },
+  register(router, {
+    category: 'payments',
+    modelName: 'Payment',
     omit: ['post', 'put'], // special handling for POST and PUT of form below
-    populate: {
-      get: [
-        { path: 'userId', select: 'name' }
-      ],
-      index: [
+    index: {
+      authorize: authorizedForDomainOrSelf,
+      populate: [
         { path: 'userId', select: 'name' }
       ]
     },
-    transformIn: {
-      put: unsetDomainIfNeeded
+    get: {
+      populate: [
+        { path: 'userId', select: 'name' }
+      ]
+    },
+    put: {
+      transformIn: unsetDomainIfNeeded
     }
   });
 

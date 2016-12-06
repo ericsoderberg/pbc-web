@@ -6,12 +6,14 @@ import { unsetDomainIfNeeded } from './domains';
 // /api/form-templates
 
 export default function (router) {
-  register(router, 'form-templates', 'FormTemplate', {
-    authorize: {
-      index: authorizedForDomain
+  register(router, {
+    category: 'form-templates',
+    modelName: 'FormTemplate',
+    index: {
+      authorize: authorizedForDomain
     },
-    transformIn: {
-      put: unsetDomainIfNeeded
+    put: {
+      transformIn: unsetDomainIfNeeded
     }
   });
 }

@@ -5,9 +5,11 @@ import { authorizedAdministrator } from './auth';
 // /api/domains
 
 export default function (router) {
-  register(router, 'domains', 'Domain', {
-    authorize: {
-      index: authorizedAdministrator
+  register(router, {
+    category: 'domains',
+    modelName: 'Domain',
+    index: {
+      authorize: authorizedAdministrator
     }
   });
 }

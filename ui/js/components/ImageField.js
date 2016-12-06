@@ -33,9 +33,9 @@ export default class ImageField extends Component {
 
       result = (
         <FormField label={label} help={imageHelp}
-          onDrop={formState.dropFile(property)}>
+          onDrop={formState.dropImageFile(property)}>
           <input name={name} type="file"
-            onChange={formState.changeFile(property)}/>
+            onChange={formState.changeImageFile(property)}/>
         </FormField>
       );
     }

@@ -78,12 +78,14 @@ export default function (router, transporter) {
     .catch(error => res.status(400).json(error));
   });
 
-  register(router, 'newsletters', 'Newsletter', {
-    authorize: {
-      index: authorizedForDomain
+  register(router, {
+    category: 'newsletters',
+    modelName: 'Newsletter',
+    index: {
+      authorize: authorizedForDomain
     },
-    transformIn: {
-      put: unsetReferences
+    put: {
+      transformIn: unsetReferences
     }
   });
 }

@@ -14,18 +14,18 @@ function addPopulate (query, populate) {
   }
 }
 
-export default (router, category, modelName, options={}) => {
-  const transformIn = options.transformIn || {};
-  const transformOut = options.transformOut || {};
+export default (router, options) => {
+  const { category, modelName } = options;
+  const Doc = mongoose.model(modelName);
   let methods = options.methods || ['get', 'put', 'delete', 'index', 'post'];
   if (options.omit) {
     methods = methods.filter(m => ! options.omit.some(o => o === m));
   }
 
   if (methods.indexOf('get') >= 0) {
+    const getOpts = options.get || {};
     router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
-      const Doc = mongoose.model(modelName);
       const criteria = ID_REGEXP.test(id) ? {_id: id} : {path: id};
       let query = Doc.findOne(criteria);
       if (req.query.select) {
@@ -35,67 +35,67 @@ export default (router, category, modelName, options={}) => {
         const populate = JSON.parse(req.query.populate);
         if (true === populate) {
           // populate from options
-          if (options.populate && options.populate.get) {
-            addPopulate(query, options.populate.get);
+          if (getOpts.populate) {
+            addPopulate(query, getOpts.populate);
           }
         } else {
           addPopulate(query, populate);
         }
-      } else if (options.populate && options.populate.get) {
-        addPopulate(query, options.populate.get);
+      } else if (getOpts.populate) {
+        addPopulate(query, getOpts.populate);
       }
       query.exec()
-      .then(doc => (transformOut.get ? transformOut.get(doc, req) : doc))
+      .then(doc => (getOpts.transformOut ?
+        getOpts.transformOut(doc, req) : doc))
       .then(doc => res.json(doc))
       .catch(error => res.status(400).json(error));
     });
   }
 
   if (methods.indexOf('put') >= 0) {
+    const putOpts = options.put || {};
     router.put(`/${category}/:id`, (req, res) => {
+      const id = req.params.id;
       authorize(req, res)
       .then(session => {
-        const id = req.params.id;
-        const Doc = mongoose.model(modelName);
         let data = req.body;
         data.modified = new Date();
         data.userId = session.userId;
-        data = (transformIn.put ? transformIn.put(data, session) : data);
-        Doc.findOneAndUpdate({ _id: id }, data)
-        .exec()
-        .then(doc => (transformOut.put ? transformOut.put(doc, req) : doc))
-        .then(doc => res.status(200).json(doc))
-        .catch(error => res.status(400).json(error));
-      });
+        return data;
+      })
+      .then(data => (putOpts.transformIn ?
+        putOpts.transformIn(data, req) : data))
+      .then(data => Doc.findOneAndUpdate({ _id: id }, data).exec())
+      .then(doc => (putOpts.transformOut ?
+        putOpts.transformOut(doc, req) : doc))
+      .then(doc => res.status(200).json(doc))
+      .catch(error => res.status(400).json(error));
     });
   }
 
   if (methods.indexOf('delete') >= 0) {
+    const deleteOpts = options.delete || {};
     router.delete(`/${category}/:id`, (req, res) => {
+      const id = req.params.id;
       authorize(req, res)
-      .then(session => {
-        const id = req.params.id;
-        const Doc = mongoose.model(modelName);
-        Doc.findById(id)
-        .exec()
-        .then(doc => doc.remove())
-        .then(doc => (transformOut.delete ?
-          transformOut.delete(doc, req) : doc))
-        .then(() => res.status(200).send())
-        .catch(error => res.status(400).json(error));
-      });
+      .then(session => Doc.findById(id).exec())
+      .then(doc => doc.remove())
+      .then(doc => (deleteOpts.transformOut ?
+        deleteOpts.transformOut(doc, req) : doc))
+      .then(() => res.status(200).send())
+      .catch(error => res.status(400).json(error));
     });
   }
 
   if (methods.indexOf('index') >= 0) {
+    const indexOpts = options.index || {};
     router.get(`/${category}`, (req, res) => {
       authorize(req, res, false)
       .then(session => {
-        const Doc = mongoose.model(modelName);
-        const searchProperties = options.searchProperties || 'name';
+        const searchProperties = indexOpts.searchProperties || 'name';
         let query = Doc.find();
-        if (options.authorize && options.authorize.index) {
-          query.find(options.authorize.index(session));
+        if (indexOpts.authorize) {
+          query.find(indexOpts.authorize(session));
         }
         if (req.query.search) {
           const exp = new RegExp(req.query.search, 'i');
@@ -130,8 +130,8 @@ export default (router, category, modelName, options={}) => {
           const populate = JSON.parse(req.query.populate);
           if (true === populate) {
             // populate from options
-            if (options.populate && options.populate.index) {
-              addPopulate(query, options.populate.index);
+            if (indexOpts.populate) {
+              addPopulate(query, indexOpts.populate);
             }
           } else {
             addPopulate(query, populate);
@@ -148,8 +148,8 @@ export default (router, category, modelName, options={}) => {
           query.skip(parseInt(req.query.skip, 10));
         }
         query.exec()
-        .then(docs => (transformOut.index ?
-          transformOut.index(docs, req) : docs))
+        .then(docs => (indexOpts.transformOut ?
+          indexOpts.transformOut(docs, req) : docs))
         .then(docs => res.json(docs))
         .catch(error => res.status(400).json(error));
       });
@@ -157,21 +157,23 @@ export default (router, category, modelName, options={}) => {
   }
 
   if (methods.indexOf('post') >= 0) {
+    const postOpts = options.post || {};
     router.post(`/${category}`, (req, res) => {
       authorize(req, res)
       .then(session => {
-        const Doc = mongoose.model(modelName);
         let data = req.body;
         data.created = new Date();
         data.modified = data.created;
         data.userId = session.userId;
-        data = (transformIn.post ? transformIn.post(data, session) : data);
-        const doc = new Doc(data);
-        doc.save()
-        .then(doc => (transformOut.post ? transformOut.post(doc, req) : doc))
-        .then(doc => res.status(200).json(doc))
-        .catch(error => res.status(400).json(error));
-      });
+        return data;
+      })
+      .then(data => (postOpts.transformIn ?
+        postOpts.transformIn(data, req) : data))
+      .then(data => (new Doc(data)).save())
+      .then(doc => (postOpts.transformOut ?
+        postOpts.transformOut(doc, req) : doc))
+      .then(doc => res.status(200).json(doc))
+      .catch(error => res.status(400).json(error));
     });
   }
 };

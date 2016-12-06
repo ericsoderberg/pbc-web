@@ -106,12 +106,14 @@ export default function (router) {
     .catch(error => res.status(400).json(error));
   });
 
-  register(router, 'pages', 'Page', {
-    authorize: {
-      index: authorizedForDomain
+  register(router, {
+    category: 'pages',
+    modelName: 'Page',
+    index: {
+      authorize: authorizedForDomain
     },
-    populate: {
-      get: [
+    get: {
+      populate: [
         { path: 'sections.pages.id', select: 'name path' },
         { path: 'sections.people.id', select: 'name image' },
         {
@@ -120,18 +122,16 @@ export default function (router) {
         },
         { path: 'sections.libraryId', select: 'name path' },
         { path: 'sections.formTemplateId', select: 'name' }
-      ]
-    },
-    transformIn: {
-      put: unsetDomainIfNeeded
-    },
-    transformOut: {
-      get: (page, req) => {
+      ],
+      transformOut: (page, req) => {
         if (page && req.query.populate) {
           return populatePage(page);
         }
         return page;
       }
+    },
+    put: {
+      transformIn: unsetDomainIfNeeded
     }
   });
 }

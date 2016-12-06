@@ -48,24 +48,26 @@ const unsetReferences = (data) => {
 };
 
 export default function (router) {
-  register(router, 'messages', 'Message', {
-    populate: {
-      get: [
+  register(router, {
+    category: 'messages',
+    modelName: 'Message',
+    index: {
+      searchProperties: ['name', 'author', 'verses']
+    },
+    get: {
+      populate: [
         { path: 'seriesId', select: 'name path' },
         { path: 'libraryId', select: 'name path' }
-      ]
-    },
-    transformIn: {
-      put: unsetReferences
-    },
-    transformOut: {
-      get: (message, req) => {
+      ],
+      transformOut: (message, req) => {
         if (message && req.query.populate) {
           return populateMessage(message);
         }
         return message;
       }
     },
-    searchProperties: ['name', 'author', 'verses']
+    put: {
+      transformIn: unsetReferences
+    }
   });
 }

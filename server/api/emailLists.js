@@ -13,7 +13,8 @@ const populateEmailList = (emailList) => {
 
   let promises = [Promise.resolve(emailList)];
   emailList.addresses.forEach(address => {
-    promises.push(User.findOne({ email: address.address }).select('name').exec());
+    promises.push(User.findOne({ email: address.address })
+      .select('name').exec());
   });
 
   return Promise.all(promises)
@@ -33,20 +34,22 @@ const populateEmailList = (emailList) => {
 };
 
 export default function (router) {
-  register(router, 'email-lists', 'EmailList', {
-    authorize: {
-      index: authorizedForDomain
+  register(router, {
+    category: 'email-lists',
+    modelName: 'EmailList',
+    index: {
+      authorize: authorizedForDomain
     },
-    transformIn: {
-      put: unsetDomainIfNeeded
-    },
-    transformOut: {
-      get: (emailList, req) => {
+    get: {
+      transformOut: (emailList, req) => {
         if (emailList) {
           return populateEmailList(emailList);
         }
         return emailList;
       }
+    },
+    put: {
+      transformIn: unsetDomainIfNeeded
     }
   });
 
@@ -88,7 +91,8 @@ export default function (router) {
         typeof a === 'string' ? { address: a } : a
       ));
       addresses.forEach(address => {
-        doc.addresses = doc.addresses.filter(a => a.address !== address.address);
+        doc.addresses =
+          doc.addresses.filter(a => a.address !== address.address);
       });
       doc.modified = new Date();
       return doc.save();

@@ -31,11 +31,11 @@ export default class ImageSectionEdit extends Component {
     return (
       <SectionEdit formState={formState}>
         <FormField name="image" label="Image" help={imageHelp}
-          onDrop={formState.dropFile('image')}>
+          onDrop={formState.dropImageFile('image')}>
           <img className="form-field__image"
             src={section.image ? section.image.data : ''} />
           <input name="image" type="file"
-            onChange={formState.changeFile('image')}/>
+            onChange={formState.changeImageFile('image')}/>
         </FormField>
       </SectionEdit>
     );

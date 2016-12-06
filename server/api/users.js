@@ -4,19 +4,35 @@ import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
 import { authorizedAdministrator } from './auth';
+import { compressImage } from './image';
 
 // /api/users
 
-const encryptPassword = (data) => {
-  if (data.password) {
-    data.encryptedPassword = bcrypt.hashSync(data.password, 10);
-    delete data.password;
-  }
-  if (! data.administratorDomainId) {
-    delete data.administratorDomainId;
-    data.$unset = { administratorDomainId: '' };
-  }
-  return data;
+const prepareUser = (data) => {
+  return Promise.resolve(data)
+  .then(data => {
+    if (! data.password) return data;
+    return bcrypt.hash(data.password, 10).then(encryptedPassword => {
+      data.encryptedPassword = encryptedPassword;
+      delete data.password;
+      return data;
+    });
+  })
+  .then(data => {
+    if (! data.administratorDomainId) {
+      delete data.administratorDomainId;
+      data.$unset = { administratorDomainId: '' };
+    }
+    return data;
+  })
+  .then(data => {
+    if (! data.image) return data;
+    return compressImage(data.image.data)
+    .then(compressedData => {
+      data.image.data = compressedData;
+      return data;
+    });
+  });
 };
 
 const deleteUserRelated = (doc) => {
@@ -100,31 +116,37 @@ It will allow sign you in to the ${site.name} web site.
     .catch(error => res.status(400).json(error));
   });
 
-  register(router, 'users', 'User', {
-    authorize: {
-      index: authorizedAdministrator
+  register(router, {
+    category: 'users',
+    modelName: 'User',
+    delete: {
+      transformOut: deleteUserRelated
     },
-    searchProperties: ['name', 'email'],
-    transformIn: {
-      put: encryptPassword,
-      post: encryptPassword
-    },
-    transformOut: {
-      get: (user) => {
+    get: {
+      transformOut: (user) => {
         if (user) {
           user = user.toObject();
           delete user.encryptedPassword;
         }
         return user;
-      },
-      index: (users) => {
+      }
+    },
+    index: {
+      authorize: authorizedAdministrator,
+      searchProperties: ['name', 'email'],
+      transformOut: (users) => {
         return users.map(doc => {
           let user = doc.toObject();
           delete user.encryptedPassword;
           return user;
         });
-      },
-      delete: deleteUserRelated
+      }
+    },
+    post: {
+      transformIn: prepareUser
+    },
+    put: {
+      transformIn: prepareUser
     }
   });
 }

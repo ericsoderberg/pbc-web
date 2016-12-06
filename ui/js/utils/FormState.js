@@ -69,14 +69,14 @@ export default class FormState {
     }
   }
 
-  changeFile (propertyName) {
+  changeImageFile (propertyName) {
     return (event => {
       const files = event.target.files;
       this._processFiles(files, propertyName);
     });
   }
 
-  dropFile (propertyName) {
+  dropImageFile (propertyName) {
     return (event => {
       event.preventDefault();
       const files = event.dataTransfer.files;

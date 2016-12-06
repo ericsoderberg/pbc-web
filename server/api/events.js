@@ -176,12 +176,14 @@ export default function (router) {
     .catch(error => res.status(400).json(error));
   });
 
-  register(router, 'events', 'Event', {
-    populate: {
-      get: { path: 'primaryEventId', select: 'name path' }
+  register(router, {
+    category: 'events',
+    modelName: 'Event',
+    get: {
+      populate: { path: 'primaryEventId', select: 'name path' }
     },
-    transformIn: {
-      put: unsetDomainIfNeeded
+    put: {
+      transformIn: unsetDomainIfNeeded
     }
   });
 }

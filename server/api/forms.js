@@ -29,22 +29,24 @@ function formValueForFieldName (formTemplate, form, fieldName) {
 
 export default function (router) {
 
-  register(router, 'forms', 'Form', {
-    authorize: {
-      index: authorizedForDomainOrSelf
-    },
+  register(router, {
+    category: 'forms',
+    modelName: 'Form',
     omit: ['post', 'put'], // special handling for POST and PUT of form below
-    populate: {
-      get: [
-        { path: 'userId', select: 'name' }
-      ],
-      index: [
+    index: {
+      authorize: authorizedForDomainOrSelf,
+      populate: [
         { path: 'userId', select: 'name' },
         { path: 'formTemplateId', select: 'name domainId' }
       ]
     },
-    transformIn: {
-      put: unsetDomainIfNeeded
+    get: {
+      populate: [
+        { path: 'userId', select: 'name' }
+      ]
+    },
+    put: {
+      transformIn: unsetDomainIfNeeded
     }
   });
 

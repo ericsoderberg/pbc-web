@@ -33,9 +33,11 @@ export default function (router) {
     .catch(error => res.status(400).json(error));
   });
 
-  register(router, 'libraries', 'Library', {
-    authorize: {
-      index: authorizedAdministrator
+  register(router, {
+    category: 'libraries',
+    modelName: 'Library',
+    index: {
+      authorize: authorizedAdministrator
     }
   });
 }
