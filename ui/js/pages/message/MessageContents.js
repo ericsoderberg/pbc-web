@@ -9,7 +9,38 @@ import Video from '../../components/Video';
 import Button from '../../components/Button';
 import MessageItem from './MessageItem';
 
+const LEFT_KEY = 37;
+const RIGHT_KEY = 39;
+
 export default class MessageContents extends Component {
+
+  constructor () {
+    super();
+    this._onKey = this._onKey.bind(this);
+  }
+
+  componentDidMount () {
+    window.addEventListener('keydown', this._onKey);
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('keydown', this._onKey);
+  }
+
+  _changeToMessage (message) {
+    const path = `/messages/${message.path || message._id}`;
+    this.context.router.replace(path);
+  }
+
+  _onKey (event) {
+    const message = this.props.item;
+    const key = (event.keyCode ? event.keyCode : event.which);
+    if (LEFT_KEY === key && message.previousMessage) {
+      this._changeToMessage(message.previousMessage);
+    } else if (RIGHT_KEY ===  key && message.nextMessage) {
+      this._changeToMessage(message.nextMessage);
+    }
+  }
 
   _renderMessageNav (message, type) {
     return (
@@ -198,4 +229,8 @@ MessageContents.PropTypes = {
 
 MessageContents.defaultProps = {
   attributes: true
+};
+
+MessageContents.contextTypes = {
+  router: PropTypes.object.isRequired
 };
