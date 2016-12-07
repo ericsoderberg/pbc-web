@@ -9,7 +9,9 @@ import { markdown } from 'nodemailer-markdown';
 const TRANSPORT_OPTIONS = {
   host: process.env.SMTP_HOST || 'localhost',
   port: process.env.SMTP_PORT || 25,
-  tls: { rejectUnauthorized: false }
+  tls: { rejectUnauthorized: false },
+  logger: true,
+  debug: true
 };
 if (process.env.SMTP_USER) {
   TRANSPORT_OPTIONS.auth = {
@@ -19,6 +21,10 @@ if (process.env.SMTP_USER) {
 }
 const transporter = nodemailer.createTransport(TRANSPORT_OPTIONS);
 transporter.use('compile', markdown());
+
+transporter.verify()
+.then(() => console.log('Email is sendable'))
+.catch(error => console.log('!!! Email verification error', error));
 
 const router = express.Router();
 
