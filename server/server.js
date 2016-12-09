@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import api from './api';
 import rss from './rss';
+import file from './file';
 
 const PORT = process.env.PORT || 8091;
 const app = express();
@@ -21,6 +22,7 @@ app.use(compression())
   .use(busboy())
   .use('', router)
   .use('/api', api)
+  .use('/file', file)
   .use('/', rss)
   .use('/', express.static(path.join(__dirname, '/../dist')))
   .get('/*', function (req, res) {

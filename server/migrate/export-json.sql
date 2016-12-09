@@ -20,5 +20,6 @@ COPY (SELECT row_to_json(t) FROM newsletters as t) to '/tmp/newsletters.json';
 COPY (SELECT row_to_json(t) FROM payments as t) to '/tmp/payments.json';
 COPY (SELECT row_to_json(t) FROM pages as t) to '/tmp/pages.json';
 COPY (SELECT row_to_json(t) FROM contacts as t) to '/tmp/contacts.json';
+COPY (SELECT row_to_json(t) FROM photos as t) to '/tmp/photos.json';
 COPY (SELECT row_to_json(t) FROM videos as t) to '/tmp/videos.json';
 COPY (SELECT row_to_json(t) FROM styles as t) to '/tmp/styles.json';

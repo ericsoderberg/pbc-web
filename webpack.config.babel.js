@@ -43,7 +43,8 @@ const config = {
   devServer: DEVELOPMENT ? {
     hot: true,
     proxy: {
-      "/api/*": 'http://localhost:8091'
+      "/api/*": 'http://localhost:8091',
+      "/file/*": 'http://localhost:8091'
     }
   } : undefined,
 

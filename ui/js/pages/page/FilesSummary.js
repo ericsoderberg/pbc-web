@@ -45,9 +45,10 @@ export default class FilesSummary extends Component {
       }
 
       return (
-        <Link key={index} to={`/file/${file._id}`} className="file-summary">
+        <a key={file._id} href={`/file/${file._id}/${file.name}`}
+          className="file-summary">
           {file.name}
-        </Link>
+        </a>
       );
     });
 
