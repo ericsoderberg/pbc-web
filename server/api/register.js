@@ -80,8 +80,8 @@ export default (router, options) => {
       authorize(req, res)
       .then(session => Doc.findById(id).exec())
       .then(doc => doc.remove())
-      .then(doc => (deleteOpts.transformOut ?
-        deleteOpts.transformOut(doc, req) : doc))
+      .then(doc => (deleteOpts.deleteRelated ?
+        deleteOpts.deleteRelated(doc, req) : doc))
       .then(() => res.status(200).send())
       .catch(error => res.status(400).json(error));
     });

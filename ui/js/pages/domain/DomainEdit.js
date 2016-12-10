@@ -7,5 +7,6 @@ export default class DomainEdit extends Edit {};
 DomainEdit.defaultProps = {
   category: 'domains',
   FormContents: DomainFormContents,
+  removeBackLevel: 1,
   title: 'Edit Domain'
 };

@@ -37,9 +37,9 @@ const prepareUser = (data) => {
 
 const deleteUserRelated = (doc) => {
   const Session = mongoose.model('Session');
-  Session.remove({ userId: doc._id }).exec();
+  Session.remove({ userId: doc._id }).exec()
   // TODO: unsubscribe from EmailLists
-  return doc;
+  .then(() => doc);
 };
 
 export default function (router, transporter) {
@@ -120,7 +120,7 @@ It will allow sign you in to the ${site.name} web site.
     category: 'users',
     modelName: 'User',
     delete: {
-      transformOut: deleteUserRelated
+      deleteRelated: deleteUserRelated
     },
     get: {
       transformOut: (user) => {

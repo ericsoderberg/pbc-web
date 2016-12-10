@@ -7,5 +7,6 @@ export default class PaymentEdit extends Edit {};
 PaymentEdit.defaultProps = {
   category: 'payments',
   FormContents: PaymentFormContents,
+  removeBackLevel: 1,
   title: 'Edit Payment'
 };

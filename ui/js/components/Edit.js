@@ -33,8 +33,9 @@ export default class Edit extends Component {
   }
 
   _onRemove () {
-    deleteItem(this.props.category, this.props.params.id)
-    .then(response => this.context.router.go(-2))
+    const { category, params: { id }, removeBackLevel } = this.props;
+    deleteItem(category, id)
+    .then(response => this.context.router.go(- (removeBackLevel || 2)))
     .catch(error => this.setState({ error: error }));
   }
 
@@ -61,6 +62,7 @@ Edit.propTypes = {
     id: PropTypes.string.isRequired
   }).isRequired,
   Preview: PropTypes.func,
+  removeBackLevel: PropTypes.number,
   title: PropTypes.string.isRequired
 };
 

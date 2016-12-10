@@ -10,6 +10,7 @@ import events from './events';
 import forms from './forms';
 import pages from './pages';
 import calendars from './calendars';
+import domains from './domains';
 import results from './results';
 
 Promise.resolve()
@@ -20,6 +21,7 @@ Promise.resolve()
 .then(() => forms())
 .then(() => pages())
 .then(() => calendars())
+.then(() => domains())
 .then(() => console.log(results.log()))
 .then(() => console.log(`Finished`))
 .catch(error => console.log(error));

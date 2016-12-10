@@ -7,5 +7,6 @@ export default class ResourceEdit extends Edit {};
 ResourceEdit.defaultProps = {
   category: 'resources',
   FormContents: ResourceFormContents,
+  removeBackLevel: 1,
   title: 'Edit Resource'
 };

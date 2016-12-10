@@ -1,13 +1,30 @@
 "use strict";
+import mongoose from 'mongoose';
 import register from './register';
 import { authorizedAdministrator } from './auth';
 
 // /api/domains
 
+const unsetDomain = (doc) => {
+  const modelNames = [
+    'Page', 'Event', 'Calendar', 'Message', 'Library',
+    'Form', 'Payment', 'FormTemplate'
+  ];
+  const promises = modelNames.map(modelName => {
+    const Doc = mongoose.model(modelName);
+    return Doc.update({ domainId: doc._id }, { $unset: { domainId: '' }})
+    .exec();
+  });
+  return Promise.all(promises).then(() => doc);
+};
+
 export default function (router) {
   register(router, {
     category: 'domains',
     modelName: 'Domain',
+    delete: {
+      deleteRelated: unsetDomain
+    },
     index: {
       authorize: authorizedAdministrator
     }
