@@ -38,6 +38,15 @@ export default function (router) {
     modelName: 'Library',
     index: {
       authorize: authorizedAdministrator
+    },
+    put: {
+      transformOut: (library) => {
+        // update all Messages in this library to have the same domain
+        const Message = mongoose.model('Message');
+        return Message.update({ libraryId: library._id },
+          { $set: { domainId: library.domainId } }, { multi: true }).exec()
+          .then(() => library);
+      }
     }
   });
 }

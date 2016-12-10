@@ -15,6 +15,15 @@ export default function (router) {
     modelName: 'Calendar',
     index: {
       authorize: authorizedAdministrator
+    },
+    put: {
+      transformOut: (calendar) => {
+        // update all Events in this calendar to have the same domain
+        const Event = mongoose.model('Event');
+        return Event.update({ calendarId: calendar._id },
+          { $set: { domainId: calendar.domainId } }, { multi: true }).exec()
+          .then(() => calendar);
+      }
     }
   });
 

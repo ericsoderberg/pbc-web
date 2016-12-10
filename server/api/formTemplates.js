@@ -1,4 +1,5 @@
 "use strict";
+import mongoose from 'mongoose';
 import register from './register';
 import { authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
@@ -13,7 +14,14 @@ export default function (router) {
       authorize: authorizedForDomain
     },
     put: {
-      transformIn: unsetDomainIfNeeded
+      transformIn: unsetDomainIfNeeded,
+      transformOut: (formTemplate) => {
+        // update all Forms for this formTemplate to have the same domain
+        const Form = mongoose.model('Form');
+        return Form.update({ formTemplateId: formTemplate._id },
+          { $set: { domainId: formTemplate.domainId } }, { multi: true }).exec()
+          .then(() => formTemplate);
+      }
     }
   });
 }
