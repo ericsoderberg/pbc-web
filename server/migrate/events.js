@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
+import moment from 'moment';
 import '../db';
 import { loadCategoryArray } from './utils';
 import results from './results';
@@ -19,8 +20,23 @@ function normalizeEvent (item, slaveEvents, reservations) {
   item.created = item.created_at;
   item.modified = item.updated_at;
   item.text = item.notes;
-  item.start = item.start_at;
-  item.end = item.stop_at;
+  // set date to latest slaveEvent date (if any)
+  let latest;
+  (slaveEvents[item.id] || []).forEach(item2 => {
+    const startAt = moment(item2.start_at);
+    if (! latest || startAt.isAfter(latest)) {
+      latest = startAt;
+    }
+  });
+  if (latest) {
+    item.start = latest.format('YYYY-MM-DD') + 'T' +
+      moment(item.start_at).format('HH:mm:ss');
+    item.end = latest.format('YYYY-MM-DD') + 'T' +
+      moment(item.stop_at).format('HH:mm:ss');
+  } else {
+    item.start = item.start_at;
+    item.end = item.stop_at;
+  }
   item.dates = (slaveEvents[item.id] || []).map(item2 => item2.start_at);
   item.resourceIds = (reservations[item.id] || []);
   return item;

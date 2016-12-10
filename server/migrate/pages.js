@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
+import moment from 'moment';
 import '../db';
 import { imageData, loadCategoryArray, copyFile } from './utils';
 import results from './results';
@@ -9,7 +10,7 @@ import results from './results';
 
 function normalizePage (item, arg) {
   const {
-    styles, contacts, userIds, photos, pageFiles, events, eventIds,
+    styles, contacts, userIds, photos, pageFiles, events, eventDocs,
     forms, formTemplateIds
   } = arg;
   item.oldId = item.id;
@@ -59,8 +60,18 @@ function normalizePage (item, arg) {
 
   if ((! item.aspect_order || item.aspect_order.indexOf('e') !== -1) &&
     events[item.id]) {
-    events[item.id].forEach(item2 => {
-      item.sections.push({ eventId: eventIds[item2.id], type: 'event' });
+    const lastWeek = moment().subtract(1, 'week');
+    events[item.id]
+    .filter(item2 => {
+      const event = eventDocs[item2.id];
+      if (item2.name === 'YAF') console.log('!!! YAF', event, lastWeek);
+      return (events[item.id].length <= 2 ||
+        moment(event.start).isAfter(lastWeek));
+    })
+    .forEach(item2 => {
+      if (eventDocs[item2.id]._id) {
+        item.sections.push({ eventId: eventDocs[item2.id]._id, type: 'event' });
+      }
     });
   }
 
@@ -149,7 +160,7 @@ export default function () {
   let styles = {}; // oldId => item
   let userIds = {}; // oldId => _id
   let events = {}; // oldId => [item, ...]
-  let eventIds = {}; // oldId => _id
+  let eventDocs = {}; // oldId => doc
   let forms = {}; // oldId => [item, ...]
   let formTemplateIds = {}; // oldId => _id
   let pageFiles = {};  // oldId => [doc, ...]
@@ -178,7 +189,7 @@ export default function () {
   .then(() => {
     loadCategoryArray('events')
     // only master events
-    .filter(item => (! item.master_id || item.master_id === item.id) )
+    .filter(item => (! item.master_id || item.master_id === item.id))
     .forEach(item => {
       if (! events[item.page_id]) {
         events[item.page_id] = [];
@@ -188,10 +199,10 @@ export default function () {
   })
   .then(() => {
     console.log('!!! find Events');
-    // load Events so we can map ids
-    return Event.find({}).select('oldId').exec()
+    // load Events so we can map ids and check start date
+    return Event.find({}).select('oldId start').exec()
     .then(events => events.filter(event => event.oldId)
-      .forEach(event => eventIds[event.oldId] = event._id)
+      .forEach(event => eventDocs[event.oldId] = event)
     );
   })
   .then(() => {
@@ -259,7 +270,7 @@ export default function () {
           return results.skipped('Page', page);
         } else {
           item = normalizePage(item, {
-            styles, contacts, userIds, photos, pageFiles, events, eventIds,
+            styles, contacts, userIds, photos, pageFiles, events, eventDocs,
             forms, formTemplateIds
           });
           page = new Page(item);
