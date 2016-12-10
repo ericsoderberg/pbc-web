@@ -8,6 +8,7 @@ import Button from '../../components/Button';
 import DateTime from '../../components/DateTime';
 import SelectSearch from '../../components/SelectSearch';
 import TrashIcon from '../../icons/Trash';
+import { getLocationParams } from '../../utils/Params';
 
 const Suggestion = (props) => (
   <div className="box--between">
@@ -42,6 +43,11 @@ export default class EventDetails extends Component {
     getItems('calendars', { sort: 'name' })
     .then(calendars => this.setState({ calendars: calendars }))
     .catch(error => console.log('EventFormContents calendars catch', error));
+
+    const params = getLocationParams();
+    if (params.calendarId) {
+      this.props.formState.change('calendarId')(params.calendarId);
+    }
   }
 
   _onStartChange (start) {

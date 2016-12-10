@@ -25,7 +25,7 @@ export function imageData (category, id, name, type) {
 export function loadCategoryObject (category) {
   const result = {};
   let data = fs.readFileSync(`${SOURCE_DIR}${category}.json`, 'utf8');
-  data.split("\n").filter(item => item).map(item => {
+  data.split("\n").filter(item => item).forEach(item => {
     item = descape(item);
     item = JSON.parse(item);
     result[item.id] = item;

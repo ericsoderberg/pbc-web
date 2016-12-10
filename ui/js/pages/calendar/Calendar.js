@@ -287,11 +287,12 @@ export default class Calendar extends Component {
     let actions = [];
     if (id) {
       actions.push(
-        <Link key="add" to={`/events/add?calendarId=${encodeURIComponent(id)}`}
+        <Link key="add"
+          to={`/events/add?calendarId=${encodeURIComponent(calendar._id)}`}
           className="a-header">Add</Link>
       );
       actions.push(
-        <Link key="edit" to={`/calendars/${id}/edit`}
+        <Link key="edit" to={`/calendars/${calendar._id}/edit`}
           className="a-header">Edit</Link>
       );
     } else {

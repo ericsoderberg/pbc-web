@@ -35,7 +35,8 @@ function normalizePage (item, arg) {
     item.sections.push({ text: item.text, type: 'text' });
   }
 
-  if (contacts[item.id]) {
+  if ((! item.aspect_order || item.aspect_order.indexOf('c') !== -1) &&
+    contacts[item.id]) {
     const people = contacts[item.id].map(item2 => {
       let image;
       if (item2.portrait_file_name) {
@@ -56,13 +57,15 @@ function normalizePage (item, arg) {
     item.sections.push({ people: people, type: 'people' });
   }
 
-  if (events[item.id]) {
+  if ((! item.aspect_order || item.aspect_order.indexOf('e') !== -1) &&
+    events[item.id]) {
     events[item.id].forEach(item2 => {
       item.sections.push({ eventId: eventIds[item2.id], type: 'event' });
     });
   }
 
-  if (photos[item.id]) {
+  if ((! item.aspect_order || item.aspect_order.indexOf('p') !== -1) &&
+    photos[item.id]) {
     let totalSize = 0;
     photos[item.id].forEach(item2 => {
       // stop if we've got too many
@@ -90,8 +93,9 @@ function normalizePage (item, arg) {
     item.sections.push({ files: files, type: 'files' });
   }
 
-  if (forms[item.id]) {
-    forms[item.id].forEach(item2 => {
+  if ((! item.aspect_order || item.aspect_order.indexOf('f') !== -1) &&
+    forms[item.id]) {
+    forms[item.id].filter(item2 => item2.published).forEach(item2 => {
       item.sections.push({
         formTemplateId: formTemplateIds[item2.id], type: 'form'
       });
@@ -240,7 +244,7 @@ export default function () {
     let pagePromises = [];
     pagesData.forEach(item => {
 
-      if (item.parent_id) {
+      if (item.parent_id && ! item.private && ! item.obscure) {
         if (! childOldIds[item.parent_id]) {
           childOldIds[item.parent_id] = [];
         }

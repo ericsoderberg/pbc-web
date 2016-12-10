@@ -46,8 +46,10 @@ export default function (router) {
 
       // find all events withing the time window
       let q = {
-        end: { $gte: start.toDate() },
-        start: { $lt: end.toDate() }
+        $or: [
+          { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+          { dates: { $gte: start.toDate(), $lt: end.toDate() }}
+        ]
       };
       if (req.query.search) {
         const exp = new RegExp(req.query.search, 'i');

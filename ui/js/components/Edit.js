@@ -39,7 +39,9 @@ export default class Edit extends Component {
   }
 
   render () {
-    const { category, params: { id }, FormContents, Preview, title } = this.props;
+    const {
+      category, params: { id }, FormContents, Preview, title
+    } = this.props;
     const { item, error } = this.state;
     return (
       <Form title={title} submitLabel="Update"

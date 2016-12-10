@@ -9,9 +9,9 @@ import { markdown } from 'nodemailer-markdown';
 const TRANSPORT_OPTIONS = {
   host: process.env.SMTP_HOST || 'localhost',
   port: process.env.SMTP_PORT || 25,
-  tls: { rejectUnauthorized: false },
-  logger: true,
-  debug: true
+  tls: { rejectUnauthorized: false }
+  // logger: true,
+  // debug: true
 };
 if (process.env.SMTP_USER) {
   TRANSPORT_OPTIONS.auth = {

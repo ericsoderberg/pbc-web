@@ -15,8 +15,9 @@ const EventTimes = (props) => {
       let nextDate;
       event.dates.forEach(date => {
         date = moment(date);
-        if (date.isAfter(yesterday) &&
-          (! nextDate || date.isBefore(nextDate))) {
+        if (! nextDate ||
+          (nextDate.isBefore(yesterday) && date.isAfter(nextDate)) ||
+          (date.isAfter(yesterday) && date.isBefore(nextDate))) {
           nextDate = date;
         }
       });

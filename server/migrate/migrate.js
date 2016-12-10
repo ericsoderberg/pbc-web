@@ -9,15 +9,17 @@ import libraries from './libraries';
 import events from './events';
 import forms from './forms';
 import pages from './pages';
+import calendars from './calendars';
 import results from './results';
 
 Promise.resolve()
-// .then(() => users())
-// .then(() => messages())
-// .then(() => libraries())
-// .then(() => events())
-// .then(() => forms())
+.then(() => users())
+.then(() => messages())
+.then(() => libraries())
+.then(() => events())
+.then(() => forms())
 .then(() => pages())
+.then(() => calendars())
 .then(() => console.log(results.log()))
 .then(() => console.log(`Finished`))
 .catch(error => console.log(error));

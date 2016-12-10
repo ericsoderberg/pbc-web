@@ -4,32 +4,42 @@ import { Link } from 'react-router';
 import { getSearch } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Text from '../../components/Text';
+import { getLocationParams, pushLocationParams } from '../../utils/Params';
 
 export default class Search extends Component {
 
   constructor () {
     super();
     this._onSearch = this._onSearch.bind(this);
+    this._get = this._get.bind(this);
     this.state = { items: [], searchText: '' };
   }
 
   componentDidMount () {
     document.title = 'Search';
+    const params = getLocationParams();
+    if (params.q) {
+      this.setState({ searchText: params.q || '' }, this._get);
+    }
+  }
+
+  _get () {
+    const { searchText } = this.state;
+    if (searchText) {
+      getSearch(searchText)
+      .then(response => this.setState({ items: response }))
+      .catch(error => console.log('!!! Search catch', error));
+    } else {
+      this.setState({ items: [] });
+    }
   }
 
   _onSearch (event) {
     const searchText = event.target.value;
-    clearTimeout(this._searchTimer);
-    this._searchTimer = setTimeout(() => {
-      if (searchText) {
-        getSearch(searchText)
-        .then(response => this.setState({ items: response }))
-        .catch(error => console.log('!!! Search catch', error));
-      } else {
-        this.setState({ items: [] });
-      }
-    }, 100);
     this.setState({ searchText: searchText });
+    pushLocationParams({ q: searchText });
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(this._get, 100);
   }
 
   render () {
