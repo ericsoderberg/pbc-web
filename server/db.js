@@ -62,6 +62,8 @@ const domainSchema = Schema({
 mongoose.model('Domain', domainSchema);
 
 const pageSectionSchema = Schema({
+  // calendar type
+  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   color: String,
   // event type
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
@@ -96,8 +98,8 @@ const pageSectionSchema = Schema({
   text: String,
   type: { type: String,
     enum: [
-      'event', 'files', 'form', 'image', 'library',  'people', 'pages',
-      'text', 'video'
+      'calendar', 'event', 'files', 'form', 'image', 'library',
+      'people', 'pages', 'text', 'video'
     ]
   },
   // video type

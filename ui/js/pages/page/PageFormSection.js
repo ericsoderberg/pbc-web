@@ -5,6 +5,7 @@ import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
+import CalendarSectionEdit from './CalendarSectionEdit';
 import EventSectionEdit from './EventSectionEdit';
 import FilesSectionEdit from './FilesSectionEdit';
 import LibrarySectionEdit from './LibrarySectionEdit';
@@ -14,6 +15,7 @@ import VideoSectionEdit from './VideoSectionEdit';
 import FormSectionEdit from './FormSectionEdit';
 
 const SECTIONS = {
+  calendar: CalendarSectionEdit,
   event: EventSectionEdit,
   files: FilesSectionEdit,
   form: FormSectionEdit,

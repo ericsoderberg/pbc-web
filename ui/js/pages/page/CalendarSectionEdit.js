@@ -5,18 +5,18 @@ import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
 import SectionEdit from './SectionEdit';
 
-export default class LibrarySectionEdit extends Component {
+export default class CalendarSectionEdit extends Component {
 
   constructor (props) {
     super(props);
     const { section, onChange } = props;
-    this.state = { formState: new FormState(section, onChange), libraries: [] };
+    this.state = { formState: new FormState(section, onChange), calendars: [] };
   }
 
   componentDidMount () {
-    getItems('libraries', { sort: 'name' })
-    .then(response => this.setState({ libraries: response }))
-    .catch(error => console.log('LibrarySectionEdit catch', error));
+    getItems('calendars', { sort: 'name' })
+    .then(calendars => this.setState({ calendars }))
+    .catch(error => console.log('CalendarSectionEdit catch', error));
   }
 
   componentWillReceiveProps (nextProps) {
@@ -29,18 +29,18 @@ export default class LibrarySectionEdit extends Component {
     const { formState } = this.state;
     const section = formState.object;
 
-    const libraryOptions = this.state.libraries.map(library => (
-      <option key={library._id} label={library.name} value={library._id} />
+    const calendarOptions = this.state.calendars.map(calendar => (
+      <option key={calendar._id} label={calendar.name} value={calendar._id} />
     ));
-    const value = (typeof section.libraryId === 'object' ?
-      section.libraryId._id : section.libraryId) || '';
+    const value = (typeof section.calendarId === 'object' ?
+      section.calendarId._id : section.calendarId) || '';
 
     return (
       <SectionEdit formState={formState}>
-        <FormField label="Library">
-          <select name="libraryId" value={value}
-            onChange={formState.change('libraryId')}>
-            {libraryOptions}
+        <FormField label="Calendar">
+          <select name="calendarId" value={value}
+            onChange={formState.change('calendarId')}>
+            {calendarOptions}
           </select>
         </FormField>
       </SectionEdit>
@@ -48,7 +48,7 @@ export default class LibrarySectionEdit extends Component {
   }
 };
 
-LibrarySectionEdit.defaultProps = {
+CalendarSectionEdit.defaultProps = {
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
 };

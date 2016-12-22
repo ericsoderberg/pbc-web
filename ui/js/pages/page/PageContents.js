@@ -2,6 +2,7 @@
 import React, { PropTypes } from 'react';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
+import CalendarSummary from '../calendar/CalendarSummary';
 import EventSummary from '../event/EventSummary';
 import LibrarySummary from '../library/LibrarySummary';
 import PageSummaries from './PageSummaries';
@@ -17,6 +18,11 @@ const PageContents = (props) => {
       return <Text key={index} color={section.color} text={section.text} />;
     } else if ('image' === section.type) {
       return <Image key={index} full={section.full} image={section.image} />;
+    } else if ('calendar' === section.type) {
+      return (
+        <CalendarSummary key={index} full={section.full} color={section.color}
+          id={section.calendarId} />
+      );
     } else if ('event' === section.type) {
       return (
         <EventSummary key={index} full={section.full} color={section.color}

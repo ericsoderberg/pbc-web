@@ -6,8 +6,10 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
 import PageFormSection from './PageFormSection';
 
-const SECTION_TYPES = ['text', 'image', 'event', 'library', 'people', 'pages',
-  'video', 'form', 'files'];
+const SECTION_TYPES = [
+  'text', 'image', 'event', 'calendar', 'library',
+  'people', 'pages', 'video', 'form', 'files'
+];
 
 export default class PageFormContents extends Component {
 
