@@ -3,9 +3,14 @@ import React, { PropTypes } from 'react';
 import moment from 'moment';
 
 const EventTimes = (props) => {
-  const { event, reverse } = props;
+  const { event, reverse, size } = props;
   const start = moment(event.start);
   const yesterday = moment().subtract(1, 'day');
+
+  let classes = ["event-times"];
+  if (size) {
+    classes.push(`event-times--${size}`);
+  }
 
   let dates;
   if (event.dates && event.dates.length > 0) {
@@ -70,7 +75,7 @@ const EventTimes = (props) => {
 
   if (reverse) {
     return (
-      <div className="event-times">
+      <div className={classes.join(' ')}>
         <span className="event-times__dates">{dates}</span>
         <span className="event-times__separator">@</span>
         <span className="event-times__times">{times}</span>
@@ -78,7 +83,7 @@ const EventTimes = (props) => {
     );
   } else {
     return (
-      <div className="event-times">
+      <div className={classes.join(' ')}>
         <span className="event-times__times">{times}</span>
         <span className="event-times__separator" />
         <span className="event-times__dates">{dates}</span>
@@ -89,7 +94,8 @@ const EventTimes = (props) => {
 
 EventTimes.propTypes = {
   event: PropTypes.any.isRequired,
-  reverse: PropTypes.bool
+  reverse: PropTypes.bool,
+  size: PropTypes.oneOf(['medium', 'large'])
 };
 
 export default EventTimes;

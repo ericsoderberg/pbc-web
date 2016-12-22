@@ -46,14 +46,14 @@ export default class EventSummary extends Component {
         contents = (
           <div className="event-summary__summary">
             <h2>{event.name}</h2>
-            <EventTimes event={event} reverse={true} />
+            <EventTimes event={event} reverse={true} size="large" />
           </div>
         );
       } else {
         contents = (
           <Link to={`/events/${event._id}`} className="event-summary__summary">
             <Button right={true}>{event.name}</Button>
-            <EventTimes event={event} reverse={true} />
+            <EventTimes event={event} reverse={true} size="large" />
           </Link>
         );
       }

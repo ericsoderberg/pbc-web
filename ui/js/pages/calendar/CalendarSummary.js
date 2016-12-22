@@ -92,7 +92,7 @@ export default class CalendarSummary extends Component {
             <Link to={`/events/${event._id}`}
               className="event-summary__summary">
               <Button right={true}>{event.name}</Button>
-              <EventTimes event={event} reverse={true} />
+              <EventTimes event={event} reverse={true} size="large" />
             </Link>
             {map}
           </div>

@@ -180,7 +180,10 @@ export default function (router) {
     category: 'events',
     modelName: 'Event',
     get: {
-      populate: { path: 'primaryEventId', select: 'name path' }
+      populate: [
+        { path: 'primaryEventId', select: 'name path' },
+        { path: 'calendarId', select: 'name path' }
+      ]
     },
     put: {
       transformIn: unsetDomainIfNeeded
