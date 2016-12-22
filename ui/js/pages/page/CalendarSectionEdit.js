@@ -32,8 +32,15 @@ export default class CalendarSectionEdit extends Component {
     const calendarOptions = this.state.calendars.map(calendar => (
       <option key={calendar._id} label={calendar.name} value={calendar._id} />
     ));
-    const value = (typeof section.calendarId === 'object' ?
-      section.calendarId._id : section.calendarId) || '';
+
+    let value = '';
+    if (section.calendarId) {
+      if (typeof section.calendarId === 'string') {
+        value = section.calendarId;
+      } else {
+        value = section.calendarId._id;
+      }
+    }
 
     return (
       <SectionEdit formState={formState}>

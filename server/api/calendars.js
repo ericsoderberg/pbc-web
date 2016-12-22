@@ -53,22 +53,22 @@ export default function (router) {
       const previous = moment(date).subtract(1, 'month');
       const next = moment(date).add(1, 'month');
 
-      // find all events withing the time window
-      let q = {
-        $or: [
-          { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-          { dates: { $gte: start.toDate(), $lt: end.toDate() }}
-        ]
-      };
+      // find events withing the time window
+      let dateCriteria = [
+        { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+        { dates: { $gte: start.toDate(), $lt: end.toDate() }}
+      ];
+      let q = { $or: dateCriteria };
       if (req.query.search) {
         const exp = new RegExp(req.query.search, 'i');
         q.name = exp;
       }
       if (calendars.length > 0) {
-        q = { ...q,
-          $or: calendars.map(calendar => ( { calendarId: calendar._id }))
-        };
+        q = { $and: [ q,
+          { $or: calendars.map(calendar => ( { calendarId: calendar._id })) }
+        ]};
       }
+
       Event.find(q)
       .sort('start')
       .exec()

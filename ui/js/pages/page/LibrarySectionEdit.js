@@ -32,8 +32,15 @@ export default class LibrarySectionEdit extends Component {
     const libraryOptions = this.state.libraries.map(library => (
       <option key={library._id} label={library.name} value={library._id} />
     ));
-    const value = (typeof section.libraryId === 'object' ?
-      section.libraryId._id : section.libraryId) || '';
+
+    let value = '';
+    if (section.libraryId) {
+      if (typeof section.libraryId === 'string') {
+        value = section.libraryId;
+      } else {
+        value = section.libraryId._id;
+      }
+    }
 
     return (
       <SectionEdit formState={formState}>
