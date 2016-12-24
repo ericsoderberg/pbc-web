@@ -40,7 +40,7 @@ export default class PageContext extends Component {
         </li>
       ));
       result = (
-        <ul className="list">
+        <ul className="page-context list">
           {pageItems}
         </ul>
       );

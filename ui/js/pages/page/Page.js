@@ -32,10 +32,7 @@ class Page extends Component {
     if (page) {
       contents = <PageContents item={page} />;
       actions = (
-        <Link to={`/pages/${page._id}/map`}
-          className="a-header">
-          Map
-        </Link>
+        <Link to={`/pages/${page._id}/map`} className="a-header">Map</Link>
       );
     } else {
       contents = <Loading />;
@@ -62,9 +59,7 @@ const select = (state, props) => {
   if (state.pages) {
     page = state.pages[props.params.id];
   }
-  return {
-    page: page
-  };
+  return { page };
 };
 
 export default Stored(Page, select);

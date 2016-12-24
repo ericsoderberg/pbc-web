@@ -1,6 +1,5 @@
 "use strict";
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
 import EventTimes from '../../components/EventTimes';
 import Text from '../../components/Text';
 import Map from '../../components/Map';
@@ -9,15 +8,9 @@ import PageContext from '../page/PageContext';
 const EventContents = (props) => {
   const event = props.item;
 
-  let text, altText;
+  let text;
   if (event.text) {
     text = <Text text={event.text} />;
-  } else {
-    altText = (
-      <div>
-        <h1>{event.name}</h1>
-      </div>
-    );
   }
 
   let map;
@@ -25,26 +18,18 @@ const EventContents = (props) => {
     map = <Map address={event.address} title={event.location} />;
   }
 
-  const calendar = event.calendarId || {};
-  const calendarLink = (
-    <Link to={`/calendars/${calendar.path || calendar._id}`}>Calendar</Link>
-  );
-
   return (
     <div>
-      {text}
       <div className="section__container">
         <div className="text section">
-          {altText}
+          <div>
+            <h1>{event.name}</h1>
+          </div>
           <EventTimes event={event} reverse={true} size="large" />
         </div>
       </div>
       {map}
-      <div className="section__container">
-        <div className="text section">
-          {calendarLink}
-        </div>
-      </div>
+      {text}
       <PageContext
         filter={event ? { 'sections.eventId': event._id } : undefined} />
     </div>
