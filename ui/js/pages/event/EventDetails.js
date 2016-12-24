@@ -5,7 +5,7 @@ import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
-import DateTime from '../../components/DateTime';
+import DateTimeInput from '../../components/DateTimeInput';
 import SelectSearch from '../../components/SelectSearch';
 import TrashIcon from '../../icons/Trash';
 import { getLocationParams } from '../../utils/Params';
@@ -114,13 +114,11 @@ export default class EventDetails extends Component {
               <TrashIcon secondary={true} />
             </button>
           }>
-          <DateTime format="h:mm a" name={`start-${index}`} step={15}
-            value={time.start || ''}
+          <DateTimeInput value={time.start || ''}
             onChange={this._otherTimeChange('start', index)} />
         </FormField>,
         <FormField key={`end-${index}`} label="Also ends">
-          <DateTime format="h:mm a" name={`end-${index}`} step={15}
-            value={time.end || ''}
+          <DateTimeInput value={time.end || ''}
             onChange={this._otherTimeChange('end', index)} />
         </FormField>
       ]);
@@ -155,13 +153,11 @@ export default class EventDetails extends Component {
               onChange={formState.change('name')}/>
           </FormField>
           <FormField label="Starts">
-            <DateTime format="M/D/YYYY h:mm a" name="start" step={15}
-              value={event.start || ''}
+            <DateTimeInput value={event.start || ''}
               onChange={this._onStartChange} />
           </FormField>
           <FormField label="Ends">
-            <DateTime format="M/D/YYYY h:mm a" name="end" step={15}
-              value={event.end || ''}
+            <DateTimeInput value={event.end || ''}
               onChange={formState.change('end')} />
           </FormField>
           <FormField label="Location">

@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
-import DateTime from '../../components/DateTime';
+import DateInput from '../../components/DateInput';
 import TextHelp from '../../components/TextHelp';
 import FormState from '../../utils/FormState';
 
@@ -36,8 +36,7 @@ export default class RelationEdit extends Component {
             onChange={formState.change('relationship')}/>
         </FormField>
         <FormField label="Birthday">
-          <DateTime format="M/D/YYYY" name="birthday" step={15}
-            value={relation.birthday || ''}
+          <DateInput value={relation.birthday || ''}
             onChange={formState.change('birthday')} />
         </FormField>
         <FormField label="Grade">

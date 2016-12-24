@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
-import DateTime from '../../components/DateTime';
+import DateInput from '../../components/DateInput';
 
 export default class NewsletterFormContents extends Component {
 
@@ -72,8 +72,7 @@ export default class NewsletterFormContents extends Component {
             onChange={formState.change('name')}/>
         </FormField>
         <FormField label="Date">
-          <DateTime format="M/D/YYYY" name="date"
-            value={newsletter.date || ''}
+          <DateInput value={newsletter.date || ''}
             onChange={formState.change('date')} />
         </FormField>
         <FormField label="Text">

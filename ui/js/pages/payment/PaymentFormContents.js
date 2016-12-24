@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
-import DateTime from '../../components/DateTime';
+import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
 import Stored from '../../components/Stored';
 
@@ -91,8 +91,7 @@ class PaymentFormContents extends Component {
             </div>
           </FormField>
           <FormField label="Sent date">
-            <DateTime format="M/D/YYYY" name="sent"
-              value={payment.sent || ''}
+            <DateInput value={payment.sent || ''}
               onChange={formState.change('sent')} />
           </FormField>
           <FormField label="Sent date">
@@ -116,8 +115,7 @@ class PaymentFormContents extends Component {
         </fieldset>
         <fieldset className="form__fields">
           <FormField label="Received date">
-            <DateTime format="M/D/YYYY" name="received"
-              value={payment.received || ''}
+            <DateInput value={payment.received || ''}
               onChange={formState.change('received')} />
           </FormField>
           {administeredBy}

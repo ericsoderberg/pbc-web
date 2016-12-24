@@ -6,7 +6,7 @@ import moment from 'moment';
 import { getItem, getItems } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Button from '../../components/Button';
-import DateTime from '../../components/DateTime';
+import DateInput from '../../components/DateInput';
 import Loading from '../../components/Loading';
 import PageItem from '../page/PageItem';
 
@@ -399,13 +399,13 @@ export default class FormTemplate extends Component {
       <div className="page-header__drop box--row">
         <div>
           <h4>From</h4>
-          <DateTime format="M/D/YYYY" inline={true} value={fromDate || ''}
+          <DateInput inline={true} value={fromDate || ''}
             onChange={date => this.setState({ fromDate: date },
               this._filterForms)} />
         </div>
         <div>
           <h4>To</h4>
-          <DateTime format="M/D/YYYY" inline={true} value={toDate || ''}
+          <DateInput inline={true} value={toDate || ''}
             onChange={date => this.setState({ toDate: date },
               this._filterForms)} />
         </div>

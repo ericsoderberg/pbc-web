@@ -4,7 +4,7 @@ import { getItems, postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import ImageField from '../../components/ImageField';
-import DateTime from '../../components/DateTime';
+import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
 import TextHelp from '../../components/TextHelp';
 import TrashIcon from '../../icons/Trash';
@@ -179,8 +179,7 @@ export default class MessageFormContents extends Component {
               onChange={formState.change('author')}/>
           </FormField>
           <FormField label="Date">
-            <DateTime format="M/D/YYYY" name="date"
-              value={message.date || ''}
+            <DateInput value={message.date || ''}
               onChange={formState.change('date')} />
           </FormField>
           <FormField label="Verses">

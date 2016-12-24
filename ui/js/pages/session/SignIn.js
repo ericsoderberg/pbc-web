@@ -54,11 +54,13 @@ export default class SignIn extends Component {
           <FormError message={error} />
           <fieldset className="form__fields">
             <FormField name="email" label="Email">
-              <input ref="email" name="email" value={session.email || ''}
+              <input ref="email" name="email" type='email'
+                value={session.email || ''}
                 onChange={formState.change('email')}/>
             </FormField>
             <FormField name="password" label="Password">
-              <input name="password" type="password" value={session.password || ''}
+              <input name="password" type="password"
+                value={session.password || ''}
                 onChange={formState.change('password')}/>
             </FormField>
           </fieldset>
