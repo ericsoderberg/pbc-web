@@ -333,6 +333,14 @@ export default class Calendar extends Component {
       today = <a onClick={this._changeDate(moment())}>Today</a>;
     }
 
+    let pageContext;
+    if (id && calendar) {
+      pageContext = (
+        <PageContext
+          filter={{ 'sections.calendarId': calendar._id }} />
+      );
+    }
+
     return (
       <main>
         <PageHeader title={calendar.name || 'Calendar'}
@@ -368,9 +376,7 @@ export default class Calendar extends Component {
           {weeks}
           {loadingIndicator}
         </div>
-        <PageContext
-          filter={calendar ? { 'sections.calendarId': calendar._id }
-            : undefined} />
+        {pageContext}
       </main>
     );
   }
