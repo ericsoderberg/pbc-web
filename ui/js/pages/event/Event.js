@@ -32,9 +32,10 @@ class Event extends Component {
     if (event) {
       contents = <EventContents item={event} />;
       const calendar = event.calendarId || {};
+      const path = (calendar.path || calendar._id) ?
+        `/calendars/${calendar.path || calendar._id}` : `/calendar`;
       actions = (
-        <Link to={`/calendars/${calendar.path || calendar._id}`}
-          className="a-header">Calendar</Link>
+        <Link to={path} className="a-header">Calendar</Link>
       );
     } else {
       contents = <Loading />;
