@@ -8,6 +8,7 @@ import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
+import PageContext from '../page/PageContext';
 
 const LEFT_KEY = 37;
 const RIGHT_KEY = 39;
@@ -367,6 +368,9 @@ export default class Calendar extends Component {
           {weeks}
           {loadingIndicator}
         </div>
+        <PageContext
+          filter={calendar ? { 'sections.calendarId': calendar._id }
+            : undefined} />
       </main>
     );
   }

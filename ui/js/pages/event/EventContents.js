@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import EventTimes from '../../components/EventTimes';
 import Text from '../../components/Text';
 import Map from '../../components/Map';
+import PageContext from '../page/PageContext';
 
 const EventContents = (props) => {
   const event = props.item;
@@ -26,9 +27,7 @@ const EventContents = (props) => {
 
   const calendar = event.calendarId || {};
   const calendarLink = (
-    <Link to={`/calendars/${calendar.path || calendar._id}`}>
-      {calendar.name}
-    </Link>
+    <Link to={`/calendars/${calendar.path || calendar._id}`}>Calendar</Link>
   );
 
   return (
@@ -46,6 +45,8 @@ const EventContents = (props) => {
           {calendarLink}
         </div>
       </div>
+      <PageContext
+        filter={event ? { 'sections.eventId': event._id } : undefined} />
     </div>
   );
 };

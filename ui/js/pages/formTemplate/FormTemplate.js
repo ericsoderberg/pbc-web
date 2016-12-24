@@ -8,7 +8,7 @@ import ItemHeader from '../../components/ItemHeader';
 import Button from '../../components/Button';
 import DateInput from '../../components/DateInput';
 import Loading from '../../components/Loading';
-import PageItem from '../page/PageItem';
+import PageContext from '../page/PageContext';
 
 const FIXED_FIELDS = ['created', 'modified'];
 const FiXED_LABELS = { created: 'Submitted', modified: 'Updated'};
@@ -18,12 +18,11 @@ export default class FormTemplate extends Component {
   constructor () {
     super();
     this._layout = this._layout.bind(this);
-    this.state = { pages: [], sortReverse: false };
+    this.state = { sortReverse: false };
   }
 
   componentDidMount () {
     this._loadFormTemplate();
-    this._loadPages();
   }
 
   componentDidUpdate () {
@@ -62,16 +61,6 @@ export default class FormTemplate extends Component {
       this.setState({ forms: forms, formTemplate: formTemplate });
     })
     .catch(error => console.log('!!! FormTemplate forms catch', error));
-  }
-
-  _loadPages () {
-    const { params: { id } } = this.props;
-    getItems('pages', {
-      filter: { 'sections.formTemplateId': id },
-      select: 'name'
-    })
-    .then(pages => this.setState({ pages: pages }))
-    .catch(error => console.log('!!! FormTemplate pages catch', error));
   }
 
   _annotateFormTemplate (formTemplate) {
@@ -415,7 +404,7 @@ export default class FormTemplate extends Component {
 
   render () {
     const { params: { id } } = this.props;
-    const { filterActive, formTemplate, forms, pages } = this.state;
+    const { filterActive, formTemplate, forms } = this.state;
 
     let filter;
     if (filterActive) {
@@ -461,29 +450,13 @@ export default class FormTemplate extends Component {
       contents = <Loading />;
     }
 
-    let pageContext;
-    if (pages.length > 0) {
-      const pageItems = pages.map(page => (
-        <li key={page._id}>
-          <PageItem item={page} />
-        </li>
-      ));
-      pageContext = (
-        <div className="text">
-          <h3>Page{pageItems.length > 1 ? 's' : ''}</h3>
-          <ul className="list">
-            {pageItems}
-          </ul>
-        </div>
-      );
-    }
-
     return (
       <main>
         <ItemHeader category="form-templates" item={formTemplate}
           title={title} actions={actions} />
         {contents}
-        {pageContext}
+        <PageContext
+          filter={id ? { 'sections.formTemplateId': id } : undefined} />
       </main>
     );
   }
