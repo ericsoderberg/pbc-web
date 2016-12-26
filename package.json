@@ -16,7 +16,7 @@
     "dist": "rm -rf dist; mkdir dist; cp ui/index.html dist; NODE_ENV=production ./node_modules/.bin/webpack -p --content-base dist/",
     "start": "node server/run.js",
     "start:dev": "NODE_ENV=development nodemon --ignore src/ server/run.js",
-    "sync": "scp -p -r .babelrc LICENSE README.md dist package.json server webapp@test.pbc.org:/srv/webapp/"
+    "sync": "rsync -r --progress .babelrc LICENSE README.md dist package.json server webapp@test.pbc.org:/srv/webapp/"
   },
   "dependencies": {
     "babel-cli": "^6.18.0",
