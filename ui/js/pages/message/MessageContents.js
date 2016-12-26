@@ -84,7 +84,7 @@ export default class MessageContents extends Component {
             </a>
           );
         } else {
-          audio = <Audio file={file} full={true} />;
+          audio = <Audio file={file} full={false} />;
         }
       }
     });
@@ -208,6 +208,7 @@ export default class MessageContents extends Component {
         {audio}
         {image}
         {text}
+        {seriesMessages}
         {files}
         {attributes}
         <div className="section__container section__container--full">
@@ -216,7 +217,6 @@ export default class MessageContents extends Component {
             {nextMessage}
           </div>
         </div>
-        {seriesMessages}
       </div>
     );
   }

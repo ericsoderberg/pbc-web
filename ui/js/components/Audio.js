@@ -1,6 +1,33 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import Section from './Section';
+import VolumeIcon from '../icons/Volume';
+
+function pad(num, size) {
+  let s = num + "";
+  while (s.length < size) s = "0" + s;
+  return s;
+}
+
+function friendlyDuration (duration) {
+  let remaining = duration;
+  let result = '';
+  if (remaining > 3600) {
+    const hours = Math.floor(remaining / 3600);
+    result += `${hours}:`;
+    remaining -= hours * 3600;
+  }
+  if (remaining > 60) {
+    const minutes = Math.floor(remaining / 60);
+    result += `${pad(minutes, 2)}:`;
+    remaining -= minutes * 60;
+  }
+  if (remaining > 0) {
+    const seconds = Math.floor(remaining);
+    result += `${pad(seconds, 2)}`;
+  }
+  return result;
+}
 
 export default class Audio extends Component {
 
@@ -82,18 +109,41 @@ export default class Audio extends Component {
     const { file, color, full, plain } = this.props;
     const { playing, volume, start, end, at } = this.state;
     const path = `/api/files/${file._id}/${file.name}`;
-    const label = playing ? 'Pause' : 'Listen';
     const onClick = playing ? this._onPause : this._onPlay;
+
+    let playControl, positionControl, volumeControl;
+    if (playing) {
+      playControl = (
+        <button className="button audio__control" type="button"
+          onClick={onClick}>Pause</button>
+      );
+      positionControl = (
+        <div className="audio__position-container">
+          <input className="audio__position" type="range" min={start} max={end}
+            value={at} onChange={this._onSeek} />
+          <label>{friendlyDuration(end - at)}</label>
+        </div>
+      );
+      volumeControl = (
+        <div className="audio__volume-container">
+          <VolumeIcon />
+          <input className="audio__volume" type="range" min={0} max={1}
+            step={0.1} value={volume} onChange={this._onVolume} />
+        </div>
+      );
+    } else {
+      playControl = (
+        <button className="button audio__control" type="button"
+          onClick={onClick}>Listen</button>
+      );
+    }
 
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="audio">
-          <button className="button audio__control" type="button"
-            onClick={onClick}>{label}</button>
-          <input className="audio__position" type="range" min={start} max={end}
-            value={at} onChange={this._onSeek} />
-          <input className="audio__volume" type="range" min={0} max={1} step={0.1}
-            value={volume} onChange={this._onVolume} />
+          {playControl}
+          {positionControl}
+          {volumeControl}
           <audio ref="audio" preload="metadata">
             <source src={path} type={file.type} />
             No audio with this browser

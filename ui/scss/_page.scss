@@ -224,6 +224,10 @@
     max-width: $page-width;
     margin: 0 auto;
     padding: 0;
+
+    h2 {
+      margin-left: $unit;
+    }
   }
 
   @media all and (max-width: 699px) {
@@ -234,10 +238,6 @@
     > * {
       margin: $half-unit 0;
     }
-  }
-
-  h2 {
-    margin-left: $unit;
   }
 
   label {
