@@ -130,7 +130,7 @@ export default class LibrarySummary extends Component {
       <Link to={`/messages/${message.path || message._id}`}>
         {image}
         <div className={classNames.join(' ')}>
-          <Button right={true}>Latest Message</Button>
+          <Button right={true}>Upcoming Message</Button>
           <label>{moment(message.date).format('MMM Do')}</label>
           <h2>{message.name}</h2>
         </div>
