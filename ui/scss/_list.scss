@@ -79,6 +79,10 @@ button.item__container {
 
   @media all and (max-width: 699px) {
     flex-direction: column;
+
+    > *:not(:first-child) {
+      margin-top: $half-unit;
+    }
   }
 }
 
@@ -88,10 +92,6 @@ button.item__container {
 
 .item__name {
   font-weight: 600;
-
-  @media all and (max-width: 699px) {
-    margin-bottom: $half-unit;
-  }
 }
 
 .item--primary {

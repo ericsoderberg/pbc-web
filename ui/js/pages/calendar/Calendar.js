@@ -249,7 +249,7 @@ export default class Calendar extends Component {
   _renderFilter () {
     const { activeCalendars, calendars } = this.state;
     const controls = calendars.map(calendar => (
-      <div key={calendar._id} className="filter-item box--row">
+      <div key={calendar._id} className="filter-item box--row box--static">
         <input id={calendar._id} name={calendar._id} type="checkbox"
           checked={activeCalendars[calendar._id] || false}
           onChange={this._toggleCalendar(calendar._id)} />
@@ -257,7 +257,7 @@ export default class Calendar extends Component {
       </div>
     ));
     controls.unshift(
-      <div key="all" className="filter-item box--row">
+      <div key="all" className="filter-item box--row box--static">
         <input id="all-calendars" name="all-calendars" type="checkbox"
           checked={Object.keys(activeCalendars).length === 0}
           onChange={() => this.setState({ activeCalendars: {} },

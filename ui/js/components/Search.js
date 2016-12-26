@@ -25,7 +25,9 @@ export default class Search extends Component {
   }
 
   _onBlur (event) {
-    this.setState({ active: false });
+    setTimeout(() => {
+      this.setState({ active: false });
+    }, 10);
   }
 
   render () {
@@ -40,7 +42,8 @@ export default class Search extends Component {
       <div className={classNames.join(' ')}>
         <input ref="input" className="search__input" placeholder="Search"
           value={value} onChange={onChange} onBlur={this._onBlur} />
-        <button className="search__control button-icon" onClick={this._onActivate}>
+        <button className="search__control button-icon"
+          onClick={! active ? this._onActivate : undefined}>
           <SearchIcon />
         </button>
       </div>

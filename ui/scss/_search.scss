@@ -1,6 +1,5 @@
 
 .search {
-  position: relative;
   z-index: 1;
 
   @media all and (min-width: 700px) {
@@ -31,7 +30,7 @@
   .search__input {
     display: block;
     position: absolute;
-    top: $double-unit;
+    top: $quadruple-unit;
     left: 0;
     max-width: round($unit * 24);
     width: 100vw;
