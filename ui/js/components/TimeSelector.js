@@ -89,11 +89,11 @@ export default class TimeSelector extends Component {
 
     return (
       <div className="time-selector">
-        <div className="time-selector__hours">
-          {hours}
-        </div>
         <div className="time-selector__minutes">
           {minutes}
+        </div>
+        <div className="time-selector__hours">
+          {hours}
         </div>
         <div className="time-selector__ampms">
           {ampms}

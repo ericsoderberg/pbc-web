@@ -374,9 +374,11 @@
 .time-selector__hour,
 .time-selector__minute,
 .time-selector__ampm {
+  height: $unit * 1.5;
+  width: $unit * 1.5;
+  border-radius: $unit * 0.75;
   cursor: pointer;
-  // width: $unit * 1.5;
-  padding: $quarter-unit;
+  padding: $unit * 0.375;
   transition: background-color 0.3s;
 
   &:hover {
@@ -403,11 +405,12 @@
 }
 
 .time-selector {
+  position: relative;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: $unit;
+  padding: $double-unit;
 }
 
 .time-selector__hours {
@@ -489,9 +492,12 @@
 }
 
 .time-selector__minutes {
-  position: relative;
-  width: round($unit * 4);
-  height: round($unit * 4);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: round($unit * 10);
+  height: round($unit * 10);
 }
 
 .time-selector__minute {
@@ -504,11 +510,11 @@
 
   &:nth-child(1),
   &:nth-child(3) {
-    left: round($unit * 1.5);
+    left: round($unit * 4.5);
   }
 
   &:nth-child(2) {
-    left: round($unit * 3);
+    left: round($unit * 9);
   }
 
   // y
@@ -518,12 +524,19 @@
 
   &:nth-child(2),
   &:nth-child(4) {
-    top: round($unit * 1.5);
+    top: round($unit * 4.5);
   }
 
   &:nth-child(3) {
-    top: round($unit * 3);
+    top: round($unit * 9);
   }
+}
+
+.time-selector__ampms {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 // .date-time__time {
