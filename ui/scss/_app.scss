@@ -1,50 +1,53 @@
 
 .app {
   position: relative;
-  display: flex;
-  flex-direction: row;
   min-height: 100vh;
   max-width: 100vw;
+
+  @media all and (min-width: 700px) {
+    display: flex;
+    flex-direction: row;
+  }
+
+  @media all and (max-width: 699px) {
+    overflow: auto;
+  }
 }
 
 .app__nav-control {
+
   @media all and (min-width: 700px) {
     display: none;
   }
 
   @media all and (max-width: 699px) {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    z-index: 2;
-    // margin-left: - $half-unit;
+    width: 100%;
   }
 }
 
-// .app__nav {
-//   background-color: #666;
-//   color: $active-color;
-//
-//   @media all and (min-width: 700px) {
-//     flex: 0 0 $sidebar-width;
-//   }
-//
-//   @media all and (max-width: 699px) {
-//     display: none;
-//   }
-// }
-
 .app__content {
-  flex: 1 1;
-  min-width: 0px;
+  @media all and (min-width: 700px) {
+    flex: 1 1;
+    min-width: 0px;
+  }
+
+  @media all and (max-width: 699px) {
+    min-height: 100vh;
+  }
 }
 
 .app--nav {
   @media all and (max-width: 699px) {
+    max-height: 100vh;
+    overflow: hidden;
+
     .main-nav {
-      display: flex;
-      flex-basis: 90vw;
-      margin-left: 0;
+      position: absolute;
+      display: block;
+      height: 90vh;
+      width: 100%;
+      overflow: auto;
+      z-index: 2;
     }
 
     .app__content {

@@ -1,15 +1,50 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { findDOMNode } from 'react-dom';
+import Button from './Button';
 import MainNav from './MainNav';
 import Stored from './Stored';
-import RightIcon from '../icons/Right';
 
 class App extends Component {
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this._onToggle = this._onToggle.bind(this);
-    this.state = { navActive: false };
+    this.state = this._stateFromProps(props);
+  }
+
+  componentDidMount () {
+    this._hideNavControl();
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.setState({ ...this._stateFromProps(nextProps) });
+  }
+
+  componentDidUpdate () {
+    this._hideNavControl();
+  }
+
+  _stateFromProps (props) {
+    const { session } = props;
+    return {
+      navigable: (session &&
+        (session.administrator || session.administratorDomainId))
+    };
+  }
+
+  _hideNavControl () {
+    clearTimeout(this._navTimer);
+    this._navTimer = setTimeout (() => {
+      const { navActive, navigable } = this.state;
+      if (navigable && ! navActive &&
+        0 === window.scrollY && window.innerWidth < 700) {
+        const navControl = this.refs.navControl;
+        if (navControl) {
+          window.scrollTo(0, findDOMNode(navControl).offsetHeight);
+        }
+      }
+    }, 40);
   }
 
   _onToggle () {
@@ -18,21 +53,20 @@ class App extends Component {
   }
 
   render () {
-    const { session } = this.props;
-    const { navActive } = this.state;
+    const { navActive, navigable } = this.state;
     let classNames = ['app'];
 
     let nav, navControl;
-    if (session && (session.administrator || session.administratorDomainId)) {
+    if (navigable) {
       nav = <MainNav onClick={this._onToggle} />;
       if (navActive) {
         classNames.push('app--nav');
       } else {
         navControl = (
-          <button type="button" className="button-icon app__nav-control"
-            onClick={this._onToggle}>
-            <RightIcon />
-          </button>
+          <Button ref="navControl"
+            className="app__nav-control" onClick={this._onToggle}>
+            menu
+          </Button>
         );
       }
     }
