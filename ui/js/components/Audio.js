@@ -109,13 +109,12 @@ export default class Audio extends Component {
     const { file, color, full, plain } = this.props;
     const { playing, volume, start, end, at } = this.state;
     const path = `/api/files/${file._id}/${file.name}`;
-    const onClick = playing ? this._onPause : this._onPlay;
 
     let playControl, positionControl, volumeControl;
     if (playing) {
       playControl = (
         <button className="button audio__control" type="button"
-          onClick={onClick}>Pause</button>
+          onClick={this._onPause}>Pause</button>
       );
       positionControl = (
         <div className="audio__position-container">
@@ -134,7 +133,7 @@ export default class Audio extends Component {
     } else {
       playControl = (
         <button className="button audio__control" type="button"
-          onClick={onClick}>Listen</button>
+          onClick={this._onPlay}>Listen</button>
       );
     }
 
