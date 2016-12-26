@@ -7,6 +7,8 @@ import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
+import SearchIcon from '../../icons/Search';
+import CalendarIcon from '../../icons/Calendar';
 import Button from '../../components/Button';
 import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
@@ -50,29 +52,20 @@ class Home extends Component {
 
   _renderSession () {
     const { session } = this.props;
-    let sessionControl;
+    let contents;
     if (session && session.token) {
-      sessionControl = (
-        <div className="home__session">
-          <Link to={`/users/${session.userId}/edit`}>{session.name}</Link>
-            <a className="home__sign-out" onClick={this._signOut}>
-              <span className="link__text">Sign Out</span>
-            </a>
-        </div>
-      );
-      // sessionControl = (
-      //   <a className="home__sign-out" onClick={this._signOut}>
-      //     <span className="link__text">Sign Out</span>
-      //   </a>
-      // );
+      contents = [
+        <Link key="name" to={`/users/${session.userId}/edit`}>
+          {session.name}
+        </Link>,
+        <a key="control" className="home__sign-out" onClick={this._signOut}>
+          <span className="link__text">Sign Out</span>
+        </a>
+      ];
     } else {
-      sessionControl = (
-        <Button path="/sign-in">
-          Sign In
-        </Button>
-      );
+      contents = <Button path="/sign-in">Sign In</Button>;
     }
-    return sessionControl;
+    return <div className="home__session">{contents}</div>;
   }
 
   _renderContents () {
@@ -123,10 +116,16 @@ class Home extends Component {
               {socialLinks}
             </div>
           </div>
+          <div className="home__nav">
+            <Link to="/calendar"><CalendarIcon /></Link>
+            <Link to="/search"><SearchIcon /></Link>
+          </div>
           {sessionControl}
         </div>
         <footer className="home__footer footer">
-          <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>{site.address}</a>
+          <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>
+            {site.address}
+          </a>
           <a href={`tel:${site.phone}`}>{site.phone}</a>
           <span>{site.copyright}</span>
         </footer>

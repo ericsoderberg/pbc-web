@@ -239,8 +239,9 @@
     flex-direction: column;
     padding: 0;
 
-    button {
-      margin: $unit 0;
+    button,
+    a {
+      margin-top: $unit;
     }
   }
 }
