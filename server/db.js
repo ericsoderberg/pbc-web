@@ -204,11 +204,13 @@ const formTemplateSectionSchema = Schema({
 });
 
 const formTemplateSchema = Schema({
+  acknowledge: Boolean,
   authenticate: Boolean,
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true, unique: true},
+  notify: String,
   oldId: Number,
   payable: Boolean,
   sections: [formTemplateSectionSchema],

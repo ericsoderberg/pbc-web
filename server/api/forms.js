@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
 import hat from 'hat';
+import moment from 'moment';
 import { authorize, authorizedForDomainOrSelf } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
@@ -27,7 +28,70 @@ function formValueForFieldName (formTemplate, form, fieldName) {
   return result;
 }
 
-export default function (router) {
+const sendEmails = (req, transporter) => {
+  return (context) => {
+    return Promise.resolve(context)
+    .then(context => {
+      const Site = mongoose.model('Site');
+      return Site.findOne({}).exec()
+      .then(site => ({ ...context, site }));
+    })
+    .then(context => {
+      // send acknowledgement, if needed
+      const { session, formTemplate, form, site } = context;
+      if (formTemplate.acknowledge) {
+        const url = `${req.protocol}://${req.get('Host')}` +
+          `/forms/${form._id}/edit`;
+        const instructions =
+`### Thank you for your submittal for
+
+
+# [${formTemplate.name}](${url})
+
+
+### on ${moment(form.modified).format('MMMM Do YYYY')}
+`;
+        transporter.sendMail({
+          from: site.email,
+          to: session.email,
+          subject: 'Thank you',
+          markdown: instructions
+        }, (err, info) => {
+          console.log('!!! sendMail', err, info);
+        });
+      }
+      return context;
+    })
+    .then(context => {
+      // send notification, if needed
+      const { session, formTemplate, form, site } = context;
+      if (formTemplate.notify) {
+        const url = `${req.protocol}://${req.get('Host')}` +
+          `/forms/${form._id}/edit`;
+        const instructions =
+`### Submittal from ${session.name} (${session.email}) for
+
+
+# [${formTemplate.name}](${url})
+
+
+### on ${moment(form.modified).format('MMMM Do YYYY')}
+`;
+        transporter.sendMail({
+          from: site.email,
+          to: formTemplate.notify,
+          subject: `${formTemplate.name} submittal`,
+          markdown: instructions
+        }, (err, info) => {
+          console.log('!!! sendMail', err, info);
+        });
+      }
+      return context;
+    });
+  };
+};
+
+export default function (router, transporter) {
 
   register(router, {
     category: 'forms',
@@ -56,10 +120,7 @@ export default function (router) {
       const data = req.body;
       const FormTemplate = mongoose.model('FormTemplate');
       return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
-      .then(formTemplate => ({
-        formTemplate: formTemplate,
-        session: session
-      }));
+      .then(formTemplate => ({ session, formTemplate }));
     })
     .then(context => {
       const { session, formTemplate } = context;
@@ -105,10 +166,7 @@ export default function (router) {
           });
           return session.save();
         })
-        .then(session => ({
-          formTemplate: formTemplate,
-          session: session
-        }));
+        .then(session => ({ ...context, session, formTemplate }));
       } else {
         return context;
       }
@@ -128,14 +186,17 @@ export default function (router) {
       }
       const form = new Form(data);
       return form.save()
-      .then(doc => {
-        if (! session.loginAt) {
-          // we created this session here, return it
-          res.status(200).json(session);
-        } else {
-          res.status(200).send({});
-        }
-      });
+      .then(form => ({ ...context, form }));
+    })
+    .then(sendEmails(req, transporter))
+    .then(context => {
+      const { session } = context;
+      if (! session.loginAt) {
+        // we created this session here, return it
+        res.status(200).json(session);
+      } else {
+        res.status(200).send({});
+      }
     })
     .catch(error => {
       console.log('!!! post form catch', error);
@@ -149,30 +210,36 @@ export default function (router) {
       const id = req.params.id;
       const Form = mongoose.model('Form');
       return Form.findOne({ _id: id }).exec()
-      .then(form => {
-        // Get the FormTemplate so we can validate it hasn't changed and so
-        // we can check the domainId for authorization.
-        const FormTemplate = mongoose.model('FormTemplate');
-        return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
-        .then(formTemplate => {
-          let data = req.body;
-          if (! formTemplate._id.equals(data.formTemplateId)) {
-            return Promise.reject({ error: 'Mismatched template' });
-          }
-          // Allow an administrator to set the userId. Otherwise, set it to
-          // the current session user
-          if (! data.userId ||
-            ! (session.administrator || (formTemplate.domainId &&
-              formTemplate.domainId.equals(session.administratorDomainId)))) {
-            data.userId = session.userId;
-          }
-          data.modified = new Date();
-          data = unsetDomainIfNeeded(data, session);
-          return form.update(data);
-        });
-      });
+      .then(form => ({ session, form, req }));
     })
-    .then(doc => res.status(200).json(doc))
+    .then(context => {
+      const { form } = context;
+      // Get the FormTemplate so we can validate it hasn't changed and so
+      // we can check the domainId for authorization.
+      const FormTemplate = mongoose.model('FormTemplate');
+      return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
+      .then(formTemplate => ({ ...context, formTemplate }));
+    })
+    .then(context => {
+      const { session, form, formTemplate } = context;
+      let data = req.body;
+      if (! formTemplate._id.equals(data.formTemplateId)) {
+        return Promise.reject({ error: 'Mismatched template' });
+      }
+      // Allow an administrator to set the userId. Otherwise, set it to
+      // the current session user
+      if (! data.userId ||
+        ! (session.administrator || (formTemplate.domainId &&
+          formTemplate.domainId.equals(session.administratorDomainId)))) {
+        data.userId = session.userId;
+      }
+      data.modified = new Date();
+      data = unsetDomainIfNeeded(data, session);
+      return form.update(data)
+      .then(form => ({ ...context, form }));
+    })
+    .then(sendEmails(req, transporter))
+    .then(context => res.status(200).json(context.form))
     .catch(error => {
       console.log('!!! post form catch', error);
       res.status(400).json(error);

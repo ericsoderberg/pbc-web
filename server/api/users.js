@@ -84,13 +84,17 @@ export default function (router, transporter) {
       // generate a tempmorary authentication token
       user.temporaryToken = hat();
       user.modified = new Date();
-      return user.save()
-      .then(user => {
-        return Site.findOne({}).exec()
-        .then(site => {
-          const url = `${req.protocol}://${req.get('Host')}` +
-            `/verify-email?token=${user.temporaryToken}`;
-          const instructions =
+      return user.save();
+    })
+    .then(user => {
+      return Site.findOne({}).exec()
+      .then(site => ({ user, site }));
+    })
+    .then(context => {
+      const { user, site } = context;
+      const url = `${req.protocol}://${req.get('Host')}` +
+        `/verify-email?token=${user.temporaryToken}`;
+      const instructions =
 `## Email verififcation for ${site.name}
 
 The link below is valid for 2 hours from the time this message was sent.
@@ -101,15 +105,13 @@ It will allow sign you in to the ${site.name} web site.
 
 
 `;
-          transporter.sendMail({
-            from: site.email,
-            to: user.email,
-            subject: 'Verify Email',
-            markdown: instructions
-          }, (err, info) => {
-            console.log('!!! sendMail', err, info);
-          });
-        });
+      transporter.sendMail({
+        from: site.email,
+        to: user.email,
+        subject: 'Verify Email',
+        markdown: instructions
+      }, (err, info) => {
+        console.log('!!! sendMail', err, info);
       });
     })
     .then(() => res.status(200).send({}))

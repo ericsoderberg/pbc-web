@@ -41,7 +41,7 @@ resources(router);
 import formTemplates from './api/formTemplates';
 formTemplates(router);
 import forms from './api/forms';
-forms(router);
+forms(router, transporter);
 import payments from './api/payments';
 payments(router);
 import emailLists from './api/emailLists';

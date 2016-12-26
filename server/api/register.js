@@ -69,7 +69,10 @@ export default (router, options) => {
       .then(doc => (putOpts.transformOut ?
         putOpts.transformOut(doc, req) : doc))
       .then(doc => res.status(200).json(doc))
-      .catch(error => res.status(400).json(error));
+      .catch(error => {
+        console.log('!!!', error);
+        res.status(400).json(error);
+      });
     });
   }
 

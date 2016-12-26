@@ -80,7 +80,8 @@ export default class FormTemplateFormContents extends Component {
           <UpIcon />
         </button>
       ));
-      const lower = (index === (formTemplate.sections.length - 1) ? undefined : (
+      const lower = (index === (formTemplate.sections.length - 1) ?
+        undefined : (
         <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index+1)}>
           <DownIcon />
@@ -109,7 +110,8 @@ export default class FormTemplateFormContents extends Component {
       }
 
       let edit;
-      if (! header || expandedSections[section._id] || expandedSections[section.id]) {
+      if (! header || expandedSections[section._id] ||
+        expandedSections[section.id]) {
         edit = (
           <FormTemplateSectionEdit key={index} section={section}
             dependableFields={dependableFields}
@@ -155,6 +157,12 @@ export default class FormTemplateFormContents extends Component {
               onChange={formState.change('submitLabel')}/>
           </FormField>
           <FormField>
+            <input name="acknowledge" type="checkbox"
+              checked={formTemplate.acknowledge || false}
+              onChange={formState.toggle('acknowledge')}/>
+            <label htmlFor="acknowledge">acknowledge via email</label>
+          </FormField>
+          <FormField>
             <input name="authenticate" type="checkbox"
               checked={formTemplate.authenticate || false}
               onChange={formState.toggle('authenticate')}/>
@@ -165,6 +173,11 @@ export default class FormTemplateFormContents extends Component {
               checked={formTemplate.payable || false}
               onChange={formState.toggle('payable')}/>
             <label htmlFor="payable">accept payment</label>
+          </FormField>
+          <FormField label="Notify email addresses">
+            <input name="notify"
+              value={formTemplate.notify || ''}
+              onChange={formState.change('notify')}/>
           </FormField>
           {administeredBy}
         </fieldset>
