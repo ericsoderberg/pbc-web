@@ -9,8 +9,8 @@ const FormTotal = (props) => {
 
   return (
     <div className="form-total">
-      <span className="secondary">Total: $</span>
-      <span>{total}</span>
+      <span className="secondary">Total</span>
+      <span className="primary">$ {total}</span>
     </div>
   );
 };

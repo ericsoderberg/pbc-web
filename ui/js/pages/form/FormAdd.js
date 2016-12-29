@@ -5,7 +5,6 @@ import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import FormContents from './FormContents';
-import FormTotal from './FormTotal';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
 class FormAdd extends Component {
@@ -118,11 +117,6 @@ class FormAdd extends Component {
         );
       }
 
-      let total;
-      if (formTemplate.payable) {
-        total = <FormTotal form={form} formTemplate={formTemplate} />;
-      }
-
       result = (
         <form className={classNames.join(' ')} action={'/forms'}
           onSubmit={this._onAdd}>
@@ -132,7 +126,6 @@ class FormAdd extends Component {
             <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}
             </button>
-            {total}
             {cancelControl}
           </footer>
         </form>

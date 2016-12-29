@@ -32,7 +32,7 @@ export default class FormTemplateFieldEdit extends Component {
     let name, help, value, required, monetary, discount, limit;
 
     if ('line' === field.type || 'choice' === field.type ||
-      'count' === field.type) {
+      'choices' === field.type || 'count' === field.type) {
       monetary = (
         <FormField>
           <input name="monetary" type="checkbox"

@@ -98,8 +98,7 @@ export default class FormTemplate extends Component {
         // calculate totals
         const templateField = formTemplate.fieldMap[field.templateFieldId];
         if (templateField.total >= 0) {
-          const value =
-            parseFloat(this._fieldValue(field, formTemplate, true), 10);
+          const value = parseFloat(this._fieldValue(field, formTemplate), 10);
           if (value) {
             templateField.total += value;
           }
@@ -110,25 +109,52 @@ export default class FormTemplate extends Component {
     });
   }
 
-  _fieldValue (field, formTemplate, total=false) {
+  _fieldValue (field, formTemplate) {
+    const templateField = formTemplate.fieldMap[field.templateFieldId];
     let value;
-    if (field.optionId) {
+    if ('count' === templateField.type) {
+      value = templateField.value * field.value;
+    } else if ('choice' === templateField.type && field.optionId) {
       const option = formTemplate.optionMap[field.optionId];
-      value = option.value || option.name;
-    } else if (field.optionIds.length > 0) {
+      value = option.value;
+    } else if ('choices' === templateField.type && field.optionIds.length > 0) {
       value = field.optionIds.map(optionId => {
         const option = formTemplate.optionMap[optionId];
-        return option.value || option.name;
+        return option.value;
       });
-      if (total) {
-        value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
-      } else {
-        value = value.join(', ');
-      }
+      value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
     } else {
       value = field.value;
     }
     return value;
+  }
+
+  _fieldContents (field, formTemplate) {
+    const templateField = formTemplate.fieldMap[field.templateFieldId];
+    let contents = field.value;
+    if ('count' === templateField.type) {
+      let prefix;
+      if (templateField.monetary) {
+        prefix = '$ ';
+      }
+      contents = (
+        <span>
+          <span className="secondary">{prefix}{templateField.value} x </span>
+          {field.value}
+        </span>
+      );
+    } else if ('choice' === templateField.type && field.optionId) {
+      const option = formTemplate.optionMap[field.optionId];
+      contents = option.name;
+    } else if ('choices' === templateField.type && field.optionIds) {
+      contents = field.optionIds.map(optionId => {
+        const option = formTemplate.optionMap[optionId];
+        return option.name;
+      }).join(', ');
+    } else if (templateField.monetary) {
+      contents = <span><span className='secondary'>$ </span>{contents}</span>;
+    }
+    return contents;
   }
 
   _sortForms (templateFieldId) {
@@ -199,8 +225,7 @@ export default class FormTemplate extends Component {
         // calculate totals
         const templateField = formTemplate.fieldMap[field.templateFieldId];
         if (templateField.total >= 0) {
-          const value =
-            parseFloat(this._fieldValue(field, formTemplate, true), 10);
+          const value = parseFloat(this._fieldValue(field, formTemplate), 10);
           if (value) {
             templateField.total += value;
           }
@@ -228,10 +253,18 @@ export default class FormTemplate extends Component {
   _renderHeaderCells () {
     const { formTemplate, sortFieldId, sortReverse } = this.state;
     let cells = formTemplate.columnFields.map(field => {
-      const classes = (sortFieldId === field._id ?
-        (sortReverse ? 'sort sort--reverse' : 'sort') : undefined);
+      let classes = [];
+      if (sortFieldId === field._id) {
+        classes.push('sort');
+        if (sortReverse) {
+          classes.push('sort--reverse');
+        }
+      }
+      if (field.total >= 0) {
+        classes.push('numeric');
+      }
       return (
-        <th key={field._id} className={classes}
+        <th key={field._id} className={classes.join(' ')}
           onClick={this._sortForms(field._id)}>
           {field.name}
         </th>
@@ -280,13 +313,9 @@ export default class FormTemplate extends Component {
         classes += ' numeric';
       }
 
-      let contents = this._fieldValue(field, formTemplate);
-      if (templateField.monetary && contents) {
-        contents = `$ ${contents}`;
-      }
-
+      let contents = this._fieldContents(field, formTemplate);
       cells[templateField.index] = (
-        <td key={field._id} className={classes}>{contents}&nbsp;</td>
+        <td key={field._id} className={classes}>{contents}</td>
       );
     });
 

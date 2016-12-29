@@ -213,6 +213,36 @@
   align-self: center;
 }
 
+.form__field-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  input {
+    flex: 0 0 auto;
+  }
+
+  label {
+    flex: 1 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    span {
+      flex: 1 1;
+    }
+
+    .form__field-option-amount {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+.form__field-option-amount {
+  white-space: nowrap;
+  padding-right: $unit;
+}
+
 .form__tabs {
   display: flex;
   flex-direction: column;
@@ -637,6 +667,17 @@
   max-width: 100%;
 }
 
+.form-total {
+  max-width: $form-width;
+  margin: $unit auto;
+  padding: 0 $unit;
+  text-align: right;
+
+  .secondary {
+    margin-right: $unit;
+  }
+}
+
 .control-icon {
   width: $unit;
   height: $unit;
@@ -700,6 +741,7 @@
     color: $color;
   }
 
+  th.numeric,
   td.numeric {
     text-align: right;
     white-space: nowrap;

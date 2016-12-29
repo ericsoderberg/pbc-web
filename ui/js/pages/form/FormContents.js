@@ -7,6 +7,7 @@ import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import Text from '../../components/Text';
 import Stored from '../../components/Stored';
+import FormTotal from './FormTotal';
 
 const UserSuggestion = (props) => (
   <div className="box--between">
@@ -74,7 +75,9 @@ class FormContents extends Component {
 
   _setOption (templateFieldId, optionId) {
     return (event) => {
-      const nextField = { templateFieldId: templateFieldId, optionId: optionId };
+      const nextField = {
+        templateFieldId: templateFieldId, optionId: optionId
+      };
       let form = { ...this.props.form };
       let fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
@@ -94,7 +97,9 @@ class FormContents extends Component {
       let fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
       if (index === -1) {
-        fields.push({ templateFieldId: templateFieldId, optionIds: [optionId] });
+        fields.push({
+          templateFieldId: templateFieldId, optionIds: [optionId]
+        });
       } else {
         let optionIds = fields[index].optionIds.slice(0);
         let optionIndex = optionIds.indexOf(optionId);
@@ -103,11 +108,34 @@ class FormContents extends Component {
         } else {
           optionIds.splice(optionIndex, 1);
         }
-        fields[index] = { templateFieldId: templateFieldId, optionIds: optionIds };
+        fields[index] = {
+          templateFieldId: templateFieldId, optionIds: optionIds
+        };
       }
       form.fields = fields;
       this.props.onChange(form);
     };
+  }
+
+  _renderOptionLabel (templateField, option, selected) {
+    let label;
+    if (templateField.monetary && option.value) {
+      let classes = ['form__field-option-amount'];
+      if (selected) {
+        classes.push('primary');
+      } else {
+        classes.push('tertiary');
+      }
+      label = [
+        <span key='name'>{option.name}</span>,
+        <span key='amount' className={classes.join(' ')}>
+          $ {option.value}
+        </span>
+      ];
+    } else {
+      label = <span>{option.name}</span>;
+    }
+    return label;
   }
 
   _renderFormField (templateField, index) {
@@ -124,10 +152,19 @@ class FormContents extends Component {
           onChange={this._change(templateField._id)} />
       );
       if (templateField.monetary) {
+        let amount;
+        if (field.value) {
+          amount = (
+            <span className="form__field-option-amount primary">
+              $ {field.value}
+            </span>
+          );
+        }
         contents = (
           <div className="box--row">
             <span className="prefix">$</span>
             {contents}
+            {amount}
           </div>
         );
       }
@@ -138,26 +175,28 @@ class FormContents extends Component {
       );
     } else if ('choice' === templateField.type) {
       contents = (templateField.options || []).map((option, index) => {
-        const name = templateField.monetary ? `$ ${option.name}` : option.name;
+        const checked = (field.optionId === option._id);
+        const label = this._renderOptionLabel(templateField, option, checked);
         return (
-          <div key={index}>
+          <div key={index} className="form__field-option">
             <input name={templateField.name} type="radio"
-              checked={field.optionId === option._id}
+              checked={checked}
               onChange={this._setOption(templateField._id, option._id)}/>
-            <label htmlFor={templateField.name}>{name}</label>
+            <label htmlFor={templateField.name}>{label}</label>
           </div>
         );
       });
     } else if ('choices' === templateField.type) {
       const optionIds = field.optionIds || [];
       contents = (templateField.options || []).map((option, index) => {
-        const name = templateField.monetary ? `$ ${option.name}` : option.name;
+        const checked = (optionIds.indexOf(option._id) !== -1);
+        const label = this._renderOptionLabel(templateField, option, checked);
         return (
-          <div key={index}>
+          <div key={index} className="form__field-option">
             <input name={templateField.name} type="checkbox"
-              checked={optionIds.indexOf(option._id) !== -1}
+              checked={checked}
               onChange={this._toggleOption(templateField._id, option._id)}/>
-            <label htmlFor={templateField.name}>{name}</label>
+            <label htmlFor={templateField.name}>{label}</label>
           </div>
         );
       });
@@ -170,11 +209,21 @@ class FormContents extends Component {
       if (templateField.value) {
         const prefix =
           `${templateField.monetary ? '$' : ''}${templateField.value}`;
+        const amount =
+          `${templateField.monetary ? '$ ' : ''}` +
+          `${field.value * templateField.value}`;
+        let amountClasses = ["form__field-option-amount"];
+        if (field.value > 0) {
+          amountClasses.push('primary');
+        } else {
+          amountClasses.push('tertiary');
+        }
         contents = (
           <div className="box--row">
             <span className="prefix">{prefix}</span>
             <span className="prefix">x</span>
             {contents}
+            <span className={amountClasses.join(' ')}>{amount}</span>
           </div>
         );
       }
@@ -276,10 +325,16 @@ class FormContents extends Component {
       );
     }
 
+    let total;
+    if (formTemplate.payable) {
+      total = <FormTotal form={form} formTemplate={formTemplate} />;
+    }
+
     return (
       <div>
         {formError}
         {sections}
+        {total}
         {admin}
       </div>
     );

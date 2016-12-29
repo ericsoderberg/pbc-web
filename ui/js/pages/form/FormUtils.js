@@ -71,6 +71,19 @@ export function calculateTotal (formTemplate, form) {
               } else {
                 total += parseInt(field.value, 10);
               }
+            } else if ('choice' === templateField.type) {
+              templateField.options.forEach(option => {
+                if (field.optionId === option._id && option.value) {
+                  total += parseInt(option.value, 10);
+                }
+              });
+            } else if ('choices' === templateField.type) {
+              const optionIds = field.optionIds || [];
+              templateField.options.forEach(option => {
+                if (optionIds.indexOf(option._id) !== -1 && option.value) {
+                  total += parseInt(option.value, 10);
+                }
+              });
             }
             return true;
           }
