@@ -9,6 +9,7 @@ export default class Edit extends Component {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
     this._onRemove = this._onRemove.bind(this);
+    this._onCancel = this._onCancel.bind(this);
     this.state = { item: {} };
   }
 
@@ -39,6 +40,10 @@ export default class Edit extends Component {
     .catch(error => this.setState({ error: error }));
   }
 
+  _onCancel () {
+    this.context.router.goBack();
+  }
+
   render () {
     const {
       category, params: { id }, FormContents, Preview, title
@@ -49,7 +54,7 @@ export default class Edit extends Component {
         action={`/api/${category}/${id}`}
         FormContents={FormContents} Preview={Preview} item={item}
         onSubmit={this._onUpdate} onRemove={this._onRemove}
-        error={error} />
+        error={error} onCancel={this._onCancel} />
     );
   }
 };

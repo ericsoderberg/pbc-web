@@ -74,7 +74,8 @@ export default class SignUp extends Component {
 
     return (
       <div className="form__container">
-        <form className="form" action="/api/users/sign-up" onSubmit={this._onSignUp}>
+        <form className="form" action="/api/users/sign-up"
+          onSubmit={this._onSignUp}>
           <PageHeader title="Sign Up" actions={cancelControl} />
           <FormError message={errorMessage} />
           <fieldset className="form__fields">

@@ -55,6 +55,7 @@
     "nodemailer": "^2.6.4",
     "nodemailer-markdown": "^1.0.1",
     "nodemon": "^1.11.0",
+    "paypal-checkout": "^4.0.37",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-router": "^3.0.0",

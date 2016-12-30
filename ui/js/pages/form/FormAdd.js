@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
+import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
@@ -77,7 +78,7 @@ class FormAdd extends Component {
         }
         return {};
       })
-      .then(response => onDone ? onDone() : this.context.router.goBack())
+      .then(response => (onDone ? onDone() : this.context.router.goBack()))
       .catch(error => {
         console.log('!!! FormAdd post error', error);
         this.setState({ error: error });
@@ -94,7 +95,7 @@ class FormAdd extends Component {
   }
 
   render () {
-    const { onCancel, full } = this.props;
+    const { onCancel, full, inline } = this.props;
     const { form, formTemplate, error } = this.state;
     let classNames = ['form'];
     if (this.props.className) {
@@ -104,22 +105,38 @@ class FormAdd extends Component {
     let result;
     if (formTemplate) {
 
-      let cancelControl;
-      if (onCancel) {
+      let cancelControl, headerCancelControl;
+      if (onCancel || (this.props.location &&
+        this.props.location.query.formTemplateId)) {
+        let cancelFunc = onCancel ? onCancel :
+          (() => this.context.router.goBack());
         cancelControl = (
-          <Button secondary={true} label="Cancel" onClick={onCancel} />
+          <Button secondary={true} label="Cancel" onClick={cancelFunc} />
         );
-      } else if (this.props.location &&
-        this.props.location.query.formTemplateId) {
-        cancelControl = (
-          <Button secondary={true} label="Cancel"
-            onClick={() => this.context.router.goBack()} />
+        headerCancelControl = (
+          <button className="button-header" type="button" onClick={cancelFunc}>
+            Cancel
+          </button>
+        );
+      }
+
+      let header;
+      if (inline) {
+        header = (
+          <div className='form__text'>
+            <h2>{formTemplate.name}</h2>
+          </div>
+        );
+      } else {
+        header = (
+          <PageHeader title={formTemplate.name} actions={headerCancelControl} />
         );
       }
 
       result = (
         <form className={classNames.join(' ')} action={'/forms'}
           onSubmit={this._onAdd}>
+          {header}
           <FormContents form={form} formTemplate={formTemplate}
             full={full} onChange={this._onChange} error={error} />
           <footer className="form__footer">
@@ -142,6 +159,7 @@ FormAdd.propTypes = {
   formTemplateId: PropTypes.string,
   formTemplate: PropTypes.object,
   full: PropTypes.bool,
+  inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onDone: PropTypes.func
 };

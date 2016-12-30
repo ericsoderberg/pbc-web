@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
-import { getItems } from '../../actions';
+import markdownToJSX from 'markdown-to-jsx';
+import { getItem, getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
@@ -14,36 +14,99 @@ const UserSuggestion = (props) => (
   </div>
 );
 
+const PAYPAL_OPTIONS = {
+  client: {
+    sandbox: 'YOUR_SANDBOX_CLIENT_ID'
+  },
+  commit: true,
+  env: 'sandbox'
+};
+
+let paypalLoaded = false;
+
 class PaymentFormContents extends Component {
 
   constructor () {
     super();
+    this._paypalPayment = this._paypalPayment.bind(this);
     this.state = { domains: [] };
   }
 
   componentDidMount () {
-    const { formState, session } = this.props;
-    if (session.administrator) {
+    const { formId, formTemplateId, formState, full, session } = this.props;
+
+    getItem('form-templates', formTemplateId)
+    .then(formTemplate => this.setState({ formTemplate }))
+    .catch(error => console.log(
+      "!!! PaymentFormContents formTemplate catch", error));
+
+    getItem('forms', formId)
+    .then(form => this.setState({ form }))
+    .catch(error => console.log("!!! PaymentFormContents form catch", error));
+
+    if (full && session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.log('PaymentFormContents catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
+
+    // add paypal
+    if (! paypalLoaded) {
+      paypalLoaded = true;
+      let script = document.createElement("script");
+      script.src = "//www.paypalobjects.com/api/checkout.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }
+
+  componentDidUpdate () {
+    const { formState } = this.props;
+    const payment = formState.object;
+    if ('paypal' === payment.method) {
+      window.paypalCheckoutReady = () => {
+        paypal.checkout.setup(PAYPAL_OPTIONS.client.sandbox, {
+          locale: 'en_US',
+          environment: 'sandbox',
+          container: 'paypalButton'
+        });
+      };
+    }
+  }
+
+  _paypalPayment () {
+    const { form } = this.state;
+    console.log('!!! payment created');
+    return paypal.rest.payment.create(
+      PAYPAL_OPTIONS.env, PAYPAL_OPTIONS.client, {
+        transactions: [
+          { amount: { total: form.unpaidTotal, currency: 'USD' } }
+        ]
+      }
+    );
+  }
+
+  _onAuthorize(data, actions) {
+    return actions.payment.execute().then(() => {
+      console.log('!!! payment authorized');
+    });
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { formState, full, session } = this.props;
+    const { form, formTemplate } = this.state;
     const payment = formState.object;
 
-    const formFilter = { 'paymentId': payment._id };
-    const formFilterLabel = `Payment`;
-    const formsPath = `/forms?` +
-      `filter=${encodeURIComponent(JSON.stringify(formFilter))}` +
-      `&filter-name=${encodeURIComponent(formFilterLabel)}`;
+    // const formFilter = { 'paymentId': payment._id };
+    // const formFilterLabel = `Payment`;
+    // const formsPath = `/forms?` +
+    //   `filter=${encodeURIComponent(JSON.stringify(formFilter))}` +
+    //   `&filter-name=${encodeURIComponent(formFilterLabel)}`;
 
     let administeredBy;
-    if (session.administrator) {
+    if (full && session.administrator) {
       let domains = this.state.domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
@@ -59,7 +122,7 @@ class PaymentFormContents extends Component {
     }
 
     let user;
-    if (session && (session.administrator || (payment.domainId &&
+    if (full && session && (session.administrator || (payment.domainId &&
       session.administratorDomainId === payment.domainId))) {
       user = (
         <fieldset className="form__fields">
@@ -77,49 +140,70 @@ class PaymentFormContents extends Component {
       );
     }
 
-    return (
-      <div>
-        <div className="form-item">
-          <Link to={formsPath}>Forms</Link>
+    let paypalButton;
+    if ('paypal' === payment.method) {
+      paypalButton = <a id="paypalButton" href="#" />;
+    }
+
+    let checkInstructions;
+    if ('check' === payment.method) {
+      checkInstructions = (
+        <div className="form-field__text">
+          {markdownToJSX(formTemplate.payByCheckInstructions || '')}
         </div>
+      );
+    }
+
+    let processFields;
+    if (payment._id) {
+      processFields = (
         <fieldset className="form__fields">
-          <FormField label="Name">
-            <div className="box--row">
-              <span className="prefix">$</span>
-              <input name="amount" type="text" value={payment.amount || ''}
-                onChange={formState.change('amount')}/>
-            </div>
-          </FormField>
-          <FormField label="Sent date">
+          <FormField label="Sent on">
             <DateInput value={payment.sent || ''}
               onChange={formState.change('sent')} />
           </FormField>
-          <FormField label="Sent date">
-            <div>
-              <input id="check" name="method" type="radio" value="check"
-                checked={'check' === payment.method}
-                onChange={formState.change('method')} />
-              <label htmlFor="check">check</label>
-            </div>
-            <div>
-              <input id="paypal" name="method" type="radio" value="paypal"
-                checked={'paypal' === payment.method}
-                onChange={formState.change('method')} />
-              <label htmlFor="paypal">paypal</label>
-            </div>
-          </FormField>
-          <FormField label="Notes">
-            <textarea name="notes" value={payment.notes || ''} rows={4}
-              onChange={formState.change('notes')}/>
-          </FormField>
-        </fieldset>
-        <fieldset className="form__fields">
-          <FormField label="Received date">
+          <FormField label="Received on">
             <DateInput value={payment.received || ''}
               onChange={formState.change('received')} />
           </FormField>
           {administeredBy}
         </fieldset>
+      );
+    }
+
+    return (
+      <div>
+        <fieldset className="form__fields">
+          <FormField label="Amount">
+            <div className="box--row">
+              <span className="prefix">$</span>
+              <input name="amount" type="text"
+                value={payment.amount || (form || {}).unpaidTotal || ''}
+                onChange={formState.change('amount')}/>
+            </div>
+          </FormField>
+          <FormField label="Method">
+            <div>
+              <input id="methodPaypal" name="method" type="radio" value="paypal"
+                checked={'paypal' === payment.method}
+                onChange={formState.change('method')} />
+              <label htmlFor="methodPaypal">paypal</label>
+            </div>
+            <div>
+              <input id="methodCheck" name="method" type="radio" value="check"
+                checked={'check' === payment.method}
+                onChange={formState.change('method')} />
+              <label htmlFor="methodCheck">check</label>
+            </div>
+            {paypalButton}
+            {checkInstructions}
+          </FormField>
+          <FormField label="Notes">
+            <textarea name="notes" value={payment.notes || ''} rows={2}
+              onChange={formState.change('notes')}/>
+          </FormField>
+        </fieldset>
+        {processFields}
         {user}
       </div>
     );
@@ -128,11 +212,18 @@ class PaymentFormContents extends Component {
 
 PaymentFormContents.propTypes = {
   formState: PropTypes.object.isRequired,
+  formId: PropTypes.string.isRequired,
+  formTemplateId: PropTypes.string.isRequired,
+  full: PropTypes.bool,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
     name: PropTypes.string
   })
+};
+
+PaymentFormContents.defaultProps = {
+  full: true
 };
 
 const select = (state, props) => ({

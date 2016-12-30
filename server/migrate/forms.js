@@ -115,7 +115,7 @@ function normalizeForm (item, fields, options, formTemplates, payments,
 
   item.formTemplateId = template._id;
   if (item.payment_id) {
-    item.paymentId = payments[item.payment_id]._id;
+    item.paymentIds = [payments[item.payment_id]._id];
   }
   if (item.user_id) {
     item.userId = userIds[item.user_id];

@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import PageHeader from './PageHeader';
 import FormError from './FormError';
 import FormState from '../utils/FormState';
+import Button from './Button';
 import ConfirmRemove from './ConfirmRemove';
 import Stored from './Stored';
 
@@ -10,7 +11,6 @@ class Form extends Component {
 
   constructor (props) {
     super(props);
-    this._onCancel = this._onCancel.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
     this._onRemove = this._onRemove.bind(this);
     this._setItem = this._setItem.bind(this);
@@ -20,15 +20,11 @@ class Form extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.item) {
+    if (nextProps.item && nextProps.item._id !== this.props.item._id) {
       this.setState({
         formState: new FormState(nextProps.item, this._setItem)
       });
     }
-  }
-
-  _onCancel () {
-    this.context.router.goBack();
   }
 
   _onSubmit (event) {
@@ -46,15 +42,30 @@ class Form extends Component {
   }
 
   render () {
-    const { title, action, submitLabel, onRemove, error, session,
-      Preview, FormContents } = this.props;
+    const {
+      action, contentsProps, error, FormContents, inline, onCancel, onRemove,
+      Preview, session, submitLabel, title
+     } = this.props;
     const { formState } = this.state;
+    let classes = ['form__container'];
+    if (inline) {
+      classes.push('form__container--inline');
+    }
 
-    const cancelControl = (
-      <button className="button-header" type="button" onClick={this._onCancel}>
-        Cancel
-      </button>
-    );
+    let header, footerCancelControl;
+    if (inline) {
+      header = <div className='form__text'><h2>{title}</h2></div>;
+      footerCancelControl = (
+        <Button secondary={true} label="Cancel" onClick={onCancel} />
+      );
+    } else {
+      const headerCancelControl = (
+        <button className="button-header" type="button" onClick={onCancel}>
+          Cancel
+        </button>
+      );
+      header = <PageHeader title={title} actions={headerCancelControl} />;
+    }
 
     let removeControl;
     if (onRemove) {
@@ -63,20 +74,28 @@ class Form extends Component {
 
     let preview;
     if (Preview) {
-      preview = <Preview item={formState.object} />;
+      preview = (
+        <div className="form__preview">
+          <Preview item={formState.object} />
+        </div>
+      );
+      classes.push('form__container--preview');
     }
 
     return (
-      <div className="form__container">
-        <form className="form" action={action} onSubmit={this._onSubmit}>
-          <PageHeader title={title} actions={cancelControl} />
+      <div className={classes.join(' ')}>
+        <form className="form" action={action}
+          onSubmit={this._onSubmit}>
+          {header}
           <FormError message={error} />
-          <FormContents formState={formState} session={session} />
+          <FormContents {...contentsProps}
+            formState={formState} session={session} />
           <footer className="form__footer">
             <button type="submit" className="button" onClick={this._onSubmit}>
               {submitLabel}
             </button>
             {removeControl}
+            {footerCancelControl}
           </footer>
         </form>
         {preview}
@@ -87,9 +106,12 @@ class Form extends Component {
 
 Form.propTypes = {
   action: PropTypes.string,
+  contentsProps: PropTypes.object,
   error: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
   item: PropTypes.object,
+  inline: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   Preview: PropTypes.func,

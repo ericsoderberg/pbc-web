@@ -463,7 +463,7 @@ export default class FormTemplate extends Component {
 
     actions.push(
       <nav key="add" className="page-header__actions">
-        <Link to={`forms/add?formTemplateId=${encodeURIComponent(id)}`}
+        <Link to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}
           className="a-header">Add</Link>
       </nav>
     );

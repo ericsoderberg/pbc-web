@@ -4,7 +4,8 @@ import fs from 'fs';
 import rmdir from 'rimraf';
 import { authorize } from './auth';
 
-export var FILES_PATH = 'public/files';
+
+export var FILES_PATH = `${__dirname}/../../public/files`;
 
 // /api/files
 

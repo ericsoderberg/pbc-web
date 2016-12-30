@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem, putItem, deleteItem } from '../../actions';
+import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
 import FormContents from './FormContents';
@@ -44,7 +45,7 @@ export default class FormEdit extends Component {
     } else {
       finalizeForm(formTemplate, form);
       putItem('forms', this.state.form)
-      .then(response => onDone ? onDone() : this.context.router.goBack())
+      .then(response => (onDone ? onDone() : this.context.router.goBack()))
       .catch(error => this.setState({ error: error }));
     }
   }
@@ -74,7 +75,7 @@ export default class FormEdit extends Component {
   }
 
   render () {
-    const { full } = this.props;
+    const { full, inline } = this.props;
     const { form, formTemplate } = this.state;
     let classNames = ['form'];
     if (this.props.className) {
@@ -84,13 +85,38 @@ export default class FormEdit extends Component {
     let result;
     if (form && formTemplate) {
 
+      let submitLabel = 'Update';
+      if (formTemplate.payable && ! form.paymentId) {
+        submitLabel = 'Pay';
+      }
+
+      let header;
+      if (inline) {
+        header = (
+          <div className='form__text'>
+            <h2>{formTemplate.name}</h2>
+          </div>
+        );
+      } else {
+        const cancelControl = (
+          <button className="button-header" type="button"
+            onClick={this._onCancel}>
+            Cancel
+          </button>
+        );
+        header = (
+          <PageHeader title={formTemplate.name} actions={cancelControl} />
+        );
+      }
+
       result = (
         <form className={classNames.join(' ')} action={`/forms${form._id}`}
           onSubmit={this._onUpdate}>
+          {header}
           <FormContents form={form} formTemplate={formTemplate}
             full={full} onChange={this._onChange} />
           <footer className="form__footer">
-            <button type="submit" className="button">Update</button>
+            <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />
             <button type="button" className="button button--secondary"
               onClick={this._onCancel}>
@@ -110,6 +136,7 @@ export default class FormEdit extends Component {
 FormEdit.propTypes = {
   full: PropTypes.bool,
   id: PropTypes.string,
+  inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   params: PropTypes.shape({

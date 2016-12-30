@@ -2,7 +2,6 @@
 import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
 import FormContents from './FormContents';
-import FormTotal from './FormTotal';
 
 export default class FormPreview extends Component {
 
@@ -30,11 +29,6 @@ export default class FormPreview extends Component {
     const { item: formTemplate } = this.props;
     const { form } = this.state;
 
-    let total;
-    if (formTemplate.payable) {
-      total = <FormTotal form={form} formTemplate={formTemplate} />;
-    }
-
     return (
       <main className="page-preview">
         <PageHeader title="Preview" />
@@ -45,7 +39,6 @@ export default class FormPreview extends Component {
             <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}
             </button>
-            {total}
           </footer>
         </form>
       </main>

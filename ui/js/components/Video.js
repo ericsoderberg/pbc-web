@@ -15,10 +15,10 @@ export default class Video extends Component {
       const match = url.match(VIMEO_REGEXP);
       if (match) {
         iframe = (
-          <iframe className="video vimeo-player" type="text/html" width="960" height="540"
+          <iframe className="video vimeo-player" type="text/html"
+            width="960" height="540"
             src={`${window.location.protocol}//player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
-            frameBorder="0" allowFullScreen>
-          </iframe>
+            frameBorder="0" allowFullScreen />
         );
       }
     }

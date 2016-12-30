@@ -24,13 +24,6 @@ export default class Add extends Component {
   _onAdd (item) {
     const { category, showable } = this.props;
     postItem(category, item)
-    .then(response => {
-      if (this.props.onAdd) {
-        return this.props.onAdd(item);
-      } else {
-        return response;
-      }
-    })
     .then(newItem => {
       if (showable) {
         this.context.router.push(`/${category}/${newItem._id}`);
@@ -41,6 +34,10 @@ export default class Add extends Component {
     .catch(error => this.setState({ error: error, item: item }));
   }
 
+  _onCancel () {
+    this.context.router.goBack();
+  }
+
   render () {
     const { category, FormContents, Preview, title } = this.props;
     const { item, error } = this.state;
@@ -48,7 +45,8 @@ export default class Add extends Component {
       <Form title={title} submitLabel="Add"
         action={`/api/${category}`}
         FormContents={FormContents} Preview={Preview} item={item}
-        onSubmit={this._onAdd} error={error} />
+        onSubmit={this._onAdd} error={error}
+        onCancel={this._onCancel} />
     );
   }
 };
@@ -57,7 +55,6 @@ Add.propTypes = {
   category: PropTypes.string.isRequired,
   default: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
-  onAdd: PropTypes.func,
   Preview: PropTypes.func,
   showable: PropTypes.bool,
   title: PropTypes.string.isRequired

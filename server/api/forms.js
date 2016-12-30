@@ -91,6 +91,70 @@ const sendEmails = (req, transporter) => {
   };
 };
 
+// duplicated in FormUtils
+function calculateTotal (formTemplate, form) {
+  let total = 0;
+  formTemplate.sections.forEach(section => {
+    section.fields.forEach(templateField => {
+      if (templateField.monetary) {
+        // see if we have it
+        form.fields.some(field => {
+          if (field.templateFieldId.equals(templateField._id)) {
+            if ('count' === templateField.type) {
+              total += (parseInt(templateField.value, 10) *
+                parseInt(field.value, 10));
+            } else if ('line' === templateField.type) {
+              if (templateField.discount) {
+                total -= parseInt(field.value, 10);
+              } else {
+                total += parseInt(field.value, 10);
+              }
+            } else if ('choice' === templateField.type) {
+              templateField.options.forEach(option => {
+                if (option.value && field.optionId === option._id) {
+                  total += parseInt(option.value, 10);
+                }
+              });
+            } else if ('choices' === templateField.type) {
+              const optionIds = field.optionIds || [];
+              templateField.options.forEach(option => {
+                if (option.value &&
+                  optionIds.some(optionId => optionId.equals(option._id))) {
+                  total += parseInt(option.value, 10);
+                }
+              });
+            }
+            return true;
+          }
+        });
+      }
+    });
+  });
+  return Math.max(0, total);
+}
+
+function calculatePaymentsTotal (form) {
+  let total = 0;
+  (form.paymentIds || []).forEach(payment => {
+    total += payment.amount;
+  });
+  return total;
+}
+
+const setUnpaidTotal = (form) => {
+  return Promise.resolve(form)
+  .then(form => {
+    const FormTemplate = mongoose.model('FormTemplate');
+    return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
+    .then(formTemplate => {
+      form = form.toObject();
+      form.unpaidTotal =
+        calculateTotal(formTemplate, form) - calculatePaymentsTotal(form);
+      return form;
+    });
+  });
+};
+
 export default function (router, transporter) {
 
   register(router, {
@@ -101,13 +165,16 @@ export default function (router, transporter) {
       authorize: authorizedForDomainOrSelf,
       populate: [
         { path: 'userId', select: 'name' },
-        { path: 'formTemplateId', select: 'name domainId' }
+        { path: 'formTemplateId', select: 'name domainId' },
+        { path: 'paymentId', select: 'amount' }
       ]
     },
     get: {
       populate: [
-        { path: 'userId', select: 'name' }
-      ]
+        { path: 'userId', select: 'name' },
+        { path: 'paymentId', select: 'amount' }
+      ],
+      transformOut: setUnpaidTotal
     },
     put: {
       transformIn: unsetDomainIfNeeded

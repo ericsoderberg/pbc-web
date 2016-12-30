@@ -6,6 +6,7 @@ import { unsetDomainIfNeeded } from './domains';
 // /api/payments
 
 export default function (router) {
+
   register(router, {
     category: 'payments',
     modelName: 'Payment',

@@ -211,7 +211,7 @@ class FormContents extends Component {
           `${templateField.monetary ? '$' : ''}${templateField.value}`;
         const amount =
           `${templateField.monetary ? '$ ' : ''}` +
-          `${field.value * templateField.value}`;
+          `${(field.value || 0) * templateField.value}`;
         let amountClasses = ["form__field-option-amount"];
         if (field.value > 0) {
           amountClasses.push('primary');
@@ -267,7 +267,7 @@ class FormContents extends Component {
     ))
     .map(this._renderTemplateField);
     return (
-      <fieldset key={index} className="form-fields">
+      <fieldset key={index} className="form__fields">
         {name}
         {fields}
       </fieldset>

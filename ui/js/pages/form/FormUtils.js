@@ -88,7 +88,6 @@ export function calculateTotal (formTemplate, form) {
             return true;
           }
         });
-        return true;
       }
     });
   });

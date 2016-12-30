@@ -128,6 +128,18 @@ export default class FormTemplateFormContents extends Component {
       );
     });
 
+    let payableByCheck;
+    if (formTemplate.payable) {
+      payableByCheck = (
+        <FormField label="Check instructions"
+          help="Leave blank to not allow checks">
+          <textarea name="payByCheckInstructions"
+            value={formTemplate.payByCheckInstructions || ''}
+            onChange={formState.change('payByCheckInstructions')} />
+        </FormField>
+      );
+    }
+
     let administeredBy;
     if (session.administrator) {
       let domains = this.state.domains.map(domain => (
@@ -154,30 +166,31 @@ export default class FormTemplateFormContents extends Component {
           <FormField label="Submit button label">
             <input name="submitLabel"
               value={formTemplate.submitLabel || 'Submit'}
-              onChange={formState.change('submitLabel')}/>
+              onChange={formState.change('submitLabel')} />
           </FormField>
           <FormField>
             <input name="acknowledge" type="checkbox"
               checked={formTemplate.acknowledge || false}
-              onChange={formState.toggle('acknowledge')}/>
+              onChange={formState.toggle('acknowledge')} />
             <label htmlFor="acknowledge">acknowledge via email</label>
           </FormField>
           <FormField>
             <input name="authenticate" type="checkbox"
               checked={formTemplate.authenticate || false}
-              onChange={formState.toggle('authenticate')}/>
+              onChange={formState.toggle('authenticate')} />
             <label htmlFor="authenticate">authenticate</label>
           </FormField>
           <FormField>
             <input name="payable" type="checkbox"
               checked={formTemplate.payable || false}
-              onChange={formState.toggle('payable')}/>
+              onChange={formState.toggle('payable')} />
             <label htmlFor="payable">accept payment</label>
           </FormField>
+          {payableByCheck}
           <FormField label="Notify email addresses">
             <input name="notify"
               value={formTemplate.notify || ''}
-              onChange={formState.change('notify')}/>
+              onChange={formState.change('notify')} />
           </FormField>
           {administeredBy}
         </fieldset>

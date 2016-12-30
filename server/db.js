@@ -213,6 +213,7 @@ const formTemplateSchema = Schema({
   notify: String,
   oldId: Number,
   payable: Boolean,
+  payByCheckInstructions: String,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -226,7 +227,7 @@ const paymentSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   notes: String,
-  method: String,
+  method: String, // check | paypal
   modified: Date,
   oldId: Number,
   received: Date,
@@ -252,7 +253,7 @@ const formSchema = Schema({
   modified: Date,
   name: String, // derived from appropriate field value
   oldId: Number,
-  paymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
+  paymentIds: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   version: Number
 });

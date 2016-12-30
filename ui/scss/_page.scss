@@ -1,16 +1,4 @@
 
-.page-preview {
-
-  @media all and (min-width: 700px) {
-    min-width: $form-width;
-    border-left: 1px solid $nav-background-color;
-  }
-
-  .form {
-    padding: 0 $unit;
-  }
-}
-
 @keyframes fadein {
   0% { opacity: 0; top: $unit; }
   100% { opacity: 1; top: 0; }

@@ -22,6 +22,9 @@ class Page extends Component {
       getItem('pages', nextProps.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Page catch', error));
     }
+    if (nextProps.page) {
+      document.title = nextProps.page.name;
+    }
   }
 
   render () {
