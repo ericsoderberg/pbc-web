@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import markdownToJSX from 'markdown-to-jsx';
 import { getItem, getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -23,6 +24,7 @@ class PaymentFormContents extends Component {
 
   componentDidMount () {
     const { formId, formTemplateId, formState, full, session } = this.props;
+    const payment = formState.object;
 
     if (formTemplateId) {
       getItem('form-templates', formTemplateId)
@@ -39,16 +41,41 @@ class PaymentFormContents extends Component {
 
     if (full && session.administrator) {
       getItems('domains', { sort: 'name' })
-      .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('PaymentFormContents catch', error));
+      .then(domains => this.setState({ domains }))
+      .catch(error => console.log('PaymentFormContents domains catch', error));
+
+      if (payment._id) {
+        getItems('forms', { filter: { paymentIds: payment._id } })
+        .then(forms => this.setState({ forms }))
+        .catch(error => console.log('PaymentFormContents forms catch', error));
+      }
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
+    }
+
+    this._loadForms(this.props);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.formState.object._id !== this.props.formState.object._id) {
+      this._loadForms(nextProps);
+    }
+  }
+
+  _loadForms (props) {
+    const { formState, full, session } = props;
+    const payment = formState.object;
+
+    if (full && session.administrator && payment && payment._id) {
+      getItems('forms', { filter: { paymentIds: payment._id } })
+      .then(forms => this.setState({ forms }))
+      .catch(error => console.log('PaymentFormContents forms catch', error));
     }
   }
 
   render () {
     const { formState, full, session } = this.props;
-    const { form, formTemplate } = this.state;
+    const { form, forms, formTemplate } = this.state;
     const payment = formState.object;
 
     // const formFilter = { 'paymentId': payment._id };
@@ -56,43 +83,6 @@ class PaymentFormContents extends Component {
     // const formsPath = `/forms?` +
     //   `filter=${encodeURIComponent(JSON.stringify(formFilter))}` +
     //   `&filter-name=${encodeURIComponent(formFilterLabel)}`;
-
-    const admin = (session && (session.administrator || (payment.domainId &&
-      session.administratorDomainId === payment.domainId)));
-
-    let administeredBy;
-    if (full && session.administrator) {
-      let domains = this.state.domains.map(domain => (
-        <option key={domain._id} label={domain.name} value={domain._id} />
-      ));
-      domains.unshift(<option key={0} />);
-      administeredBy = (
-        <FormField label="Administered by">
-          <select name="domainId" value={payment.domainId || ''}
-            onChange={formState.change('domainId')}>
-            {domains}
-          </select>
-        </FormField>
-      );
-    }
-
-    let user;
-    if (full && admin) {
-      user = (
-        <fieldset className="form__fields">
-          <FormField label="Person" help="the person to submit this form for">
-            <SelectSearch category="users"
-              options={{select: 'name email', sort: 'name'}}
-              Suggestion={UserSuggestion}
-              value={(payment.userId || session).name || ''}
-              onChange={(suggestion) => {
-                payment.userId = suggestion;
-                this.props.onChange(payment);
-              }} />
-          </FormField>
-        </fieldset>
-      );
-    }
 
     let checkInstructions;
     if ('check' === payment.method && formTemplate) {
@@ -103,19 +93,73 @@ class PaymentFormContents extends Component {
       );
     }
 
-    let processFields;
-    if (payment._id) {
-      processFields = (
-        <fieldset className="form__fields">
-          <FormField label="Sent on">
+    const administrator = (session &&
+      (session.administrator || (payment.domainId &&
+        session.administratorDomainId === payment.domainId)));
+
+    let admin;
+    if (full && administrator) {
+
+      let processFields;
+      if (payment._id) {
+        processFields = [
+          <FormField key="sent" label="Sent on">
             <DateInput value={payment.sent || ''}
               onChange={formState.change('sent')} />
-          </FormField>
-          <FormField label="Received on">
+          </FormField>,
+          <FormField key='received' label="Received on">
             <DateInput value={payment.received || ''}
               onChange={formState.change('received')} />
           </FormField>
+        ];
+      }
+
+      let administeredBy;
+      if (session.administrator) {
+        let domains = this.state.domains.map(domain => (
+          <option key={domain._id} label={domain.name} value={domain._id} />
+        ));
+        domains.unshift(<option key={0} />);
+        administeredBy = (
+          <FormField label="Administered by">
+            <select name="domainId" value={payment.domainId || ''}
+              onChange={formState.change('domainId')}>
+              {domains}
+            </select>
+          </FormField>
+        );
+      }
+
+      let formLinks;
+      if (forms && forms.length > 0) {
+        const links = forms.map(form => (
+          <Link key={form._id} to={`/forms/${form._id}/edit`}>form</Link>
+        ));
+        formLinks = (
+          <div className='form__footer'>
+            {links}
+          </div>
+        );
+      }
+
+      admin = (
+        <fieldset className="form__fields">
+          <div className="form__header">
+            <h3>Administrative</h3>
+          </div>
+          {processFields}
+          <FormField label="Person" help="the person to submit this form for">
+            <SelectSearch category="users"
+              options={{select: 'name email', sort: 'name'}}
+              Suggestion={UserSuggestion}
+              value={(payment.userId || session).name || ''}
+              onChange={(suggestion) => {
+                payment.userId = suggestion;
+                this.props.onChange(payment);
+              }} />
+          </FormField>
           {administeredBy}
+          {formLinks}
         </fieldset>
       );
     }
@@ -126,7 +170,7 @@ class PaymentFormContents extends Component {
           <FormField label="Amount">
             <div className="box--row">
               <span className="prefix">$</span>
-              <input name="amount" type="text" disabled={! admin}
+              <input name="amount" type="text" disabled={! administrator}
                 value={payment.amount || (form || {}).unpaidTotal || ''}
                 onChange={formState.change('amount')}/>
             </div>
@@ -151,8 +195,7 @@ class PaymentFormContents extends Component {
               onChange={formState.change('notes')}/>
           </FormField>
         </fieldset>
-        {processFields}
-        {user}
+        {admin}
       </div>
     );
   }

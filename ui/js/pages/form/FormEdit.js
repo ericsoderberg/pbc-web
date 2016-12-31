@@ -86,7 +86,7 @@ export default class FormEdit extends Component {
     if (form && formTemplate) {
 
       let submitLabel = 'Update';
-      if (formTemplate.payable && ! form.paymentId) {
+      if (formTemplate.payable && form.paymentIds.length === 0) {
         submitLabel = 'Pay';
       }
 
@@ -125,6 +125,10 @@ export default class FormEdit extends Component {
           </footer>
         </form>
       );
+
+      if (! inline) {
+        result = <div className="form__container">{result}</div>;
+      }
 
     } else {
       result = <Loading />;

@@ -281,6 +281,7 @@
   margin: 0 auto;
 }
 
+.form__header,
 .form__footer {
   display: flex;
 
@@ -289,8 +290,14 @@
     justify-content: space-between;
     align-items: center;
     max-width: $form-width;
-    margin: $unit auto 0;
-    padding-bottom: $unit;
+    margin: $unit auto;
+    // padding-bottom: $unit;
+
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+    }
   }
 
   @media all and (max-width: 699px) {

@@ -293,18 +293,35 @@ class FormContents extends Component {
 
     let admin;
     if (full && administrator) {
+
       let added;
       if (form.created) {
         added = (
-          <div className="form-item secondary">
-            First added {moment(form.created).format('MMM Do YYYY')}
-          </div>
+          <span className="secondary">
+            First submitted {moment(form.created).format('MMM Do YYYY')}
+          </span>
         );
+      } else {
+        added = <span />;
       }
+      const formTemplatePath = `/form-templates/${formTemplate._id}`;
+
+      let payments;
+      if (form && form.paymentIds && form.paymentIds.length > 0) {
+        payments = form.paymentIds.map(payment => (
+          <Link key={payment._id} to={`/payments/${payment._id}/edit`}>
+            payment
+          </Link>
+        ));
+      } else {
+        payments = <span />;
+      }
+
       admin = (
         <fieldset className="form__fields">
-          <div className="form__text">
+          <div className="form__header">
             <h3>Administrative</h3>
+            {added}
           </div>
           <FormField label="Person" help="the person to submit this form for">
             <SelectSearch category="users"
@@ -316,11 +333,9 @@ class FormContents extends Component {
                 this.props.onChange(form);
               }} />
           </FormField>
-          {added}
-          <div className="form-item">
-            <Link to={`/form-templates/${formTemplate._id}`}>
-              {formTemplate.name} form template
-            </Link>
+          <div className='form__footer'>
+            {payments}
+            <Link to={formTemplatePath}>template</Link>
           </div>
         </fieldset>
       );

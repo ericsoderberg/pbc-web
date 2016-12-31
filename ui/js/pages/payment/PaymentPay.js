@@ -129,6 +129,7 @@ class PaymentPay extends Component {
     const payment = formState.object;
     return actions.payment.execute().then(() => {
       payment.payPalId = data.paymentID;
+      payment.received = (new Date()).toISOString();
       this._onAdd(payment);
     });
   }
