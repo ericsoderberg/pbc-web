@@ -50,8 +50,8 @@ export default function (router) {
       const date = moment(req.query.date || undefined);
       const start = moment(date).startOf('month').startOf('week');
       const end = moment(date).endOf('month').endOf('week');
-      const previous = moment(date).subtract(1, 'month');
-      const next = moment(date).add(1, 'month');
+      const previous = moment(date).subtract(1, 'month').startOf('month');
+      const next = moment(date).add(1, 'month').startOf('month');
 
       // find events withing the time window
       let dateCriteria = [

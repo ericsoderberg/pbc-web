@@ -41,7 +41,7 @@ export default class Search extends Component {
     return (
       <div className={classNames.join(' ')}>
         <input ref="input" className="search__input" placeholder="Search"
-          value={value} onChange={onChange} onBlur={this._onBlur} />
+          value={value || ''} onChange={onChange} onBlur={this._onBlur} />
         <button className="search__control button-icon"
           onClick={! active ? this._onActivate : undefined}>
           <SearchIcon />

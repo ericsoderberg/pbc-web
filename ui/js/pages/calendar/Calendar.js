@@ -12,6 +12,7 @@ import PageContext from '../page/PageContext';
 
 const LEFT_KEY = 37;
 const RIGHT_KEY = 39;
+const DATE_FORMAT = 'YYYY-MM-DD';
 
 export default class Calendar extends Component {
 
@@ -25,17 +26,20 @@ export default class Calendar extends Component {
     this._onKeyDown = this._onKeyDown.bind(this);
     this.state = {
       activeCalendars: {},
-      calendar: { events: [] },
       days: {},
       calendars: [],
+      loading: true,
       searchText: ''
     };
   }
 
   componentDidMount () {
+    const { location } = this.props;
     document.title = 'Calendar';
 
-    this._load(this.props);
+    // use any query parameters
+    const locationState = this._stateFromLocation(location);
+    this.setState(locationState, this._throttledLoad);
 
     // Load the possible calendars
     getItems('calendars', { select: 'name', sort: 'name' })
@@ -46,13 +50,39 @@ export default class Calendar extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.params.id !== this.props.params.id) {
-      this._load(nextProps);
+    if (nextProps.params.id !== this.props.params.id ||
+      nextProps.location.query.date !== this.props.location.query.date) {
+      const locationState = this._stateFromLocation(nextProps.location);
+      this.setState(locationState, this._throttledLoad);
+      // this._load(nextProps);
+    }
+  }
+
+  componentDidUpdate () {
+    const { loading, needScrollToFocus } = this.state;
+    if (needScrollToFocus && ! loading) {
+      this.setState({ needScrollToFocus: false });
+      this._scrollToFocus();
     }
   }
 
   componentWillUnmount () {
     window.removeEventListener("keydown", this._onKeyDown);
+  }
+
+  _stateFromLocation (location) {
+    const { query } = location;
+    const focus = (query.focus ?
+      moment(query.focus, DATE_FORMAT, true) : undefined);
+    const date = focus ||
+      (query.date ? moment(query.date, DATE_FORMAT, true) : moment());
+    let state = {
+      date: date,
+      focus: focus,
+      needScrollToFocus: query.focus !== undefined,
+      searchText: query.search
+    };
+    return state;
   }
 
   _load (props) {
@@ -90,27 +120,54 @@ export default class Calendar extends Component {
   }
 
   _throttledLoad () {
+    const { date, focus, searchText } = this.state;
+
     // throttle gets when user is typing
     clearTimeout(this._getTimer);
     this._getTimer = setTimeout(this._load.bind(this, this.props), 100);
+
+    // update browser location
+    let searchParams = [];
+    if (searchText) {
+      searchParams.push(`search=${encodeURIComponent(searchText)}`);
+    }
+    if (focus) {
+      searchParams.push(
+        `focus=${encodeURIComponent(focus.format(DATE_FORMAT))}`);
+    } else if (date) {
+      searchParams.push(`date=${encodeURIComponent(date.format(DATE_FORMAT))}`);
+    }
+
+    this.context.router.replace({
+      pathname: window.location.pathname,
+      search: `?${searchParams.join('&')}`
+    });
+  }
+
+  _scrollToFocus () {
+    const focusWeek = document.querySelector('.calendar__week--focus');
+    if (focusWeek) {
+      const rect = focusWeek.getBoundingClientRect();
+      document.body.scrollTop = rect.top;
+    }
   }
 
   _changeDate (date) {
     return (event) => {
-      this.setState({ date: date }, this._throttledLoad);
+      this.setState({ date: date, focus: undefined }, this._throttledLoad);
     };
   }
 
   _onChangeMonth (event) {
     let date = moment(this.state.date);
     date.month(event.target.value);
-    this.setState({ date: date }, this._throttledLoad);
+    this.setState({ date: date, focus: undefined }, this._throttledLoad);
   }
 
   _onChangeYear (event) {
     let date = moment(this.state.date);
     date.year(event.target.value);
-    this.setState({ date: date }, this._throttledLoad);
+    this.setState({ date: date, focus: undefined }, this._throttledLoad);
   }
 
   _onSearch (event) {
@@ -159,9 +216,13 @@ export default class Calendar extends Component {
     return result;
   }
 
-  _renderWeek (days, key) {
+  _renderWeek (days, date, focus) {
+    let classNames = ['calendar__week'];
+    if (focus && date.isSame(focus, 'week')) {
+      classNames.push('calendar__week--focus');
+    }
     return (
-      <div key={key} className="calendar__week">
+      <div key={date.valueOf()} className={classNames.join(' ')}>
         {days}
       </div>
     );
@@ -193,10 +254,8 @@ export default class Calendar extends Component {
   }
 
   _renderWeeks () {
-    const { calendar } = this.state;
+    const { calendar, date: referenceDate, focus } = this.state;
     let weeks = [];
-    let today = moment();
-    let focus = moment(calendar.date);
     let date = moment(calendar.start).startOf('day');
     let end = moment(calendar.end);
     let days, previous;
@@ -205,17 +264,17 @@ export default class Calendar extends Component {
 
       if (! previous || previous.isBefore(date, 'week')) {
         if (previous) {
-          weeks.push(this._renderWeek(days, previous.valueOf()));
+          weeks.push(this._renderWeek(days, previous, focus));
         }
         days = [];
       }
       const dayEvents = this._renderEvents(date, days);
 
       let classNames = ['calendar__day'];
-      if (date.isSame(today, 'date')) {
+      if (focus && date.isSame(focus, 'date')) {
         classNames.push('calendar__day--today');
       }
-      if (date.month() !== focus.month()) {
+      if (date.month() !== referenceDate.month()) {
         classNames.push('calendar__day--alternate');
       }
 
@@ -240,7 +299,7 @@ export default class Calendar extends Component {
       date.add(1, 'day');
     }
     if (previous) {
-      weeks.push(this._renderWeek(days, previous.valueOf()));
+      weeks.push(this._renderWeek(days, previous, focus));
     }
 
     return weeks;
@@ -275,110 +334,116 @@ export default class Calendar extends Component {
   render () {
     const { params: { id } } = this.props;
     const { calendar, filterActive, searchText, loading } = this.state;
-    const date = moment(calendar.date);
-    const daysOfWeek = this._renderDaysOfWeek();
-    const weeks = loading ? undefined : this._renderWeeks();
-    const loadingIndicator = loading ? <Loading /> : undefined;
 
-    let filter;
-    if (filterActive) {
-      filter = this._renderFilter();
-    }
+    let contents;
+    if (calendar) {
+      const date = moment(calendar.date);
+      const daysOfWeek = this._renderDaysOfWeek();
+      const weeks = loading ? undefined : this._renderWeeks();
 
-    let actions = [];
-    if (id) {
-      actions.push(
-        <Link key="add"
-          to={`/events/add?calendarId=${encodeURIComponent(calendar._id)}`}
-          className="a-header">Add</Link>
-      );
-      actions.push(
-        <Link key="edit" to={`/calendars/${calendar._id}/edit`}
-          className="a-header">Edit</Link>
+      let filter;
+      if (filterActive) {
+        filter = this._renderFilter();
+      }
+
+      let actions = [];
+      if (id) {
+        actions.push(
+          <Link key="add"
+            to={`/events/add?calendarId=${encodeURIComponent(calendar._id)}`}
+            className="a-header">Add</Link>
+        );
+        actions.push(
+          <Link key="edit" to={`/calendars/${calendar._id}/edit`}
+            className="a-header">Edit</Link>
+        );
+      } else {
+        actions.push(
+          <nav key="filter" className="page-header__actions">
+            <span className="page-header__dropper">
+              <Button label="Calendars" className="button-header"
+                onClick={() => this.setState({
+                  filterActive: ! this.state.filterActive})}/>
+              {filter}
+            </span>
+          </nav>
+        );
+      }
+
+      let months = [];
+      let monthDate = moment(date).startOf('year');
+      while (monthDate.year() === date.year()) {
+        months.push(
+          <option key={monthDate.month()}>{monthDate.format('MMMM')}</option>
+        );
+        monthDate.add(1, 'month');
+      }
+
+      let years = [];
+      let now = moment();
+      let yearDate = moment().subtract(3, 'years');
+      while (yearDate.year() <= (now.year() + 2)) {
+        years.push(
+          <option key={yearDate.year()}>{yearDate.format('YYYY')}</option>
+        );
+        yearDate.add(1, 'year');
+      }
+
+      let today;
+      if (! date.isSame(now, 'date')) {
+        today = <a onClick={this._changeDate(moment())}>Today</a>;
+      }
+
+      let pageContext;
+      if (id && calendar) {
+        pageContext = (
+          <PageContext
+            filter={{ 'sections.calendarId': calendar._id }} />
+        );
+      }
+
+      contents = (
+        <main>
+          <PageHeader title={calendar.name || 'Calendar'}
+            homer={id ? false : true}
+            back={id ? true : false}
+            searchText={searchText} onSearch={this._onSearch}
+            actions={actions} />
+          <div className="calendar">
+            <div className="calendar__header">
+              <button type="button" className="button-icon"
+                onClick={this._changeDate(moment(calendar.previous))}>
+                <LeftIcon />
+              </button>
+              <span>
+                <select value={moment(calendar.date).format('MMMM')}
+                  onChange={this._onChangeMonth}>
+                  {months}
+                </select>
+                <select value={moment(calendar.date).format('YYYY')}
+                  onChange={this._onChangeYear}>
+                  {years}
+                </select>
+                {today}
+              </span>
+              <button type="button" className="button-icon"
+                onClick={this._changeDate(moment(calendar.next))}>
+                <RightIcon />
+              </button>
+            </div>
+            <div className="calendar__week calendar__week--header">
+              {daysOfWeek}
+            </div>
+            {weeks}
+          </div>
+          {pageContext}
+        </main>
       );
     } else {
-      actions.push(
-        <nav key="filter" className="page-header__actions">
-          <span className="page-header__dropper">
-            <Button label="Calendars" className="button-header"
-              onClick={() => this.setState({
-                filterActive: ! this.state.filterActive})}/>
-            {filter}
-          </span>
-        </nav>
-      );
+      contents = <Loading />;
     }
 
-    let months = [];
-    let monthDate = moment(date).startOf('year');
-    while (monthDate.year() === date.year()) {
-      months.push(
-        <option key={monthDate.month()}>{monthDate.format('MMMM')}</option>
-      );
-      monthDate.add(1, 'month');
-    }
-
-    let years = [];
-    let now = moment();
-    let yearDate = moment().subtract(3, 'years');
-    while (yearDate.year() <= (now.year() + 2)) {
-      years.push(
-        <option key={yearDate.year()}>{yearDate.format('YYYY')}</option>
-      );
-      yearDate.add(1, 'year');
-    }
-
-    let today;
-    if (! date.isSame(now, 'date')) {
-      today = <a onClick={this._changeDate(moment())}>Today</a>;
-    }
-
-    let pageContext;
-    if (id && calendar) {
-      pageContext = (
-        <PageContext
-          filter={{ 'sections.calendarId': calendar._id }} />
-      );
-    }
-
-    return (
-      <main>
-        <PageHeader title={calendar.name || 'Calendar'}
-          homer={id ? false : true}
-          back={id ? true : false}
-          searchText={searchText} onSearch={this._onSearch}
-          actions={actions} />
-        <div className="calendar">
-          <div className="calendar__header">
-            <button type="button" className="button-icon"
-              onClick={this._changeDate(moment(calendar.previous))}>
-              <LeftIcon />
-            </button>
-            <span>
-              <select value={moment(calendar.date).format('MMMM')}
-                onChange={this._onChangeMonth}>
-                {months}
-              </select>
-              <select value={moment(calendar.date).format('YYYY')}
-                onChange={this._onChangeYear}>
-                {years}
-              </select>
-              {today}
-            </span>
-            <button type="button" className="button-icon"
-              onClick={this._changeDate(moment(calendar.next))}>
-              <RightIcon />
-            </button>
-          </div>
-          <div className="calendar__week calendar__week--header">
-            {daysOfWeek}
-          </div>
-          {weeks}
-          {loadingIndicator}
-        </div>
-        {pageContext}
-      </main>
-    );
+    return contents;
   }
 };
 
