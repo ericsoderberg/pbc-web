@@ -14,35 +14,28 @@ const UserSuggestion = (props) => (
   </div>
 );
 
-const PAYPAL_OPTIONS = {
-  client: {
-    sandbox: 'YOUR_SANDBOX_CLIENT_ID'
-  },
-  commit: true,
-  env: 'sandbox'
-};
-
-let paypalLoaded = false;
-
 class PaymentFormContents extends Component {
 
   constructor () {
     super();
-    this._paypalPayment = this._paypalPayment.bind(this);
     this.state = { domains: [] };
   }
 
   componentDidMount () {
     const { formId, formTemplateId, formState, full, session } = this.props;
 
-    getItem('form-templates', formTemplateId)
-    .then(formTemplate => this.setState({ formTemplate }))
-    .catch(error => console.log(
-      "!!! PaymentFormContents formTemplate catch", error));
+    if (formTemplateId) {
+      getItem('form-templates', formTemplateId)
+      .then(formTemplate => this.setState({ formTemplate }))
+      .catch(error => console.log(
+        "!!! PaymentFormContents formTemplate catch", error));
+    }
 
-    getItem('forms', formId)
-    .then(form => this.setState({ form }))
-    .catch(error => console.log("!!! PaymentFormContents form catch", error));
+    if (formId) {
+      getItem('forms', formId)
+      .then(form => this.setState({ form }))
+      .catch(error => console.log("!!! PaymentFormContents form catch", error));
+    }
 
     if (full && session.administrator) {
       getItems('domains', { sort: 'name' })
@@ -51,47 +44,6 @@ class PaymentFormContents extends Component {
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
-
-    // add paypal
-    if (! paypalLoaded) {
-      paypalLoaded = true;
-      let script = document.createElement("script");
-      script.src = "//www.paypalobjects.com/api/checkout.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }
-
-  componentDidUpdate () {
-    const { formState } = this.props;
-    const payment = formState.object;
-    if ('paypal' === payment.method) {
-      window.paypalCheckoutReady = () => {
-        paypal.checkout.setup(PAYPAL_OPTIONS.client.sandbox, {
-          locale: 'en_US',
-          environment: 'sandbox',
-          container: 'paypalButton'
-        });
-      };
-    }
-  }
-
-  _paypalPayment () {
-    const { form } = this.state;
-    console.log('!!! payment created');
-    return paypal.rest.payment.create(
-      PAYPAL_OPTIONS.env, PAYPAL_OPTIONS.client, {
-        transactions: [
-          { amount: { total: form.unpaidTotal, currency: 'USD' } }
-        ]
-      }
-    );
-  }
-
-  _onAuthorize(data, actions) {
-    return actions.payment.execute().then(() => {
-      console.log('!!! payment authorized');
-    });
   }
 
   render () {
@@ -104,6 +56,9 @@ class PaymentFormContents extends Component {
     // const formsPath = `/forms?` +
     //   `filter=${encodeURIComponent(JSON.stringify(formFilter))}` +
     //   `&filter-name=${encodeURIComponent(formFilterLabel)}`;
+
+    const admin = (session && (session.administrator || (payment.domainId &&
+      session.administratorDomainId === payment.domainId)));
 
     let administeredBy;
     if (full && session.administrator) {
@@ -122,8 +77,7 @@ class PaymentFormContents extends Component {
     }
 
     let user;
-    if (full && session && (session.administrator || (payment.domainId &&
-      session.administratorDomainId === payment.domainId))) {
+    if (full && admin) {
       user = (
         <fieldset className="form__fields">
           <FormField label="Person" help="the person to submit this form for">
@@ -140,13 +94,8 @@ class PaymentFormContents extends Component {
       );
     }
 
-    let paypalButton;
-    if ('paypal' === payment.method) {
-      paypalButton = <a id="paypalButton" href="#" />;
-    }
-
     let checkInstructions;
-    if ('check' === payment.method) {
+    if ('check' === payment.method && formTemplate) {
       checkInstructions = (
         <div className="form-field__text">
           {markdownToJSX(formTemplate.payByCheckInstructions || '')}
@@ -177,7 +126,7 @@ class PaymentFormContents extends Component {
           <FormField label="Amount">
             <div className="box--row">
               <span className="prefix">$</span>
-              <input name="amount" type="text"
+              <input name="amount" type="text" disabled={! admin}
                 value={payment.amount || (form || {}).unpaidTotal || ''}
                 onChange={formState.change('amount')}/>
             </div>
@@ -195,7 +144,6 @@ class PaymentFormContents extends Component {
                 onChange={formState.change('method')} />
               <label htmlFor="methodCheck">check</label>
             </div>
-            {paypalButton}
             {checkInstructions}
           </FormField>
           <FormField label="Notes">
@@ -212,8 +160,8 @@ class PaymentFormContents extends Component {
 
 PaymentFormContents.propTypes = {
   formState: PropTypes.object.isRequired,
-  formId: PropTypes.string.isRequired,
-  formTemplateId: PropTypes.string.isRequired,
+  formId: PropTypes.string,
+  formTemplateId: PropTypes.string,
   full: PropTypes.bool,
   session: PropTypes.shape({
     administrator: PropTypes.bool,

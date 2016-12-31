@@ -166,13 +166,13 @@ export default function (router, transporter) {
       populate: [
         { path: 'userId', select: 'name' },
         { path: 'formTemplateId', select: 'name domainId' },
-        { path: 'paymentId', select: 'amount' }
+        { path: 'paymentIds', select: 'amount' }
       ]
     },
     get: {
       populate: [
         { path: 'userId', select: 'name' },
-        { path: 'paymentId', select: 'amount' }
+        { path: 'paymentIds', select: 'amount' }
       ],
       transformOut: setUnpaidTotal
     },

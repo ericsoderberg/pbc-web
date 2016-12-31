@@ -11,7 +11,7 @@ import Button from '../../components/Button';
 import AddIcon from '../../icons/Add';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
-import PaymentAdd from '../payment/PaymentAdd';
+import PaymentPay from '../payment/PaymentPay';
 import { calculateTotal } from './FormUtils';
 
 const LABEL = {
@@ -121,7 +121,7 @@ class FormSummary extends Component {
         forms.forEach(form => {
           const formTotal = calculateTotal(formTemplate, form);
           let paymentTotal = 0;
-          (forms.paymentIds || []).forEach(payment => {
+          (form.paymentIds || []).forEach(payment => {
             paymentTotal += payment.amount;
           });
           if (formTotal > paymentTotal) {
@@ -214,15 +214,14 @@ class FormSummary extends Component {
       );
     } else if (paymentFormId) {
       contents = (
-        <PaymentAdd formId={paymentFormId} formTemplateId={formTemplate._id}
-          full={false} inline={true}
+        <PaymentPay formId={paymentFormId} formTemplateId={formTemplate._id}
           onDone={this._onDone} onCancel={this._onCancel} />
       );
     } else {
       const items = forms.map(form => (
         <li key={form._id}>
           <FormItem item={form} onClick={this._edit(form._id)}
-            verb={LABEL[formTemplate.submitLabel || 'Submit']}
+            verb={LABEL[formTemplate.submitLabel] || LABEL.Submit}
             distinguish={forms.length > 1} />
         </li>
       ));

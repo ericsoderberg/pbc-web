@@ -202,8 +202,9 @@ class FormContents extends Component {
       });
     } else if ('count' === templateField.type) {
       contents = (
-        <input name={templateField.name} type="number" min="0"
-          value={field.value || 0}
+        <input name={templateField.name} type="number"
+          min={templateField.min || 0} max={templateField.max}
+          value={field.value || templateField.min || 0}
           onChange={this._change(templateField._id)} />
       );
       if (templateField.value) {

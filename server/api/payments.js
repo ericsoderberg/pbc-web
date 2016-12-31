@@ -1,6 +1,7 @@
 "use strict";
+import mongoose from 'mongoose';
 import register from './register';
-import { authorizedForDomainOrSelf } from './auth';
+import { authorize, authorizedForDomainOrSelf } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 
 // /api/payments
@@ -34,6 +35,9 @@ export default function (router) {
       let data = req.body;
       data.created = new Date();
       data.modified = data.created;
+      if (! data.sent) {
+        data.sent = data.created;
+      }
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
       if (! data.userId ||
@@ -43,7 +47,7 @@ export default function (router) {
       }
       const payment = new Payment(data);
       return payment.save()
-      .then(doc => res.status(200).send({}));
+      .then(doc => res.status(200).send(doc));
     })
     .catch(error => {
       console.log('!!! post payment catch', error);

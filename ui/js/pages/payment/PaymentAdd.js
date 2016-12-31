@@ -5,9 +5,6 @@ import Loading from '../../components/Loading';
 import Form from '../../components/Form';
 import PaymentFormContents from './PaymentFormContents';
 
-class PaymentFormContentsInline extends PaymentFormContents {};
-PaymentFormContentsInline.defaultProps = { full: false };
-
 export default class PaymentAdd extends Component {
 
   constructor (props) {
@@ -83,7 +80,6 @@ export default class PaymentAdd extends Component {
 PaymentAdd.propTypes = {
   formId: PropTypes.string.isRequired,
   formTemplateId: PropTypes.string.isRequired,
-  inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onDone: PropTypes.func
 };

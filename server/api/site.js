@@ -5,6 +5,12 @@ import { authorize } from './auth';
 
 export var ICON_DIR = `${__dirname}/../../`;
 
+if (process.env.PAYPAL_CLIENT_ID) {
+  console.log('PayPal available');
+} else {
+  console.log('PayPal unavailable, set PAYPAL_CLIENT_ID environment variable');
+}
+
 // /api/site
 
 export default function (router) {
@@ -14,7 +20,12 @@ export default function (router) {
     Doc.findOne({})
     .populate({ path: 'homePageId', select: 'name' })
     .exec()
-    .then(doc => res.json(doc))
+    .then(site => {
+      site = site.toObject();
+      site.paypalClientId = process.env.PAYPAL_CLIENT_ID;
+      return site;
+    })
+    .then(site => res.json(site))
     .catch(error => res.status(400).json(error));
   });
 
@@ -29,11 +40,11 @@ export default function (router) {
       return Doc.remove({}).exec()
       .then(() => doc.save());
     })
-    .then(doc => {
+    .then(site => {
       // copy shortcut and mobile icons
-      if (doc.shortcutIcon) {
+      if (site.shortcutIcon) {
         // strip metadata
-        const matches = doc.shortcutIcon.data.match(/^(data:.+;base64,)(.*)$/);
+        const matches = site.shortcutIcon.data.match(/^(data:.+;base64,)(.*)$/);
         // const metadata = matches[1];
         const base64Data = matches[2];
         fs.writeFile(`${ICON_DIR}/shortcut-icon.png`, base64Data, 'base64',
@@ -41,9 +52,9 @@ export default function (router) {
             console.log(err);
           });
       }
-      if (doc.mobileIcon) {
+      if (site.mobileIcon) {
         // strip metadata
-        const matches = doc.mobileIcon.data.match(/^(data:.+;base64,)(.*)$/);
+        const matches = site.mobileIcon.data.match(/^(data:.+;base64,)(.*)$/);
         // const metadata = matches[1];
         const base64Data = matches[2];
         fs.writeFile(`${ICON_DIR}/mobile-app-icon.png`, base64Data, 'base64',
@@ -52,7 +63,7 @@ export default function (router) {
           });
       }
     })
-    .then(doc => res.status(200).json(doc))
+    .then(site => res.status(200).json(site))
     .catch(error => res.status(400).json(error));
   });
 }

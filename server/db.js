@@ -182,6 +182,8 @@ const formTemplateFieldSchema = Schema({
   discount: Boolean, // negates form field value
   help: String,
   limit: Number,
+  max: Number, // for count
+  min: Number, // for count
   monetary: Boolean,
   name: String,
   oldId: Number,
@@ -230,6 +232,7 @@ const paymentSchema = Schema({
   method: String, // check | paypal
   modified: Date,
   oldId: Number,
+  payPalId: String,
   received: Date,
   sent: Date,
   temporaryToken: String,
@@ -253,6 +256,8 @@ const formSchema = Schema({
   modified: Date,
   name: String, // derived from appropriate field value
   oldId: Number,
+  // This is an array in case the form is modified to increase the amount
+  // and needs a subsequent payment.
   paymentIds: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   version: Number

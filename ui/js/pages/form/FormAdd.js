@@ -38,18 +38,23 @@ class FormAdd extends Component {
     getItem('form-templates', formTemplateId)
     .then(formTemplate => {
       let fields = [];
-      // pre-fill out name and email from session, if possible
-      if (session) {
-        formTemplate.sections.forEach(section => {
-          section.fields.forEach(field => {
+      formTemplate.sections.forEach(section => {
+        section.fields.forEach(field => {
+          if (session) {
+            // pre-fill out name and email from session, if possible
             if ('Name' === field.name) {
               fields.push({ templateFieldId: field._id, value: session.name });
             } else if ('Email' === field.name) {
               fields.push({ templateFieldId: field._id, value: session.email });
             }
-          });
+          }
+          // pre-fill out fields with a minimum value
+          if (field.min) {
+            fields.push({ templateFieldId: field._id, value: field.min });
+          }
         });
-      }
+      });
+
       this.setState({
         form: { fields: fields, formTemplateId: formTemplate._id },
         formTemplate: formTemplate

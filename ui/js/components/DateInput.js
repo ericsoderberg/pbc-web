@@ -43,10 +43,11 @@ export default class DateInput extends Component {
     const date = moment(value);
     if (date.isValid()) {
       result.current = date;
+      result.dateValue = date.format(DATE_FORMAT);
     } else {
       result.current = moment().startOf('hour').add(1, 'hour');
+      result.dateValue = value;
     }
-    result.dateValue = result.current.format(DATE_FORMAT);
     return result;
   }
 
@@ -54,7 +55,7 @@ export default class DateInput extends Component {
     const { onChange } = this.props;
     const dateValue = event.target.value;
     this.setState({ dateValue });
-    if (value.length > 0) {
+    if (dateValue.length > 0) {
       const date = moment(dateValue, DATE_FORMAT, true);
       // Only notify if the value looks valid
       if (date.isValid()) {

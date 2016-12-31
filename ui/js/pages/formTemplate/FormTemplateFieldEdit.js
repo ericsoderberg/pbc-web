@@ -29,7 +29,7 @@ export default class FormTemplateFieldEdit extends Component {
     const { formState } = this.state;
     const field = formState.object;
 
-    let name, help, value, required, monetary, discount, limit;
+    let name, help, value, required, monetary, discount, limit, max, min;
 
     if ('line' === field.type || 'choice' === field.type ||
       'choices' === field.type || 'count' === field.type) {
@@ -62,6 +62,18 @@ export default class FormTemplateFieldEdit extends Component {
         <FormField label="Total available">
           <input name="limit" type="number" min="0" value={field.limit || ''}
             onChange={formState.change('limit')}/>
+        </FormField>
+      );
+      min = (
+        <FormField label="Minimum">
+          <input name="min" type="number" min="0" value={field.min || ''}
+            onChange={formState.change('min')}/>
+        </FormField>
+      );
+      max = (
+        <FormField label="Maximum">
+          <input name="max" type="number" min="0" value={field.max || ''}
+            onChange={formState.change('max')}/>
         </FormField>
       );
     }
@@ -181,6 +193,8 @@ export default class FormTemplateFieldEdit extends Component {
         <fieldset className="form__fields">
           {name}
           {help}
+          {min}
+          {max}
           {value}
           {limit}
           {required}
