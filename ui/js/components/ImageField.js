@@ -5,14 +5,14 @@ import FormField from './FormField';
 export default class ImageField extends Component {
 
   render () {
-    const { formState, property, label, name } = this.props;
+    const { formState, help, label, name, property  } = this.props;
     const image = formState.object[property];
 
     let result;
     if (image) {
 
       result = (
-        <FormField label={label}>
+        <FormField label={label} help={help}>
           <div>
             <img className="image-field__image" src={image.data} />
           </div>
@@ -24,7 +24,7 @@ export default class ImageField extends Component {
 
     } else {
 
-      const imageHelp = (
+      const imageHelp = help || (
         <span>
           {"Don't forget to "}
           <a href="https://tinyjpg.com" target="_blank">optimize</a>!
@@ -46,6 +46,7 @@ export default class ImageField extends Component {
 
 ImageField.propTypes = {
   formState: PropTypes.object.isRequired,
+  help: PropTypes.string,
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   property: PropTypes.string.isRequired

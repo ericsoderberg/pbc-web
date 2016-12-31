@@ -1,6 +1,5 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import Section from '../../components/Section';
 
@@ -45,7 +44,7 @@ export default class FilesSummary extends Component {
       }
 
       return (
-        <a key={file._id} href={`/file/${file._id}/${file.name}`}
+        <a key={file._id || index} href={`/file/${file._id}/${file.name}`}
           className="file-summary">
           {file.name}
         </a>

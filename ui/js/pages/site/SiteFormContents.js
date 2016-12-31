@@ -43,10 +43,14 @@ export default class SiteFormContents extends Component {
         </FormField>
         <ImageField label="Logo" name="logo"
           formState={formState} property="logo" />
+        <ImageField label="Mobile icon" name="mobileIcon" help="120x120 .png"
+          formState={formState} property="mobileIcon" />
+        <ImageField label="Shortcut icon" name="shortcutIcon" help="16x16 .png"
+          formState={formState} property="shortcutIcon" />
         <FormField label="Home page">
           <SelectSearch category="pages"
             options={{ select: 'name', sort: 'name' }}
-            value={(site.homePageId || {}).name}
+            value={(site.homePageId || {}).name || ''}
             onChange={(suggestion) =>
               formState.change('homePageId')({
                 _id: suggestion._id, name: suggestion.name })} />

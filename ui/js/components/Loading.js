@@ -1,8 +1,9 @@
 "use strict";
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Section from './Section';
 
 const Loading = (props) => {
+  const { small } = props;
   const dots = [];
   for (let i=0; i<=3; i++) {
     dots.push(
@@ -11,13 +12,15 @@ const Loading = (props) => {
       </svg>
     );
   }
-  return (
-    <Section full={true}>
-      <div className="loading">
-        {dots}
-      </div>
-    </Section>
-  );
+  let contents = <div className="loading">{dots}</div>;
+  if (! small) {
+    contents = <Section full={true}>{contents}</Section>;
+  }
+  return contents;
+};
+
+Loading.propTypes = {
+  small: PropTypes.bool
 };
 
 export default Loading;

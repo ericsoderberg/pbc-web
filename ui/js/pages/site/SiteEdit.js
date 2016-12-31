@@ -9,6 +9,7 @@ export default class SiteEdit extends Component {
   constructor (props) {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
+    this._onCancel = this._onCancel.bind(this);
     this.state = { site: {} };
   }
 
@@ -26,13 +27,17 @@ export default class SiteEdit extends Component {
       .catch(error => this.setState({ error: error }));
   }
 
+  _onCancel () {
+    this.context.router.goBack();
+  }
+
   render () {
     const { site, error } = this.state;
 
     return (
       <Form title="Edit Site" submitLabel="Update" action="/api/site"
         FormContents={SiteFormContents} item={site}
-        onSubmit={this._onUpdate} error={error} />
+        onSubmit={this._onUpdate} error={error} onCancel={this._onCancel} />
     );
   }
 };

@@ -324,9 +324,11 @@ const siteSchema = Schema({
   copyright: String,
   email: String,
   homePageId: { type: Schema.Types.ObjectId, ref: 'Page' },
+  mobileIcon: image,
   name: String,
   logo: image,
   phone: String,
+  shortcutIcon: image,
   socialUrls: [String],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

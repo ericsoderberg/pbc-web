@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
+import Loading from '../../components/Loading';
 import FormState from '../../utils/FormState';
 import SectionMultiEdit from './SectionMultiEdit';
 
@@ -20,7 +21,9 @@ class FilesItemEdit extends Component {
 
   _changeFile (index) {
     return (event) => {
+      const { formState } = this.state;
       const files = event.target.files;
+      formState.set({ name: files[0].name });
       let data = new FormData();
       data.append('file', files[0]);
       postFile(data)
@@ -45,6 +48,13 @@ class FilesItemEdit extends Component {
           <div className="box--row">
             <span className="input">{file.name || file._id}</span>
           </div>
+        </FormField>
+      );
+    } else if (file.name) {
+      // uploading
+      field = (
+        <FormField name={`file-${index}`} label="File">
+          <Loading small={true} />
         </FormField>
       );
     } else {
