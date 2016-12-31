@@ -12,35 +12,72 @@
   <link rel="apple-touch-icon" href="/mobile-app-icon.png">
 </head>
 <style>
-  body.loading {margin: 0px; width: 100vw; height: 100vh;
-    animation: draw 3s infinite linear alternate;
+  body.loading {
+    margin: 0px;
+    width: 100vw;
+    height: 100vh;
   }
   body.loading #content {
     position: relative;
     width: 100%;
     height: 100%;
   }
-  body.loading #logo {
-    position: absolute; display: block; width: 96px; height: 96px;
-    top: calc(50vh - 48px); left: calc(50vw - 48px);
+  body.loading .indicator {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
-  body.loading #logo circle {
-    stroke-dasharray: 260px 260px;
-    stroke-dashoffset: 0;
-    animation: draw 3s infinite linear alternate;
+
+  body.loading .indicator svg {
+    margin: 24px;
+    fill: #ccc;
+    animation-name: fadein;
+    animation-delay: 1s;
+    animation-duration: 1s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
   }
-  @keyframes draw {
-    0%, 5% { stroke-dashoffset: 260px; }
-    90%, 100% { stroke-dashoffset: 0; }
+
+  body.loading .indicator svg:nth-child(2) {
+    animation-delay: 1.3s;
+  }
+
+  body.loading .indicator svg:nth-child(3) {
+    animation-delay: 1.6s;
+  }
+
+  body.loading .indicator svg:nth-child(4) {
+    animation-delay: 1.9s;
+  }
+
+  @keyframes fadein {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }
 </style>
 <body class="loading">
   <div id="content">
-    <svg id="logo" width="96px" height="96px" viewBox="0 0 96 96" version="1.1">
-      <g stroke="#cccccc" stroke-width="6" fill="none" fill-rule="evenodd">
-        <circle cx="48" cy="48" r="40" />
-      </g>
-    </svg>
+    <div class="indicator">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <circle stroke="none" cx="12" cy="12" r="12" />
+      </svg>
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <circle stroke="none" cx="12" cy="12" r="12" />
+      </svg>
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <circle stroke="none" cx="12" cy="12" r="12" />
+      </svg>
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <circle stroke="none" cx="12" cy="12" r="12" />
+      </svg>
+    </div>
   </div>
   <script src="/index.js"></script>
 </body>
