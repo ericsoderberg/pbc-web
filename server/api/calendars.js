@@ -2,7 +2,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import register from './register';
-import { authorizedAdministrator } from './auth';
+import { authorize, authorizedAdministrator } from './auth';
 
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
@@ -28,64 +28,74 @@ export default function (router) {
   });
 
   router.get('/calendar', (req, res) => {
-    const Calendar = mongoose.model('Calendar');
-    const Event = mongoose.model('Event');
-    const id = req.query.id;
+    authorize(req, res, false) // don't require session yet
+    .then(session => {
+      const Calendar = mongoose.model('Calendar');
+      const id = req.query.id;
 
-    // if we have an id, get the calendar by _id or path
-    let promise;
-    if (id) {
-      let criteria;
-      if (Array.isArray(id)) {
-        criteria = { $or: id.map(id2 => ({ _id: id2 })) };
+      // if we have an id, get the calendar by _id or path
+      let promise;
+      if (id) {
+        let criteria;
+        if (Array.isArray(id)) {
+          criteria = { $or: id.map(id2 => ({ _id: id2 })) };
+        } else {
+          criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+        }
+        promise = Calendar.find(criteria).exec()
+        .then(calendars => ({ session, calendars }));
       } else {
-        criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+        promise = Promise.resolve({ session, calendars: [] });
       }
-      promise = Calendar.find(criteria).exec();
-    } else {
-      promise = Promise.resolve([]);
-    }
-
-    promise.then(calendars => {
+      return promise;
+    })
+    .then(context => {
+      const { calendars, session } = context;
+      const Event = mongoose.model('Event');
       const date = moment(req.query.date || undefined);
       const start = moment(date).startOf('month').startOf('week');
       const end = moment(date).endOf('month').endOf('week');
       const previous = moment(date).subtract(1, 'month').startOf('month');
       const next = moment(date).add(1, 'month').startOf('month');
 
+      let query = Event.find();
+
       // find events withing the time window
       let dateCriteria = [
         { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
         { dates: { $gte: start.toDate(), $lt: end.toDate() }}
       ];
-      let q = { $or: dateCriteria };
+      query.find({ $or: dateCriteria });
+
       if (req.query.search) {
         const exp = new RegExp(req.query.search, 'i');
-        q.name = exp;
+        query.find({ name: exp });
       }
       if (calendars.length > 0) {
-        q = { $and: [ q,
-          { $or: calendars.map(calendar => ( { calendarId: calendar._id })) }
-        ]};
+        query.find({
+          $or: calendars.map(calendar => ( { calendarId: calendar._id }))
+        });
+      }
+      if (! session ||
+        ! (session.administrator || session.administratorDomainId)) {
+        query.find({ private: { $exists: false } });
+      } else if (! session.administrator) {
+        query.find({ $or: [{
+          private: { $exists: false }, domainId: session.administratorDomainId
+        }]});
       }
 
-      Event.find(q)
-      .sort('start')
-      .exec()
-      .then(docs => {
-        const calendar = calendars.length === 1 ? calendars[0].toObject() : {};
-        res.status(200).json({
-          ...calendar,
-          date: date,
-          end: end,
-          events: docs,
-          next: next,
-          previous: previous,
-          start: start
-        });
-      })
-      .catch(error => res.status(400).json(error));
-    });
+      return query.sort('start').exec()
+      .then(events => ({
+        calendars, events, session, dates: { date, start, end, previous, next }
+      }));
+    })
+    .then(context => {
+      const { calendars, dates, events } = context;
+      const calendar = calendars.length === 1 ? calendars[0].toObject() : {};
+      res.status(200).json({ ...calendar, ...dates, events });
+    })
+    .catch(error => res.status(400).json(error));
   });
 }
 

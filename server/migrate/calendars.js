@@ -69,6 +69,9 @@ export default function () {
             // We only migrate the master event as a distinct Event
             if (event) {
               event.calendarId = calendar._id;
+              if ('Private' === spec.name) {
+                event.private = true;
+              }
               return event.save();
             }
           });
