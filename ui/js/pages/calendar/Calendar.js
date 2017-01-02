@@ -390,7 +390,7 @@ export default class Calendar extends Component {
       }
 
       let today;
-      if (! date.isSame(now, 'date')) {
+      if (false && ! date.isSame(now, 'date')) {
         today = <a onClick={this._changeDate(moment())}>Today</a>;
       }
 

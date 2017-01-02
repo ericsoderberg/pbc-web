@@ -118,9 +118,10 @@ export default class EventDates extends Component {
       days.push(
         <div key={name} className="calendar__day">
           <div className="calendar__day-date">
-            <input type="checkbox" checked={weekDayChecked[day] || false}
+            <label htmlFor={day}>{name}</label>
+            <input id={day} type="checkbox"
+              checked={weekDayChecked[day] || false}
               onChange={this._toggleWeekDay(day)} />
-            <label>{name}</label>
           </div>
         </div>
       );
@@ -157,13 +158,15 @@ export default class EventDates extends Component {
       const dateValue = date.valueOf();
       const checked = selectedDates[dateValue] || (dateValue === startValue);
       const disabled = unavailableDates[dateValue];
+      const dateString = date.toISOString();
 
       days.push(
         <div key={name} className={classNames.join(' ')}>
           <div className="calendar__day-date">
-            <input type="checkbox" checked={checked} disabled={disabled}
-              onChange={formState.toggleIn('dates', date.toISOString())} />
-            <label>{name}</label>
+            <label htmlFor={dateString}>{name}</label>
+            <input id={dateString} type="checkbox"
+              checked={checked} disabled={disabled}
+              onChange={formState.toggleIn('dates', dateString)} />
           </div>
         </div>
       );
@@ -187,7 +190,7 @@ export default class EventDates extends Component {
     let calendar;
     if (active) {
       calendar = (
-        <div className="calendar">
+        <div className="calendar calendar--fixed">
           {this._renderHeader()}
           {this._renderDays()}
         </div>
@@ -195,13 +198,13 @@ export default class EventDates extends Component {
     }
 
     return (
-      <div ref="container">
+      <fieldset ref="container" className="form__fields">
         <div type="button" className="form-item">
           <Button secondary={true} label="Recurring dates"
             onClick={this._onToggle} />
         </div>
         {calendar}
-      </div>
+      </fieldset>
     );
   }
 };

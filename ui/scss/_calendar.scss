@@ -1,5 +1,7 @@
 .calendar {
-  padding: $unit;
+  @media all and (min-width: 700px) {
+    padding: $unit;
+  }
 }
 
 .calendar__header {
@@ -7,18 +9,20 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  max-width: $page-width;
-  margin: 0 auto $unit;
 
   a:not(:last-child) {
     margin-right: $unit;
   }
 
-  select {
-    font-size: 24px;
+  @media all and (min-width: 700px) {
+    margin-bottom: $unit;
 
-    option {
-      font-size: 16px;
+    select {
+      font-size: 24px;
+
+      option {
+        font-size: 16px;
+      }
     }
   }
 }
@@ -48,8 +52,6 @@
 
 .calendar__day {
   @media all and (min-width: 700px) {
-    display: inline-block;
-    vertical-align: top;
     flex: 1;
     text-align: left;
   }
@@ -64,13 +66,22 @@
 
 .calendar__day-date {
   padding: $quarter-unit;
-  text-align: right;
   background-color: $header-background-color;
-  border-right: 2px solid $background-color;
-  margin-bottom: 2px;
+  border: 1px solid $background-color;
 
-  input {
-    float: left;
+  @media all and (min-width: 700px) {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+
+    input {
+      margin-left: $quarter-unit;
+    }
+
+    label {
+      text-align: right;
+    }
   }
 }
 
@@ -105,17 +116,59 @@
   display: none;
 }
 
+.calendar--fixed {
+  padding: $unit 0;
+
+  @media all and (max-width: 699px) {
+    .calendar__week {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .calendar__day {
+      display: inline-block;
+      vertical-align: top;
+      flex: 1;
+      text-align: left;
+    }
+
+    .calendar__day-date {
+      text-align: center;
+
+      label {
+        display: block;
+        margin-top: $quarter-unit;
+      }
+    }
+  }
+}
+
+.calendar:not(.calendar--fixed) {
+  @media all and (max-width: 699px) {
+    .calendar__day-date {
+      padding: $quarter-unit $unit;
+    }
+
+    .calendar__event {
+      a {
+        padding: $quarter-unit $unit;
+      }
+    }
+  }
+}
+
 .calendar__events {
-  margin: 0 0 $unit;
+  margin: 0 ; //0 0 $unit;
   padding: 0;
   list-style-type: none;
-  min-height: $double-unit;
+
+  @media all and (min-width: 700px) {
+    min-height: $double-unit;
+  }
 }
 
 .calendar__event {
   a {
-    // text-indent: - $half-unit;
-    // padding: $quarter-unit $quarter-unit $quarter-unit ($half-unit + $quarter-unit);
     padding: $quarter-unit;
     display: block;
     color: #333;
@@ -129,9 +182,7 @@
 }
 
 .calendar__event-time {
-  // width: $unit * 3;
   margin-right: $quarter-unit;
-  // text-indent: 0;
   color: $tertiary-color;
   display: inline-block;
 }
