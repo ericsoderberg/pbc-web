@@ -504,6 +504,11 @@
   }
 }
 
+.home__header {
+  margin: $unit;
+  text-align: center;
+}
+
 .home__brand {
   display: flex;
   flex-direction: row;

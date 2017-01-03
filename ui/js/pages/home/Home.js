@@ -105,7 +105,9 @@ class Home extends Component {
     }
 
     return [
-      // <PageHeader key="header" logo={true} />,
+      <header key="header" className="home__header">
+        {logo}
+      </header>,
       pageContents,
       <div key="footer"
         className="section__container section__container--footer">

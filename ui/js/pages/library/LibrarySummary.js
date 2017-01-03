@@ -52,13 +52,13 @@ export default class LibrarySummary extends Component {
         .catch(error => console.log('!!! LibrarySummary library catch', error));
       }
 
-      let date = moment().subtract(1, 'day');
+      let date = moment().add(1, 'day');
       getItems('messages', {
         filter: {
           libraryId: libraryId,
-          date: { $gt: date.toString() }
+          date: { $lt: date.toString() }
         },
-        sort: 'date',
+        sort: '-date',
         limit: 1
       })
       .then(messages => {
@@ -130,7 +130,7 @@ export default class LibrarySummary extends Component {
       <Link to={`/messages/${message.path || message._id}`}>
         {image}
         <div className={classNames.join(' ')}>
-          <Button right={true}>Upcoming Message</Button>
+          <Button right={true}>Latest Message</Button>
           <label>{moment(message.date).format('MMM Do')}</label>
           <h2>{message.name}</h2>
         </div>

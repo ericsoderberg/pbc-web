@@ -28,7 +28,9 @@ export default class EventResources extends Component {
     if (active) {
       if (resources.length === 0) {
         getResources(event)
-        .then(resources => this.setState({ resources: resources, scroll: true }))
+        .then(resources => this.setState({
+          resources: resources, scroll: true
+        }))
         .catch(error => console.log('!!! EventResources catch', error));
       } else {
         this.setState({ scroll : true });
@@ -54,7 +56,10 @@ export default class EventResources extends Component {
         });
         let usedBy;
         if (resource.events) {
-          classNames.push("choice--disabled");
+          if (! checked) {
+            // allow unchecking resources with conflicts
+            classNames.push("choice--disabled");
+          }
           const events = resource.events.map(event => (
             <a key={event._id} href={`/events/${event._id}`}>{event.name}</a>
           ));
@@ -62,7 +67,8 @@ export default class EventResources extends Component {
         }
         return (
           <div key={resource._id} className={classNames.join(' ')}>
-            <input type="checkbox" checked={checked} disabled={resource.events}
+            <input type="checkbox" checked={checked}
+              disabled={resource.events && ! checked}
               onChange={formState.toggleIn('resourceIds', resource._id)}/>
             <label>{resource.name}</label>
             {usedBy}

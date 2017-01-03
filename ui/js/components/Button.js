@@ -6,6 +6,19 @@ export default class Button extends Component {
   constructor () {
     super();
     this._onClick = this._onClick.bind(this);
+    this.state = {};
+  }
+
+  componentDidMount () {
+    const { left, right } = this.props;
+    // avoid sub-pixel label width for left/right buttons
+    if (left || right) {
+      // delay a bit to account for lazy browser rendering
+      setTimeout(() => {
+        const element = this.refs.component;
+        this.setState({ width: element.offsetWidth + 1 });
+      }, 50);
+    }
   }
 
   _onClick (event) {
@@ -19,12 +32,15 @@ export default class Button extends Component {
 
   render () {
     const { children, circle, className, icon, label, left, path, plain, right,
-      secondary, tag, type } = this.props;
+      secondary, tag, type
+    } = this.props;
+    const { width } = this.state;
     const Tag = tag || (path ? 'a' : 'button');
 
     let classNames = [];
     let contents = label || icon || children;
     let arrow;
+    let style = {};
     if (circle) {
       classNames.push('button-circle');
       contents = <span className="button__label">{contents}</span>;
@@ -36,6 +52,12 @@ export default class Button extends Component {
           <path d='M24,0 L24,24 L0,12 Z' />
         </svg>
       );
+      if (width) {
+        style.minWidth = width;
+      }
+      contents = (
+        <span ref="label" className="button__label">{contents}</span>
+      );
     } else if (right) {
       classNames.push('button-right');
       arrow = (
@@ -43,6 +65,12 @@ export default class Button extends Component {
           className="button__arrow">
           <path d='M0,0 L24,12 L0,24 Z' />
         </svg>
+      );
+      if (width) {
+        style.minWidth = width;
+      }
+      contents = (
+        <span ref="label" className="button__label">{contents}</span>
       );
     } else if (icon) {
       classNames.push('button-icon');
@@ -67,8 +95,8 @@ export default class Button extends Component {
     }
 
     return (
-      <Tag className={classNames.join(' ')} href={href} type={type}
-        onClick={onClick}>
+      <Tag ref="component" className={classNames.join(' ')}
+        href={href} type={type} onClick={onClick} style={style}>
         {contents}
         {arrow}
       </Tag>
