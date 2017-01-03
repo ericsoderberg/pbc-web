@@ -131,7 +131,7 @@ export default class LibrarySummary extends Component {
         {image}
         <div className={classNames.join(' ')}>
           <Button right={true}>Latest Message</Button>
-          <label>{moment(message.date).format('MMM Do')}</label>
+          <label>{moment(message.date).format('MMMM Do')}</label>
           <h2>{message.name}</h2>
         </div>
       </Link>

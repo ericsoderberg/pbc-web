@@ -5,20 +5,40 @@ export default class Button extends Component {
 
   constructor () {
     super();
+    this._layout = this._layout.bind(this);
     this._onClick = this._onClick.bind(this);
     this.state = {};
   }
 
   componentDidMount () {
     const { left, right } = this.props;
-    // avoid sub-pixel label width for left/right buttons
     if (left || right) {
-      // delay a bit to account for lazy browser rendering
-      setTimeout(() => {
-        const element = this.refs.component;
-        this.setState({ width: element.offsetWidth + 1 });
-      }, 50);
+      this._layout();
     }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if ((nextProps.left || nextProps.right) &&
+      nextProps.label !== this.props.label) {
+      this.setState({ needLayout: true });
+    }
+  }
+
+  componentDidUpdate () {
+    const { needLayout } = this.state;
+    if (needLayout) {
+      this.setState({ needLayout: false }, this._layout);
+    }
+  }
+
+  _layout () {
+    // avoid sub-pixel label width for left/right buttons
+    setTimeout(() => {
+      const element = this.refs.component;
+      const width = element.offsetWidth;
+      // align to even pixels to avoid gap, who knows why
+      this.setState({ width: width + (width % 2) });
+    }, 10);
   }
 
   _onClick (event) {
