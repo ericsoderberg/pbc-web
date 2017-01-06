@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import EventTimes from '../../components/EventTimes';
 import Section from '../../components/Section';
+import Image from '../../components/Image';
 import Map from '../../components/Map';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
@@ -40,8 +41,15 @@ export default class EventSummary extends Component {
     const { color, full, plain, navigable } = this.props;
     const { event } = this.state;
 
-    let contents, map;
+    let image, contents, map;
     if (event) {
+
+      if (event.image) {
+        image = (
+          <Image image={event.image} full={false} plain={true} />
+        );
+      }
+
       if (false === navigable) {
         contents = (
           <div className="event-summary__summary">
@@ -72,8 +80,11 @@ export default class EventSummary extends Component {
     return (
       <Section color={color} full={full} plain={plain}>
         <div className="event-summary">
-          {contents}
-          {map}
+          {image}
+          <div className="event-summary__contents">
+            {contents}
+            {map}
+          </div>
         </div>
       </Section>
     );

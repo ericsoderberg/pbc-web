@@ -7,6 +7,7 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
 import DateTimeInput from '../../components/DateTimeInput';
 import SelectSearch from '../../components/SelectSearch';
+import ImageField from '../../components/ImageField';
 import TrashIcon from '../../icons/Trash';
 import { getLocationParams } from '../../utils/Params';
 
@@ -172,6 +173,8 @@ export default class EventDetails extends Component {
             <textarea ref="text" name="text" value={event.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
+          <ImageField label="Image" name="image"
+            formState={formState} property="image" />
           <FormField label="Calendar">
             <select name="calendarId" value={event.calendarId || ''}
               onChange={formState.change('calendarId')}>

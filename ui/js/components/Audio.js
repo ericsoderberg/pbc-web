@@ -1,6 +1,9 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import Section from './Section';
+import Button from './Button';
+import PlayIcon from '../icons/Play';
+import PauseIcon from '../icons/Pause';
 import VolumeIcon from '../icons/Volume';
 
 function pad(num, size) {
@@ -75,7 +78,7 @@ export default class Audio extends Component {
 
   _onEnded (event) {
     const { onEnd } = this.props;
-    this.setState({ playing: false });
+    this.setState({ playing: false, at: 0 });
     if (onEnd) {
       onEnd();
     }
@@ -142,13 +145,11 @@ export default class Audio extends Component {
     let playControl;
     if (playing) {
       playControl = (
-        <button className="button audio__control" type="button"
-          onClick={this._onPause}>Pause</button>
+        <Button icon={<PauseIcon />} onClick={this._onPause} />
       );
     } else {
       playControl = (
-        <button className="button audio__control" type="button"
-          onClick={this._onPlay}>Play</button>
+        <Button icon={<PlayIcon />} onClick={this._onPlay} />
       );
     }
 
@@ -173,16 +174,16 @@ export default class Audio extends Component {
     return (
       <Section color={color} full={full} plain={plain}>
         <div className={classes.join(' ')}>
-          <span>
+          <audio ref="audio" preload="metadata">
+            <source src={path} type={file.type} />
+            No audio with this browser
+          </audio>
+          <span className="audio__control">
             {label}
             {playControl}
           </span>
           {positionControl}
           {volumeControl}
-          <audio ref="audio" preload="metadata">
-            <source src={path} type={file.type} />
-            No audio with this browser
-          </audio>
         </div>
       </Section>
     );

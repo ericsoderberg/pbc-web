@@ -139,6 +139,7 @@ const eventSchema = Schema({
   dates: [Date],
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   end: Date,
+  image: image,
   location: String, // room, house owner's name, etc.
   modified: Date,
   name: String,

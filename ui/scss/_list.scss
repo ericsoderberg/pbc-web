@@ -61,9 +61,13 @@ button.item__container {
   }
 }
 
+.item__container {
+  padding-left: $unit;
+  padding-right: $unit;
+}
+
 .item {
   display: flex;
-  padding: $unit;
   max-width: $page-width;
   margin: 0 auto;
 
@@ -71,6 +75,7 @@ button.item__container {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: $unit;
 
     > *:not(:last-child) {
       margin-right: $half-unit;
@@ -79,6 +84,7 @@ button.item__container {
 
   @media all and (max-width: 699px) {
     flex-direction: column;
+    padding: $unit 0;
 
     > *:not(:first-child) {
       margin-top: $half-unit;

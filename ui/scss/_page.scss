@@ -52,25 +52,46 @@
 
   &.list {
     font-size: 1.25rem;
+    max-width: $page-width + $double-unit;
 
     .item {
-      padding-left: 0;
-      padding-right: 0;
+      @media all and (min-width: 700px) {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
   }
 }
 
 .section__container--full {
+  padding: 0;
+
   .section,
   .footer {
     max-width: none;
     margin: 0;
+    padding: 0;
   }
 
-  .section.image {
-    margin: (- $double-unit) (- $unit);
-    width: calc(100% + #{$double-unit});
-    pointer-events: none; // so we don't inhibit neighboring section controls
+  .section {
+    &.list {
+
+      .item__container:first-child {
+        .item.audio {
+          margin-top: $unit;
+        }
+      }
+
+      .item__container:last-child {
+        .item.audio {
+          margin-bottom: $unit;
+        }
+      }
+    }
+  }
+
+  .library-summary {
+    padding: $unit;
   }
 }
 
@@ -91,12 +112,20 @@
   padding: $double-unit 0;
   margin: 0 auto;
 
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    margin-bottom: 0;
+  }
+
   > div { // markdown-to-jsx
-    p:first-child {
+    *:first-child {
       margin-top: 0;
     }
 
-    p:last-child {
+    *:last-child {
       margin-bottom: 0;
     }
   }
@@ -104,7 +133,6 @@
 
 .map {
   position: relative;
-  // height: 40vh;
   min-height: round($unit * 8);
 }
 
@@ -116,12 +144,12 @@
   }
 
   @media all and (max-width: 699px) {
-    padding: $unit 0;
+    // padding: $unit 0;
     height: 62vw; // empirically determined
   }
 }
 
-.event-summary {
+.event-summary__contents {
   position: relative;
   display: flex;
 
@@ -142,20 +170,36 @@
   flex-direction: column;
   text-decoration: none;
   justify-content: center;
-  align-items: center;
 
   @media all and (min-width: 700px) {
     flex: 1 0 50%;
-    padding: $double-unit;
+    padding: $double-unit $double-unit $double-unit 0;
+    align-items: flex-start;
   }
 
   @media all and (max-width: 699px) {
     padding: $unit;
+    align-items: center;
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin-top: 0;
+  }
+
+  button {
+    margin-bottom: $unit;
   }
 
   .event-times {
-    text-align: center;
-    margin-top: $unit;
+    @media all and (min-width: 700px) {
+      text-align: left;
+    }
+
+    @media all and (max-width: 699px) {
+      text-align: center;
+    }
   }
 
   .event-times__times {
@@ -172,6 +216,7 @@
 
   @media all and (min-width: 700px) {
     flex: 0 0 50%;
+    margin: $unit 0;
   }
 
   @media all and (max-width: 699px) {

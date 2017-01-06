@@ -18,6 +18,10 @@ export default class PageContext extends Component {
     this._load(nextProps);
   }
 
+  componentWillUnmount () {
+    this._unmounted = true;
+  }
+
   _load (props) {
     const { filter } = props;
     if (filter) {
@@ -25,7 +29,11 @@ export default class PageContext extends Component {
         filter: filter,
         select: 'name'
       })
-      .then(pages => this.setState({ pages: pages }))
+      .then(pages => {
+        if (! this._unmounted) {
+          this.setState({ pages: pages });
+        }
+      })
       .catch(error => console.log('!!! PageContext pages catch', error));
     }
   }
