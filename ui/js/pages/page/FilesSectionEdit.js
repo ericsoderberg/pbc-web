@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { postFile, deleteFile } from '../../actions';
+import { postFile } from '../../actions';
 import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
 import FormState from '../../utils/FormState';
@@ -41,9 +41,9 @@ class FilesItemEdit extends Component {
     const { formState } = this.state;
     const file = formState.object;
 
-    let field;
+    let fileField;
     if (file._id) {
-      field = (
+      fileField = (
         <FormField name={`file-${index}`} label="File">
           <div className="box--row">
             <span className="input">{file.name || file._id}</span>
@@ -52,13 +52,13 @@ class FilesItemEdit extends Component {
       );
     } else if (file.name) {
       // uploading
-      field = (
+      fileField = (
         <FormField name={`file-${index}`} label="File">
           <Loading small={true} />
         </FormField>
       );
     } else {
-      field = (
+      fileField = (
         <FormField name={`file-${index}`} label="File">
           <input name={`file-${index}`} type="file"
             onChange={this._changeFile(index)}/>
@@ -66,7 +66,15 @@ class FilesItemEdit extends Component {
       );
     }
 
-    return field;
+    return (
+      <div>
+        {fileField}
+        <FormField label="Label">
+          <input name={`label-${index}`} value={file.label || ''}
+            onChange={formState.change('label')}/>
+        </FormField>
+      </div>
+    );
   }
 
 }

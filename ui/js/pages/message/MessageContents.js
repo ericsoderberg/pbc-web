@@ -7,6 +7,7 @@ import Image from '../../components/Image';
 import Audio from '../../components/Audio';
 import Video from '../../components/Video';
 import Button from '../../components/Button';
+import Section from '../../components/Section';
 import MessageItem from './MessageItem';
 
 const LEFT_KEY = 37;
@@ -77,22 +78,24 @@ export default class MessageContents extends Component {
     (message.files || []).forEach(file => {
       const path = `/api/files/${file._id}`;
       if (file.type) {
-        if (! file.type.match(/audio/)) {
+        if (file.type.match(/audio/)) {
+          audio = <Audio file={file} full={false} />;
+        } else {
           files.push(
             <a key={file._id} className="item__container" href={path}>
-              <div className="item">{file.name}</div>
+              <div className="item">{file.label || file.name}</div>
             </a>
           );
-        } else {
-          audio = <Audio file={file} full={false} />;
         }
       }
     });
     if (files.length > 0) {
       files = (
-        <div className="list">
-          {files}
-        </div>
+        <Section full={true}>
+          <div className="list">
+            {files}
+          </div>
+        </Section>
       );
     }
 

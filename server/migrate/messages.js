@@ -13,6 +13,7 @@ const LIBRARY_NAME = 'Sermons';
 function normalizeOldFile (item) {
   item._id = new mongoose.Types.ObjectId();
   item.oldId = item.id;
+  item.label = item.caption;
   item.name = item.file_file_name;
   item.size = item.file_file_size || undefined;
   item.type = item.file_content_type;
@@ -69,6 +70,7 @@ function normalizeMessage (item, mainLibrary, authors, messageFiles,
   .filter(item2 => item2 && item2.name)
   .map(item2 => ({
     _id: item2._id,
+    label: item2.label,
     name: item2.name,
     size: item2.size,
     type: item2.type

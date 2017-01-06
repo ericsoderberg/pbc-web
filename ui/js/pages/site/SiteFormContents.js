@@ -9,10 +9,6 @@ import TrashIcon from '../../icons/Trash';
 
 export default class SiteFormContents extends Component {
 
-  componentDidMount () {
-    this.refs.name.focus();
-  }
-
   render () {
     const { formState } = this.props;
     const site = formState.object;
@@ -38,7 +34,7 @@ export default class SiteFormContents extends Component {
     return (
       <fieldset className="form__fields">
         <FormField label="Name">
-          <input ref="name" name="name" value={site.name || ''}
+          <input name="name" value={site.name || ''}
             onChange={formState.change('name')}/>
         </FormField>
         <ImageField label="Logo" name="logo"

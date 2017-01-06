@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItem } from '../../actions';
 import Section from '../../components/Section';
+import Audio from '../../components/Audio';
 
 export default class FilesSummary extends Component {
 
@@ -36,25 +37,51 @@ export default class FilesSummary extends Component {
 
   render () {
     const { color, full, files, plain } = this.props;
+    const { playIndex } = this.state;
 
-    const links = (files || []).map((file, index) => {
+    // In case there are multiple audio files, we chain their playing
+    // together. Remember what audio file to play next when one finshes.
+    let nextPlayIndex = {};
+    let previousFile;
+    (files || []).forEach((file, index) => {
+      if (file.type && file.type.match(/audio/)) {
+        if (previousFile) {
+          nextPlayIndex[previousFile._id] = index;
+        }
+        previousFile = file;
+      }
+    });
+
+    const items = (files || []).map((file, index) => {
       if (! file._id) {
         // populated via _load
         file = this.state.files[file.id] || {};
       }
-
-      return (
-        <a key={file._id || index} href={`/file/${file._id}/${file.name}`}
-          className="file-summary">
-          {file.name}
-        </a>
-      );
+      const key = file._id || index;
+      const path = `/file/${file._id}/${file.name}`;
+      if (file.type && file.type.match(/audio/)) {
+        return (
+          <div key={key} className="item__container">
+            <Audio className="item" file={file}
+              full={false} plain={true} autoPlay={index === playIndex}
+              onStart={() => this.setState({ playIndex: undefined })}
+              onEnd={() => this.setState({
+                playIndex: nextPlayIndex[file._id] })} />
+          </div>
+        );
+      } else {
+        return (
+          <a key={key} className="item__container" href={path}>
+            <div className="item">{file.label || file.name}</div>
+          </a>
+        );
+      }
     });
 
     return (
       <Section color={color} full={full} plain={plain}>
-        <div className="file-summaries">
-          {links}
+        <div className="list">
+          {items}
         </div>
       </Section>
     );

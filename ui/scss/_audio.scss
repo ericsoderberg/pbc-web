@@ -1,23 +1,38 @@
 .audio {
   display: flex;
   width: 100%;
+  margin-top: $half-unit;
+  margin-bottom: $half-unit;
+  font-size: 1.25rem;
 
   @media all and (min-width: 700px) {
     flex-direction: row;
     align-items: center;
     height: $double-unit;
-    padding: $quadruple-unit 0 $unit;
   }
 
   @media all and (max-width: 699px) {
     flex-direction: column;
-    padding: $unit 0 $half-unit;
   }
 
   audio {
     position: absolute;
     height: 0;
   }
+}
+
+.audio:not(.audio--plain) {
+  @media all and (min-width: 700px) {
+    padding: $quadruple-unit 0 $unit;
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+  }
+}
+
+.audio__label {
+  margin-right: $unit;
 }
 
 .audio__control {
@@ -31,13 +46,14 @@
 .audio__position,
 .audio__volume {
 
-  @media all and (min-width: 700px) {
-    padding: $unit 0;
-  }
-
-  @media all and (max-width: 699px) {
-    padding: $half-unit 0;
-  }
+  padding: 0;
+  // @media all and (min-width: 700px) {
+  //   padding: $unit 0;
+  // }
+  //
+  // @media all and (max-width: 699px) {
+  //   padding: $half-unit 0;
+  // }
 
   // Reset
   &[type=range] {
@@ -135,15 +151,16 @@
   @media all and (max-width: 699px) {
 
   }
+}
 
-  label {
-    position: absolute;
-    top: 50%;
-    right: $unit;
-    transform: translateY(-50%);
-    z-index: 1;
-    pointer-events: none;
-  }
+.audio__duration {
+  position: absolute;
+  top: 50%;
+  right: $unit;
+  transform: translateY(-50%);
+  z-index: 1;
+  pointer-events: none;
+  color: $color;
 }
 
 .audio__volume-container {

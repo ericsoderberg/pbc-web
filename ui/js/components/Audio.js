@@ -53,6 +53,14 @@ export default class Audio extends Component {
     this._layout();
   }
 
+  componentDidUpdate () {
+    const { autoPlay } = this.props;
+    const { playing } = this.state;
+    if (autoPlay && ! playing) {
+      this._onPlay();
+    }
+  }
+
   componentWillUnmount () {
     const audio = this.refs.audio;
     audio.removeEventListener('timeupdate', this._onTimeUpdate);
@@ -66,7 +74,11 @@ export default class Audio extends Component {
   }
 
   _onEnded (event) {
+    const { onEnd } = this.props;
     this.setState({ playing: false });
+    if (onEnd) {
+      onEnd();
+    }
   }
 
   _onResize (event) {
@@ -79,10 +91,14 @@ export default class Audio extends Component {
   }
 
   _onPlay () {
+    const { onStart } = this.props;
     const audio = this.refs.audio;
     audio.play();
     this.setState({ playing: true,
       start: audio.seekable.start(0), end: audio.seekable.end(0) });
+    if (onStart) {
+      onStart();
+    }
   }
 
   _onPause () {
@@ -106,21 +122,43 @@ export default class Audio extends Component {
   }
 
   render () {
-    const { file, color, full, plain } = this.props;
+    const { file, className, color, full, plain } = this.props;
     const { playing, volume, start, end, at } = this.state;
     const path = `/api/files/${file._id}/${file.name}`;
 
-    let playControl, positionControl, volumeControl;
+    let classes = ['audio'];
+    if (plain) {
+      classes.push('audio--plain');
+    }
+    if (className) {
+      classes.push(className);
+    }
+
+    let label;
+    if (file.label) {
+      label = <span className="audio__label">{file.label}</span>;
+    }
+
+    let playControl;
     if (playing) {
       playControl = (
         <button className="button audio__control" type="button"
           onClick={this._onPause}>Pause</button>
       );
+    } else {
+      playControl = (
+        <button className="button audio__control" type="button"
+          onClick={this._onPlay}>Play</button>
+      );
+    }
+
+    let positionControl, volumeControl;
+    if (playing) {
       positionControl = (
         <div className="audio__position-container">
           <input className="audio__position" type="range" min={start} max={end}
             value={at} onChange={this._onSeek} />
-          <label>{friendlyDuration(end - at)}</label>
+          <span className="audio__duration">{friendlyDuration(end - at)}</span>
         </div>
       );
       volumeControl = (
@@ -130,17 +168,15 @@ export default class Audio extends Component {
             step={0.1} value={volume} onChange={this._onVolume} />
         </div>
       );
-    } else {
-      playControl = (
-        <button className="button audio__control" type="button"
-          onClick={this._onPlay}>Listen</button>
-      );
     }
 
     return (
       <Section color={color} full={full} plain={plain}>
-        <div className="audio">
-          {playControl}
+        <div className={classes.join(' ')}>
+          <span>
+            {label}
+            {playControl}
+          </span>
           {positionControl}
           {volumeControl}
           <audio ref="audio" preload="metadata">
@@ -154,11 +190,15 @@ export default class Audio extends Component {
 };
 
 Audio.propTypes = {
+  autoPlay: PropTypes.bool,
   full: PropTypes.bool,
   file: PropTypes.shape({
     _id: PropTypes.string.isRequired,
+    label: PropTypes.string,
     name: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired
   }),
+  onEnd: PropTypes.func,
+  onStart: PropTypes.func,
   ...Section.propTypes
 };

@@ -13,8 +13,6 @@ export default class CalendarFormContents extends Component {
   componentDidMount () {
     const { formState, session } = this.props;
 
-    this.refs.name.focus();
-
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
@@ -48,7 +46,7 @@ export default class CalendarFormContents extends Component {
       <div>
         <fieldset className="form__fields">
           <FormField label="Name">
-            <input ref="name" name="name" value={calendar.name || ''}
+            <input name="name" value={calendar.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
           <FormField name="path" label="Path" help="unique url name">

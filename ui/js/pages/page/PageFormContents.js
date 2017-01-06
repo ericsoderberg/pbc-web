@@ -20,7 +20,6 @@ export default class PageFormContents extends Component {
 
   componentDidMount () {
     const { formState, session } = this.props;
-    this.refs.name.focus();
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
@@ -79,7 +78,7 @@ export default class PageFormContents extends Component {
       <div>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
-            <input ref="name" name="name" value={page.name || ''}
+            <input name="name" value={page.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
           <FormField name="path" label="Path" help="unique url name">

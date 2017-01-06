@@ -49,6 +49,15 @@
       max-height: $tile-width + (2 * $double-unit);
     }
   }
+
+  &.list {
+    font-size: 1.25rem;
+
+    .item {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
 }
 
 .section__container--full {
@@ -155,7 +164,7 @@
 }
 
 .event-summary__date {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 100;
 }
 
@@ -359,7 +368,7 @@
 .page-tile__name {
   position: relative;
   display: inline-block;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 100;
   padding: $unit;
   background-color: $control-background-color;
@@ -437,7 +446,7 @@
 
 .footer {
   display: flex;
-  font-size: 14px;
+  font-size: 0.875rem;
 
   @media all and (min-width: 700px) {
     flex-direction: row;

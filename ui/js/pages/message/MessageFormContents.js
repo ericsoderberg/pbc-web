@@ -14,14 +14,14 @@ export default class MessageFormContents extends Component {
   constructor () {
     super();
     this._onAddFile = this._onAddFile.bind(this);
-    this._renderFileField = this._renderFileField.bind(this);
+    this._renderFile = this._renderFile.bind(this);
+    this._changeFileProperty = this._changeFileProperty.bind(this);
     this._onChangeSeries = this._onChangeSeries.bind(this);
     this.state = { domains: [], libraries: [] };
   }
 
   componentDidMount () {
     const { formState, session } = this.props;
-    this.refs.name.focus();
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
@@ -71,8 +71,17 @@ export default class MessageFormContents extends Component {
     };
   }
 
+  _changeFileProperty (index, property) {
+    return (event) => {
+      const message = this.props.formState.object;
+      let files = (message.files || []).slice(0);
+      const file = files[index];
+      file[property] = event.target.value;
+      this.props.formState.set('files', files);
+    };
+  }
+
   _onChangeSeries (suggestion) {
-    const { formState } = this.props;
     let value;
     if (suggestion) {
       value = { _id: suggestion._id, name: suggestion.name };
@@ -82,18 +91,18 @@ export default class MessageFormContents extends Component {
     formState.set('seriesId', value);
   }
 
-  _renderFileField (file, index) {
+  _renderFile (file, index) {
     let closeControl = (
       <button type="button" className="button-icon"
-        onClick={this.props.formState.removeAt('files', index)}>
+        onClick={this._removeFile(index)}>
         <TrashIcon secondary={true} />
       </button>
     );
 
-    let field;
+    let fileField;
     if (file._id) {
-      field = (
-        <FormField key={index} name={`file-${index}`} label="File"
+      fileField = (
+        <FormField name={`file-${index}`} label="File"
           closeControl={closeControl}>
           <div className="box--row">
             <span className="input">{file.name || file._id}</span>
@@ -101,15 +110,24 @@ export default class MessageFormContents extends Component {
         </FormField>
       );
     } else {
-      field = (
-        <FormField key={index} name={`file-${index}`} label="File"
+      fileField = (
+        <FormField name={`file-${index}`} label="File"
           closeControl={closeControl}>
           <input name={`file-${index}`} type="file"
             onChange={this._changeFile(index)}/>
         </FormField>
       );
     }
-    return field;
+
+    return (
+      <div key={index}>
+        {fileField}
+        <FormField label="Label">
+          <input name={`label-${index}`} value={file.label || ''}
+            onChange={this._changeFileProperty(index, 'label')}/>
+        </FormField>
+      </div>
+    );
   }
 
   render () {
@@ -119,7 +137,7 @@ export default class MessageFormContents extends Component {
 
     let files;
     if (message.files) {
-      files = message.files.map(this._renderFileField);
+      files = message.files.map(this._renderFile);
     }
 
     let seriesField;
@@ -171,7 +189,7 @@ export default class MessageFormContents extends Component {
       <div>
         <fieldset className="form__fields">
           <FormField label="Name">
-            <input ref="name" name="name" value={message.name || ''}
+            <input name="name" value={message.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
           <FormField label="Author">
@@ -191,7 +209,7 @@ export default class MessageFormContents extends Component {
           <ImageField label="Image" name="image"
             formState={formState} property="image" />
           <FormField name="text" label="Text" help={<TextHelp />}>
-            <textarea ref="text" name="text" value={message.text || ''} rows={4}
+            <textarea name="text" value={message.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
           <FormField label="Video URL">

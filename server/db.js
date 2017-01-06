@@ -70,6 +70,7 @@ const pageSectionSchema = Schema({
   // files type
   files: [{
     _id: String,
+    label: String,
     name: String,
     size: Number,
     type: { type: String }
@@ -295,6 +296,7 @@ const messageSchema = Schema({
   dpId: String,
   files: [{
     _id: String,
+    label: String,
     name: String,
     size: Number,
     type: { type: String }
@@ -317,6 +319,7 @@ mongoose.model('Message', messageSchema);
 
 const oldFileSchema = Schema({
   oldId: {type: String, required: true, unique: true},
+  label: String,
   name: String,
   size: Number,
   type: { type: String }

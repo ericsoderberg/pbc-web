@@ -23,7 +23,6 @@ export default class UserFormContents extends Component {
 
   componentDidMount () {
     const { formState, session } = this.props;
-    this.refs.name.focus();
 
     if (session.administrator) {
       this._getDomains();
@@ -191,7 +190,7 @@ export default class UserFormContents extends Component {
       <div>
         <fieldset className="form__fields">
           <FormField label="Name">
-            <input ref="name" name="name" value={user.name || ''}
+            <input name="name" value={user.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
           <FormField name="email" label="Email">
@@ -208,7 +207,7 @@ export default class UserFormContents extends Component {
           <ImageField label="Photo" name="image"
             formState={formState} property="image" />
           <FormField name="text" label="Text" help={<TextHelp />}>
-            <textarea ref="text" name="text" value={user.text || ''} rows={8}
+            <textarea name="text" value={user.text || ''} rows={8}
               onChange={formState.change('text')}/>
           </FormField>
         </fieldset>

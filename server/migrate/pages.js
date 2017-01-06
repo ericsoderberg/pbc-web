@@ -97,6 +97,7 @@ function normalizePage (item, arg) {
   if (pageFiles[item.id]) {
     const files = pageFiles[item.id].filter(item2 => item2).map(item2 => ({
       _id: item2._id,
+      label: item2.label,
       name: item2.name,
       size: item2.size,
       type: item2.type
@@ -119,6 +120,7 @@ function normalizePage (item, arg) {
 function normalizeOldFile (item, oldId) {
   item._id = new mongoose.Types.ObjectId();
   item.oldId = oldId;
+  item.label = item.name;
   item.name = item.file_file_name;
   item.size = item.file_file_size || undefined;
   item.type = item.file_content_type;
