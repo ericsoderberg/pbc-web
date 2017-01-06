@@ -21,6 +21,9 @@ class Message extends Component {
       getItem('messages', nextProps.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Message catch', error));
     }
+    if (nextProps.message) {
+      document.title = nextProps.message.name;
+    }
   }
 
   render () {
