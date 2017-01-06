@@ -25,6 +25,9 @@ class Event extends Component {
       getItem('events', nextProps.params.id, { cache: true, populate: true })
       .catch(error => console.log('!!! Event catch', error));
     }
+    if (nextProps.event) {
+      document.title = nextProps.event.name;
+    }
   }
 
   render () {

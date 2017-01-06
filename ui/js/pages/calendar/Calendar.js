@@ -54,7 +54,6 @@ export default class Calendar extends Component {
       nextProps.location.query.date !== this.props.location.query.date) {
       const locationState = this._stateFromLocation(nextProps.location);
       this.setState(locationState, this._throttledLoad);
-      // this._load(nextProps);
     }
   }
 
@@ -113,6 +112,10 @@ export default class Calendar extends Component {
           });
         }
       });
+
+      if (calendar.name) {
+        document.title = `${calendar.name} Calendar`;
+      }
 
       this.setState({ calendar: calendar, days: days, loading: false });
     })

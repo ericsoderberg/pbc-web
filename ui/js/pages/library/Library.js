@@ -27,7 +27,6 @@ export default class Library extends Component {
     const { params: { id } } = this.props;
     getItem('libraries', id)
     .then(library => {
-      document.title = library.name;
       this.setState({ library: library });
     })
     .catch(error => console.log('!!! Library catch', error));

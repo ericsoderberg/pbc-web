@@ -30,7 +30,10 @@ export default class FormEdit extends Component {
       this.setState({ form: form });
       return getItem('form-templates', form.formTemplateId);
     })
-    .then(formTemplate => this.setState({ formTemplate: formTemplate }))
+    .then(formTemplate => {
+      this.setState({ formTemplate: formTemplate });
+      document.title = formTemplate.name;
+    })
     .catch(error => console.log("!!! FormEdit catch", error));
   }
 
