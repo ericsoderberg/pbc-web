@@ -153,7 +153,7 @@ export default class Audio extends Component {
     }
 
     let positionControl, volumeControl;
-    if (playing) {
+    if (playing || at) {
       positionControl = (
         <div className="audio__position-container">
           <input className="audio__position" type="range" min={start} max={end}
