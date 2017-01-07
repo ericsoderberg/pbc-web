@@ -14,9 +14,25 @@ export default class Edit extends Component {
   }
 
   componentDidMount () {
-    document.title = this.props.title;
-    getItem(this.props.category, this.props.params.id)
-    .then(item => this.setState({ item: item }))
+    this._load(this.props);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.params.id !== this.props.params.id) {
+      this._load(nextProps);
+    }
+  }
+
+  _load (props) {
+    document.title = props.title;
+    getItem(props.category, props.params.id)
+    .then(item => {
+      const { onChange } = props;
+      this.setState({ item: item });
+      if (onChange) {
+        onChange(item);
+      }
+    })
     .catch(error => console.log("!!! Edit catch", error));
   }
 
@@ -46,13 +62,16 @@ export default class Edit extends Component {
 
   render () {
     const {
-      category, params: { id }, FormContents, Preview, title
+      actions, category, params: { id }, footerActions, FormContents,
+      onChange, Preview, submitLabel, title
     } = this.props;
     const { item, error } = this.state;
     return (
-      <Form title={title} submitLabel="Update"
+      <Form title={title} actions={actions} footerActions={footerActions}
+        submitLabel={submitLabel || "Update"}
         action={`/api/${category}/${id}`}
         FormContents={FormContents} Preview={Preview} item={item}
+        onChange={onChange}
         onSubmit={this._onUpdate} onRemove={this._onRemove}
         error={error} onCancel={this._onCancel} />
     );
@@ -60,14 +79,18 @@ export default class Edit extends Component {
 };
 
 Edit.propTypes = {
+  actions: PropTypes.node,
   category: PropTypes.string.isRequired,
   FormContents: PropTypes.func.isRequired,
+  footerActions: PropTypes.node,
+  onChange: PropTypes.func,
   onUpdate: PropTypes.func,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
   }).isRequired,
   Preview: PropTypes.func,
   removeBackLevel: PropTypes.number,
+  submitLabel: PropTypes.string,
   title: PropTypes.string.isRequired
 };
 

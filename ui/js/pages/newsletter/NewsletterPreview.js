@@ -7,17 +7,9 @@ export default class NewsletterPreview extends Component {
 
   render () {
     const { item: newsletter } = this.props;
-
-    let sendControl;
-    if (newsletter.address) {
-      sendControl = (
-        <button type="button" className="button-header">Send</button>
-      );
-    }
-
     return (
       <main className="page-preview">
-        <PageHeader title="Preview" actions={sendControl} />
+        <PageHeader title="Preview" />
         <NewsletterContents item={newsletter} />
       </main>
     );

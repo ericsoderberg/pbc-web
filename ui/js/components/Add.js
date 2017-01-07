@@ -39,12 +39,13 @@ export default class Add extends Component {
   }
 
   render () {
-    const { category, FormContents, Preview, title } = this.props;
+    const { category, FormContents, onChange, Preview, title } = this.props;
     const { item, error } = this.state;
     return (
       <Form title={title} submitLabel="Add"
         action={`/api/${category}`}
         FormContents={FormContents} Preview={Preview} item={item}
+        onChange={onChange}
         onSubmit={this._onAdd} error={error}
         onCancel={this._onCancel} />
     );
@@ -55,6 +56,7 @@ Add.propTypes = {
   category: PropTypes.string.isRequired,
   default: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   Preview: PropTypes.func,
   showable: PropTypes.bool,
   title: PropTypes.string.isRequired

@@ -38,13 +38,17 @@ class Form extends Component {
   }
 
   _setItem (item) {
+    const { onChange } = this.props;
     this.setState({ formState: new FormState(item, this._setItem) });
+    if (onChange) {
+      onChange(item);
+    }
   }
 
   render () {
     const {
-      action, contentsProps, error, FormContents, inline, onCancel, onRemove,
-      Preview, session, submitLabel, title
+      action, actions, contentsProps, error, footerActions, FormContents,
+      inline, onCancel, onRemove, Preview, session, submitLabel, title
      } = this.props;
     const { formState } = this.state;
     let classes = ['form__container'];
@@ -59,12 +63,15 @@ class Form extends Component {
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
     } else {
-      const headerCancelControl = (
-        <button className="button-header" type="button" onClick={onCancel}>
-          Cancel
-        </button>
+      const headerActions = (
+        <nav className="page-header__actions">
+          {actions}
+          <button className="button-header" type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        </nav>
       );
-      header = <PageHeader title={title} actions={headerCancelControl} />;
+      header = <PageHeader title={title} actions={headerActions} />;
     }
 
     let removeControl;
@@ -94,6 +101,7 @@ class Form extends Component {
             <button type="submit" className="button" onClick={this._onSubmit}>
               {submitLabel}
             </button>
+            {footerActions}
             {removeControl}
             {footerCancelControl}
           </footer>
@@ -106,12 +114,15 @@ class Form extends Component {
 
 Form.propTypes = {
   action: PropTypes.string,
+  actions: PropTypes.node,
   contentsProps: PropTypes.object,
   error: PropTypes.object,
+  footerActions: PropTypes.node,
   FormContents: PropTypes.func.isRequired,
   item: PropTypes.object,
   inline: PropTypes.bool,
   onCancel: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   onRemove: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   Preview: PropTypes.func,

@@ -18,6 +18,10 @@ export default class Search extends Component {
     }
   }
 
+  componentWillUnmount () {
+    this._unmounted = true;
+  }
+
   _onActivate (event) {
     this.setState({ active: true }, () => {
       this.refs.input.focus();
@@ -26,7 +30,9 @@ export default class Search extends Component {
 
   _onBlur (event) {
     setTimeout(() => {
-      this.setState({ active: false });
+      if (! this._unmounted) {
+        this.setState({ active: false });
+      }
     }, 10);
   }
 
