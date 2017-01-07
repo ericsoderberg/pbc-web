@@ -192,7 +192,7 @@ export default class MessageContents extends Component {
       }
 
       attributes = (
-        <div className="section__container">
+        <Section>
           <dl className="page-attributes section">
             <dt>Name</dt><dd>{message.name}</dd>
             {verses}
@@ -201,7 +201,7 @@ export default class MessageContents extends Component {
             {series}
             {library}
           </dl>
-        </div>
+        </Section>
       );
     }
 
@@ -214,12 +214,12 @@ export default class MessageContents extends Component {
         {seriesMessages}
         {files}
         {attributes}
-        <div className="section__container section__container--full">
+        <Section full={true}>
           <div className="message__nav footer">
             {previousMessage}
             {nextMessage}
           </div>
-        </div>
+        </Section>
       </div>
     );
   }

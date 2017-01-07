@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getSite, getItem, deleteSession } from '../../actions';
 import PageContents from '../page/PageContents';
+import Section from '../../components/Section';
 import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
@@ -109,29 +110,30 @@ class Home extends Component {
         {logo}
       </header>,
       pageContents,
-      <div key="footer"
-        className="section__container section__container--footer">
-        <div className="footer__links">
-          <div className="home__brand">
-            {logo}
-            <div className="home__social">
-              {socialLinks}
+      <Section key="footer">
+        <div>
+          <div className="footer__links">
+            <div className="home__brand">
+              {logo}
+              <div className="home__social">
+                {socialLinks}
+              </div>
             </div>
+            <div className="home__nav">
+              <Link to="/calendar"><CalendarIcon /></Link>
+              <Link to="/search"><SearchIcon /></Link>
+            </div>
+            {sessionControl}
           </div>
-          <div className="home__nav">
-            <Link to="/calendar"><CalendarIcon /></Link>
-            <Link to="/search"><SearchIcon /></Link>
-          </div>
-          {sessionControl}
+          <footer className="home__footer footer">
+            <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>
+              {site.address}
+            </a>
+            <a href={`tel:${site.phone}`}>{site.phone}</a>
+            <span>{site.copyright}</span>
+          </footer>
         </div>
-        <footer className="home__footer footer">
-          <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>
-            {site.address}
-          </a>
-          <a href={`tel:${site.phone}`}>{site.phone}</a>
-          <span>{site.copyright}</span>
-        </footer>
-      </div>
+      </Section>
     ];
   }
 

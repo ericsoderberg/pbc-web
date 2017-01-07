@@ -3,6 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getGeocode } from '../actions';
 import Leaflet from 'leaflet';
+import Section from './Section';
 
 export default class Map extends Component {
 
@@ -56,9 +57,10 @@ export default class Map extends Component {
   _setMap (mapSize) {
     const { map, lat, lon } = this.state;
     map.setView([lat, lon], 14);
-    Leaflet.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-      attribution: '&copy;OpenStreetMap, &copy;CartoDB'
-    }).addTo(map);
+    Leaflet.tileLayer(
+      'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy;OpenStreetMap, &copy;CartoDB'
+      }).addTo(map);
     const circle = Leaflet.circleMarker([lat, lon], {
       color: '#FF8D6D',
       opacity: 0.8,
@@ -110,17 +112,12 @@ export default class Map extends Component {
 
     let result;
     if (! plain) {
-      let classNames = ['section__container'];
-      if (full) {
-        classNames.push('section__container--full');
-      }
-
       result = (
-        <div className={classNames.join(' ')}>
-          <div ref="map" id="map" className="map section">
+        <Section full={full}>
+          <div ref="map" id="map" className="map">
             {address}
           </div>
-        </div>
+        </Section>
       );
     } else {
       result = (

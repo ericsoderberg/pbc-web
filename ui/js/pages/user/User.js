@@ -17,16 +17,16 @@ const UserContents = (props) => {
     image = <Image image={user.image} avatar={true} />;
   }
 
+  let email = `
+  ## Email
+  [${user.email}](mailto:${user.email})
+  `;
+
   return (
     <div>
       {image}
       {text}
-      <div className="section__container">
-        <div className="text section">
-          <h2>Email</h2>
-          <a href={`mailto:${user.email}`}>{user.email}</a>
-        </div>
-      </div>
+      <Text text={email} />
     </div>
   );
 };
