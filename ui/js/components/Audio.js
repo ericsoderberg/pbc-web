@@ -20,15 +20,12 @@ function friendlyDuration (duration) {
     result += `${hours}:`;
     remaining -= hours * 3600;
   }
-  if (remaining > 60) {
-    const minutes = Math.floor(remaining / 60);
-    result += `${pad(minutes, 2)}:`;
-    remaining -= minutes * 60;
-  }
-  if (remaining > 0) {
-    const seconds = Math.floor(remaining);
-    result += `${pad(seconds, 2)}`;
-  }
+  // always show minutes and seconds, even when 0
+  const minutes = Math.floor(remaining / 60);
+  result += `${pad(minutes, 2)}:`;
+  remaining -= minutes * 60;
+  const seconds = Math.floor(remaining);
+  result += `${pad(seconds, 2)}`;
   return result;
 }
 
