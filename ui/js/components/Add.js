@@ -8,6 +8,7 @@ export default class Add extends Component {
   constructor (props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
+    this._onCancel = this._onCancel.bind(this);
     this.state = { item: props.default };
   }
 
