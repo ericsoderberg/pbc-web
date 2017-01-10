@@ -63,7 +63,7 @@ export default class LibrarySummary extends Component {
       })
       .then(messages => {
         const message = messages[0];
-        if (message && message.seriesId) {
+        if (false && message && message.seriesId) {
           return getItem('messages', message.seriesId);
         } else {
           this.setState({ message: message });
