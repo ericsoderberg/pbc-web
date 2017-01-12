@@ -79,7 +79,7 @@ class Home extends Component {
     return <div className="home__session">{contents}</div>;
   }
 
-  _renderMenu () {
+  _renderMenuLinks () {
     const { page } = this.props;
     let links = [
       <Link key='/search' to='/search'>Search</Link>
@@ -184,17 +184,17 @@ class Home extends Component {
       pageContents = <Loading key="page" />;
     }
 
-    let menuLayer;
+    let menuLayerClasses = ["home__menu-layer"];
     if (showMenu) {
-      const links = this._renderMenu();
-      menuLayer = (
-        <div key="menuLayer" className="home__menu-layer"
-          onClick={this._hideMenu}>
-          <Button plain={true}>menu</Button>
-          {links}
-        </div>
-      );
+      menuLayerClasses.push("home__menu-layer--active");
     }
+    const links = this._renderMenuLinks();
+    const menuLayer = (
+      <div key="menuLayer" className={menuLayerClasses.join(' ')}>
+        <Button plain={true}>menu</Button>
+        {links}
+      </div>
+    );
 
     let footer = this._renderFooter();
 

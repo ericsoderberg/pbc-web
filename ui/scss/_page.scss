@@ -649,7 +649,7 @@
   z-index: 100;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -100%);
   overflow: hidden;
   padding-bottom: $double-unit;
   border-bottom-left-radius: $quadruple-unit;
@@ -671,6 +671,10 @@
       color: $control-hover-background;
     }
   }
+}
+
+.home__menu-layer--active {
+  transform: translate(-50%, 0%);
 }
 
 .home__brand {
