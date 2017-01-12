@@ -63,14 +63,14 @@ export default class LibrarySummary extends Component {
       })
       .then(messages => {
         const message = messages[0];
-        if (false && message && message.seriesId) {
-          return getItem('messages', message.seriesId);
-        } else {
-          this.setState({ message: message });
-          return undefined;
-        }
+        // if (message && message.seriesId) {
+        //   return getItem('messages', message.seriesId);
+        // } else {
+        this.setState({ message: message });
+        //   return undefined;
+        // }
       })
-      .then(series => this.setState({ series: series }))
+      // .then(series => this.setState({ series: series }))
       .catch(error => console.log('!!! LibrarySummary messages catch', error));
     }
   }

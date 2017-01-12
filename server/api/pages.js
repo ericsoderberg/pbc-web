@@ -43,20 +43,20 @@ const populatePage = (page) => {
     promises.push(
       Message.findOne({
         libraryId: section.libraryId,
-        date: { $gt: date.toString() },
-        series: { $ne: true }
+        date: { $lt: date.toString() }
+        // series: { $ne: true }
       })
-      .sort('date').select(PAGE_MESSAGE_FIELDS).exec()
+      .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
       .then(message => {
-        if (message && message.seriesId) {
-          // get series instead
-          return (
-            Message.findOne({ _id: message.seriesId })
-            .select(PAGE_MESSAGE_FIELDS).exec()
-          );
-        } else {
-          return message;
-        }
+        // if (message && message.seriesId) {
+        //   // get series instead
+        //   return (
+        //     Message.findOne({ _id: message.seriesId })
+        //     .select(PAGE_MESSAGE_FIELDS).exec()
+        //   );
+        // } else {
+        return message;
+        // }
       })
     );
   });
