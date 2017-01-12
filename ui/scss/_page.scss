@@ -236,13 +236,20 @@
 .event-summary__date {
   font-size: 1.5rem;
   font-weight: 100;
+  margin: $half-unit 0;
+}
+
+.event-summary__location {
+  font-size: 1.1rem;
+  font-weight: 100;
+  margin: $half-unit 0;
 }
 
 .event-summary__map {
 
   @media all and (min-width: 700px) {
     flex: 0 0 50%;
-    // padding: $quadruple-unit 0;
+    // padding: $unit 0;
   }
 
   @media all and (max-width: 699px) {
@@ -256,6 +263,10 @@
       width: 100%;
     }
   }
+}
+
+.event__map {
+  padding: $unit 0;
 }
 
 @import 'audio';

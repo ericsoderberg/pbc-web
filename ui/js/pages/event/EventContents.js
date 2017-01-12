@@ -17,6 +17,13 @@ const EventContents = (props) => {
     );
   }
 
+  let location;
+  if (event.location) {
+    location = (
+      <div className="event-summary__location">{event.location}</div>
+    );
+  }
+
   let text;
   if (event.text) {
     text = <Text text={event.text} />;
@@ -39,8 +46,11 @@ const EventContents = (props) => {
           <div className="event-summary__summary">
             <h1>{event.name}</h1>
             <EventTimes event={event} reverse={true} size="large" />
+            {location}
           </div>
-          {map}
+          <div className="event__map">
+            {map}
+          </div>
         </div>
       </Section>
       {text}
