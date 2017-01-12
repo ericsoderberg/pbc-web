@@ -27,6 +27,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   min-width: 100%;
+  width: 100%;
 }
 
 .section {
@@ -307,9 +308,10 @@
     // padding: $double-unit $unit $double-unit 0;
   }
 
-  // @media all and (max-width: 699px) {
-  //   padding: 0 $unit $unit;
-  // }
+  @media all and (max-width: 699px) {
+    // padding: 0 $unit $unit;
+    padding-bottom: $unit;
+  }
 }
 
 .library-summary__message {

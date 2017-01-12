@@ -65,7 +65,7 @@ class App extends Component {
         navControl = (
           <Button ref="navControl"
             className="app__nav-control" onClick={this._onToggle}>
-            menu
+            admin
           </Button>
         );
       }

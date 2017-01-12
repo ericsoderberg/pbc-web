@@ -762,8 +762,16 @@
 
 .form-summary__template {
   position: absolute;
-  top: $quadruple-unit;
-  right: $double-unit;
+
+  @media all and (min-width: 700px) {
+    top: $quadruple-unit;
+    right: $double-unit;
+  }
+
+  @media all and (max-width: 699px) {
+    top: $double-unit;
+    right: $unit;
+  }
 }
 
 .form-table {
