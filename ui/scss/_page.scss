@@ -117,7 +117,7 @@
 
 @mixin section-content {
   @media all and (min-width: 700px) {
-    padding: $quadruple-unit 0;
+    padding: $double-unit 0;
   }
 
   @media all and (max-width: 699px) {
@@ -649,7 +649,7 @@
   z-index: 100;
   top: 0;
   left: 50%;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%, -120%);
   overflow: hidden;
   padding-bottom: $double-unit;
   border-bottom-left-radius: $quadruple-unit;
