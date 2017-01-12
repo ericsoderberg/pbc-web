@@ -3,10 +3,9 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import EventTimes from '../../components/EventTimes';
-import Section from '../../components/Section';
 import Image from '../../components/Image';
 import Map from '../../components/Map';
-import Button from '../../components/Button';
+// import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 
 export default class EventSummary extends Component {
@@ -38,11 +37,21 @@ export default class EventSummary extends Component {
   }
 
   render () {
-    const { color, full, plain, navigable } = this.props;
+    const { className, navigable } = this.props;
     const { event } = this.state;
+
+    let classes = ["event-summary"];
+    if (className) {
+      classes.push(className);
+    }
 
     let image, contents, map;
     if (event) {
+
+      if (event.backgroundImage) {
+        backgroundImage =
+          <Image image={event.backgroundImage} full={false} plain={true} />;
+      }
 
       if (event.image) {
         image = (
@@ -52,17 +61,21 @@ export default class EventSummary extends Component {
 
       if (false === navigable) {
         contents = (
-          <div className="event-summary__summary">
-            <h2>{event.name}</h2>
-            <EventTimes event={event} reverse={true} size="large" />
+          <div className="event-summary__text-container">
+            <div className="event-summary__text">
+              <h2 className='event-summary__name'>{event.name}</h2>
+              <EventTimes event={event} reverse={true} size="large" />
+            </div>
           </div>
         );
       } else {
         contents = (
-          <Link to={`/events/${event._id}`} className="event-summary__summary">
-            <Button right={true}>{event.name}</Button>
-            <EventTimes event={event} reverse={true} size="large" />
-          </Link>
+          <div className="event-summary__text-container">
+            <Link to={`/events/${event._id}`} className="event-summary__text">
+              <h2 className='event-summary__name'>{event.name}</h2>
+              <EventTimes event={event} reverse={true} size="large" />
+            </Link>
+          </div>
         );
       }
 
@@ -78,21 +91,18 @@ export default class EventSummary extends Component {
     }
 
     return (
-      <Section color={color} full={full} plain={plain}>
-        <div className="event-summary">
-          {image}
-          <div className="event-summary__contents">
-            {contents}
-            {map}
-          </div>
+      <div className={classes.join(' ')}>
+        {image}
+        <div className="event-summary__contents">
+          {contents}
+          {map}
         </div>
-      </Section>
+      </div>
     );
   }
 };
 
 EventSummary.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  navigable: PropTypes.bool,
-  ...Section.propTypes
+  navigable: PropTypes.bool
 };

@@ -8,8 +8,6 @@ import FacebookIcon from '../../icons/Facebook';
 import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
-import SearchIcon from '../../icons/Search';
-import CalendarIcon from '../../icons/Calendar';
 import Button from '../../components/Button';
 import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
@@ -20,6 +18,8 @@ class Home extends Component {
     super();
     this._signOut = this._signOut.bind(this);
     this._siteReady = this._siteReady.bind(this);
+    this._showMenu = this._showMenu.bind(this);
+    this._hideMenu = this._hideMenu.bind(this);
     this.state = {};
   }
 
@@ -51,6 +51,16 @@ class Home extends Component {
     .catch(error => console.log('!!! Home _signOut catch', error));
   }
 
+  _showMenu () {
+    this.setState({ showMenu: true });
+    document.body.addEventListener('click', this._hideMenu);
+  }
+
+  _hideMenu () {
+    this.setState({ showMenu: false });
+    document.body.removeEventListener('click', this._hideMenu);
+  }
+
   _renderSession () {
     const { session } = this.props;
     let contents;
@@ -69,17 +79,46 @@ class Home extends Component {
     return <div className="home__session">{contents}</div>;
   }
 
-  _renderContents () {
-    const { site, page } = this.props;
-
-    let pageContents;
+  _renderMenu () {
+    const { page } = this.props;
+    let links = [
+      <Link key='/search' to='/search'>Search</Link>
+    ];
     if (page) {
-      pageContents = <PageContents key="page" item={page} />;
-    } else {
-      pageContents = <Loading key="page" />;
-    }
 
-    const sessionControl = this._renderSession();
+      page.sections.filter(section => 'pages' === section.type)
+      .forEach(section => {
+        section.pages.forEach(page => {
+          page = page.id; // how the backend returns it
+          let path = page.path ? `/${page.path}` : `/pages/${page._id}`;
+          links.push(<Link key={path} to={path}>{page.name}</Link>);
+        });
+      });
+
+      const calendarSections =
+        page.sections.filter(section => 'calendar' === section.type);
+      calendarSections.forEach(section => {
+        const calendar = section.calendarId;
+        let path = `/calendars/${calendar.path || calendar._id}`;
+        links.push(<Link key={path} to={path}>{calendar.name}</Link>);
+      });
+      if (calendarSections.length === 0) {
+        links.push(<Link key='/calendar' to='/calendar'>Calendar</Link>);
+      }
+
+      page.sections.filter(section => 'library' === section.type)
+      .forEach(section => {
+        const library = section.libraryId;
+        let path = `/libraries/${library.path || library._id}`;
+        links.push(<Link key={path} to={path}>{library.name}</Link>);
+      });
+
+    }
+    return links;
+  }
+
+  _renderFooter () {
+    const { site } = this.props;
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
@@ -105,11 +144,9 @@ class Home extends Component {
       logo = <img className="home__logo" src={site.logo.data} />;
     }
 
-    return [
-      <header key="header" className="home__header">
-        {logo}
-      </header>,
-      pageContents,
+    const sessionControl = this._renderSession();
+
+    return (
       <Section key="footer">
         <div>
           <div className="footer__links">
@@ -120,8 +157,7 @@ class Home extends Component {
               </div>
             </div>
             <div className="home__nav">
-              <Link to="/calendar"><CalendarIcon /></Link>
-              <Link to="/search"><SearchIcon /></Link>
+              <Link to="/search"><Button>Search</Button></Link>
             </div>
             {sessionControl}
           </div>
@@ -134,6 +170,43 @@ class Home extends Component {
           </footer>
         </div>
       </Section>
+    );
+  }
+
+  _renderContents () {
+    const { page } = this.props;
+    const { showMenu } = this.state;
+
+    let pageContents;
+    if (page) {
+      pageContents = <PageContents key="page" item={page} />;
+    } else {
+      pageContents = <Loading key="page" />;
+    }
+
+    let menuLayer;
+    if (showMenu) {
+      const links = this._renderMenu();
+      menuLayer = (
+        <div key="menuLayer" className="home__menu-layer"
+          onClick={this._hideMenu}>
+          <Button plain={true}>menu</Button>
+          {links}
+        </div>
+      );
+    }
+
+    let footer = this._renderFooter();
+
+    return [
+      <header key="header" className="home__header">
+        <Button plain={true} onClick={this._showMenu}>
+          menu
+        </Button>
+        {menuLayer}
+      </header>,
+      pageContents,
+      footer
     ];
   }
 

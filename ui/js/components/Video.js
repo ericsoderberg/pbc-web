@@ -1,37 +1,33 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import Section from './Section';
 
 const VIMEO_REGEXP = /vimeo\.com\/(\d+)/;
 
 export default class Video extends Component {
 
   render () {
-    const { url, full } = this.props;
+    const { url } = this.props;
 
-    let iframe = <span>Unknown type</span>;
+    let contents = <span>Unknown type</span>;
     if (url) {
       // TOOD: Handle YouTube vs. Vimeo
       const match = url.match(VIMEO_REGEXP);
       if (match) {
-        iframe = (
+        const src = `${window.location.protocol}//player.vimeo.com/video/` +
+          `${match[1]}?title=0&byline=0&portrait=0`;
+        contents = (
           <iframe className="video vimeo-player" type="text/html"
             width="960" height="540"
-            src={`${window.location.protocol}//player.vimeo.com/video/${match[1]}?title=0&byline=0&portrait=0`}
+            src={src}
             frameBorder="0" allowFullScreen />
         );
       }
     }
 
-    return (
-      <Section full={full} plain={full}>
-        {iframe}
-      </Section>
-    );
+    return contents;
   }
 };
 
 Video.propTypes = {
-  url: PropTypes.string,
-  ...Section.propTypes
+  url: PropTypes.string
 };

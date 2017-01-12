@@ -62,6 +62,7 @@ const domainSchema = Schema({
 mongoose.model('Domain', domainSchema);
 
 const pageSectionSchema = Schema({
+  backgroundImage: image,
   // calendar type
   calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   color: String,

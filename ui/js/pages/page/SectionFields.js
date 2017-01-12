@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
+import ImageField from '../../components/ImageField';
 
 export default class SectionFields extends Component {
 
@@ -20,6 +21,8 @@ export default class SectionFields extends Component {
           <input ref="color" name="color" value={section.color || ''}
             onChange={formState.change('color')}/>
         </FormField>
+        <ImageField label="Background image" name="backgroundImage"
+          formState={formState} property="backgroundImage" />
       </div>
     );
   }

@@ -2,7 +2,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
-import Section from '../../components/Section';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
 
@@ -38,7 +37,12 @@ export default class PageSummaries extends Component {
   }
 
   render () {
-    const { color, full, pages } = this.props;
+    const { className, pages } = this.props;
+
+    let classes = ['page-summaries'];
+    if (className) {
+      classes.push(className);
+    }
 
     const links = (pages || []).map((pageRef, index) => {
       let page;
@@ -69,16 +73,13 @@ export default class PageSummaries extends Component {
     });
 
     return (
-      <Section color={color} full={full} plain={full}>
-        <div className="page-summaries">
-          {links}
-        </div>
-      </Section>
+      <div className={classes.join(' ')}>
+        {links}
+      </div>
     );
   }
 };
 
 PageSummaries.propTypes = {
-  pages: PropTypes.array,
-  ...Section.propTypes
+  pages: PropTypes.array
 };

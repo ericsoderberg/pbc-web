@@ -1,11 +1,12 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
+import markdownToJSX from 'markdown-to-jsx';
 import moment from 'moment';
 import FormError from '../../components/FormError';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
-import Text from '../../components/Text';
+// import Text from '../../components/Text';
 import Stored from '../../components/Stored';
 import FormTotal from './FormTotal';
 
@@ -243,7 +244,7 @@ class FormContents extends Component {
     if ('instructions' === templateField.type) {
       result = (
         <div key={index} className="form__text">
-          <Text text={templateField.help} plain={true} />
+          {markdownToJSX(templateField.help)}
         </div>
       );
     } else {

@@ -1,23 +1,23 @@
 "use strict";
 import React, { PropTypes } from 'react';
 import markdownToJSX from 'markdown-to-jsx';
-import Section from './Section';
 
 const Text = (props) => {
-  const { text, color, plain, full } = props;
+  const { className, text } = props;
+  let classes = ['text'];
+  if (className) {
+    classes.push(className);
+  }
   const content = text || props.children;
   return (
-    <Section color={color} full={full} plain={plain}>
-      <div className="text">
-        {markdownToJSX(content || '')}
-      </div>
-    </Section>
+    <div className={classes.join(' ')}>
+      {markdownToJSX(content || '')}
+    </div>
   );
 };
 
 Text.propTypes = {
-  text: PropTypes.string,
-  ...Section.propTypes
+  text: PropTypes.string
 };
 
 export default Text;

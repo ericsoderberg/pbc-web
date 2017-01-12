@@ -118,7 +118,8 @@ export default function (router) {
         { path: 'sections.people.id', select: 'name image' },
         {
           path: 'sections.eventId',
-          select: 'name path start end dates times address location image'
+          select: 'name path start end dates times address location ' +
+            'image'
         },
         { path: 'sections.libraryId', select: 'name path' },
         { path: 'sections.formTemplateId', select: 'name' }

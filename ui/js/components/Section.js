@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes, Children } from 'react';
+import Image from './Image';
 
 export default class Section extends Component {
 
@@ -41,7 +42,7 @@ export default class Section extends Component {
   }
 
   render () {
-    const { color, footer, full, plain } = this.props;
+    const { backgroundImage, color, footer, full, plain } = this.props;
     const { active } = this.state;
     let child = Children.only(this.props.children);
 
@@ -65,11 +66,18 @@ export default class Section extends Component {
         classNames.push('section__container--colored');
       }
 
+      let background;
+      if (backgroundImage) {
+        background =
+          <Image className='section__background' image={backgroundImage} />;
+      }
+
       child = React.cloneElement(child, {
         className: `${child.props.className || ''} section`});
 
       result = (
         <div ref='component' className={classNames.join(' ')} style={style}>
+          {background}
           {child}
         </div>
       );
@@ -80,6 +88,9 @@ export default class Section extends Component {
 }
 
 Section.propTypes = {
+  backgroundImage: PropTypes.shape({
+    data: PropTypes.string.isRequired
+  }),
   color: PropTypes.string,
   footer: PropTypes.bool,
   full: PropTypes.bool,

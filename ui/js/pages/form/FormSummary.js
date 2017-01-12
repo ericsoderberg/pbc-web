@@ -4,7 +4,6 @@ import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItems, getItem } from '../../actions';
-import Section from '../../components/Section';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import Button from '../../components/Button';
@@ -173,19 +172,23 @@ class FormSummary extends Component {
   }
 
   render () {
-    const { color, full, plain, formTemplateId, session } = this.props;
+    const { className, formTemplateId, session } = this.props;
     const {
       formTemplate, forms, adding, editId, height, paymentFormId
     } = this.state;
+
+    let classes = ['form-summary__container'];
+    if (className) {
+      classes.push(className);
+    }
 
     let formTemplateLink;
     if (session && session.administrator && formTemplate) {
       const formTemplatePath = `/form-templates/${formTemplate._id}`;
       formTemplateLink = (
-        <div className='form__footer'>
-          <span />
-          <Link to={formTemplatePath}>template</Link>
-        </div>
+        <Link className='form-summary__template' to={formTemplatePath}>
+          template
+        </Link>
       );
     }
 
@@ -242,15 +245,13 @@ class FormSummary extends Component {
     }
 
     return (
-      <Section color={color} full={full} plain={plain}>
-        <div ref="container" className="form-summary__container"
-          style={{ height }}>
-          <div>
-            {contents}
-            {formTemplateLink}
-          </div>
+      <div ref="container" className={classes.join(' ')}
+        style={{ height }}>
+        {formTemplateLink}
+        <div>
+          {contents}
         </div>
-      </Section>
+      </div>
     );
   }
 };
@@ -263,8 +264,7 @@ FormSummary.propTypes = {
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
     userId: PropTypes.string
-  }),
-  ...Section.propTypes
+  })
 };
 
 const select = (state, props) => ({

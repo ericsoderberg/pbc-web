@@ -1,7 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem } from '../../actions';
-import Section from '../../components/Section';
 import Audio from '../../components/Audio';
 
 export default class FilesSummary extends Component {
@@ -36,8 +35,13 @@ export default class FilesSummary extends Component {
   }
 
   render () {
-    const { color, full, files, plain } = this.props;
+    const { className, files } = this.props;
     const { playIndex } = this.state;
+
+    let classes = ['list'];
+    if (className) {
+      classes.push(className);
+    }
 
     // In case there are multiple audio files, we chain their playing
     // together. Remember what audio file to play next when one finshes.
@@ -79,16 +83,13 @@ export default class FilesSummary extends Component {
     });
 
     return (
-      <Section color={color} full={full} plain={plain}>
-        <div className="list">
-          {items}
-        </div>
-      </Section>
+      <div className={classes.join(' ')}>
+        {items}
+      </div>
     );
   }
 };
 
 FilesSummary.propTypes = {
-  files: PropTypes.array,
-  ...Section.propTypes
+  files: PropTypes.array
 };

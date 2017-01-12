@@ -4,7 +4,6 @@ import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItems, getItem } from '../../actions';
-import Section from '../../components/Section';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
 
@@ -37,11 +36,8 @@ export default class LibrarySummary extends Component {
   }
 
   _load (props) {
-    if (props.message) {
-      this.setState({ message: props.message });
-    } else if (props.id) {
-
-      let libraryId;
+    let libraryId;
+    if (props.id) {
       if (typeof props.id === 'object') {
         libraryId = props.id._id;
         this.setState({ library: props.id });
@@ -51,6 +47,11 @@ export default class LibrarySummary extends Component {
         .then(library => this.setState({ library: library }))
         .catch(error => console.log('!!! LibrarySummary library catch', error));
       }
+    }
+
+    if (props.message) {
+      this.setState({ message: props.message });
+    } else if (libraryId) {
 
       let date = moment().add(1, 'day');
       getItems('messages', {
@@ -95,7 +96,7 @@ export default class LibrarySummary extends Component {
       };
       image = (
         <Image ref="image" className="library-summary__message-image"
-          image={series.image} plain={true} style={style} />
+          image={series.image} style={style} />
       );
       classNames.push('library-summary__message--imaged');
     }
@@ -112,28 +113,25 @@ export default class LibrarySummary extends Component {
   }
 
   _renderMessage (message) {
-    let classNames = ['library-summary__message'];
-    let image;
-    if (message.image) {
-      const style = {
-        top: this.state.offset,
-        transform: `scale(${1 + (this.state.offset / 600)})`
-      };
-      image = (
-        <Image ref="image" className="library-summary__message-image"
-          image={message.image} plain={true} style={style} />
-      );
-      classNames.push('library-summary__message--imaged');
-    }
+    // let classNames = ['library-summary__message'];
+    // let image;
+    // if (message.image) {
+    //   const style = {
+    //     top: this.state.offset,
+    //     transform: `scale(${1 + (this.state.offset / 600)})`
+    //   };
+    //   image = (
+    //     <Image ref="image" className="library-summary__message-image"
+    //       image={message.image} style={style} />
+    //   );
+    //   classNames.push('library-summary__message--imaged');
+    // }
 
     return (
       <Link to={`/messages/${message.path || message._id}`}>
-        {image}
-        <div className={classNames.join(' ')}>
-          <Button right={true}>Latest Message</Button>
-          <label>{moment(message.date).format('MMMM Do')}</label>
-          <h2>{message.name}</h2>
-        </div>
+        <label>Latest Message</label>
+        <h2>{message.name}</h2>
+        <span>{moment(message.date).format('MMMM Do')}</span>
       </Link>
     );
   }
@@ -147,39 +145,40 @@ export default class LibrarySummary extends Component {
   }
 
   render () {
-    const { color, full } = this.props;
+    const { className } = this.props;
     const { library, message } = this.state;
-    let plain = full;
+
+    let classes = ['library-summary'];
+    if (className) {
+      classes.push(className);
+    }
 
     let contents;
     if (message) {
       if (message.series) {
         contents = this._renderSeries(message);
-        if (! message.image) {
-          plain = false;
-        }
       } else {
         contents = this._renderMessage(message);
-        if (! message.image) {
-          plain = false;
-        }
       }
-    } else {
-      contents = this._renderLibrary(library);
     }
 
     return (
-      <Section color={color} full={full} plain={plain}>
-        <div className="library-summary">
+      <div className={classes.join(' ')}>
+        <div className="library-summary__library">
+          <Button
+            path={`/libraries/${library.path || library._id}`} right={true}>
+            {library.name}
+          </Button>
+        </div>
+        <div className="library-summary__message">
           {contents}
         </div>
-      </Section>
+      </div>
     );
   }
 };
 
 LibrarySummary.propTypes = {
   message: PropTypes.object,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  ...Section.propTypes
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 };

@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import markdownToJSX from 'markdown-to-jsx';
 import { getItem } from '../../actions';
-import Section from '../../components/Section';
 import Image from '../../components/Image';
 
 export default class PeopleSummary extends Component {
@@ -38,7 +37,12 @@ export default class PeopleSummary extends Component {
   }
 
   render () {
-    const { color, full, people, plain } = this.props;
+    const { className, people } = this.props;
+
+    let classes = ['people-summaries'];
+    if (className) {
+      classes.push(className);
+    }
 
     const links = (people || []).map((person, index) => {
       let user;
@@ -70,16 +74,13 @@ export default class PeopleSummary extends Component {
     });
 
     return (
-      <Section color={color} full={full} plain={plain}>
-        <div className="people-summaries">
-          {links}
-        </div>
-      </Section>
+      <div className={classes.join(' ')}>
+        {links}
+      </div>
     );
   }
 };
 
 PeopleSummary.propTypes = {
-  people: PropTypes.array,
-  ...Section.propTypes
+  people: PropTypes.array
 };

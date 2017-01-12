@@ -735,9 +735,35 @@
   transition: height 1s;
   overflow: auto;
 
+  @media all and (min-width: 700px) {
+    padding: $quadruple-unit 0;
+  }
+
+  @media all and (max-width: 699px) {
+    padding: $double-unit 0;
+  }
+
   > * {
     animation: fadein 2s;
   }
+
+  form {
+    > .form__text:first-child {
+      > *:first-child {
+        margin-top: 0;
+      }
+    }
+
+    > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.form-summary__template {
+  position: absolute;
+  top: $quadruple-unit;
+  right: $double-unit;
 }
 
 .form-table {

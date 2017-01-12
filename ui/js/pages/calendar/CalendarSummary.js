@@ -1,10 +1,8 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-// import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItem, getItems } from '../../actions';
-import Section from '../../components/Section';
 import EventTimes from '../../components/EventTimes';
 import Map from '../../components/Map';
 import Button from '../../components/Button';
@@ -111,22 +109,20 @@ export default class CalendarSummary extends Component {
   }
 
   render () {
-    const { color, full } = this.props;
-    let plain = full;
-
+    const { className } = this.props;
+    let classes = ['calendar-summary'];
+    if (className) {
+      classes.push(className);
+    }
     let contents = this._renderCalendar();
-
     return (
-      <Section color={color} full={full} plain={plain}>
-        <div className="calendar-summary">
-          {contents}
-        </div>
-      </Section>
+      <div className={classes.join(' ')}>
+        {contents}
+      </div>
     );
   }
 };
 
 CalendarSummary.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  ...Section.propTypes
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 };

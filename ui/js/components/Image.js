@@ -1,23 +1,20 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import Section from './Section';
 
 export default class Image extends Component {
   render () {
-    const { avatar, image, full, plain, style } = this.props;
-    let classNames = ['image'];
+    const { avatar, className, image, style } = this.props;
+    let classes = ['image'];
     if (avatar) {
-      classNames.push('image--avatar');
+      classes.push('image--avatar');
     }
-    if (this.props.className) {
-      classNames.push(this.props.className);
+    if (className) {
+      classes.push(className);
     }
 
     return (
-      <Section full={full} plain={plain}>
-        <img className={classNames.join(' ')} src={image ? image.data : ''}
-          style={style} />
-      </Section>
+      <img className={classes.join(' ')} src={image ? image.data : ''}
+        style={style} />
     );
   }
 };
@@ -26,6 +23,5 @@ Image.propTypes = {
   avatar: PropTypes.bool,
   image: PropTypes.shape({
     data: PropTypes.string.isRequired
-  }),
-  ...Section.propTypes
+  })
 };
