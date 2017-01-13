@@ -213,16 +213,18 @@
 
 .event-summary__text {
   display: inline-block;
-  border-color: $control-background-color;
-  border-width: round($unit / 4);
-  border-style: solid none;
   padding: $unit;
   text-decoration: none;
 
   h1,
   h2,
   h3 {
+    font-weight: 600;
     margin-top: 0;
+  }
+
+  h2 {
+    font-size: 1.75rem;
   }
 
   // button {
