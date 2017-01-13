@@ -51,14 +51,12 @@ class Home extends Component {
     .catch(error => console.log('!!! Home _signOut catch', error));
   }
 
-  _showMenu () {
+  _showMenu (event) {
     this.setState({ showMenu: true });
-    document.body.addEventListener('click', this._hideMenu);
   }
 
-  _hideMenu () {
+  _hideMenu (event) {
     this.setState({ showMenu: false });
-    document.body.removeEventListener('click', this._hideMenu);
   }
 
   _renderSession () {
@@ -191,7 +189,6 @@ class Home extends Component {
     const links = this._renderMenuLinks();
     const menuLayer = (
       <div key="menuLayer" className={menuLayerClasses.join(' ')}>
-        <Button plain={true}>menu</Button>
         {links}
       </div>
     );
@@ -200,7 +197,8 @@ class Home extends Component {
 
     return [
       <header key="header" className="home__header">
-        <Button plain={true} onClick={this._showMenu}>
+        <Button className="home__header-menu" plain={true}
+          onClick={showMenu ? undefined : this._showMenu}>
           menu
         </Button>
         {menuLayer}
@@ -212,6 +210,7 @@ class Home extends Component {
 
   render () {
     const { site } = this.props;
+    const { showMenu } = this.state;
 
     let contents;
     if (site) {
@@ -221,7 +220,7 @@ class Home extends Component {
     }
 
     return (
-      <main>
+      <main onClick={showMenu ? this._hideMenu : undefined}>
         {contents}
       </main>
     );

@@ -40,7 +40,7 @@
 
   &.image,
   > .image {
-    width: 100%;
+    min-width: 100%;
 
     &.image--avatar {
       width: auto;
@@ -640,25 +640,33 @@
 
 .home__header {
   position: relative;
-  // margin: $unit;
-  text-align: center;
+  text-align: right;
+}
+
+.home__header-menu {
+  position: relative;
+  z-index: 101;
+  padding-left: $double-unit;
+  padding-right: $double-unit;
 }
 
 .home__menu-layer {
   position: absolute;
   z-index: 100;
   top: 0;
-  left: 50%;
-  transform: translate(-50%, -120%);
+  right: 0;
+  height: 100vh;
+  transform: translateX(100%);
+  padding-top: $double-unit;
   overflow: hidden;
-  padding-bottom: $double-unit;
-  border-bottom-left-radius: $quadruple-unit;
-  border-bottom-right-radius: $quadruple-unit;
-  background-color: $secondary-background-color;
+  background-color: #E3A235; /// variable!
+  transition: transform 0.3s;
 
   > button {
     display: block;
     width: 100%;
+    padding-left: $double-unit;
+    padding-right: $double-unit;
   }
 
   > a {
@@ -674,7 +682,7 @@
 }
 
 .home__menu-layer--active {
-  transform: translate(-50%, 0%);
+  transform: translateX(0%);
 }
 
 .home__brand {
