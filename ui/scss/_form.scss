@@ -59,6 +59,10 @@
   // }
 }
 
+.form__contents {
+  padding: 0 $unit;
+}
+
 .form-error {
   height: 0;
   max-width: $form-width;
@@ -81,7 +85,7 @@
 }
 
 .form__fields {
-  margin: $double-unit $unit;
+  margin: $double-unit 0;
 
   legend {
     margin: $quarter-unit;
@@ -232,6 +236,18 @@
 .form-field__image {
   padding-top: $half-unit;
   max-width: $form-width - $double-unit;
+}
+
+.form-item-control {
+
+  &:hover {
+    background-color: $control-hover-background;
+    color: $active-color;
+  }
+
+  h4 {
+    font-weight: 300;
+  }
 }
 
 .form-item-add {

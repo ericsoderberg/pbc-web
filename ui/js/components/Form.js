@@ -94,17 +94,19 @@ class Form extends Component {
         <form className="form" action={action}
           onSubmit={this._onSubmit}>
           {header}
-          <FormError message={error} />
-          <FormContents {...contentsProps}
-            formState={formState} session={session} />
-          <footer className="form__footer">
-            <button type="submit" className="button" onClick={this._onSubmit}>
-              {submitLabel}
-            </button>
-            {footerActions}
-            {removeControl}
-            {footerCancelControl}
-          </footer>
+          <div className="form__contents">
+            <FormError message={error} />
+            <FormContents {...contentsProps}
+              formState={formState} session={session} />
+            <footer className="form__footer">
+              <button type="submit" className="button" onClick={this._onSubmit}>
+                {submitLabel}
+              </button>
+              {footerActions}
+              {removeControl}
+              {footerCancelControl}
+            </footer>
+          </div>
         </form>
         {preview}
       </div>

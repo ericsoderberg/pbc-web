@@ -78,9 +78,9 @@ export default class PageFormSection extends Component {
     return (
       <div>
         <div type="button" className="form-item">
-          <button type="button" className="button-plain"
+          <button type="button" className="button-plain form-item-control"
             onClick={this._onToggle}>
-            <h4>{section.type}</h4>
+            <h3>{section.type}</h3>
           </button>
           <div className="box--row box--static">
             {raise}
