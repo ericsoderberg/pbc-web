@@ -117,7 +117,7 @@ class Home extends Component {
   }
 
   _renderFooter () {
-    const { site } = this.props;
+    const { page, session, site } = this.props;
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
@@ -145,6 +145,11 @@ class Home extends Component {
 
     const sessionControl = this._renderSession();
 
+    let editControl;
+    if (page && session && session.administrator) {
+      editControl = <Link to={`/pages/${page._id}/edit`}>Edit</Link>;
+    }
+
     return (
       <Section key="footer">
         <div>
@@ -158,6 +163,7 @@ class Home extends Component {
             <div className="home__nav">
               <Link to="/search"><Button>Search</Button></Link>
             </div>
+            {editControl}
             {sessionControl}
           </div>
           <footer className="home__footer footer">
