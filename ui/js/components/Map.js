@@ -20,7 +20,8 @@ export default class Map extends Component {
   componentDidMount () {
     const mapElement = this.refs.map;
     const options = {
-      touchZoom: false, scrollWheelZoom: false, dragging: false, zoom: 14
+      touchZoom: false, scrollWheelZoom: false, dragging: false, zoom: 14,
+      zoomControl: false
     };
     const map = Leaflet.map(mapElement, options);
     this.setState({ map: map }, this._load);

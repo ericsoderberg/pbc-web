@@ -1,5 +1,5 @@
-require("../scss/index.scss");
 require("leaflet/dist/leaflet.css");
+require("../scss/index.scss");
 
 import React from 'react';
 import ReactDOM from 'react-dom';
