@@ -60,7 +60,7 @@ export default class Button extends Component {
     let classNames = [];
     let contents = label || icon || children;
     let arrow;
-    let style = {};
+    let style = this.props.style ? { ...this.props.style } : {};
     if (circle) {
       classNames.push('button-circle');
       contents = <span className="button__label">{contents}</span>;

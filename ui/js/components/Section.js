@@ -35,8 +35,8 @@ export default class Section extends Component {
   _layout () {
     const { active } = this.state;
     const rect = this.refs.component.getBoundingClientRect();
-    const nextActive = (rect.top + 10) < window.innerHeight;
-    if (nextActive && nextActive !== active) {
+    const nextActive = (rect.top + 100) < window.innerHeight;
+    if (nextActive !== active) {
       this.setState({ active: nextActive });
     }
   }

@@ -54,17 +54,20 @@ export default class PageSummaries extends Component {
         page = this.state.pages[pageRef.id] || {};
       }
       let path = page.path ? `/${page.path}` : `/pages/${page._id}`;
+      const style = { transitionDelay: `${100 + (100 * index)}ms` };
       let link;
       if (pageRef.image) {
         link = (
-          <Link key={index} className="page-tile" to={path}>
+          <Link key={index} className="page-tile page-summary" to={path}
+            style={style}>
             <Image image={pageRef.image} plain={true} />
             <Button>{page.name}</Button>
           </Link>
         );
       } else {
         link = (
-          <Button key={index} circle={true} path={path}>
+          <Button key={index} className="page-summary"
+            circle={true} path={path} style={style}>
             {page.name}
           </Button>
         );

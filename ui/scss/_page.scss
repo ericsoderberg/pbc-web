@@ -441,6 +441,21 @@
   }
 }
 
+.page-summary {
+  position: relative;
+
+  @media all and (min-width: 700px) {
+    transform: translateY($quadruple-unit);
+    transition: transform 1s;
+  }
+
+  .section__container--active & {
+    @media all and (min-width: 700px) {
+      transform: translateY(0);
+    }
+  }
+}
+
 .people-summaries {
   @media all and (min-width: 700px) {
     margin: 0 auto;
