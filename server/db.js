@@ -331,6 +331,7 @@ mongoose.model('OldFile', oldFileSchema);
 
 const siteSchema = Schema({
   address: String,
+  color: String,
   copyright: String,
   email: String,
   homePageId: { type: Schema.Types.ObjectId, ref: 'Page' },

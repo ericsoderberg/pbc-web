@@ -43,6 +43,10 @@ export default class SiteFormContents extends Component {
           formState={formState} property="mobileIcon" />
         <ImageField label="Shortcut icon" name="shortcutIcon" help="16x16 .png"
           formState={formState} property="shortcutIcon" />
+        <FormField label="Brand color">
+          <input ref="color" name="color" value={site.color || ''}
+            onChange={formState.change('color')}/>
+        </FormField>
         <FormField label="Home page">
           <SelectSearch category="pages"
             options={{ select: 'name', sort: 'name' }}

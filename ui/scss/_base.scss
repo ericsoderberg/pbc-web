@@ -31,6 +31,10 @@ a,
   // &:hover {
   //   background-color: $secondary-background-color;
   // }
+
+  .dark-background & {
+    color: #fff;
+  }
 }
 
 .button,
@@ -244,4 +248,8 @@ dd {
 
 .tertiary {
   color: $tertiary-color;
+}
+
+.dark-background {
+  color: $color-on-dark;
 }

@@ -11,6 +11,7 @@ import YouTubeIcon from '../../icons/YouTube';
 import Button from '../../components/Button';
 import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
+import { isDarkBackground } from '../../utils/Color';
 
 class Home extends Component {
 
@@ -172,7 +173,7 @@ class Home extends Component {
   }
 
   _renderContents () {
-    const { page } = this.props;
+    const { page, site } = this.props;
     const { showMenu } = this.state;
 
     let pageContents;
@@ -182,13 +183,25 @@ class Home extends Component {
       pageContents = <Loading key="page" />;
     }
 
+    let menuControlClasses = ["home__header-menu"];
     let menuLayerClasses = ["home__menu-layer"];
+    let menuLayerStyle = { backgroundColor: '#fff' };
     if (showMenu) {
       menuLayerClasses.push("home__menu-layer--active");
     }
+    if (site && site.color) {
+      menuLayerStyle.backgroundColor = site.color;
+      if (isDarkBackground(site.color)) {
+        menuLayerClasses.push("dark-background");
+        if (showMenu) {
+          menuControlClasses.push("dark-background");
+        }
+      }
+    }
     const links = this._renderMenuLinks();
     const menuLayer = (
-      <div key="menuLayer" className={menuLayerClasses.join(' ')}>
+      <div key="menuLayer" className={menuLayerClasses.join(' ')}
+        style={menuLayerStyle}>
         {links}
       </div>
     );
@@ -197,7 +210,7 @@ class Home extends Component {
 
     return [
       <header key="header" className="home__header">
-        <Button className="home__header-menu" plain={true}
+        <Button className={menuControlClasses.join(' ')} plain={true}
           onClick={showMenu ? undefined : this._showMenu}>
           menu
         </Button>
