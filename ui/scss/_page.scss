@@ -661,7 +661,6 @@
 }
 
 .home__header {
-  position: relative;
   text-align: right;
 }
 
@@ -677,7 +676,7 @@
   z-index: 100;
   top: 0;
   right: 0;
-  height: 100vh;
+  bottom: 0;
   transform: translateX(100%);
   padding-top: $double-unit;
   overflow: hidden;
