@@ -19,7 +19,15 @@
   }
 }
 
+.form__container--preview {
+  .form {
+    flex: 0 1 $form-width;
+  }
+}
+
 .form__preview {
+
+  flex: 1 1;
 
   @media all and (min-width: 700px) {
     min-width: $form-width;
