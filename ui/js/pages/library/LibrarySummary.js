@@ -1,19 +1,16 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItems, getItem } from '../../actions';
-import Image from '../../components/Image';
-import Button from '../../components/Button';
+import RightIcon from '../../icons/Right';
+import MessageItem from '../message/MessageItem';
 
 export default class LibrarySummary extends Component {
 
   constructor (props) {
     super(props);
-    this._onScroll = this._onScroll.bind(this);
     this.state = {
-      offset: 0,
       library: (typeof props.id === 'string' ? props.id : {}),
       message: props.message
     };
@@ -21,7 +18,6 @@ export default class LibrarySummary extends Component {
 
   componentDidMount () {
     this._load(this.props);
-    window.addEventListener('scroll', this._onScroll);
   }
 
   componentWillReceiveProps (nextProps) {
@@ -29,10 +25,6 @@ export default class LibrarySummary extends Component {
       this.props.message !== nextProps.message) {
       this._load(nextProps);
     }
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('scroll', this._onScroll);
   }
 
   _load (props) {
@@ -76,74 +68,6 @@ export default class LibrarySummary extends Component {
     }
   }
 
-  _onScroll (event) {
-    const elem = findDOMNode(this.refs.image);
-    if (elem) { // might not have an image
-      const rect = elem.getBoundingClientRect();
-      if (rect.top < 0) {
-        this.setState({ offset: Math.floor(Math.abs(rect.top) / 20) });
-      }
-    }
-  }
-
-  _renderSeries (series) {
-    let classNames = ['library-summary__message'];
-    let image;
-    if (series.image) {
-      const style = {
-        top: this.state.offset,
-        transform: `scale(${1 + (this.state.offset / 600)})`
-      };
-      image = (
-        <Image ref="image" className="library-summary__message-image"
-          image={series.image} style={style} />
-      );
-      classNames.push('library-summary__message--imaged');
-    }
-
-    return (
-      <Link to={`/messages/${series.path || series._id}`}>
-        {image}
-        <div className={classNames.join(' ')}>
-          <Button right={true}>Current Series</Button>
-          <h2>{series.name}</h2>
-        </div>
-      </Link>
-    );
-  }
-
-  _renderMessage (message) {
-    // let classNames = ['library-summary__message'];
-    // let image;
-    // if (message.image) {
-    //   const style = {
-    //     top: this.state.offset,
-    //     transform: `scale(${1 + (this.state.offset / 600)})`
-    //   };
-    //   image = (
-    //     <Image ref="image" className="library-summary__message-image"
-    //       image={message.image} style={style} />
-    //   );
-    //   classNames.push('library-summary__message--imaged');
-    // }
-
-    return (
-      <Link to={`/messages/${message.path || message._id}`}>
-        <label>Latest Message</label>
-        <h2>{message.name}</h2>
-        <span>{moment(message.date).format('MMMM Do')}</span>
-      </Link>
-    );
-  }
-
-  _renderLibrary (library) {
-    return (
-      <Button path={`/libraries/${library.path || library._id}`} right={true}>
-        Messages
-      </Button>
-    );
-  }
-
   render () {
     const { className } = this.props;
     const { library, message } = this.state;
@@ -153,25 +77,22 @@ export default class LibrarySummary extends Component {
       classes.push(className);
     }
 
-    let contents;
+    let messageItem;
     if (message) {
-      if (message.series) {
-        contents = this._renderSeries(message);
-      } else {
-        contents = this._renderMessage(message);
-      }
+      messageItem = (
+        <MessageItem item={message} />
+      );
     }
 
     return (
       <div className={classes.join(' ')}>
         <div className="library-summary__library">
-          <Button
-            path={`/libraries/${library.path || library._id}`} right={true}>
-            {library.name}
-          </Button>
+          <Link to={`/libraries/${library.path || library._id}`}>
+            <h2><span>{library.name}</span><RightIcon /></h2>
+          </Link>
         </div>
         <div className="library-summary__message">
-          {contents}
+          {messageItem}
         </div>
       </div>
     );

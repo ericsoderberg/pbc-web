@@ -216,6 +216,23 @@
   padding: $unit;
   text-decoration: none;
 
+  @media all and (min-width: 700px) {
+    &:hover {
+      background-color: $hover-background;
+
+      .control-icon {
+        left: 4px;
+      }
+    }
+  }
+
+  .control-icon {
+    position: relative;
+    left: 0;
+    margin-left: $half-unit;
+    transition: all 0.7s;
+  }
+
   h1,
   h2,
   h3 {
@@ -225,11 +242,11 @@
 
   h2 {
     font-size: 1.75rem;
-  }
 
-  // button {
-  //   margin-bottom: $unit;
-  // }
+    .control-icon {
+      margin-left: $half-unit;
+    }
+  }
 
   .event-times {
     text-align: center;
@@ -279,124 +296,56 @@
 @import 'audio';
 
 .library-summary {
-  // overflow: hidden;
-  // padding: $quadruple-unit 0;
-
-  position: relative;
-  display: flex;
+  text-align: center;
   @include section-content;
 
   @media all and (min-width: 700px) {
-    flex-direction: row;
-    align-items: center;
     max-width: $page-width;
     margin: 0 auto;
   }
 
-  @media all and (max-width: 699px) {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  // > a {
-  //   display: flex;
+  // @media all and (max-width: 699px) {
   //   flex-direction: column;
-  //   text-decoration: none;
-  //
-  //   @media all and (min-width: 700px) {
-  //     // align-items: center;
-  //   }
-  //
-  //   @media all and (max-width: 699px) {
-  //     align-items: center;
-  //
-  //     h2 {
-  //       text-align: center;
-  //     }
-  //   }
+  //   align-items: center;
   // }
 }
 
 .library-summary__library {
-  text-align: center;
 
-  @media all and (min-width: 700px) {
-    flex: 1 0 50%;
+  a {
+    display: inline-block;
+    text-decoration: none;
+    padding-left: $unit;
     padding-right: $unit;
-    // padding: $double-unit $unit $double-unit 0;
+
+    @media all and (min-width: 700px) {
+      &:hover {
+        background-color: $hover-background;
+
+        .control-icon {
+          left: 4px;
+        }
+      }
+    }
   }
 
-  @media all and (max-width: 699px) {
-    // padding: 0 $unit $unit;
-    padding-bottom: $unit;
+  h2 {
+    display: inline-block;
+    font-size: 1.75rem;
+  }
+
+  .control-icon {
+    position: relative;
+    left: 0;
+    margin-left: $half-unit;
+    transition: all 0.7s;
   }
 }
 
 .library-summary__message {
-
-  @media all and (min-width: 700px) {
-    flex: 1 0 50%;
-    // padding: $double-unit $unit $double-unit 0;
-  }
-
-  // @media all and (max-width: 699px) {
-  //   padding: 0 $unit $unit;
-  // }
-
-  > a {
-    text-decoration: none;
-  }
-
-  // @media all and (min-width: 700px) {
-  //   flex-direction: row;
-  //   align-items: center;
-  //   max-width: $page-width;
-  //   margin: 0 auto;
-  //   padding: 0;
-  //
-  //   h2 {
-  //     margin-left: $unit;
-  //   }
-  // }
-  //
-  // @media all and (max-width: 699px) {
-  //   flex-direction: column;
-  //   align-items: center;
-  //   padding: $unit;
-  //
-  //   > * {
-  //     margin: $half-unit 0;
-  //   }
-  // }
-  //
-  // label {
-  //   font-size: 1.5em;
-  //   font-weight: 100;
-  //   text-align: right;
-  //
-  //   @media all and (min-width: 700px) {
-  //     margin: 0 $unit;
-  //   }
-  //
-  //   @media all and (max-width: 699px) {
-  //     margin-bottom: $half-unit;
-  //   }
-  // }
-}
-
-.library-summary__message--imaged {
-  // margin-top: -4px;
-  margin-top: $unit;
-  margin-bottom: $unit;
-}
-
-.library-summary__message-image {
-  position: relative;
-  min-width: 100%;
-  // margin-bottom: -4px;
-
-  .section__container & {
-    width: 100%;
+  .item__container {
+    width: auto;
+    display: inline-block;
   }
 }
 

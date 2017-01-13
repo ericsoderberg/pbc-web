@@ -5,6 +5,7 @@ import { getItem } from '../../actions';
 import EventTimes from '../../components/EventTimes';
 import Image from '../../components/Image';
 import Map from '../../components/Map';
+import RightIcon from '../../icons/Right';
 // import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 
@@ -72,7 +73,10 @@ export default class EventSummary extends Component {
         contents = (
           <div className="event-summary__text-container">
             <Link to={`/events/${event._id}`} className="event-summary__text">
-              <h2 className='event-summary__name'>{event.name}</h2>
+              <h2 className='event-summary__name'>
+                <span>{event.name}</span>
+                <RightIcon />
+              </h2>
               <EventTimes event={event} reverse={true} size="large" />
             </Link>
           </div>
