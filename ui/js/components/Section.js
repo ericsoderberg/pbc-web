@@ -1,6 +1,7 @@
 "use strict";
 import React, { Component, PropTypes, Children } from 'react';
 import Image from './Image';
+import { isDarkBackground } from '../utils/Color';
 
 export default class Section extends Component {
 
@@ -62,8 +63,11 @@ export default class Section extends Component {
       }
       let style;
       if (color) {
-        style = { backgroundColor: color, color: '#fff' };
+        style = { backgroundColor: color };
         classNames.push('section__container--colored');
+        if (isDarkBackground(color)) {
+          classNames.push('dark-background');
+        }
       }
 
       let background;
