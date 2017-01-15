@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import { getSite, getItem, deleteSession } from '../../actions';
 import PageContents from '../page/PageContents';
@@ -17,11 +18,13 @@ class Home extends Component {
 
   constructor () {
     super();
+    this._onResize = this._onResize.bind(this);
+    this._layout = this._layout.bind(this);
     this._signOut = this._signOut.bind(this);
     this._siteReady = this._siteReady.bind(this);
     this._showMenu = this._showMenu.bind(this);
     this._hideMenu = this._hideMenu.bind(this);
-    this.state = {};
+    this.state = { menuHeight: 0, showMenu: false };
   }
 
   componentDidMount () {
@@ -33,6 +36,26 @@ class Home extends Component {
     } else {
       this._siteReady(site);
     }
+    window.addEventListener('resize', this._onResize);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.page && ! this.props.page) {
+      this.setState({ layoutNeeded: true });
+    }
+  }
+
+  componentDidUpdate () {
+    const { layoutNeeded } = this.state;
+    if (layoutNeeded) {
+      this.setState({ layoutNeeded: false });
+      this._layout();
+    }
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this._onResize);
+    clearTimeout(this._resizeTimer);
   }
 
   _siteReady (site) {
@@ -44,12 +67,27 @@ class Home extends Component {
     } else {
       return Promise.reject();
     }
+    this._layout();
   }
 
   _signOut () {
     deleteSession()
     .then(() => this.context.router.go('/'))
     .catch(error => console.log('!!! Home _signOut catch', error));
+  }
+
+  _onResize () {
+    clearTimeout(this._resizeTimer);
+    this._resizeTimer = setTimeout(this._layout, 20); // debounce
+  }
+
+  _layout () {
+    if (window.innerWidth < 700 && this.refs.menuRef) {
+      const rect = findDOMNode(this.refs.menuRef).getBoundingClientRect();
+      this.setState({ menuHeight: rect.height, showMenu: false });
+    } else {
+      this.setState({ menuHeight: 0, showMenu: false });
+    }
   }
 
   _showMenu (event) {
@@ -118,6 +156,7 @@ class Home extends Component {
 
   _renderFooter () {
     const { page, session, site } = this.props;
+    const { menuHeight, showMenu } = this.state;
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
@@ -150,8 +189,13 @@ class Home extends Component {
       editControl = <Link to={`/pages/${page._id}/edit`}>Edit</Link>;
     }
 
+    let style;
+    if (! showMenu) {
+      style = { marginBottom: `-${menuHeight}px` };
+    }
+
     return (
-      <Section key="footer">
+      <Section key="footer" style={style}>
         <div>
           <div className="footer__links">
             <div className="home__brand">
@@ -189,25 +233,25 @@ class Home extends Component {
       pageContents = <Loading key="page" />;
     }
 
-    let menuControlClasses = ["home__header-menu"];
-    let menuLayerClasses = ["home__menu-layer"];
-    let menuLayerStyle = { backgroundColor: '#fff' };
+    let menuControlClasses = ["home__menu-control"];
+    let menuClasses = ["home__menu"];
+    let menuStyle = { backgroundColor: '#fff' };
     if (showMenu) {
-      menuLayerClasses.push("home__menu-layer--active");
+      menuClasses.push("home__menu--active");
     }
     if (site && site.color) {
-      menuLayerStyle.backgroundColor = site.color;
+      menuStyle.backgroundColor = site.color;
       if (isDarkBackground(site.color)) {
-        menuLayerClasses.push("dark-background");
+        menuStyle.push("dark-background");
         if (showMenu) {
           menuControlClasses.push("dark-background");
         }
       }
     }
     const links = this._renderMenuLinks();
-    const menuLayer = (
-      <div key="menuLayer" className={menuLayerClasses.join(' ')}
-        style={menuLayerStyle}>
+    const menu = (
+      <div key="menu" ref='menuRef' className={menuClasses.join(' ')}
+        style={menuStyle}>
         {links}
       </div>
     );
@@ -215,12 +259,12 @@ class Home extends Component {
     let footer = this._renderFooter();
 
     return [
+      menu,
       <header key="header" className="home__header">
         <Button className={menuControlClasses.join(' ')} plain={true}
           onClick={showMenu ? undefined : this._showMenu}>
           menu
         </Button>
-        {menuLayer}
       </header>,
       pageContents,
       footer
@@ -229,17 +273,21 @@ class Home extends Component {
 
   render () {
     const { site } = this.props;
-    const { showMenu } = this.state;
+    const { menuHeight, showMenu } = this.state;
 
-    let contents;
+    let contents, style;
     if (site) {
       contents = this._renderContents();
+      if (! showMenu) {
+        style = { transform: `translateY(-${menuHeight}px)` };
+      }
     } else {
       contents = <Loading />;
     }
 
     return (
-      <main onClick={showMenu ? this._hideMenu : undefined}>
+      <main className="home" style={style}
+        onClick={showMenu ? this._hideMenu : undefined} >
         {contents}
       </main>
     );

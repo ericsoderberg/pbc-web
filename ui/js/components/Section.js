@@ -44,6 +44,7 @@ export default class Section extends Component {
 
   render () {
     const { backgroundImage, color, footer, full, plain } = this.props;
+    let { style } = this.props;
     const { active } = this.state;
     let child = Children.only(this.props.children);
 
@@ -61,9 +62,8 @@ export default class Section extends Component {
       if (active) {
         classNames.push('section__container--active');
       }
-      let style;
       if (color) {
-        style = { backgroundColor: color };
+        style = { ...style, backgroundColor: color };
         classNames.push('section__container--colored');
         if (isDarkBackground(color)) {
           classNames.push('dark-background');
