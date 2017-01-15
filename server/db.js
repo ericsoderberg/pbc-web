@@ -340,6 +340,7 @@ const siteSchema = Schema({
   logo: image,
   phone: String,
   shortcutIcon: image,
+  slogan: String,
   socialUrls: [String],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

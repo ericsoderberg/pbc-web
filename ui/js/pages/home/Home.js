@@ -12,6 +12,7 @@ import YouTubeIcon from '../../icons/YouTube';
 import Button from '../../components/Button';
 import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
+import Logo from '../../components/Logo';
 import { isDarkBackground } from '../../utils/Color';
 
 class Home extends Component {
@@ -154,6 +155,23 @@ class Home extends Component {
     return links;
   }
 
+  _renderSplash () {
+    const { site } = this.props;
+    // let logo;
+    // if (site && site.logo) {
+    //   logo = <img className="home__splash-logo" src={site.logo.data} />;
+    // }
+    return (
+      <Section key="splash" className="home__splash">
+        <div>
+          <Logo className="home__splash-logo" />
+          <h1>{site.name}</h1>
+          <h2>{site.slogan}</h2>
+        </div>
+      </Section>
+    );
+  }
+
   _renderFooter () {
     const { page, session, site } = this.props;
     const { menuHeight, showMenu } = this.state;
@@ -179,7 +197,7 @@ class Home extends Component {
 
     let logo;
     if (site && site.logo) {
-      logo = <img className="home__logo" src={site.logo.data} />;
+      logo = <img className="home__logo logo" src={site.logo.data} />;
     }
 
     const sessionControl = this._renderSession();
@@ -226,6 +244,8 @@ class Home extends Component {
     const { page, site } = this.props;
     const { showMenu } = this.state;
 
+    let splash = this._renderSplash();
+
     let pageContents;
     if (page) {
       pageContents = <PageContents key="page" item={page} />;
@@ -266,6 +286,7 @@ class Home extends Component {
           menu
         </Button>
       </header>,
+      splash,
       pageContents,
       footer
     ];

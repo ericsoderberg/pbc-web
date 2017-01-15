@@ -40,7 +40,11 @@
 
   &.image,
   > .image {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
     min-width: 100%;
+    max-height: 600px;
 
     &.image--avatar {
       width: auto;
@@ -671,6 +675,123 @@
 
   @media all and (min-width: 700px) {
     transform: translateX(0%);
+  }
+}
+
+.home__splash {
+  .section {
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 3.5em;
+    font-weight: 400;
+    margin-bottom: 0;
+    line-height: 1em;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-weight: 300;
+    text-transform: uppercase;
+  }
+}
+
+@keyframes backgroundIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes openLeft {
+  0% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes openRight {
+  0% {
+    transform: rotate(-90deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pIn {
+  0%,
+  40% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bIn {
+  0%,
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes cIn {
+  0%,
+  60% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.home__splash-logo {
+  width: 240px;
+  height: 240px;
+  max-height: 240px;
+
+  .logo__background {
+    transform-origin: center;
+    animation: backgroundIn 2s;
+  }
+
+  .logo__left {
+    transform-origin: center right;
+    animation: openLeft 2s;
+  }
+
+  .logo__right {
+    transform-origin: center left;
+    animation: openRight 2s;
+  }
+
+  .logo__p {
+    animation: pIn 3s;
+  }
+
+  .logo__b {
+    animation: bIn 3s;
+  }
+
+  .logo__c {
+    animation: cIn 3s;
   }
 }
 

@@ -105,6 +105,10 @@
   padding: $half-unit $unit;
 }
 
+.logo {
+  max-height: $double-unit;
+}
+
 .page-header {
   display: flex;
   flex-direction: row;

@@ -43,7 +43,9 @@ export default class Section extends Component {
   }
 
   render () {
-    const { backgroundImage, color, footer, full, plain } = this.props;
+    const {
+      backgroundImage, className, color, footer, full, plain
+    } = this.props;
     let { style } = this.props;
     const { active } = this.state;
     let child = Children.only(this.props.children);
@@ -68,6 +70,9 @@ export default class Section extends Component {
         if (isDarkBackground(color)) {
           classNames.push('dark-background');
         }
+      }
+      if (className) {
+        classNames.push(className);
       }
 
       let background;

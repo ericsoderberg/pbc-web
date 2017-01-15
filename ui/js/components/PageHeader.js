@@ -44,7 +44,7 @@ export default class PageHeader extends Component {
 
     let logo;
     if (this.props.logo && site && site.logo) {
-      logo = <img className="page-header__logo" src={site.logo.data} />;
+      logo = <img className="page-header__logo logo" src={site.logo.data} />;
     }
 
     let backControl;

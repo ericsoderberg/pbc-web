@@ -37,6 +37,10 @@ export default class SiteFormContents extends Component {
           <input name="name" value={site.name || ''}
             onChange={formState.change('name')}/>
         </FormField>
+        <FormField label="Slogan">
+          <input name="slogan" value={site.slogan || ''}
+            onChange={formState.change('slogan')}/>
+        </FormField>
         <ImageField label="Logo" name="logo"
           formState={formState} property="logo" />
         <ImageField label="Mobile icon" name="mobileIcon" help="120x120 .png"
