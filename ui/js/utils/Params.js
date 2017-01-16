@@ -11,8 +11,8 @@ export function getLocationParams () {
   return params;
 }
 
-export function pushLocationParams (params) {
-  const search = Object.keys(params)
-  .map(name => `${name}=${encodeURIComponent(params[name])}`).join('&');
-  window.history.pushState(undefined, undefined, `?${search}`);
-}
+// export function replaceLocationParams (params) {
+//   const search = Object.keys(params)
+//   .map(name => `${name}=${encodeURIComponent(params[name])}`).join('&');
+//   window.history.pushState(undefined, undefined, `?${search}`);
+// }

@@ -35,7 +35,8 @@ class Home extends Component {
       .then(this._siteReady)
       .catch(error => console.log('!!! Home catch', error));
     } else {
-      this._siteReady(site);
+      this._siteReady(site)
+      .catch(error => console.log('!!! Home re-catch', error));
     }
     window.addEventListener('resize', this._onResize);
   }
@@ -62,13 +63,15 @@ class Home extends Component {
   _siteReady (site) {
     const { page } = this.props;
     document.title = site.name;
-    if (! page && site.homePageId) {
+    this._layout();
+    if (page) {
+      return Promise.resolve();
+    } else if (! page && site.homePageId) {
       return getItem('pages', site.homePageId._id,
         { cache: true, populate: true });
     } else {
-      return Promise.reject();
+      return Promise.reject('No home page');
     }
-    this._layout();
   }
 
   _signOut () {

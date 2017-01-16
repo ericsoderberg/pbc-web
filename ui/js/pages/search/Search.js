@@ -1,12 +1,12 @@
 "use strict";
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getSearch } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Text from '../../components/Text';
 import EventTimes from '../../components/EventTimes';
 import Loading from '../../components/Loading';
-import { getLocationParams, pushLocationParams } from '../../utils/Params';
+import { getLocationParams } from '../../utils/Params';
 
 export default class Search extends Component {
 
@@ -28,10 +28,12 @@ export default class Search extends Component {
   _get () {
     const { searchText } = this.state;
     if (searchText) {
+      document.title = `Search - ${searchText}`;
       getSearch(searchText)
       .then(items => this.setState({ items, loading: false }))
       .catch(error => console.log('!!! Search catch', error));
     } else {
+      document.title = 'Search';
       this.setState({ items: [] });
     }
   }
@@ -39,15 +41,18 @@ export default class Search extends Component {
   _onSearch (event) {
     const searchText = event.target.value;
     this.setState({ searchText: searchText, loading: true });
-    pushLocationParams({ q: searchText });
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
+    this.context.router.replace({
+      pathname: window.location.pathname,
+      search: `?q=${encodeURIComponent(searchText)}`
+    });
   }
 
   render () {
     const { items, loading, searchText } = this.state;
 
-    let contents = items.map(item => {
+    let contents = items.filter(item => item).map(item => {
       let content, path;
       if (item.hasOwnProperty('sections')) {
         // Page
@@ -90,4 +95,8 @@ export default class Search extends Component {
       </main>
     );
   }
+};
+
+Search.contextTypes = {
+  router: PropTypes.any
 };
