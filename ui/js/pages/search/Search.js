@@ -27,7 +27,7 @@ export default class Search extends Component {
     const { searchText } = this.state;
     if (searchText) {
       getSearch(searchText)
-      .then(response => this.setState({ items: response }))
+      .then(items => this.setState({ items }))
       .catch(error => console.log('!!! Search catch', error));
     } else {
       this.setState({ items: [] });

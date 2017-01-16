@@ -119,7 +119,11 @@ const pageSchema = Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
-mongoose.model('Page', pageSchema);
+pageSchema.index({ name: 'text', 'sections.text': 'text' },
+  { weights: { name: 5, 'sections.text': 1 } });
+
+const Page = mongoose.model('Page', pageSchema);
+Page.on('index', (error) => console.log('Page index ready'));
 
 const calendarSchema = Schema({
   created: Date,
@@ -159,7 +163,11 @@ const eventSchema = Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
-mongoose.model('Event', eventSchema);
+eventSchema.index({ name: 'text', text: 'text' },
+  { weights: { name: 5, text: 1 } });
+
+const Event = mongoose.model('Event', eventSchema);
+Event.on('index', (error) => console.log('Event index ready'));
 
 const resourceSchema = Schema({
   created: Date,
@@ -317,7 +325,14 @@ const messageSchema = Schema({
   verses: String
 });
 
-mongoose.model('Message', messageSchema);
+messageSchema.index({
+  author: 'text', name: 'text', text: 'text', verses: 'text'
+},
+  { weights: { verses: 8, name: 5, author: 3, text: 1 } });
+
+const Message = mongoose.model('Message', messageSchema);
+Message.on('index', (error) => console.log('Message index ready'));
+
 
 const oldFileSchema = Schema({
   oldId: {type: String, required: true, unique: true},
