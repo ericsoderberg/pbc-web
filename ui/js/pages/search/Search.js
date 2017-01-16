@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 import { getSearch } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Text from '../../components/Text';
+import EventTimes from '../../components/EventTimes';
+import Loading from '../../components/Loading';
 import { getLocationParams, pushLocationParams } from '../../utils/Params';
 
 export default class Search extends Component {
@@ -27,7 +29,7 @@ export default class Search extends Component {
     const { searchText } = this.state;
     if (searchText) {
       getSearch(searchText)
-      .then(items => this.setState({ items }))
+      .then(items => this.setState({ items, loading: false }))
       .catch(error => console.log('!!! Search catch', error));
     } else {
       this.setState({ items: [] });
@@ -36,35 +38,56 @@ export default class Search extends Component {
 
   _onSearch (event) {
     const searchText = event.target.value;
-    this.setState({ searchText: searchText });
+    this.setState({ searchText: searchText, loading: true });
     pushLocationParams({ q: searchText });
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
   }
 
   render () {
-    const { searchText, items } = this.state;
+    const { items, loading, searchText } = this.state;
 
-    const elements = items.map(item => {
-      const texts = item.sections.map(section => (
-        <Text key={section._id} text={section.text} />
-      ));
+    let contents = items.map(item => {
+      let content, path;
+      if (item.hasOwnProperty('sections')) {
+        // Page
+        content = item.sections.map(section => (
+          <Text key={section._id} text={section.text} />
+        ));
+        path = item.path || `/pages/${item._id}`;
+      } else if (item.hasOwnProperty('start')) {
+        // Event
+        content = [
+          <EventTimes key="event" event={item} />,
+          <Text key="text" text={item.text} />
+        ];
+        path = `/events/${item.path || item._id}`;
+      }
       return (
         <div className="search__item" key={item._id}>
-          <Link className="search__link" to={item.path || `/pages/${item._id}`}>
+          <Link className="search__link" to={path}>
             {item.name}
           </Link>
-          {texts}
+          {content}
         </div>
       );
     });
+
+    if (contents.length === 0) {
+      if (loading) {
+        contents = <Loading />;
+      } else {
+        const message = searchText ? 'No matches' : 'Awaiting your input';
+        contents = <div className="search__message">{message}</div>;
+      }
+    }
 
     return (
       <main>
         <PageHeader homer={true}
           searchText={searchText} onSearch={this._onSearch}
           focusOnSearch={true} />
-        {elements}
+        {contents}
       </main>
     );
   }

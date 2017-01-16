@@ -132,6 +132,10 @@
 
   @media all and (max-width: 699px) {
     min-height: $double-unit;
+
+    .button-icon {
+      padding: $third-unit;
+    }
   }
 
   > * {

@@ -1,7 +1,10 @@
 
 .search {
+  position: relative;
   z-index: 1;
+}
 
+.search--responsive {
   @media all and (min-width: 700px) {
     flex: 1 0 auto;
 
@@ -26,6 +29,24 @@
   }
 }
 
+.search:not(.search--responsive) {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0 $half-unit 0 0;
+  height: $double-unit;
+  background-color: transparent;
+  font-size: 1.4rem;
+
+  .search__control {
+    display: none;
+  }
+
+  .search__input {
+    padding: ($unit / 3) $half-unit;
+    width: 100%;
+  }
+}
+
 .search--active {
   .search__input {
     display: block;
@@ -37,11 +58,16 @@
   }
 }
 
+.search__message {
+  padding: $quadruple-unit $triple-unit;
+  color: $tertiary-color;
+}
+
 .search__link {
   display: block;
-  font-size: 2em;
+  font-size: 1.5em;
   padding: $half-unit $unit;
-  background-color: $header-background-color;
+  background-color: $secondary-background-color;
   text-decoration: none;
 
   &:hover {
@@ -51,7 +77,10 @@
 }
 
 .search__item {
-  .text {
+  .text,
+  .event-times {
+    padding: $unit;
+
     strong {
       background-color: $accent-color;
     }

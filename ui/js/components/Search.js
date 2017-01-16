@@ -37,9 +37,12 @@ export default class Search extends Component {
   }
 
   render () {
-    const { onChange, value } = this.props;
+    const { onChange, responsive, value } = this.props;
     const { active } = this.state;
     let classNames = ['search'];
+    if (responsive) {
+      classNames.push('search--responsive');
+    }
     if (active) {
       classNames.push('search--active');
     }
@@ -60,5 +63,6 @@ export default class Search extends Component {
 Search.propTypes = {
   focusOnMount: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  responsive: PropTypes.bool,
   value: PropTypes.string
 };

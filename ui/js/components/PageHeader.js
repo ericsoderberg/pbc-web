@@ -74,7 +74,8 @@ export default class PageHeader extends Component {
     let search;
     if (onSearch) {
       search = (
-        <Search ref="search" value={searchText} onChange={onSearch}
+        <Search ref="search" responsive={false}
+          value={searchText} onChange={onSearch}
           focusOnMount={focusOnSearch} />
       );
     }

@@ -17,7 +17,7 @@
 
 .list__header {
   display: flex;
-  background-color: $header-background-color;
+  background-color: $secondary-background-color;
 
   @media all and (min-width: 700px) {
     flex-direction: row;

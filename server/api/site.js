@@ -62,6 +62,7 @@ export default function (router) {
             console.log(err);
           });
       }
+      return site;
     })
     .then(site => res.status(200).json(site))
     .catch(error => res.status(400).json(error));

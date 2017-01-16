@@ -1,17 +1,21 @@
-.calendar {
-  @media all and (min-width: 700px) {
-    padding: $unit;
-  }
-}
 
 .calendar__header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  background-color: $secondary-background-color;
 
   a:not(:last-child) {
     margin-right: $unit;
+  }
+
+  > .button-icon:first-child {
+    margin-right: $half-unit;
+  }
+
+  > .button-icon:last-child {
+    margin-left: $half-unit;
   }
 
   @media all and (min-width: 700px) {
