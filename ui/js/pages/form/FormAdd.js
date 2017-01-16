@@ -118,11 +118,12 @@ class FormAdd extends Component {
         cancelControl = (
           <Button secondary={true} label="Cancel" onClick={cancelFunc} />
         );
-        headerCancelControl = (
-          <button type="button" onClick={cancelFunc}>
+        headerCancelControl = [
+          <button key="cancel" type="button" className="button"
+            onClick={cancelFunc}>
             Cancel
           </button>
-        );
+        ];
       }
 
       let header;

@@ -207,9 +207,9 @@
           padding: 0 $half-unit;
         }
 
-        a,
-        button,
-        .page-header__drop {
+        > a,
+        > button,
+        > .page-header__drop {
           width: 100%;
         }
       }
@@ -324,6 +324,10 @@
   right: 0;
   background-color: $header-background-color;
   padding: $unit;
+
+  @media all and (max-width: 699px) {
+    text-align: center;
+  }
 
   &.box--row {
     align-items: flex-start;

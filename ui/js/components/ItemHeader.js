@@ -61,6 +61,10 @@ ItemHeader.propTypes = {
   title: PropTypes.string
 };
 
+ItemHeader.defaultProps = {
+  actions: []
+};
+
 ItemHeader.contextTypes = {
   router: PropTypes.any
 };

@@ -60,11 +60,12 @@ class VerifyEmail extends Component {
   _renderForm () {
     const { email, errorMessage, errors } = this.state;
 
-    const cancelControl = (
-      <button className="button-header" type="button" onClick={this._onCancel}>
+    const cancelControl = [
+      <button key="cancel" type="button" className="button"
+        onClick={this._onCancel}>
         Cancel
       </button>
-    );
+    ];
 
     return (
       <div className="form__container">

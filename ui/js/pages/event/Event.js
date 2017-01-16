@@ -42,9 +42,9 @@ class Event extends Component {
         `/calendars/${calendar.path || calendar._id}` : `/calendar`) +
         // TODO: pick date via shared function with EventTimes
         `?focus=${encodeURIComponent(moment(event.start).format(DATE_FORMAT))}`;
-      actions = (
-        <Link to={path}>Calendar</Link>
-      );
+      actions = [
+        <Link key="calendar" to={path}>Calendar</Link>
+      ];
     } else {
       contents = <Loading />;
     }

@@ -101,11 +101,12 @@ export default class FormEdit extends Component {
           </div>
         );
       } else {
-        const cancelControl = (
-          <button type="button" onClick={this._onCancel}>
+        const cancelControl = [
+          <button key="cancel" type="button" className="button"
+            onClick={this._onCancel}>
             Cancel
           </button>
-        );
+        ];
         header = (
           <PageHeader title={formTemplate.name} actions={cancelControl} />
         );

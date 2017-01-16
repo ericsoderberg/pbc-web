@@ -66,11 +66,11 @@ export default class SignUp extends Component {
     const { formState, errorMessage, errors } = this.state;
     const user = formState.object;
 
-    const cancelControl = (
-      <button className="button-header" type="button" onClick={this._onCancel}>
+    const cancelControl = [
+      <button key="cancel" type="button" onClick={this._onCancel}>
         Cancel
       </button>
-    );
+    ];
 
     return (
       <div className="form__container">
