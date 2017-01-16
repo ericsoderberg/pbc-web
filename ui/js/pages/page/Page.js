@@ -34,9 +34,9 @@ class Page extends Component {
     let contents;
     if (page) {
       contents = <PageContents item={page} />;
-      actions = (
-        <Link to={`/pages/${page._id}/map`} className="a-header">Map</Link>
-      );
+      actions = [
+        <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>
+      ];
     } else {
       contents = <Loading />;
     }

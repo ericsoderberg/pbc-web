@@ -41,11 +41,11 @@ export default class SignIn extends Component {
     const { formState, error } = this.state;
     const session = formState.object;
 
-    const cancelControl = (
-      <button className="button-header" type="button" onClick={this._onCancel}>
+    const cancelControl = [
+      <button key="cancel" type="button" onClick={this._onCancel}>
         Cancel
       </button>
-    );
+    ];
 
     return (
       <div className="form__container">

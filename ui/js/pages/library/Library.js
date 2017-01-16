@@ -52,8 +52,7 @@ export default class Library extends Component {
       };
 
       const controls = [
-        <Link key='edit' className='a-header'
-          to={`/libraries/${library._id}/edit`}>
+        <Link key='edit' to={`/libraries/${library._id}/edit`}>
           Edit
         </Link>
       ];

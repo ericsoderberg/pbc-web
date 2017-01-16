@@ -102,8 +102,7 @@ export default class FormEdit extends Component {
         );
       } else {
         const cancelControl = (
-          <button className="button-header" type="button"
-            onClick={this._onCancel}>
+          <button type="button" onClick={this._onCancel}>
             Cancel
           </button>
         );

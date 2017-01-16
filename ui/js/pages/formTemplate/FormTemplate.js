@@ -442,30 +442,25 @@ export default class FormTemplate extends Component {
 
     let actions = [];
     actions.push(
-      <nav key="filter" className="page-header__actions">
-        <span className="page-header__dropper">
-          <Button label="Filter" className="button-header"
-            onClick={() => this.setState({
-              filterActive: ! this.state.filterActive})}/>
-          {filter}
-        </span>
-      </nav>
+      <span key="filter" className="page-header__dropper">
+        <Button label="Filter"
+          onClick={() => this.setState({
+            filterActive: ! this.state.filterActive})}/>
+        {filter}
+      </span>
     );
 
     actions.push(
-      <nav key="download" className="page-header__actions">
-        <Link to={`/form-templates/${id}/download`}
-          className="a-header">
-          Download
-        </Link>
-      </nav>
+      <Link key="download" to={`/form-templates/${id}/download`}>
+        Download
+      </Link>
     );
 
     actions.push(
-      <nav key="add" className="page-header__actions">
-        <Link to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}
-          className="a-header">Add</Link>
-      </nav>
+      <Link key="add"
+        to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}>
+        Add
+      </Link>
     );
 
     let title;

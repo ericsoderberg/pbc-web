@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getSite } from '../actions';
 import BackIcon from '../icons/Back';
 import Search from './Search';
+import Button from './Button';
 
 export default class PageHeader extends Component {
 
@@ -10,6 +11,7 @@ export default class PageHeader extends Component {
     super();
     this._onHome = this._onHome.bind(this);
     this._onBack = this._onBack.bind(this);
+    this._toggleMenu = this._toggleMenu.bind(this);
     this.state = {};
   }
 
@@ -33,90 +35,100 @@ export default class PageHeader extends Component {
     }
   }
 
+  _toggleMenu () {
+    this.setState({ showMenu: ! this.state.showMenu });
+  }
+
   render () {
-    const { title, searchText, onSearch, actions, form, back, homer,
-      focusOnSearch } = this.props;
-    const { site } = this.state;
+    const {
+      title, searchText, onSearch, actions, back, homer,
+      focusOnSearch, responsive
+    } = this.props;
+    const { showMenu, site } = this.state;
     let classes = ["page-header"];
-    if (form) {
-      classes.push("page-header--form");
+    if (responsive && actions && actions.length > 1) {
+      classes.push("page-header--responsive");
     }
 
-    let logo;
-    if (this.props.logo && site && site.logo) {
-      logo = <img className="page-header__logo logo" src={site.logo.data} />;
-    }
-
-    let backControl;
+    let navControl;
     if (homer) {
       let contents;
-      let className;
+      let classes = ["page-header__nav-control"];
       if (site && site.logo) {
         contents = <img className="page-header__logo" src={site.logo.data} />;
-        className = 'button-icon';
+        classes.push('button-icon');
       } else {
         contents = 'Home';
-        className = 'button-header';
+        classes.push('button-header');
       }
-      backControl = (
-        <button className={className} onClick={this._onHome}>
+      navControl = (
+        <button className={classes.join(' ')} onClick={this._onHome}>
           {contents}
         </button>
       );
     } else if (back) {
-      backControl = (
-        <button className="button-icon" onClick={this._onBack}>
+      navControl = (
+        <button className="button-icon page-header__nav-control"
+          onClick={this._onBack}>
           <BackIcon />
         </button>
       );
     }
 
-    let search;
-    if (onSearch) {
-      search = (
-        <Search ref="search" responsive={false}
-          value={searchText} onChange={onSearch}
-          focusOnMount={focusOnSearch} />
-      );
-    }
-
-    let h1;
+    let titleElement;
     if (title) {
-      h1 = <h1 className="page-header__title">{title}</h1>;
+      titleElement = <h1 className="page-header__title">{title}</h1>;
     }
 
-    let main;
-    if (title || search || ! logo) {
-      main = (
-        <span className="page-header__main">
-          {h1}
-          {search}
-        </span>
+    let menu;
+    if (actions || onSearch) {
+      let classes = ["page-header__menu"];
+      if (showMenu) {
+        classes.push("page-header__menu--active");
+      }
+      let search;
+      if (onSearch) {
+        search = (
+          <Search ref="search" responsive={false}
+            value={searchText} onChange={onSearch}
+            focusOnMount={focusOnSearch} />
+        );
+      }
+      menu = (
+        <div className={classes.join(' ')}>
+          <Button className="page-header__menu-control" label='menu'
+            onClick={this._toggleMenu} />
+          <nav className="page-header__actions">
+            {search}
+            {actions}
+          </nav>
+        </div>
       );
     }
 
     return (
       <header className={classes.join(' ')}>
-        {backControl}
-        {logo}
-        {main}
-        {actions}
+        {navControl}
+        {titleElement}
+        {menu}
       </header>
     );
   }
 };
 
 PageHeader.propTypes = {
-  actions: PropTypes.node,
+  actions: PropTypes.arrayOf(PropTypes.element),
   back: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  color: PropTypes.string,
   focusOnSearch: PropTypes.bool,
-  form: PropTypes.bool,
   homer: PropTypes.bool,
-  logo: PropTypes.bool,
   onSearch: PropTypes.func,
+  responsive: PropTypes.bool,
   searchText: PropTypes.string,
   title: PropTypes.string
+};
+
+PageHeader.defaultProps = {
+  responsive: true
 };
 
 PageHeader.contextTypes = {

@@ -353,23 +353,23 @@ export default class Calendar extends Component {
       if (id) {
         actions.push(
           <Link key="add"
-            to={`/events/add?calendarId=${encodeURIComponent(calendar._id)}`}
-            className="a-header">Add</Link>
+            to={`/events/add?calendarId=${encodeURIComponent(calendar._id)}`}>
+            Add
+          </Link>
         );
         actions.push(
-          <Link key="edit" to={`/calendars/${calendar._id}/edit`}
-            className="a-header">Edit</Link>
+          <Link key="edit" to={`/calendars/${calendar._id}/edit`}>
+            Edit
+          </Link>
         );
       } else {
         actions.push(
-          <nav key="filter" className="page-header__actions">
-            <span className="page-header__dropper">
-              <Button label="Calendars" className="button-header"
-                onClick={() => this.setState({
-                  filterActive: ! this.state.filterActive})}/>
-              {filter}
-            </span>
-          </nav>
+          <span key="filter" className="page-header__dropper">
+            <Button label="Calendars"
+              onClick={() => this.setState({
+                filterActive: ! this.state.filterActive})}/>
+            {filter}
+          </span>
         );
       }
 

@@ -43,7 +43,7 @@ class Event extends Component {
         // TODO: pick date via shared function with EventTimes
         `?focus=${encodeURIComponent(moment(event.start).format(DATE_FORMAT))}`;
       actions = (
-        <Link to={path} className="a-header">Calendar</Link>
+        <Link to={path}>Calendar</Link>
       );
     } else {
       contents = <Loading />;

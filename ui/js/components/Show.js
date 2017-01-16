@@ -59,7 +59,7 @@ export default class Show extends Component {
 };
 
 Show.propTypes = {
-  actions: PropTypes.node,
+  actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
   Contents: PropTypes.func.isRequired,
   item: PropTypes.object,

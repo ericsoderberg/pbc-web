@@ -47,9 +47,10 @@ class Form extends Component {
 
   render () {
     const {
-      action, actions, contentsProps, error, footerActions, FormContents,
+      action, contentsProps, error, footerActions, FormContents,
       inline, onCancel, onRemove, Preview, session, submitLabel, title
-     } = this.props;
+    } = this.props;
+    let { actions } = this.props;
     const { formState } = this.state;
     let classes = ['form__container'];
     if (inline) {
@@ -63,15 +64,13 @@ class Form extends Component {
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
     } else {
-      const headerActions = (
-        <nav className="page-header__actions">
-          {actions}
-          <button className="button-header" type="button" onClick={onCancel}>
-            Cancel
-          </button>
-        </nav>
-      );
-      header = <PageHeader title={title} actions={headerActions} />;
+      actions = [ ...actions,
+        <button key="cancel" type="button" className="button"
+          onClick={onCancel}>
+          Cancel
+        </button>
+      ];
+      header = <PageHeader title={title} actions={actions} />;
     }
 
     let removeControl;
@@ -116,7 +115,7 @@ class Form extends Component {
 
 Form.propTypes = {
   action: PropTypes.string,
-  actions: PropTypes.node,
+  actions: PropTypes.arrayOf(PropTypes.element),
   contentsProps: PropTypes.object,
   error: PropTypes.object,
   footerActions: PropTypes.node,
@@ -135,6 +134,10 @@ Form.propTypes = {
   }),
   submitLabel: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired
+};
+
+Form.defaultProps = {
+  actions: []
 };
 
 Form.contextTypes = {

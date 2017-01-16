@@ -180,9 +180,10 @@ class List extends Component {
 
   render () {
     const {
-      actions, addIfFilter, Item, path, title, marker, sort, session,
+      addIfFilter, Item, path, title, marker, sort, session,
       filters, search, homer
     } = this.props;
+    let { actions } = this.props;
     const {
       searchText, filter, filterNames, mightHaveMore, loadingMore
     } = this.state;
@@ -240,19 +241,16 @@ class List extends Component {
       });
     }
 
-    let listActions = [];
     if ((! addIfFilter || (filter || {})[addIfFilter]) && session &&
       (session.administrator || session.administratorDomainId)) {
       let addPath = `${path}/add`;
       if (addIfFilter) {
         addPath += `?${addIfFilter}=${encodeURIComponent(filter[addIfFilter])}`;
       }
-      listActions.push(
-        <Link key="add" to={addPath} className="a-header">Add</Link>
-      );
-    }
-    if (actions) {
-      listActions.push(actions);
+      actions = [
+        <Link key="add" to={addPath}>Add</Link>,
+        ...actions
+      ];
     }
 
     let onSearch;
@@ -271,8 +269,8 @@ class List extends Component {
 
     return (
       <main>
-        <PageHeader title={title} homer={homer} focusOnSearch={true}
-          searchText={searchText} onSearch={onSearch} actions={listActions} />
+        <PageHeader title={title} homer={homer} focusOnSearch={false}
+          searchText={searchText} onSearch={onSearch} actions={actions} />
         <div className="list__header">
           {filterItems}
         </div>
@@ -286,7 +284,7 @@ class List extends Component {
 };
 
 List.propTypes = {
-  actions: PropTypes.node,
+  actions: PropTypes.arrayOf(PropTypes.element),
   addIfFilter: PropTypes.string,
   category: PropTypes.string,
   filter: PropTypes.object,
@@ -321,6 +319,7 @@ List.propTypes = {
 };
 
 List.defaultProps = {
+  actions: [],
   search: true,
   sort: 'name'
 };

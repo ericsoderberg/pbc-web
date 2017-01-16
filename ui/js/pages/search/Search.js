@@ -84,9 +84,8 @@ export default class Search extends Component {
 
     return (
       <main>
-        <PageHeader homer={true}
-          searchText={searchText} onSearch={this._onSearch}
-          focusOnSearch={true} />
+        <PageHeader homer={true} responsive={false} focusOnSearch={true}
+          searchText={searchText} onSearch={this._onSearch} />
         {contents}
       </main>
     );

@@ -79,7 +79,7 @@ export default class Edit extends Component {
 };
 
 Edit.propTypes = {
-  actions: PropTypes.node,
+  actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
   FormContents: PropTypes.func.isRequired,
   footerActions: PropTypes.node,
