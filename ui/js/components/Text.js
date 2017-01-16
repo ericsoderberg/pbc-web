@@ -8,10 +8,12 @@ const Text = (props) => {
   if (className) {
     classes.push(className);
   }
-  const content = text || props.children;
+  const content = text || props.children || '';
+  // strip out inline HTML
+  const stripped = content.replace(/(<([^>]+)>)/ig,"");
   return (
     <div className={classes.join(' ')}>
-      {markdownToJSX(content || '')}
+      {markdownToJSX(stripped)}
     </div>
   );
 };

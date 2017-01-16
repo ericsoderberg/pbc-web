@@ -1,6 +1,6 @@
 "use strict";
 
-const COLOR_RGB_REGEXP = /#(\d{2})(\d{2})(\d{2})/;
+const COLOR_RGB_REGEXP = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})/;
 
 export function isDarkBackground (colorString) {
   // convert to RGB elements
