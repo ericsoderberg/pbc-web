@@ -42,6 +42,7 @@ export default function (router) {
           doc.sections.push({ type: 'text', text: '' });
         }
 
+        return doc;
       });
     })
     // check events too
