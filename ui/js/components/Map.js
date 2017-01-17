@@ -3,7 +3,6 @@
 import React, { Component, PropTypes } from 'react';
 import { getGeocode } from '../actions';
 import Leaflet from 'leaflet';
-import Section from './Section';
 
 export default class Map extends Component {
 
@@ -20,8 +19,8 @@ export default class Map extends Component {
   componentDidMount () {
     const mapElement = this.refs.map;
     const options = {
-      touchZoom: false, scrollWheelZoom: false, dragging: false, zoom: 14,
-      zoomControl: false
+      touchZoom: false, scrollWheelZoom: false, dragging: false,
+      zoom: 14, zoomControl: false
     };
     const map = Leaflet.map(mapElement, options);
     this.setState({ map: map }, this._load);
@@ -102,35 +101,21 @@ export default class Map extends Component {
   }
 
   render () {
-    const { full, plain } = this.props;
-
-    let address;
-    if (! this.state.busy && ! this.state.lat) {
-      address = (
-        <div className="map__address">
-          {this.props.address}
-        </div>
-      );
+    const { address, busy, lat, mergedAddress } = this.state;
+    let addressElement;
+    if (! busy && ! lat) {
+      addressElement = <div className="map__address">{address}</div>;
     }
-
-    let result;
-    if (! plain) {
-      result = (
-        <Section full={full}>
-          <div ref="map" id="map" className="map">
-            {address}
-          </div>
-        </Section>
-      );
-    } else {
-      result = (
-        <div ref="map" id="map" className="map">
-          {address}
+    return (
+      <div className="map">
+        <a className="map__link"
+          href={`maps://?daddr=${encodeURIComponent(mergedAddress)}`} />
+        <div ref="map" id="map" className="map__map">
+          {addressElement}
         </div>
-      );
-    }
+      </div>
 
-    return result;
+    );
   }
 
 };
@@ -138,10 +123,8 @@ export default class Map extends Component {
 Map.propTypes = {
   address: PropTypes.string.isRequired,
   baseAddress: PropTypes.string,
-  full: PropTypes.bool,
   latitude: PropTypes.string,
   longitude: PropTypes.string,
-  plain: PropTypes.bool,
   title: PropTypes.string
 };
 
