@@ -676,3 +676,10 @@
     margin-left: $double-unit;
   }
 }
+
+.not-found {
+  padding: $unit $double-unit;
+  max-width: $form-width;
+  margin: $double-unit auto;
+  background-color: $secondary-background-color;
+}

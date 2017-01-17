@@ -45,10 +45,20 @@ export default (router, options) => {
         addPopulate(query, getOpts.populate);
       }
       query.exec()
+      .then(doc => {
+        if (! doc) {
+          res.status(404);
+          return Promise.reject(404);
+        } else {
+          return doc;
+        }
+      })
       .then(doc => (getOpts.transformOut ?
         getOpts.transformOut(doc, req) : doc))
       .then(doc => res.json(doc))
-      .catch(error => res.status(400).json(error));
+      .catch(error => {
+        res.status(typeof error === 'number' ? error : 400).json(error);
+      });
     });
   }
 

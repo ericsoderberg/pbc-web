@@ -4,31 +4,44 @@ import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
 import Stored from '../../components/Stored';
 import PageContents from './PageContents';
 
 class Page extends Component {
 
+  constructor () {
+    super();
+    this.state = {};
+  }
+
   componentDidMount () {
     if (! this.props.page) {
-      getItem('pages', this.props.params.id, { cache: true, populate: true })
-      .catch(error => console.log('!!! Page catch', error));
+      this._load(this.props);
     }
   }
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.params.id !== this.props.params.id &&
       ! nextProps.page) {
-      getItem('pages', nextProps.params.id, { cache: true, populate: true })
-      .catch(error => console.log('!!! Page catch', error));
+      this._load(nextProps);
     }
     if (nextProps.page) {
       document.title = nextProps.page.name;
     }
   }
 
+  _load (props) {
+    getItem('pages', props.params.id, { cache: true, populate: true })
+    .catch(error => {
+      console.log('!!! Page catch', error);
+      this.setState({ error: error });
+    });
+  }
+
   render () {
     const { page } = this.props;
+    const { error } = this.state;
 
     let actions;
     let contents;
@@ -37,6 +50,8 @@ class Page extends Component {
       actions = [
         <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>
       ];
+    } else if (error) {
+      contents = <NotFound />;
     } else {
       contents = <Loading />;
     }
