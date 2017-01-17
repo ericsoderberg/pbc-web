@@ -121,7 +121,6 @@
 
   @media all and (max-width: 699px) {
     padding: $half-unit;
-    text-align: right;
   }
 
   &:hover {
@@ -204,9 +203,11 @@
         }
 
         > a,
-        > button,
-        > .page-header__drop {
+        > .button,
+        .page-header__dropper > .button,
+        .page-header__drop {
           width: 100%;
+          text-align: center;
         }
       }
     }
