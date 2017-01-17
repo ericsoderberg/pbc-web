@@ -19,6 +19,7 @@ export default class SignIn extends Component {
   }
 
   componentDidMount () {
+    document.title = 'Sign In';
     this.refs.email.focus();
   }
 
@@ -42,7 +43,8 @@ export default class SignIn extends Component {
     const session = formState.object;
 
     const cancelControl = [
-      <button key="cancel" type="button" onClick={this._onCancel}>
+      <button key="cancel" type="button" className="button"
+        onClick={this._onCancel}>
         Cancel
       </button>
     ];

@@ -22,6 +22,7 @@ export default class SignUp extends Component {
   }
 
   componentDidMount () {
+    document.title = 'Sign Up';
     this.refs.name.focus();
   }
 
@@ -67,7 +68,8 @@ export default class SignUp extends Component {
     const user = formState.object;
 
     const cancelControl = [
-      <button key="cancel" type="button" onClick={this._onCancel}>
+      <button key="cancel" type="button" className="button"
+        onClick={this._onCancel}>
         Cancel
       </button>
     ];

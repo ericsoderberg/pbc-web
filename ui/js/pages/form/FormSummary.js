@@ -105,35 +105,37 @@ class FormSummary extends Component {
   _loadForms () {
     const { session } = this.props;
     const { formTemplate } = this.state;
-    getItems('forms', {
-      filter: {
-        formTemplateId: formTemplate._id,
-        userId: session.userId
-      },
-      // select: 'modified userId name',
-      populate: true
-    })
-    .then(forms => {
-      let paymentFormId;
-      if (formTemplate.payable) {
-        // see if any require payment
-        forms.forEach(form => {
-          const formTotal = calculateTotal(formTemplate, form);
-          let paymentTotal = 0;
-          (form.paymentIds || []).forEach(payment => {
-            paymentTotal += payment.amount;
-          });
-          if (formTotal > paymentTotal) {
-            form.needsPayment = true;
-            if (! paymentFormId) {
-              paymentFormId = form._id;
+    if (session) {
+      getItems('forms', {
+        filter: {
+          formTemplateId: formTemplate._id,
+          userId: session.userId
+        },
+        // select: 'modified userId name',
+        populate: true
+      })
+      .then(forms => {
+        let paymentFormId;
+        if (formTemplate.payable) {
+          // see if any require payment
+          forms.forEach(form => {
+            const formTotal = calculateTotal(formTemplate, form);
+            let paymentTotal = 0;
+            (form.paymentIds || []).forEach(payment => {
+              paymentTotal += payment.amount;
+            });
+            if (formTotal > paymentTotal) {
+              form.needsPayment = true;
+              if (! paymentFormId) {
+                paymentFormId = form._id;
+              }
             }
-          }
-        });
-      }
-      this.setState({ forms: forms, paymentFormId });
-    })
-    .catch(error => console.log('!!! FormSummary forms catch', error));
+          });
+        }
+        this.setState({ forms: forms, paymentFormId });
+      })
+      .catch(error => console.log('!!! FormSummary forms catch', error));
+    }
   }
 
   _layout () {

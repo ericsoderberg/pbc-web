@@ -24,6 +24,7 @@ class VerifyEmail extends Component {
   }
 
   componentDidMount () {
+    document.title = 'Verify Email';
     const temporaryToken = this.props.location.query.token;
     if (temporaryToken) {
       postSessionViaToken({ token: this.props.location.query.token })
@@ -74,7 +75,7 @@ class VerifyEmail extends Component {
           <FormError message={errorMessage} />
           <fieldset className="form__fields">
             <div className="form__text">
-              <p>You can sign you via a link sent to your email
+              <p>You can sign in via a link we'll send to your email
               address.</p>
             </div>
             <FormField name="email" label="Email" error={errors.email}>
@@ -105,7 +106,8 @@ class VerifyEmail extends Component {
           <fieldset className="form__fields">
             <div className="form__text">
               We've sent an email to {email}. Check your email for a message
-              with the subject 'Verify Email' and click the link in it to sign in.
+              with the subject 'Verify Email' and click the link in it to
+              sign in.
             </div>
           </fieldset>
           <footer className="form__footer">
