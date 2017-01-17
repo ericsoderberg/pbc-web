@@ -75,9 +75,9 @@ class App extends Component {
       <div className={classNames.join(' ')}>
         {navControl}
         {nav}
-        <section className="app__content">
+        <div className="app__content">
           {this.props.children}
-        </section>
+        </div>
       </div>
     );
   }

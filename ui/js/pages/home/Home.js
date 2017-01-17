@@ -160,10 +160,6 @@ class Home extends Component {
 
   _renderSplash () {
     const { site } = this.props;
-    // let logo;
-    // if (site && site.logo) {
-    //   logo = <img className="home__splash-logo" src={site.logo.data} />;
-    // }
     return (
       <Section key="splash" className="home__splash">
         <div>
@@ -177,7 +173,6 @@ class Home extends Component {
 
   _renderFooter () {
     const { page, session, site } = this.props;
-    const { menuHeight, showMenu } = this.state;
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
@@ -210,13 +205,8 @@ class Home extends Component {
       editControl = <Link to={`/pages/${page._id}/edit`}>Edit</Link>;
     }
 
-    let style;
-    if (! showMenu) {
-      style = { marginBottom: `-${menuHeight}px` };
-    }
-
     return (
-      <Section key="footer" style={style}>
+      <Section key="footer">
         <div>
           <div className="footer__links">
             <div className="home__brand">
