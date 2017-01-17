@@ -40,8 +40,7 @@ const sendEmails = (req, transporter) => {
       // send acknowledgement, if needed
       const { session, formTemplate, form, site } = context;
       if (formTemplate.acknowledge) {
-        const url = `${req.protocol}://${req.get('Host')}` +
-          `/forms/${form._id}/edit`;
+        const url = `${req.headers.origin}/forms/${form._id}/edit`;
         const instructions =
 `### Thank you for your submittal for
 
@@ -66,8 +65,7 @@ const sendEmails = (req, transporter) => {
       // send notification, if needed
       const { session, formTemplate, form, site } = context;
       if (formTemplate.notify) {
-        const url = `${req.protocol}://${req.get('Host')}` +
-          `/forms/${form._id}/edit`;
+        const url = `${req.headers.origin}/forms/${form._id}/edit`;
         const instructions =
 `### Submittal from ${session.name} (${session.email}) for
 

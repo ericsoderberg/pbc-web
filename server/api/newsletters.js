@@ -82,7 +82,7 @@ const populateNewsletterForRendering = (newsletter) => {
 const send = (data, req, transporter) => {
   if (data.address) {
     console.log('!!! send to', data.address);
-    const urlBase = `${req.protocol}://${req.hostname}`;
+    const urlBase = `${req.headers.origin}`;
     const Site = mongoose.model('Site');
     return populateNewsletterForRendering(data)
     .then(newsletterData => renderNewsletter(newsletterData, urlBase))
@@ -112,7 +112,7 @@ export default function (router, transporter) {
   router.post('/newsletters/render', (req, res) => {
     const Newsletter = mongoose.model('Newsletter');
     const newsletter = new Newsletter(req.body);
-    const urlBase = `${req.protocol}://${req.hostname}`;
+    const urlBase = `${req.headers.origin}`;
     populateNewsletterForRendering(newsletter)
     .then(newsletterData => renderNewsletter(newsletterData, urlBase))
     .then(markup => res.send(markup))

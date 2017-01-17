@@ -16,7 +16,7 @@ function rfc822 (date) {
 
 function renderRSS (req, library, messages, pages, site) {
   const { podcast } = library;
-  const urlBase = `${req.protocol}://${req.hostname}`;
+  const urlBase = `${req.headers.origin}`;
   const page = pages[0];
   const path = (page._id.equals(site.homePageId) ? '' : page.path || page._id);
 

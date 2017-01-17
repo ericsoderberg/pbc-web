@@ -92,10 +92,10 @@ export default function (router, transporter) {
     })
     .then(context => {
       const { user, site } = context;
-      const url = `${req.protocol}://${req.get('Host')}` +
-        `/verify-email?token=${user.temporaryToken}`;
+      const url =
+        `${req.headers.origin}/verify-email?token=${user.temporaryToken}`;
       const instructions =
-`## Email verififcation for ${site.name}
+`## Email verification for ${site.name}
 
 The link below is valid for 2 hours from the time this message was sent.
 It will allow sign you in to the ${site.name} web site.
