@@ -46,7 +46,9 @@ export default class PageHeader extends Component {
     } = this.props;
     const { showMenu, site } = this.state;
     let classes = ["page-header"];
-    if (responsive && actions && actions.length > 1) {
+    if (responsive && (
+      (actions && actions.length > 1) || (actions.length === 1 && onSearch)
+    )) {
       classes.push("page-header--responsive");
     }
 

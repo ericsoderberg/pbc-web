@@ -58,7 +58,7 @@ export default class Library extends Component {
       ];
 
       result = (
-        <List location={location}
+        <List location={location} back={true}
           category="messages" title={library.name} path="/messages"
           filter={{ libraryId: library._id }}
           select="name path verses date" sort="-date"

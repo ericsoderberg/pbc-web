@@ -180,7 +180,7 @@ class List extends Component {
 
   render () {
     const {
-      addIfFilter, Item, path, title, marker, sort, session,
+      addIfFilter, back, Item, path, title, marker, sort, session,
       filters, search, homer
     } = this.props;
     let { actions } = this.props;
@@ -269,7 +269,8 @@ class List extends Component {
 
     return (
       <main>
-        <PageHeader title={title} homer={homer} focusOnSearch={false}
+        <PageHeader title={title} homer={homer} back={back}
+          focusOnSearch={false}
           searchText={searchText} onSearch={onSearch} actions={actions} />
         <div className="list__header">
           {filterItems}
@@ -286,6 +287,7 @@ class List extends Component {
 List.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   addIfFilter: PropTypes.string,
+  back: PropTypes.bool,
   category: PropTypes.string,
   filter: PropTypes.object,
   filters: PropTypes.arrayOf(PropTypes.shape({

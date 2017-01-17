@@ -31,6 +31,12 @@ export default class Search extends Component {
       document.title = `Search - ${searchText}`;
       getSearch(searchText)
       .then(items => this.setState({ items, loading: false }))
+      // .then(() => {
+      //   this.context.router.replace({
+      //     pathname: window.location.pathname,
+      //     search: `?q=${encodeURIComponent(searchText)}`
+      //   });
+      // })
       .catch(error => console.log('!!! Search catch', error));
     } else {
       document.title = 'Search';
@@ -43,10 +49,6 @@ export default class Search extends Component {
     this.setState({ searchText: searchText, loading: true });
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
-    this.context.router.replace({
-      pathname: window.location.pathname,
-      search: `?q=${encodeURIComponent(searchText)}`
-    });
   }
 
   render () {
@@ -88,7 +90,7 @@ export default class Search extends Component {
     }
 
     return (
-      <main>
+      <main className="search-page">
         <PageHeader homer={true} responsive={false} focusOnSearch={true}
           searchText={searchText} onSearch={this._onSearch} />
         {contents}
