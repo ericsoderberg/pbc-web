@@ -1,5 +1,6 @@
 "use strict";
 import React, { PropTypes } from 'react';
+import moment from 'moment';
 import Section from '../../components/Section';
 import EventTimes from '../../components/EventTimes';
 import Text from '../../components/Text';
@@ -26,7 +27,11 @@ const EventContents = (props) => {
 
   let text;
   if (event.text) {
-    text = <Text text={event.text} />;
+    text = (
+      <Section full={false}>
+        <Text text={event.text} />
+      </Section>
+    );
   }
 
   let map;
@@ -35,6 +40,26 @@ const EventContents = (props) => {
       <div className="event-summary__map">
         <Map address={event.address} title={event.location} plain={true} />
       </div>
+    );
+  }
+
+  let upcoming;
+  let now = moment();
+  const upcomingDates = (event.dates || []).sort().map(date => moment(date))
+  .filter(date => date.isAfter(now)).slice(0, 3)
+  .map(date => (
+    <li key={date} className="item">{date.format('MMMM Do YYYY')}</li>
+  ));
+  if (upcomingDates.length > 0) {
+    upcoming = (
+      <Section full={false}>
+        <div>
+          <h3>Upcoming</h3>
+          <ul className="list">
+            {upcomingDates}
+          </ul>
+        </div>
+      </Section>
     );
   }
 
@@ -53,9 +78,8 @@ const EventContents = (props) => {
           </div>
         </div>
       </Section>
-      <Section full={false}>
-        {text}
-      </Section>
+      {text}
+      {upcoming}
       <PageContext
         filter={event ? { 'sections.eventId': event._id } : undefined} />
     </div>
