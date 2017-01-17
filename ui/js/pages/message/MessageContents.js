@@ -63,7 +63,11 @@ export default class MessageContents extends Component {
 
     let text;
     if (message.text) {
-      text = <Text text={message.text} />;
+      text = (
+        <Section full={false}>
+          <Text text={message.text} />
+        </Section>
+      );
     }
 
     let image;
