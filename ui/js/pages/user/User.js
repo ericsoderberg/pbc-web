@@ -1,32 +1,41 @@
 "use strict";
 import React from 'react';
 import Show from '../../components/Show';
+import Section from '../../components/Section';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
 
 const UserContents = (props) => {
   const user = props.item;
 
-  let text;
-  if (user.text) {
-    text = <Text text={user.text} />;
-  }
-
   let image;
   if (user.image) {
     image = <Image image={user.image} avatar={true} />;
   }
 
-  let email = `
-  ## Email
-  [${user.email}](mailto:${user.email})
-  `;
+  let text;
+  if (user.text) {
+    text = (
+      <Section full={false}>
+        <Text text={user.text} />
+      </Section>
+    );
+  }
 
   return (
     <div>
-      {image}
+      <Section full={false}>
+        <div>
+          <div className="user__summary">
+            {image}
+            <div className="user__heading">
+              <h1>{user.name}</h1>
+              <a href={`mailto:${user.email}`}>{user.email}</a>
+            </div>
+          </div>
+        </div>
+      </Section>
       {text}
-      <Text text={email} />
     </div>
   );
 };
