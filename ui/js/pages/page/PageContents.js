@@ -45,7 +45,8 @@ export default class PageContents extends Component {
       }
 
       return (
-        <Section key={index} full={section.full} color={section.color}
+        <Section key={index} align='center' full={section.full}
+          color={section.color}
           backgroundImage={section.backgroundImage} plain={section.plain}>
           {contents}
         </Section>

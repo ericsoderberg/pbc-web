@@ -21,6 +21,25 @@
   }
 }
 
+.section__container--center {
+  text-align: center;
+
+  .section.text {
+    p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
+.section__container--left {
+  text-align: left;
+}
+
+.section__container--right {
+  text-align: right;
+}
+
 .section__background {
   position: absolute;
   top: 50%;
@@ -61,15 +80,6 @@
         padding-left: 0;
         padding-right: 0;
       }
-    }
-  }
-
-  &.text {
-    text-align: center;
-
-    p {
-      margin-left: auto;
-      margin-right: auto;
     }
   }
 }

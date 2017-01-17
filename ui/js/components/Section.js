@@ -44,7 +44,7 @@ export default class Section extends Component {
 
   render () {
     const {
-      backgroundImage, className, color, footer, full, plain
+      align, backgroundImage, className, color, footer, full, plain
     } = this.props;
     let { style } = this.props;
     const { active } = this.state;
@@ -70,6 +70,9 @@ export default class Section extends Component {
         if (isDarkBackground(color)) {
           classNames.push('dark-background');
         }
+      }
+      if (align) {
+        classNames.push(`section__container--${align}`);
       }
       if (className) {
         classNames.push(className);
@@ -97,6 +100,7 @@ export default class Section extends Component {
 }
 
 Section.propTypes = {
+  align: PropTypes.oneOf(['center', 'left', 'right']),
   backgroundImage: PropTypes.shape({
     data: PropTypes.string.isRequired
   }),

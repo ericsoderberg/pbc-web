@@ -53,7 +53,9 @@ const EventContents = (props) => {
           </div>
         </div>
       </Section>
-      {text}
+      <Section full={false}>
+        {text}
+      </Section>
       <PageContext
         filter={event ? { 'sections.eventId': event._id } : undefined} />
     </div>
