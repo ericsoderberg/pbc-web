@@ -375,5 +375,6 @@ export function getSearch (searchText) {
   const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/search${q}`, {
     method: 'GET', headers: _headers })
+  .then(processStatus)
   .then(response => response.json());
 }

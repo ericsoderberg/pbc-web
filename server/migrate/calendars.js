@@ -6,14 +6,14 @@ import { loadCategoryArray } from './utils';
 import results from './results';
 
 const CALENDARS = [
-  { name: 'Children', path: 'children', pageId: 15 },
-  { name: 'Junior High', path: 'junior-high', pageId: 4 },
-  { name: 'High School', path: 'high-school', pageId: 3 },
-  { name: 'College', path: 'college', pageId: 6 },
-  { name: 'Young Adults', path: 'young-adults', pageId: 90 },
-  { name: 'Women', path: 'women', pageId: 2 },
-  { name: 'Recovery', path: 'recovery', pageId: 77 },
-  { name: 'Private', path: 'private', pageId: 160, private: true }
+  { name: 'Children', path: 'children', pageId: 15, public: true },
+  { name: 'Junior High', path: 'junior-high', pageId: 4, public: true },
+  { name: 'High School', path: 'high-school', pageId: 3, public: true },
+  { name: 'College', path: 'college', pageId: 6, public: true },
+  { name: 'Young Adults', path: 'young-adults', pageId: 90, public: true },
+  { name: 'Women', path: 'women', pageId: 2, public: true },
+  { name: 'Recovery', path: 'recovery', pageId: 77, public: true },
+  { name: 'Private', path: 'private', pageId: 160 }
 ];
 
 // Calendar
@@ -36,12 +36,16 @@ export default function () {
       // create Library
       return Calendar.findOne({ name: spec.name }).exec()
       .then(calendar => {
+        let item = {
+          name: spec.name, path: spec.path, public: spec.public
+        };
         if (calendar) {
-          return results.skipped('Calendar', calendar);
+          return calendar.update(item)
+          .then(event => results.replaced('Calendar', calendar))
+          .catch(error => results.errored('Calendar', item, error));
+          // return results.skipped('Calendar', calendar);
         } else {
-          const calendar = new Calendar({
-            name: spec.name, path: spec.path, private: spec.private
-          });
+          const calendar = new Calendar(item);
           return calendar.save()
           .then(calendar => results.saved('Calendar', calendar))
           .catch(error => results.errored('Calendar', calendar, error));
@@ -70,7 +74,7 @@ export default function () {
             if (event) {
               event.calendarId = calendar._id;
               if ('Private' === spec.name) {
-                event.private = true;
+                event.public = false;
               }
               return event.save();
             }

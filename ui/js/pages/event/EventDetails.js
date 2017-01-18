@@ -186,10 +186,10 @@ export default class EventDetails extends Component {
               onChange={formState.change('path')}/>
           </FormField>
           <FormField>
-            <input name="private" type="checkbox"
-              checked={event.private || false}
-              onChange={formState.toggle('private')}/>
-            <label htmlFor="private">private</label>
+            <input name="public" type="checkbox"
+              checked={event.public || false}
+              onChange={formState.toggle('public')}/>
+            <label htmlFor="public">public</label>
           </FormField>
           {administeredBy}
           {primaryEvent}

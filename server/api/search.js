@@ -1,24 +1,33 @@
 "use strict";
 import mongoose from 'mongoose';
+import { authorize, authorizedForDomain } from './auth';
 
 // /api/search
 
 export default function (router) {
   router.get('/search', (req, res) => {
-    // start with pages
-    const Page = mongoose.model('Page');
-    Page.find(
-      { $text: { $search: req.query.search } },
-      { score : { $meta: "textScore" } }
-    )
-    .sort({ score: { $meta: "textScore" }, modified: -1 })
-    .limit(10)
-    .exec()
-    .then(docs => {
+    authorize(req, res, false)
+    .then(session => {
+      // start with pages
+      const Page = mongoose.model('Page');
+      return Page.find(
+        {
+          $text: { $search: req.query.search },
+          $or: [ authorizedForDomain(session), { public: true } ]
+        },
+        { score: { $meta: "textScore" } }
+      )
+      .sort({ score: { $meta: "textScore" }, modified: -1 })
+      .limit(10)
+      .exec()
+      .then(pages => ({ session, pages }));
+    })
+    .then(context => {
+      let { pages } = context;
 
       // prune sections down to just text
       const exp = new RegExp(req.query.search, 'i');
-      return docs.map(doc => {
+      pages = pages.map(doc => {
 
         doc.sections = doc.sections
         .filter(section => 'text' === section.type)
@@ -44,12 +53,18 @@ export default function (router) {
 
         return doc;
       });
+
+      return { ...context, pages };
     })
     // check events too
-    .then(pages => {
+    .then(context => {
+      const { session, pages } = context;
       const Event = mongoose.model('Event');
       return Event.find(
-        { $text: { $search: req.query.search } },
+        {
+          $text: { $search: req.query.search },
+          $or: [ authorizedForDomain(session), { public: true } ]
+        },
         { score : { $meta: "textScore" } }
       )
       .sort({ score: { $meta: "textScore" }, modified: -1 })

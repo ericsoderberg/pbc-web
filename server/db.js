@@ -132,7 +132,7 @@ const calendarSchema = Schema({
   modified: Date,
   name: {type: String, required: true},
   path: String,
-  private: Boolean,
+  public: Boolean,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
@@ -153,7 +153,7 @@ const eventSchema = Schema({
   path: String,
   // set in one-off cases
   primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' },
-  private: Boolean,
+  public: Boolean,
   resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }],
   start: Date,
   text: String,

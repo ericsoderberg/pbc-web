@@ -19,6 +19,7 @@ function normalizeEvent (item, slaveEvents, reservations) {
   item.oldId = item.id;
   item.created = item.created_at;
   item.modified = item.updated_at;
+  item.public = ! item.private;
   item.text = item.notes;
   // set date to latest slaveEvent date (if any)
   let latest;
@@ -96,10 +97,13 @@ export default function () {
     .forEach(item => {
       const promise = Event.findOne({ oldId: item.id }).exec()
       .then(event => {
+        item = normalizeEvent(item, slaveEvents, reservations);
         if (event) {
-          return results.skipped('Event', event);
+          return event.update(item)
+          .then(event => results.replaced('Event', event))
+          .catch(error => results.errored('Event', item, error));
+          // return results.skipped('Event', event);
         } else {
-          item = normalizeEvent(item, slaveEvents, reservations);
           event = new Event(item);
           return event.save()
           .then(event => results.saved('Event', event))

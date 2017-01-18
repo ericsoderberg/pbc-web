@@ -24,6 +24,17 @@ function copied (context, doc) {
   return doc;
 }
 
+function replaced (context, doc) {
+  if (! results[context]) {
+    results[context] = {};
+  }
+  if (! results[context].replaced) {
+    results[context].replaced = 0;
+  }
+  results[context].replaced += 1;
+  return doc;
+}
+
 function skipped (context, doc) {
   if (! results[context]) {
     results[context] = {};
@@ -53,6 +64,7 @@ function log () {
 export default {
   saved: saved,
   copied: copied,
+  replaced: replaced,
   skipped: skipped,
   errored: errored,
   log: log

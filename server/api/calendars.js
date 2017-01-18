@@ -78,10 +78,10 @@ export default function (router) {
       }
       if (! session ||
         ! (session.administrator || session.administratorDomainId)) {
-        query.find({ private: { $exists: false } });
+        query.find({ public: true });
       } else if (! session.administrator) {
         query.find({ $or: [{
-          private: { $exists: false }, domainId: session.administratorDomainId
+          public: true, domainId: session.administratorDomainId
         }]});
       }
 
