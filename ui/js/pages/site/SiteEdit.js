@@ -23,8 +23,8 @@ export default class SiteEdit extends Component {
 
   _onUpdate (site) {
     postSite(site)
-      .then(response => this.context.router.goBack())
-      .catch(error => this.setState({ error: error }));
+    .then(response => this.context.router.goBack())
+    .catch(error => this.setState({ error: error }));
   }
 
   _onCancel () {

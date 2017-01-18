@@ -72,6 +72,71 @@ const populatePage = (page) => {
   });
 };
 
+const publicize = (data) => {
+  console.log('!!! publicize');
+  // get site
+  const Site = mongoose.model('Site');
+  return Site.findOne({})
+  .select('homePageId')
+  .exec()
+  .then(site => ({ site }))
+  // get all pages
+  .then(context => {
+    const Page = mongoose.model('Page');
+    return Page.find({})
+    .select('name sections')
+    .exec()
+    .then(pages => ({ ...context, pages }));
+  })
+  // generate an object keyed by page id and containing page references
+  .then(context => {
+    const { pages } = context;
+    const pageMap = {};
+    pages.forEach(page => {
+      let children = [];
+      page.sections.filter(s => 'pages' === s.type)
+      .forEach(section => {
+        section.pages.forEach(page => {
+          children.push(page.id.toString());
+        });
+      });
+      pageMap[page._id.toString()] = children;
+    });
+    return { ...context, pageMap };
+  })
+  // record all page ids descended from the home page
+  .then(context => {
+    const { pageMap, site } = context;
+    const pagesRelatedToHome = {};
+    const pagesVisited = {};
+    const descend = (id) => {
+      if (id && ! pagesVisited[id]) {
+        pagesRelatedToHome[id] = true;
+        pagesVisited[id] = true;
+        pageMap[id].forEach(childId => descend(childId));
+      }
+    };
+    if (site.homePageId) {
+      descend(site.homePageId.toString());
+    }
+    return { ...context, pagesRelatedToHome };
+  })
+  // update any pages whose public state isn't correct
+  .then(context => {
+    const { pages, pagesRelatedToHome } = context;
+    let promises = [];
+    pages.forEach(page => {
+      const publicPage = pagesRelatedToHome[page._id.toString()];
+      if (publicPage !== page.public) {
+        page.public = publicPage;
+        promises.push(page.save());
+      }
+    });
+    return Promise.all(promises);
+  })
+  .then(() => data);
+};
+
 export default function (router) {
 
   router.get('/pages/:id/map', (req, res) => {
@@ -106,6 +171,16 @@ export default function (router) {
     .catch(error => res.status(400).json(error));
   });
 
+  router.post('/pages/publicize', (req, res) => {
+    authorize(req, res, true)
+    .then(session => publicize())
+    .then(() => res.status(200).json({}))
+    .catch(error => {
+      console.log('!!! error', error);
+      res.status(400).json(error);
+    });
+  });
+
   register(router, {
     category: 'pages',
     modelName: 'Page',
@@ -132,7 +207,11 @@ export default function (router) {
       }
     },
     put: {
-      transformIn: unsetDomainIfNeeded
+      transformIn: unsetDomainIfNeeded,
+      transformOut: (data) => {
+        publicize().then(() => console.log('!!! publicized')); // don't wait
+        return data;
+      }
     }
   });
 }

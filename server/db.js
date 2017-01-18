@@ -115,6 +115,7 @@ const pageSchema = Schema({
   name: String,
   oldId: Number,
   path: String,
+  public: Boolean,
   sections: [pageSectionSchema],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });

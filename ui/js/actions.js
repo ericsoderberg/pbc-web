@@ -215,6 +215,12 @@ export function getPageMap (id) {
   .then(response => response.json());
 }
 
+export function postPublicize () {
+  return fetch('/api/pages/publicize', { method: 'POST', headers: _headers })
+  .then(processStatus)
+  .then(response => response.json());
+}
+
 // User
 
 export function postSignUp (user) {

@@ -247,9 +247,8 @@ class List extends Component {
       if (addIfFilter) {
         addPath += `?${addIfFilter}=${encodeURIComponent(filter[addIfFilter])}`;
       }
-      actions = [
-        <Link key="add" to={addPath}>Add</Link>,
-        ...actions
+      actions = [ ...actions,
+        <Link key="add" to={addPath}>Add</Link>
       ];
     }
 
