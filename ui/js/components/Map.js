@@ -4,6 +4,9 @@ import React, { Component, PropTypes } from 'react';
 import { getGeocode } from '../actions';
 import Leaflet from 'leaflet';
 
+const ACCESS_TOKEN =
+  'pk.eyJ1IjoiZXJpY3NvZGVyYmVyZyIsImEiOiJjaXkzMnp4eDkwMDVvMnFxamxiMGZ1d3hwIn0.a2hwxKcOlZ86rUekW_YuRw';
+
 export default class Map extends Component {
 
   constructor (props) {
@@ -20,7 +23,7 @@ export default class Map extends Component {
     const mapElement = this.refs.map;
     const options = {
       touchZoom: false, scrollWheelZoom: false, dragging: false,
-      zoom: 14, zoomControl: false
+      zoom: 10, zoomControl: false
     };
     const map = Leaflet.map(mapElement, options);
     this.setState({ map: map }, this._load);
@@ -58,10 +61,11 @@ export default class Map extends Component {
 
   _setMap (mapSize) {
     const { map, lat, lon } = this.state;
-    map.setView([lat, lon], 14);
+    map.setView([lat, lon]);
     Leaflet.tileLayer(
-      'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-        attribution: '&copy;OpenStreetMap, &copy;CartoDB'
+      `https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/` +
+      `{z}/{x}/{y}@2x?access_token=${ACCESS_TOKEN}`, {
+        attribution: '© Mapbox © OpenStreetMap'
       }).addTo(map);
     const circle = Leaflet.circleMarker([lat, lon], {
       color: '#FF8D6D',
