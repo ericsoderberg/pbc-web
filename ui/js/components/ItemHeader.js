@@ -45,7 +45,7 @@ class ItemHeader extends Component {
     }
 
     return (
-      <PageHeader title={title} back={true} actions={actions} />
+      <PageHeader title={title} homer={true} actions={actions} />
     );
   }
 };

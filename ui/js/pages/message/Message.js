@@ -1,5 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
@@ -28,16 +29,21 @@ class Message extends Component {
 
   render () {
     const { message } = this.props;
-    let contents;
+    let contents, actions;
     if (message) {
       contents = <MessageContents item={message} />;
+      const library = message.libraryId || {};
+      const path = `/libraries/${library.path || library._id}`;
+      actions = [
+        <Link key="library" to={path}>{library.name || 'Library'}</Link>
+      ];
     } else {
       contents = <Loading />;
     }
 
     return (
       <main>
-        <ItemHeader category="messages" item={message} />
+        <ItemHeader category="messages" item={message} actions={actions} />
         {contents}
       </main>
     );

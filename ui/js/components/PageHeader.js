@@ -57,10 +57,10 @@ export default class PageHeader extends Component {
       let classes = ["page-header__nav-control"];
       if (site && site.logo) {
         contents = <img className="page-header__logo" src={site.logo.data} />;
-        classes.push('button-icon');
+        classes.push('button-plain');
       } else {
         contents = 'Home';
-        classes.push('button-header');
+        classes.push('button-plain');
       }
       navControl = (
         <button className={classes.join(' ')} onClick={this._onHome}>

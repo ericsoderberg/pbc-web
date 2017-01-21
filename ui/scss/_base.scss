@@ -65,7 +65,7 @@ a,
 
   &:hover {
     background-color: $control-hover-background;
-    color: $active-color;
+    color: $control-hover-color;
   }
 }
 
@@ -96,8 +96,8 @@ a,
     background-color: $control-hover-background;
 
     .control-icon {
-      fill: $active-color;
-      stroke: $active-color;
+      fill: $control-hover-color;
+      stroke: $control-hover-color;
     }
   }
 }
@@ -141,7 +141,7 @@ a,
 
   &:hover {
     background-color: $control-hover-background;
-    color: $active-color;
+    color: $control-hover-color;
 
     .button__arrow {
       fill: $control-hover-background;

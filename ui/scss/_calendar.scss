@@ -4,7 +4,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: $secondary-background-color;
+  // background-color: $secondary-background-color;
 
   a:not(:last-child) {
     margin-right: $unit;
@@ -180,7 +180,7 @@
 
     &:hover {
       background-color: $control-hover-background;
-      color: $active-color;
+      color: $control-hover-color;
     }
   }
 }

@@ -8,6 +8,17 @@
   z-index: 1;
 }
 
+.search__input {
+  outline: 0;
+  border-width: 2px;
+  border-color: transparent;
+  border-bottom-style: solid;
+
+  &:focus {
+    border-color: $brand-color;
+  }
+}
+
 .search--responsive {
   @media all and (min-width: 700px) {
     flex: 1 0 auto;
@@ -76,7 +87,7 @@
 
   &:hover {
     background-color: $control-hover-background;
-    color: $active-color;
+    color: $control-hover-color;
   }
 }
 

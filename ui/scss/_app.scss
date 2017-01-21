@@ -107,7 +107,7 @@
 
 @mixin page-header-input {
   text-decoration: none;
-  background-color: $header-background-color;
+  background-color: transparent;
   color: inherit;
   font-size: 1.125rem;;
   cursor: pointer;
@@ -125,7 +125,7 @@
 
   &:hover {
     background-color: $control-hover-background;
-    color: $active-color;
+    color: $control-hover-color;
   }
 }
 
@@ -134,7 +134,7 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
-  background-color: $header-background-color;
+  // background-color: $header-background-color;
 
   @media all and (min-width: 700px) {
     height: $triple-unit;
@@ -195,7 +195,8 @@
         right: 0;
         width: 100vw;
         display: flex;
-        background-color: $header-background-color;
+        background-color: $secondary-background-color;
+        padding: $half-unit 0;
         border-bottom: 1px solid $border-color;
 
         .search {
@@ -241,6 +242,13 @@
 
 .page-header__nav-control {
   flex: 0 0 auto;
+  height: $triple-unit;
+  padding: $half-unit $unit;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .page-header__logo {
@@ -255,7 +263,7 @@
 
 .page-header__title {
   flex: 0 1 auto;
-  margin: 0 $half-unit;
+  margin: 0 $half-unit 0 0;
   line-height: $double-unit;
 
   @media all and (max-width: 699px) {

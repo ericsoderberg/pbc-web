@@ -5,6 +5,7 @@
 
 .home__header {
   @media all and (min-width: 700px) {
+    height: $triple-unit;
     text-align: right;
   }
 
@@ -16,8 +17,7 @@
 .home__menu-control {
   position: relative;
   z-index: 101;
-  padding-left: $double-unit;
-  padding-right: $double-unit;
+  padding: $half-unit $double-unit;
 }
 
 .home__menu {
@@ -36,6 +36,7 @@
 
   @media all and (max-width: 699px) {
     text-align: center;
+    padding: $half-unit 0;
   }
 
   > button {
@@ -52,7 +53,7 @@
 
     &:hover {
       background-color: $hover-background;
-      color: $control-hover-background;
+      color: $control-hover-color;
     }
   }
 }

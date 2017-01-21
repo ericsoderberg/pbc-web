@@ -408,8 +408,7 @@ export default class Calendar extends Component {
       contents = (
         <main>
           <PageHeader title={calendar.name || 'Calendar'}
-            homer={id ? false : true}
-            back={id ? true : false}
+            homer={true}
             searchText={searchText} onSearch={this._onSearch}
             actions={actions} />
           <div className="calendar">

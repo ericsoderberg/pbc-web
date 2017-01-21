@@ -472,7 +472,7 @@
   &:hover {
     .page-tile__name {
       background-color: $control-hover-background;
-      color: $active-color;
+      color: $control-hover-color;
 
       &:after {
         content: '';
