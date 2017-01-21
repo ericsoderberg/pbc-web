@@ -6,13 +6,14 @@ import { getItem } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
 import MessageItem from '../message/MessageItem';
+import Stored from '../../components/Stored';
 
 class LibraryMessageItem extends MessageItem {};
 LibraryMessageItem.defaultProps = {
   detailsForMostRecent: true
 };
 
-export default class Library extends Component {
+class Library extends Component {
 
   constructor () {
     super();
@@ -33,7 +34,7 @@ export default class Library extends Component {
   }
 
   render () {
-    const { location } = this.props;
+    const { location, session } = this.props;
     const { library } = this.state;
 
     let result;
@@ -51,11 +52,15 @@ export default class Library extends Component {
         )
       };
 
-      const controls = [
-        <Link key='edit' to={`/libraries/${library._id}/edit`}>
-          Edit
-        </Link>
-      ];
+      let controls;
+      if (session && (session.administrator ||
+        session.administratorDomainId === page.domainId)) {
+        controls = [
+          <Link key='edit' to={`/libraries/${library._id}/edit`}>
+            Edit
+          </Link>
+        ];
+      }
 
       result = (
         <List location={location} back={true}
@@ -74,5 +79,15 @@ Library.propTypes = {
   location: PropTypes.object,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired
+  }),
+  session: PropTypes.shape({
+    administrator: PropTypes.bool,
+    administratorDomainId: PropTypes.string
   })
 };
+
+const select = (state, props) => ({
+  session: state.session
+});
+
+export default Stored(Library, select);

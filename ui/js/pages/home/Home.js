@@ -6,6 +6,7 @@ import { getSite, getItem, deleteSession } from '../../actions';
 import PageContents from '../page/PageContents';
 import Section from '../../components/Section';
 import FacebookIcon from '../../icons/Facebook';
+import InstagramIcon from '../../icons/Instagram';
 import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
@@ -180,6 +181,8 @@ class Home extends Component {
         let contents;
         if (url.match(/facebook/)) {
           contents = <FacebookIcon />;
+        } else if (url.match(/instagram/)) {
+          contents = <InstagramIcon />;
         } else if (url.match(/twitter/)) {
           contents = <TwitterIcon />;
         } else if (url.match(/vimeo/)) {
