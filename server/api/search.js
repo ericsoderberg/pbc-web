@@ -58,7 +58,7 @@ export default function (router) {
     })
     // check events too
     .then(context => {
-      const { session, pages } = context;
+      const { session } = context;
       const Event = mongoose.model('Event');
       return Event.find(
         {
@@ -70,9 +70,26 @@ export default function (router) {
       .sort({ score: { $meta: "textScore" }, modified: -1 })
       .limit(10)
       .exec()
-      .then(events => ([ ...pages, ...events ]));
+      .then(events => ({ ...context, events }));
     })
-    .then(result => res.status(200).json(result))
+    // check libraries
+    .then(context => {
+      const Library = mongoose.model('Library');
+      return Library.find(
+        {
+          $text: { $search: req.query.search }
+        },
+        { score : { $meta: "textScore" } }
+      )
+      .sort({ score: { $meta: "textScore" }, modified: -1 })
+      .limit(10)
+      .exec()
+      .then(libraries => ({ ...context, libraries }));
+    })
+    .then(context => {
+      const { pages, events, libraries } = context;
+      res.status(200).json({ pages, events, libraries });
+    })
     .catch(error => {
       console.log('!!!', error);
       res.status(400).json(error);

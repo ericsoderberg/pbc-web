@@ -8,13 +8,23 @@ import EventTimes from '../../components/EventTimes';
 import Loading from '../../components/Loading';
 import { getLocationParams } from '../../utils/Params';
 
+const Item = (props) => (
+  <div className="search__item">
+    <Link className="search__link" to={props.path}>
+      {props.item.name}
+    </Link>
+    {props.children}
+  </div>
+);
+
+
 export default class Search extends Component {
 
   constructor () {
     super();
     this._onSearch = this._onSearch.bind(this);
     this._get = this._get.bind(this);
-    this.state = { items: [], searchText: '' };
+    this.state = { categories: {}, searchText: '' };
   }
 
   componentDidMount () {
@@ -30,13 +40,7 @@ export default class Search extends Component {
     if (searchText) {
       document.title = `Search - ${searchText}`;
       getSearch(searchText)
-      .then(items => this.setState({ items, loading: false }))
-      // .then(() => {
-      //   this.context.router.replace({
-      //     pathname: window.location.pathname,
-      //     search: `?q=${encodeURIComponent(searchText)}`
-      //   });
-      // })
+      .then(categories => this.setState({ categories, loading: false }))
       .catch(error => console.log('!!! Search catch', error));
     } else {
       document.title = 'Search';
@@ -49,34 +53,43 @@ export default class Search extends Component {
     this.setState({ searchText: searchText, loading: true });
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
+    // Put the search term in the browser location
+    this.context.router.replace({
+      pathname: '/search',
+      search: `?q=${encodeURIComponent(searchText)}`
+    });
   }
 
   render () {
-    const { items, loading, searchText } = this.state;
+    const { categories, loading, searchText } = this.state;
 
-    let contents = items.filter(item => item).map(item => {
-      let content, path;
-      if (item.hasOwnProperty('sections')) {
-        // Page
-        content = item.sections.map(section => (
-          <Text key={section._id} text={section.text} />
-        ));
-        path = item.path || `/pages/${item._id}`;
-      } else if (item.hasOwnProperty('start')) {
-        // Event
-        content = [
-          <EventTimes key="event" event={item} />,
-          <Text key="text" text={item.text} />
-        ];
-        path = `/events/${item.path || item._id}`;
-      }
-      return (
-        <div className="search__item" key={item._id}>
-          <Link className="search__link" to={path}>
-            {item.name}
-          </Link>
+    let contents = [];
+    (categories.pages || []).map(page => {
+      const content = page.sections.map((section, index) => (
+        <Text key={index}>{section.text}</Text>
+      ));
+      contents.push(
+        <Item key={page._id} item={page}
+          path={page.path || `/pages/${page._id}`}>
           {content}
-        </div>
+        </Item>
+      );
+    });
+
+    (categories.events || []).map(event => {
+      contents.push(
+        <Item key={event._id} item={event}
+          path={`/events/${event.path || event._id}`}>
+          <EventTimes event={event} />
+          <Text text={event.text} />
+        </Item>
+      );
+    });
+
+    (categories.libraries || []).map(library => {
+      contents.push(
+        <Item key={library._id} item={library}
+          path={`/libraries/${library.path || library._id}`} />
       );
     });
 

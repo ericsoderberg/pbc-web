@@ -297,6 +297,8 @@ const librarySchema = Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
+librarySchema.index({ name: 'text' });
+
 mongoose.model('Library', librarySchema);
 
 const messageSchema = Schema({

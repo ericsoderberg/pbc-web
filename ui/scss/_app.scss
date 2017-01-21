@@ -266,6 +266,10 @@
   margin: 0 $half-unit 0 0;
   line-height: $double-unit;
 
+  &:first-child {
+    margin-left: $unit;
+  }
+
   @media all and (max-width: 699px) {
     margin: 0 $half-unit;
     font-size: 1.25em;

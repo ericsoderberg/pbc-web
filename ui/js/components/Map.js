@@ -4,8 +4,10 @@ import React, { Component, PropTypes } from 'react';
 import { getGeocode } from '../actions';
 import Leaflet from 'leaflet';
 
-const ACCESS_TOKEN =
-  'pk.eyJ1IjoiZXJpY3NvZGVyYmVyZyIsImEiOiJjaXkzMnp4eDkwMDVvMnFxamxiMGZ1d3hwIn0.a2hwxKcOlZ86rUekW_YuRw';
+const TILES_URL = `https://api.mapbox.com/styles/v1/ericsoderberg/` +
+`ciy3410qp006p2smnq39o2zk4/tiles/256/{z}/{x}/{y}?access_token=` +
+`pk.eyJ1IjoiZXJpY3NvZGVyYmVyZyIsImEiOiJjaXkzMnp4eDkwMDVvMnFxamxiMGZ1d3hwIn0.` +
+`a2hwxKcOlZ86rUekW_YuRw`;
 
 export default class Map extends Component {
 
@@ -23,7 +25,7 @@ export default class Map extends Component {
     const mapElement = this.refs.map;
     const options = {
       touchZoom: false, scrollWheelZoom: false, dragging: false,
-      zoom: 10, zoomControl: false
+      zoom: 11, zoomControl: false
     };
     const map = Leaflet.map(mapElement, options);
     this.setState({ map: map }, this._load);
@@ -62,17 +64,19 @@ export default class Map extends Component {
   _setMap (mapSize) {
     const { map, lat, lon } = this.state;
     map.setView([lat, lon]);
-    Leaflet.tileLayer(
-      `https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/` +
-      `{z}/{x}/{y}@2x?access_token=${ACCESS_TOKEN}`, {
-        attribution: '© Mapbox © OpenStreetMap'
-      }).addTo(map);
-    const circle = Leaflet.circleMarker([lat, lon], {
-      color: '#FF8D6D',
-      opacity: 0.8,
-      fillOpacity: 0.8
+    Leaflet.tileLayer(TILES_URL, {
+      attribution: '© Mapbox © OpenStreetMap'
     }).addTo(map);
-    circle.bindPopup(this._renderPopup()).openPopup();
+    const circle = Leaflet.circleMarker([lat, lon], {
+      radius: 8,
+      stroke: true,
+      weight: 6,
+      color: '#E3A235',
+      fill: false
+      // opacity: 0.8,
+      // fillOpacity: 0.8
+    }).addTo(map);
+    // circle.bindPopup(this._renderPopup()).openPopup();
   }
 
   _parseAddress (address) {
