@@ -4,6 +4,10 @@
 
   > div:last-child {
     margin-top: 0;
+
+    @media all and (min-width: 700px) {
+      text-align: right;
+    }
   }
 }
 
