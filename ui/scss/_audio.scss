@@ -27,7 +27,8 @@
 
 .audio:not(.audio--plain) {
   @media all and (min-width: 700px) {
-    margin-top: $quadruple-unit;
+    margin-top: $unit;
+    margin-bottom: $unit;
     padding: 0;
   }
 

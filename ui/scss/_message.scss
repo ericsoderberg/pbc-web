@@ -5,6 +5,11 @@
   @media all and (min-width: 700px) {
     flex-direction: row;
     justify-content: space-between;
+
+    > * {
+      margin-top: $double-unit;
+      margin-bottom: $double-unit;
+    }
   }
 
   @media all and (max-width: 699px) {
@@ -19,4 +24,35 @@
 
 .message__nav-verses {
   color: #999;
+}
+
+.message__header {
+  max-width: $page-width + $double-unit;
+  margin: 0 auto;
+  padding: $double-unit $unit;
+  line-height: 1.5;
+
+  @media all and (min-width: 700px) {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &:last-child {
+        text-align: right;
+      }
+
+      div:first-child {
+        line-height: 3.375rem;
+      }
+    }
+  }
+
+  h1 {
+    margin: 0 0 $half-unit 0;
+  }
 }

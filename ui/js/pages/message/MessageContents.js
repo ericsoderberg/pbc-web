@@ -134,42 +134,26 @@ export default class MessageContents extends Component {
     let attributes;
     if (this.props.attributes) {
 
-      let verses;
-      if (message.verses) {
-        verses = [
-          <dt key="t">Verses</dt>,
-          <dd key="d">{message.verses}</dd>
-        ];
-      }
-
-      let author;
-      if (message.author) {
-        author = [
-          <dt key="t">Author</dt>,
-          <dd key="d">{message.author}</dd>
-        ];
-      }
-
-      let date;
-      if (message.date) {
-        // The date could be a partial string, a moment object,
-        // or an ISO-8601 string
-        let dateProperty = message.date;
-        if (typeof dateProperty === 'string') {
-          if (dateProperty.match(/.+T.+Z/)) {
-            dateProperty = moment(dateProperty);
-          } else {
-            // match MessageFormContents
-            dateProperty = moment(dateProperty, 'M/D/YYYY');
-          }
-        }
-        if (dateProperty) {
-          date = [
-            <dt key="t">Date</dt>,
-            <dd key="d">{dateProperty.format('MMMM Do YYYY')}</dd>
-          ];
-        }
-      }
+      // let date;
+      // if (message.date) {
+      //   // The date could be a partial string, a moment object,
+      //   // or an ISO-8601 string
+      //   let dateProperty = message.date;
+      //   if (typeof dateProperty === 'string') {
+      //     if (dateProperty.match(/.+T.+Z/)) {
+      //       dateProperty = moment(dateProperty);
+      //     } else {
+      //       // match MessageFormContents
+      //       dateProperty = moment(dateProperty, 'M/D/YYYY');
+      //     }
+      //   }
+      //   if (dateProperty) {
+      //     date = [
+      //       <dt key="t">Date</dt>,
+      //       <dd key="d">{dateProperty.format('MMMM Do YYYY')}</dd>
+      //     ];
+      //   }
+      // }
 
       let series;
       if (message.seriesId) {
@@ -183,27 +167,10 @@ export default class MessageContents extends Component {
         ];
       }
 
-      let library;
-      if (message.libraryId) {
-        library = [
-          <dt key="t">Library</dt>,
-          <dd key="d">
-            <Link to={`/libraries/${message.libraryId._id}`}>
-              {message.libraryId.name}
-            </Link>
-          </dd>
-        ];
-      }
-
       attributes = (
         <Section>
           <dl className="page-attributes section">
-            <dt>Name</dt><dd>{message.name}</dd>
-            {verses}
-            {author}
-            {date}
             {series}
-            {library}
           </dl>
         </Section>
       );
@@ -212,6 +179,19 @@ export default class MessageContents extends Component {
     return (
       <div>
         {video}
+        <header className='message__header'>
+          <div>
+            <h1>{message.name}</h1>
+            <div className="secondary">{message.verses}</div>
+          </div>
+          <div>
+            <div className="tertiary">
+              {moment(message.date).format('MMM Do YYYY')}
+            </div>
+            <div className="secondary">{message.author}</div>
+          </div>
+        </header>
+
         {audio}
         {image}
         {text}
