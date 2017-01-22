@@ -40,8 +40,11 @@ export default class Audio extends Component {
     this._onPlay = this._onPlay.bind(this);
     this._onPause = this._onPause.bind(this);
     this._onSeek = this._onSeek.bind(this);
+    this._onToggleVolume = this._onToggleVolume.bind(this);
     this._onVolume = this._onVolume.bind(this);
-    this.state = { playing: false, volume: 0.7, start: 0, end: 0, at: 0 };
+    this.state = {
+      playing: false, volume: 0.7, start: 0, end: 0, at: 0, showVolume: false
+    };
   }
 
   componentDidMount () {
@@ -114,6 +117,10 @@ export default class Audio extends Component {
     this.setState({ at: value });
   }
 
+  _onToggleVolume (event) {
+    this.setState({ showVolume: ! this.state.showVolume });
+  }
+
   _onVolume (event) {
     const audio = this.refs.audio;
     const value = event.target.value;
@@ -123,7 +130,7 @@ export default class Audio extends Component {
 
   render () {
     const { file, className, color, full, plain } = this.props;
-    const { playing, volume, start, end, at } = this.state;
+    const { playing, volume, start, end, at, showVolume } = this.state;
     const path = `/api/files/${file._id}/${file.name}`;
 
     let classes = ['audio'];
@@ -142,29 +149,25 @@ export default class Audio extends Component {
     let playControl;
     if (playing) {
       playControl = (
-        <Button icon={<PauseIcon />} onClick={this._onPause} />
+        <Button className="audio__toggle" plain={true} onClick={this._onPause}>
+          <span>Listen</span>
+          <PauseIcon />
+        </Button>
       );
     } else {
       playControl = (
-        <Button icon={<PlayIcon />} onClick={this._onPlay} />
+        <Button className="audio__toggle" plain={true} onClick={this._onPlay}>
+          <span>Listen</span>
+          <PlayIcon />
+        </Button>
       );
     }
 
-    let positionControl, volumeControl;
-    if (playing || at) {
-      positionControl = (
-        <div className="audio__position-container">
-          <input className="audio__position" type="range" min={start} max={end}
-            value={at} onChange={this._onSeek} />
-          <span className="audio__duration">{friendlyDuration(end - at)}</span>
-        </div>
-      );
+    let volumeControl;
+    if (showVolume) {
       volumeControl = (
-        <div className="audio__volume-container">
-          <VolumeIcon />
-          <input className="audio__volume" type="range" min={0} max={1}
-            step={0.1} value={volume} onChange={this._onVolume} />
-        </div>
+        <input className="audio__volume" type="range" min={0} max={1}
+          step={0.1} value={volume} onChange={this._onVolume} />
       );
     }
 
@@ -179,8 +182,14 @@ export default class Audio extends Component {
             {label}
             {playControl}
           </span>
-          {positionControl}
+          <input className="audio__position" type="range"
+            min={start} max={end} value={at} onChange={this._onSeek} />
+          <span className="audio__duration">{friendlyDuration(end - at)}</span>
           {volumeControl}
+          <Button className="audio__toggle" plain={true}
+            onClick={this._onToggleVolume}>
+            <VolumeIcon />
+          </Button>
         </div>
       </Section>
     );

@@ -92,7 +92,7 @@ export default class Button extends Component {
       contents = (
         <span ref="label" className="button__label">{contents}</span>
       );
-    } else if (icon) {
+    } else if (icon && ! label) {
       classNames.push('button-icon');
     } else if (plain) {
       classNames.push('button-plain');

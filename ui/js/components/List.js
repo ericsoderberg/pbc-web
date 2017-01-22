@@ -64,7 +64,7 @@ class List extends Component {
     this._getTimer = setTimeout(() => {
       getItems(category, { sort, filter, search: searchText, select, populate })
       .then(response => this.setState({
-        items: response, mightHaveMore: response.length >= 20
+        items: response, mightHaveMore: response.length >= 20, loading: false
       }))
       .catch(error => console.log('!!! List catch', error));
     }, 100);
@@ -149,7 +149,7 @@ class List extends Component {
 
   _onSearch (event) {
     const searchText = event.target.value;
-    this._setLocation({ searchText: searchText });
+    this._setLocation({ searchText: searchText, loading: true });
   }
 
   _filter (property) {
@@ -185,7 +185,7 @@ class List extends Component {
     } = this.props;
     let { actions } = this.props;
     const {
-      searchText, filter, filterNames, mightHaveMore, loadingMore
+      searchText, filter, filterNames, mightHaveMore, loading, loadingMore
     } = this.state;
 
     const descending = (sort && sort[0] === '-');
@@ -266,6 +266,16 @@ class List extends Component {
       more = <div className="list__count">{items.length}</div>;
     }
 
+    let message;
+    if (items.length === 0) {
+      if (loading) {
+        message = <Loading />;
+      } else {
+        const text = searchText ? 'No matches' : 'Awaiting your input';
+        message = <div className="list__message">{text}</div>;
+      }
+    }
+
     return (
       <main>
         <PageHeader title={title} homer={homer} back={back}
@@ -277,6 +287,7 @@ class List extends Component {
         <ul className="list">
           {items}
         </ul>
+        {message}
         {more}
       </main>
     );

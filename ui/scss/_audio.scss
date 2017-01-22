@@ -2,6 +2,7 @@
   display: flex;
   width: 100%;
   font-size: 1.25rem;
+  background-color: #E3A235;
 
   @media all and (min-width: 700px) {
     flex-direction: row;
@@ -11,6 +12,7 @@
 
   @media all and (max-width: 699px) {
     flex-direction: column;
+    align-items: center;
   }
 
   audio {
@@ -25,11 +27,12 @@
 
 .audio:not(.audio--plain) {
   @media all and (min-width: 700px) {
-    padding: $quadruple-unit 0 $unit;
+    margin-top: $quadruple-unit;
+    padding: 0;
   }
 
   @media all and (max-width: 699px) {
-    flex-direction: column;
+    padding: $half-unit;
   }
 }
 
@@ -37,20 +40,31 @@
   margin-right: $unit;
 }
 
-.audio__control {
-  flex: 0 0 auto;
+.audio__toggle {
   display: flex;
   flex-direction: row;
   align-items: center;
 
   @media all and (max-width: 699px) {
-    margin-bottom: $half-unit;
+    margin: $half-unit 0;
   }
+
+  .control-icon:not(:first-child) {
+    margin: $half-unit 0 $half-unit $half-unit;
+  }
+}
+
+.audio__control {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .audio__position,
 .audio__volume {
 
+  margin: 0;
   padding: 0;
 
   // Reset
@@ -67,25 +81,30 @@
 
   &[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: $double-unit;
-    width: $quarter-unit;
-    background: #999;
+    height: $unit;
+    width: $unit;
+    border-radius: $half-unit;
+    background: #fff;
     border: none;
     cursor: pointer;
+    margin-top: - $half-unit;
     // margin-top: -14px; // You need to specify a margin in Chrome, but in Firefox and IE it is automatic
   }
 
   &[type=range]::-moz-range-thumb {
-    height: $double-unit;
-    width: $quarter-unit;
-    background: #999;
+    height: $unit;
+    width: $unit;
+    border-radius: $half-unit;
+    border: none;
+    background: #fff;
     cursor: pointer;
   }
 
   &[type=range]::-ms-thumb {
-    height: $double-unit;
-    width: $quarter-unit;
-    background: #999;
+    height: $unit;
+    width: $unit;
+    border-radius: $half-unit;
+    background: #fff;
     cursor: pointer;
   }
 
@@ -93,27 +112,27 @@
 
   &[type=range]::-webkit-slider-runnable-track {
     width: 100%;
-    height: $double-unit;
+    height: 2px;
     cursor: pointer;
-    background: #eee;
+    background: $secondary-color;
     border: none;
   }
 
   &[type=range]:focus::-webkit-slider-runnable-track {
-    background: #eee;
+    background: $secondary-color;
     border: none;
   }
 
   &[type=range]::-moz-range-track {
     width: 100%;
-    height: $double-unit;
+    height: 2px;
     cursor: pointer;
-    background: #eee;
+    background: $secondary-color;
   }
 
   &[type=range]::-ms-track {
     width: 100%;
-    height: $double-unit;
+    height: 2px;
     cursor: pointer;
     background: transparent;
     border-color: transparent;
@@ -122,54 +141,45 @@
   }
 
   &[type=range]::-ms-fill-lower {
-    background: #eee;
+    background: $secondary-color;
   }
 
   &[type=range]:focus::-ms-fill-lower {
-    background: #eee;
+    background: $secondary-color;
   }
 
   &[type=range]::-ms-fill-upper {
-    background: #eee;
+    background: $secondary-color;
   }
 
   &[type=range]:focus::-ms-fill-upper {
-    background: #eee;
+    background: $secondary-color;
   }
 }
 
-.audio__position-container {
-  position: relative;
-
+.audio__position {
   @media all and (min-width: 700px) {
     flex: 1 1;
+    margin-right: $unit;
+  }
+
+  @media all and (max-width: 699px) {
+    margin: $unit 0;
   }
 }
 
 .audio__duration {
-  position: absolute;
-  top: 50%;
-  right: $unit;
-  transform: translateY(-50%);
-  z-index: 1;
-  pointer-events: none;
+  font-size: 1rem;
   color: $secondary-color;
 }
 
-.audio__volume-container {
-  position: relative;
-
+.audio__volume {
   @media all and (min-width: 700px) {
     flex: 0 1 $quadruple-unit;
     margin-left: $unit;
   }
 
-  .control-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    pointer-events: none;
+  @media all and (max-width: 699px) {
+    margin: $unit 0;
   }
 }

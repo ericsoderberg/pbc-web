@@ -36,6 +36,11 @@
   }
 }
 
+.list__message {
+  padding: $quadruple-unit $triple-unit;
+  color: $tertiary-color;
+}
+
 .marker {
   display: flex;
   flex-direction: row;

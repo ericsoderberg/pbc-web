@@ -44,7 +44,7 @@ export default class Search extends Component {
       .catch(error => console.log('!!! Search catch', error));
     } else {
       document.title = 'Search';
-      this.setState({ items: [] });
+      this.setState({ categories: {}, loading: false });
     }
   }
 
