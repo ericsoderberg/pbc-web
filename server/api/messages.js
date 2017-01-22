@@ -51,9 +51,10 @@ export default function (router) {
   register(router, {
     category: 'messages',
     modelName: 'Message',
-    index: {
-      searchProperties: ['name', 'author', 'verses']
-    },
+    omit: ['index'],
+    // index: {
+    //   textSearch: true
+    // },
     get: {
       populate: [
         { path: 'seriesId', select: 'name path' },
@@ -69,5 +70,59 @@ export default function (router) {
     put: {
       transformIn: unsetReferences
     }
+  });
+
+  // custom one below because register version wasn't working with $text
+  router.get(`/messages`, (req, res) => {
+    const Message = mongoose.model('Message');
+
+    let criteria = {};
+    let options = {};
+    let sort = req.query.sort;
+
+    if (req.query.filter) {
+      let filter = JSON.parse(req.query.filter);
+      if (typeof filter === 'string') {
+        // need double de-escape,
+        // first to de-string and then to de-stringify
+        filter = JSON.parse(filter);
+      }
+      criteria = { ...criteria, ...filter };
+    }
+
+    if (req.query.search) {
+      criteria = { ...criteria, $text: { $search: req.query.search } };
+      options = { ...options, score : { $meta: "textScore" } };
+      sort = { score: { $meta: "textScore" } };
+    }
+
+    let query = Message.find(criteria, options);
+
+    query.sort(sort);
+
+    if (req.query.select) {
+      query.select(req.query.select);
+    }
+
+    if (req.query.populate) {
+      const populate = JSON.parse(req.query.populate);
+      addPopulate(query, populate);
+    }
+
+    if (req.query.distinct) {
+      query.distinct(req.query.distinct);
+    } else if (req.query.limit) {
+      query.limit(parseInt(req.query.limit, 10));
+    } else {
+      query.limit(20);
+    }
+
+    if (req.query.skip) {
+      query.skip(parseInt(req.query.skip, 10));
+    }
+
+    query.exec()
+    .then(docs => res.json(docs))
+    .catch(error => res.status(400).json(error));
   });
 }

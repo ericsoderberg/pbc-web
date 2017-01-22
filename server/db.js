@@ -328,10 +328,10 @@ const messageSchema = Schema({
   verses: String
 });
 
-messageSchema.index({
-  author: 'text', name: 'text', text: 'text', verses: 'text'
-},
-  { weights: { verses: 8, name: 5, author: 3, text: 1 } });
+messageSchema.index(
+  { author: 'text', name: 'text', text: 'text', verses: 'text' },
+  { weights: { author: 3, name: 5, text: 1, verses: 8 } }
+);
 
 const Message = mongoose.model('Message', messageSchema);
 Message.on('index', (error) => console.log('Message index ready'));

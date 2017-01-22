@@ -86,6 +86,20 @@ export default function (router) {
       .exec()
       .then(libraries => ({ ...context, libraries }));
     })
+    // // check messages
+    // .then(context => {
+    //   const Message = mongoose.model('Message');
+    //   return Message.find(
+    //     {
+    //       $text: { $search: req.query.search }
+    //     },
+    //     { score : { $meta: "textScore" } }
+    //   )
+    //   .sort({ score: { $meta: "textScore" }, modified: -1 })
+    //   .limit(10)
+    //   .exec()
+    //   .then(messages => ({ ...context, messages }));
+    // })
     .then(context => {
       const { pages, events, libraries } = context;
       res.status(200).json({ pages, events, libraries });

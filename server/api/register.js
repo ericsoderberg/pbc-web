@@ -112,17 +112,26 @@ export default (router, options) => {
           query.find(indexOpts.authorize(session));
         }
         if (req.query.search) {
-          const exp = new RegExp(req.query.search, 'i');
-          if (Array.isArray(searchProperties)) {
-            query.or(searchProperties.map(property => {
-              let obj = {};
-              obj[property] = exp;
-              return obj;
-            }));
+          if (indexOpts.textSearch) {
+            // This isn't working :(
+            query.find(
+              { $text: { $search: req.query.search } },
+              { score: { $meta: "textScore" } }
+            );
+            query.sort({ score: { $meta: "textScore" }, modified: -1 });
           } else {
-            let obj = {};
-            obj[searchProperties] = exp;
-            query.find(obj);
+            const exp = new RegExp(req.query.search, 'i');
+            if (Array.isArray(searchProperties)) {
+              query.or(searchProperties.map(property => {
+                let obj = {};
+                obj[property] = exp;
+                return obj;
+              }));
+            } else {
+              let obj = {};
+              obj[searchProperties] = exp;
+              query.find(obj);
+            }
           }
         }
         if (req.query.filter) {
@@ -134,7 +143,7 @@ export default (router, options) => {
           }
           query.find(filter);
         }
-        if (req.query.sort) {
+        if (req.query.sort && (! indexOpts.textSearch || ! req.query.search) ) {
           query.sort(req.query.sort);
         }
         if (req.query.select) {
