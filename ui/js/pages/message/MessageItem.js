@@ -35,12 +35,15 @@ export default class MessageItem extends Component {
     const link = (
       <Link className={classNames.join(' ')}
         to={`/messages/${message.path || message._id}`}>
-        <div className="item">
-          <span className="item__name">{message.name}</span>
-          <span className="box--row">
-            <span>{message.verses}</span>
-            <span className="tertiary">{date.format('MMM Do YYYY')}</span>
-          </span>
+        <div className="item message-item">
+          <div>
+            <div className="item__name">{message.name}</div>
+            <div className="secondary">{message.verses}</div>
+          </div>
+          <div>
+            <div className="tertiary">{date.format('MMM Do YYYY')}</div>
+            <div className="secondary">{message.author}</div>
+          </div>
         </div>
       </Link>
     );

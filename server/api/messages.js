@@ -8,7 +8,7 @@ import register from './register';
 
 const populateMessage = (message) => {
   const Doc = mongoose.model('Message');
-  const subFields = 'name verses date path';
+  const subFields = 'name verses date path author';
 
   // nextMessage
   const nextPromise = Doc.find({

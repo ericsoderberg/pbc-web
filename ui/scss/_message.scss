@@ -1,4 +1,12 @@
 
+.message-item {
+  line-height: 1.5;
+
+  > div:last-child {
+    margin-top: 0;
+  }
+}
+
 .message__nav {
   display: flex;
 
