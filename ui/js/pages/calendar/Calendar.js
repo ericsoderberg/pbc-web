@@ -247,7 +247,7 @@ export default class Calendar extends Component {
 
       return (
         <li key={event._id} className="calendar__event">
-          <Link to={`/events/${event._id}`}>
+          <Link to={`/events/${event.path || event._id}`}>
             {time}
             <span className="calendar__event-name">{event.name}</span>
           </Link>

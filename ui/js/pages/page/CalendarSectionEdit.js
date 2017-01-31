@@ -43,14 +43,14 @@ export default class CalendarSectionEdit extends Component {
     }
 
     return (
-      <SectionEdit formState={formState}>
+      <fieldset className="form__fields">
         <FormField label="Calendar">
           <select name="calendarId" value={value}
             onChange={formState.change('calendarId')}>
             {calendarOptions}
           </select>
         </FormField>
-      </SectionEdit>
+      </fieldset>
     );
   }
 };

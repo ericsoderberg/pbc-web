@@ -6,7 +6,9 @@ import EventTimes from '../../components/EventTimes';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
 import Map from '../../components/Map';
+import FormSummary from '../form/FormSummary';
 import PageContext from '../page/PageContext';
+import EventSummary from './EventSummary';
 
 const EventContents = (props) => {
   const event = props.item;
@@ -43,6 +45,15 @@ const EventContents = (props) => {
     );
   }
 
+  let form;
+  if (event.formTemplateId) {
+    form = (
+      <Section align='left'>
+        <FormSummary formTemplateId={event.formTemplateId} />
+      </Section>
+    );
+  }
+
   let upcoming;
   let now = moment();
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
@@ -65,20 +76,11 @@ const EventContents = (props) => {
 
   return (
     <div>
-      {image}
-      <Section full={false}>
-        <div className="event-summary">
-          <div className="event-summary__summary">
-            <h1>{event.name}</h1>
-            <EventTimes event={event} reverse={true} size="large" />
-            {location}
-          </div>
-          <div className="event__map">
-            {map}
-          </div>
-        </div>
+      <Section full={false} align='left' backgroundImage={event.image}>
+        <EventSummary id={event} navigable={false} includeMap={true} />
       </Section>
       {text}
+      {form}
       {upcoming}
       <PageContext
         filter={event ? { 'sections.eventId': event._id } : undefined} />

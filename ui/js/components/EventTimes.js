@@ -45,9 +45,10 @@ const EventTimes = (props) => {
       ];
     }
   } else {
+    const now = moment();
     dates = (
       <span className="event-times__date">
-        {start.format('MMMM Do YYYY')}
+        {start.format(start.isSame(now, 'year') ? 'MMMM Do' : 'MMMM Do YYYY')}
       </span>
     );
   }

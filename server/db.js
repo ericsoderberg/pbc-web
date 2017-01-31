@@ -79,6 +79,8 @@ const pageSectionSchema = Schema({
   // form type
   formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   full: Boolean,
+  // event type
+  includeMap: Boolean,
   // image type
   image: image,
   // library type
@@ -145,6 +147,7 @@ const eventSchema = Schema({
   dates: [Date],
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   end: Date,
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   image: image,
   location: String, // room, house owner's name, etc.
   modified: Date,

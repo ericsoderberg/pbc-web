@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
-import { getItem } from '../../actions';
+import { getItem, getItems } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
 import MessageItem from '../message/MessageItem';
@@ -29,13 +29,19 @@ class Library extends Component {
     getItem('libraries', id)
     .then(library => {
       this.setState({ library: library });
+      getItems('pages', {
+        filter: { 'sections.libraryId': library._id },
+        select: 'name'
+      })
+      .then(pages => this.setState({ pages: pages }))
+      .catch(error => console.log('!!! Library pages catch', error));
     })
     .catch(error => console.log('!!! Library catch', error));
   }
 
   render () {
     const { location, session } = this.props;
-    const { library } = this.state;
+    const { library, pages } = this.state;
 
     let result;
     if (! library) {
@@ -52,19 +58,23 @@ class Library extends Component {
         )
       };
 
-      let controls;
+      const controls = (pages || []).map(page => (
+        <Link key={page.name} to={page.path || `/pages/${page._id}`}>
+          {page.name}
+        </Link>
+      ));
       if (session && (session.administrator ||
         session.administratorDomainId === page.domainId)) {
-        controls = [
+        controls.push(
           <Link key='edit' to={`/libraries/${library._id}/edit`}>
             Edit
           </Link>
-        ];
+        );
       }
 
       result = (
         <List location={location} homer={true}
-          category="messages" title={library.name} path="/messages"
+          category="messages" title={`${library.name} Library`} path="/messages"
           filter={{ libraryId: library._id }}
           select="name path verses date author" sort="-date"
           Item={LibraryMessageItem} marker={marker}

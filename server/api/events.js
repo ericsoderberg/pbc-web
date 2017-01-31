@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 import { authorize } from './auth';
 import { unsetDomainIfNeeded } from './domains';
+import { unsetCalendarIfNeeded } from './calendars';
 import register from './register';
 
 // /api/events
@@ -127,6 +128,12 @@ function eventDates (event) {
   return dates.concat(event.dates || []);
 }
 
+const unsetReferences = (data) => {
+  data = unsetCalendarIfNeeded(data);
+  data = unsetDomainIfNeeded(data);
+  return data;
+};
+
 export default function (router) {
 
   router.post('/events/resources', (req, res) => {
@@ -182,11 +189,12 @@ export default function (router) {
     get: {
       populate: [
         { path: 'primaryEventId', select: 'name path' },
-        { path: 'calendarId', select: 'name path' }
+        { path: 'calendarId', select: 'name path' },
+        { path: 'formTemplateId', select: 'name' }
       ]
     },
     put: {
-      transformIn: unsetDomainIfNeeded
+      transformIn: unsetReferences
     }
   });
 }

@@ -38,7 +38,7 @@ export default class EventSummary extends Component {
   }
 
   render () {
-    const { className, navigable } = this.props;
+    const { className, includeMap, navigable } = this.props;
     const { event } = this.state;
 
     let classes = ["event-summary"];
@@ -46,17 +46,23 @@ export default class EventSummary extends Component {
       classes.push(className);
     }
 
-    let image, contents, map;
+    let contents, map;
     if (event) {
 
-      if (event.backgroundImage) {
-        backgroundImage =
-          <Image image={event.backgroundImage} full={false} plain={true} />;
-      }
+      // if (event.backgroundImage) {
+      //   backgroundImage =
+      //     <Image image={event.backgroundImage} full={false} plain={true} />;
+      // }
 
-      if (event.image) {
-        image = (
-          <Image image={event.image} full={false} plain={true} />
+      // if (event.image) {
+      //   image = (
+      //     <Image image={event.image} full={false} plain={true} />
+      //   );
+      // }
+      let location;
+      if (event.location) {
+        location = (
+          <div className='event-summary__location'>{event.location}</div>
         );
       }
 
@@ -66,24 +72,27 @@ export default class EventSummary extends Component {
             <div className="event-summary__text">
               <h2 className='event-summary__name'>{event.name}</h2>
               <EventTimes event={event} reverse={true} size="large" />
+              {location}
             </div>
           </div>
         );
       } else {
         contents = (
           <div className="event-summary__text-container">
-            <Link to={`/events/${event._id}`} className="event-summary__text">
-              <h2 className='event-summary__name'>
-                <span>{event.name}</span>
+            <Link className="event-summary__text"
+              to={`/events/${event.path || event._id}`}>
+              <div className='event-summary__name'>
+                <h2>{event.name}</h2>
                 <RightIcon />
-              </h2>
+              </div>
               <EventTimes event={event} reverse={true} size="large" />
+              {location}
             </Link>
           </div>
         );
       }
 
-      if (event.address) {
+      if (includeMap && event.address) {
         map = (
           <div className="event-summary__map">
             <Map address={event.address} plain={true} />
@@ -96,7 +105,6 @@ export default class EventSummary extends Component {
 
     return (
       <div className={classes.join(' ')}>
-        {image}
         <div className="event-summary__contents">
           {contents}
           {map}
@@ -108,5 +116,6 @@ export default class EventSummary extends Component {
 
 EventSummary.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  includeMap: PropTypes.bool,
   navigable: PropTypes.bool
 };

@@ -88,7 +88,7 @@ export default class LibrarySummary extends Component {
       <div className={classes.join(' ')}>
         <div className="library-summary__library">
           <Link to={`/libraries/${library.path || library._id}`}>
-            <h2><span>{library.name}</span><RightIcon /></h2>
+            <h2>Message Library</h2><RightIcon />
           </Link>
         </div>
         <div className="library-summary__message">

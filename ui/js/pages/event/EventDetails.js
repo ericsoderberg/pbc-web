@@ -169,14 +169,29 @@ export default class EventDetails extends Component {
             <input name="address" value={event.address || ''}
               onChange={formState.change('address')}/>
           </FormField>
+
           <FormField label="Text">
             <textarea ref="text" name="text" value={event.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
           <ImageField label="Image" name="image"
             formState={formState} property="image" />
+          <FormField name="formTemplateId" label="Form template">
+            <SelectSearch category="form-templates" clearable={true}
+              value={(event.formTemplateId || {}).name || ''}
+              onChange={(suggestion) => {
+                if (suggestion) {
+                  formState.change('formTemplateId')({
+                    _id: suggestion._id, name: suggestion.name });
+                } else {
+                  formState.set('formTemplateId', undefined);
+                }
+              }} />
+          </FormField>
+
           <FormField label="Calendar">
-            <select name="calendarId" value={event.calendarId || ''}
+            <select name="calendarId"
+              value={(event.calendarId || {})._id || event.calendarId || ''}
               onChange={formState.change('calendarId')}>
               {calendarOptions}
             </select>

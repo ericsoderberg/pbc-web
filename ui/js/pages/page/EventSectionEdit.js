@@ -45,6 +45,12 @@ export default class EventSectionEdit extends Component {
                 _id: suggestion._id, name: suggestion.name })} />
         </FormField>
         <FormField>
+          <input name="includeMap" type="checkbox"
+            checked={section.includeMap || false}
+            onChange={formState.toggle('includeMap')}/>
+          <label htmlFor="includeMap">Map?</label>
+        </FormField>
+        <FormField>
           <input name="navigable" type="checkbox"
             checked={(false === section.navigable ? section.navigable : true)}
             onChange={formState.toggle('navigable')}/>

@@ -25,8 +25,10 @@ export default class PageContents extends Component {
       } else if ('calendar' === section.type) {
         contents = <CalendarSummary id={section.calendarId} />;
       } else if ('event' === section.type) {
-        contents =
-          <EventSummary id={section.eventId} navigable={section.navigable} />;
+        contents = (
+          <EventSummary id={section.eventId} includeMap={section.includeMap}
+            navigable={section.navigable} />
+        );
       } else if ('library' === section.type) {
         contents =
           <LibrarySummary id={section.libraryId} message={section.message} />;
@@ -44,13 +46,17 @@ export default class PageContents extends Component {
         contents = <span>TBD</span>;
       }
 
-      return (
-        <Section key={index} align='center' full={section.full}
-          color={section.color}
-          backgroundImage={section.backgroundImage} plain={section.plain}>
-          {contents}
-        </Section>
-      );
+      if ('calendar' !== section.type) {
+        contents = (
+          <Section key={index} align='center' full={section.full}
+            color={section.color}
+            backgroundImage={section.backgroundImage} plain={section.plain}>
+            {contents}
+          </Section>
+        );
+      }
+
+      return contents;
     });
     return <div>{sections}</div>;
   }
