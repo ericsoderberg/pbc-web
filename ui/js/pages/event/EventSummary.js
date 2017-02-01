@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import EventTimes from '../../components/EventTimes';
-import Image from '../../components/Image';
 import Map from '../../components/Map';
 import RightIcon from '../../icons/Right';
 // import Button from '../../components/Button';
@@ -49,16 +48,6 @@ export default class EventSummary extends Component {
     let contents, map;
     if (event) {
 
-      // if (event.backgroundImage) {
-      //   backgroundImage =
-      //     <Image image={event.backgroundImage} full={false} plain={true} />;
-      // }
-
-      // if (event.image) {
-      //   image = (
-      //     <Image image={event.image} full={false} plain={true} />
-      //   );
-      // }
       let location;
       if (event.location) {
         location = (

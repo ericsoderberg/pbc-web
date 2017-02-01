@@ -75,10 +75,13 @@ export default class CalendarSummary extends Component {
   }
 
   _renderCalendar () {
+    const { excludeEventIds } = this.props;
     const { calendar, events } = this.state;
     let result;
     if (events.length > 0) {
-      result = events.map(event => (
+      result = events
+      .filter(event => excludeEventIds.indexOf(event._id) === -1)
+      .map(event => (
         <Section key={event._id} align='center' full={true}
           backgroundImage={event.image}>
           <EventSummary key={event._id} id={event} />
@@ -112,5 +115,6 @@ export default class CalendarSummary extends Component {
 };
 
 CalendarSummary.propTypes = {
+  excludeEventIds: PropTypes.arrayOf(PropTypes.string),
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 };

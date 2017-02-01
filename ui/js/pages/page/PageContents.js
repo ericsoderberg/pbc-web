@@ -23,7 +23,14 @@ export default class PageContents extends Component {
       } else if ('image' === section.type) {
         contents =  <Image image={section.image} />;
       } else if ('calendar' === section.type) {
-        contents = <CalendarSummary id={section.calendarId} />;
+        // exclude events already in page
+        const excludeEventIds =
+          page.sections.filter(s => 'event' === s.type)
+          .map(s => s.eventId._id || s.eventId);
+        contents = (
+          <CalendarSummary id={section.calendarId}
+            excludeEventIds={excludeEventIds}/>
+        );
       } else if ('event' === section.type) {
         contents = (
           <EventSummary id={section.eventId} includeMap={section.includeMap}

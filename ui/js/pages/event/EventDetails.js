@@ -148,7 +148,7 @@ export default class EventDetails extends Component {
 
     return (
       <div>
-        <fieldset key="main" className="form__fields">
+        <fieldset className="form__fields">
           <FormField label="Name">
             <input ref="name" name="name" value={event.name || ''}
               onChange={formState.change('name')}/>
@@ -165,17 +165,19 @@ export default class EventDetails extends Component {
             <input name="location" value={event.location || ''}
               onChange={formState.change('location')}/>
           </FormField>
-          <FormField label="Address">
-            <input name="address" value={event.address || ''}
-              onChange={formState.change('address')}/>
-          </FormField>
+        </fieldset>
 
+        <fieldset className="form__fields">
+          <ImageField label="Image" name="image"
+            formState={formState} property="image" />
           <FormField label="Text">
             <textarea ref="text" name="text" value={event.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
-          <ImageField label="Image" name="image"
-            formState={formState} property="image" />
+          <FormField label="Address">
+            <input name="address" value={event.address || ''}
+              onChange={formState.change('address')}/>
+          </FormField>
           <FormField name="formTemplateId" label="Form template">
             <SelectSearch category="form-templates" clearable={true}
               value={(event.formTemplateId || {}).name || ''}
@@ -188,7 +190,9 @@ export default class EventDetails extends Component {
                 }
               }} />
           </FormField>
+        </fieldset>
 
+        <fieldset className="form__fields">
           <FormField label="Calendar">
             <select name="calendarId"
               value={(event.calendarId || {})._id || event.calendarId || ''}
@@ -209,6 +213,7 @@ export default class EventDetails extends Component {
           {administeredBy}
           {primaryEvent}
         </fieldset>
+
         <fieldset className="form__fields">
           {otherTimes}
           <FormFieldAdd>

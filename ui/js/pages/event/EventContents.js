@@ -2,9 +2,7 @@
 import React, { PropTypes } from 'react';
 import moment from 'moment';
 import Section from '../../components/Section';
-import EventTimes from '../../components/EventTimes';
 import Text from '../../components/Text';
-import Image from '../../components/Image';
 import Map from '../../components/Map';
 import FormSummary from '../form/FormSummary';
 import PageContext from '../page/PageContext';
@@ -12,20 +10,6 @@ import EventSummary from './EventSummary';
 
 const EventContents = (props) => {
   const event = props.item;
-
-  let image;
-  if (event.image) {
-    image = (
-      <Image image={event.image} full={true} />
-    );
-  }
-
-  let location;
-  if (event.location) {
-    location = (
-      <div className="event-summary__location">{event.location}</div>
-    );
-  }
 
   let text;
   if (event.text) {
@@ -77,9 +61,10 @@ const EventContents = (props) => {
   return (
     <div>
       <Section full={false} align='left' backgroundImage={event.image}>
-        <EventSummary id={event} navigable={false} includeMap={true} />
+        <EventSummary id={event} navigable={false} />
       </Section>
       {text}
+      {map}
       {form}
       {upcoming}
       <PageContext
