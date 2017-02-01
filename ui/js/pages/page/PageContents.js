@@ -28,7 +28,7 @@ export default class PageContents extends Component {
           page.sections.filter(s => 'event' === s.type)
           .map(s => s.eventId._id || s.eventId);
         contents = (
-          <CalendarSummary id={section.calendarId}
+          <CalendarSummary key={index} id={section.calendarId}
             excludeEventIds={excludeEventIds}/>
         );
       } else if ('event' === section.type) {

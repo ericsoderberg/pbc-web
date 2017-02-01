@@ -61,6 +61,14 @@
 
 .form__contents {
   padding: 0 $unit;
+
+  .form__fields:first-child {
+    margin-top: 0;
+  }
+
+  .form__fields:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .form-error {
@@ -136,6 +144,7 @@
 .form__text {
   max-width: $form-width;
   margin: 0 auto;
+  text-align: left;
 
   .text {
     padding: 0;
@@ -333,6 +342,10 @@
       margin-top: $unit;
     }
   }
+}
+
+.form__footer {
+  padding: 0 $unit;
 }
 
 // confirm-remove
@@ -782,19 +795,27 @@
       margin-bottom: 0;
     }
   }
+
+  .form__footer {
+    padding: 0;
+  }
+
+  .item__container {
+    padding: 0;
+  }
 }
 
 .form-summary__template {
   position: absolute;
 
   @media all and (min-width: 700px) {
-    top: $double-unit;
-    right: $double-unit;
+    bottom: $unit;
+    right: $unit;
   }
 
   @media all and (max-width: 699px) {
-    top: $double-unit;
-    right: $unit;
+    bottom: $half-unit;
+    right: 0;
   }
 }
 

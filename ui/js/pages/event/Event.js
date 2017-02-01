@@ -6,6 +6,7 @@ import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
+import PageContext from '../page/PageContext';
 import EventContents from './EventContents';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -53,6 +54,8 @@ class Event extends Component {
       <main>
         <ItemHeader category="events" item={event} actions={actions} />
         {contents}
+        <PageContext
+          filter={event ? { 'sections.eventId': event._id } : undefined} />
       </main>
     );
   }

@@ -67,7 +67,7 @@ export default class NewsletterFormContents extends Component {
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const { calendars, domains, libraries } = this.state;
     const newsletter = formState.object;
 
@@ -113,7 +113,7 @@ export default class NewsletterFormContents extends Component {
     });
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={newsletter.name || ''}

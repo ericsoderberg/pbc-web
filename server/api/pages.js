@@ -144,7 +144,7 @@ export default function (router) {
     .then(session => {
       const Page = mongoose.model('Page');
       return Page.find({})
-      .select('name sections')
+      .select('name path sections')
       .populate({ path: 'sections.pages.id', select: 'name path' })
       .exec();
     })

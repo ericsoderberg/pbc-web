@@ -24,7 +24,7 @@ export default class LibraryFormContents extends Component {
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const library = formState.object;
 
     let administeredBy;
@@ -52,7 +52,7 @@ export default class LibraryFormContents extends Component {
     }
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={library.name || ''}

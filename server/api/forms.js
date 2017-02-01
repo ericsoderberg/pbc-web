@@ -17,7 +17,7 @@ function formValueForFieldName (formTemplate, form, fieldName) {
     return section.fields.some(field => {
       if (field.name && field.name.toLowerCase() === fieldName.toLowerCase()) {
         return form.fields.some(field2 => {
-          if (field._id.equals(field2.fieldId)) {
+          if (field._id.equals(field2.templateFieldId)) {
             result = field2.value;
             return true;
           }

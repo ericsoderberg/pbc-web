@@ -45,7 +45,7 @@ export default class PageFormContents extends Component {
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const page = formState.object;
 
     const sections = (page.sections || []).map((section, index) => (
@@ -75,7 +75,7 @@ export default class PageFormContents extends Component {
     }
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
             <input name="name" value={page.name || ''}

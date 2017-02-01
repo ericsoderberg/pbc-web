@@ -1,6 +1,5 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
 import { getItems, getItem } from '../../actions';
@@ -86,7 +85,7 @@ class FormSummary extends Component {
 
   _onResize () {
     clearTimeout(this._layoutTimer);
-    this._layoutTimer = setTimeout(this._layout, 200);
+    this._layoutTimer = setTimeout(this._layout, 300);
   }
 
   _load (props) {
@@ -139,16 +138,15 @@ class FormSummary extends Component {
   }
 
   _layout () {
-    const container = findDOMNode(this.refs.container);
-    const child = container.childNodes[0];
-    const height = child.offsetHeight;
-    if (this.state.height !== height) {
-      this.setState({ height });
-      // unset height after a while, this allows forms to be dynamic
-      clearTimeout(this._layoutTimer);
-      this._layoutTimer = setTimeout(
-        () => this.setState({ height: undefined }), 2000);
-    }
+    // const contents = this.refs.contents;
+    // const height = contents.offsetHeight;
+    // if (this.state.height !== height) {
+    //   this.setState({ height });
+    //   // unset height after a while, this allows forms to be dynamic
+    //   clearTimeout(this._layoutTimer);
+    //   this._layoutTimer = setTimeout(
+    //     () => this.setState({ height: undefined }), 600);
+    // }
   }
 
   _onAdd () {
@@ -189,7 +187,7 @@ class FormSummary extends Component {
       const formTemplatePath = `/form-templates/${formTemplate._id}`;
       formTemplateLink = (
         <Link className='form-summary__template' to={formTemplatePath}>
-          template
+          {formTemplate.name}
         </Link>
       );
     }
@@ -249,10 +247,10 @@ class FormSummary extends Component {
     return (
       <div ref="container" className={classes.join(' ')}
         style={{ height }}>
-        {formTemplateLink}
-        <div>
+        <div ref="contents">
           {contents}
         </div>
+        {formTemplateLink}
       </div>
     );
   }

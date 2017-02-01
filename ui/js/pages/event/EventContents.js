@@ -5,7 +5,6 @@ import Section from '../../components/Section';
 import Text from '../../components/Text';
 import Map from '../../components/Map';
 import FormSummary from '../form/FormSummary';
-import PageContext from '../page/PageContext';
 import EventSummary from './EventSummary';
 
 const EventContents = (props) => {
@@ -67,8 +66,6 @@ const EventContents = (props) => {
       {map}
       {form}
       {upcoming}
-      <PageContext
-        filter={event ? { 'sections.eventId': event._id } : undefined} />
     </div>
   );
 };

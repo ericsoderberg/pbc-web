@@ -7,9 +7,9 @@ import EventResources from './EventResources';
 export default class EventFormContents extends Component {
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     return (
-      <div>
+      <div className={className}>
         <EventDetails formState={formState} session={session} />
         <EventResources formState={formState} session={session} />
         <EventDates formState={formState} session={session} />

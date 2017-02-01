@@ -128,11 +128,11 @@ class FormAdd extends Component {
 
       let header;
       if (inline) {
-        header = (
-          <div className='form__text'>
-            <h2>{formTemplate.name}</h2>
-          </div>
-        );
+        // header = (
+        //   <div className='form__text'>
+        //     <h2>{formTemplate.name}</h2>
+        //   </div>
+        // );
       } else {
         header = (
           <PageHeader title={formTemplate.name} actions={headerCancelControl} />

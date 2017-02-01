@@ -48,7 +48,7 @@ export default class PageMap extends Component {
   _renderMap () {
     const rows = this.state.rows.map((row, index) => {
       const pages = row.map(page => {
-        const path = `/pages/${page._id}`;
+        const path = page.path || `/pages/${page._id}`;
         if (this.context.router.isActive(`${path}/map`)) {
           return (
             <Button key={page._id} className="page-map__page"

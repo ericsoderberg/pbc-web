@@ -74,7 +74,7 @@ class PaymentFormContents extends Component {
   }
 
   render () {
-    const { formState, full, session } = this.props;
+    const { className, formState, full, session } = this.props;
     const { form, forms, formTemplate } = this.state;
     const payment = formState.object;
 
@@ -165,7 +165,7 @@ class PaymentFormContents extends Component {
     }
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Amount">
             <div className="box--row">

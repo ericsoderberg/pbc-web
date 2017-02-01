@@ -348,7 +348,7 @@ class FormContents extends Component {
     }
 
     return (
-      <div>
+      <div className='form__contents'>
         {formError}
         {sections}
         {total}

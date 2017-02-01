@@ -95,7 +95,7 @@ export default class UserFormContents extends Component {
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const user = formState.object;
 
     let adminFields;
@@ -187,7 +187,7 @@ export default class UserFormContents extends Component {
       `&userId-name=${encodeURIComponent(user.name)}`;
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={user.name || ''}

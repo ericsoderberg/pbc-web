@@ -53,7 +53,7 @@ export default class FormTemplateFormContents extends Component {
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const { expandedSections } = this.state;
     const formTemplate = formState.object;
 
@@ -157,7 +157,7 @@ export default class FormTemplateFormContents extends Component {
     }
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Form name">
             <input name="name" value={formTemplate.name || ''}

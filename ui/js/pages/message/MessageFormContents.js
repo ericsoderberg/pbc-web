@@ -131,7 +131,7 @@ export default class MessageFormContents extends Component {
   }
 
   render () {
-    const { formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const { domains, libraries } = this.state;
     const message = formState.object;
 
@@ -186,7 +186,7 @@ export default class MessageFormContents extends Component {
     libraryOptions.unshift(<option key={0} />);
 
     return (
-      <div>
+      <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={message.name || ''}
