@@ -8,7 +8,7 @@ export default class SectionEdit extends Component {
     const { children, formState } = this.props;
 
     return (
-      <fieldset className="form__fields">
+      <fieldset className="form__fields section-edit">
         {children}
         <SectionFields formState={formState} />
       </fieldset>

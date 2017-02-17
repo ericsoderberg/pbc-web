@@ -62,11 +62,11 @@
 .form__contents {
   padding: 0 $unit;
 
-  .form__fields:first-child {
+  .form__fields:not(.section-edit):first-child {
     margin-top: 0;
   }
 
-  .form__fields:last-child {
+  .form__fields:not(.section-edit):last-child {
     margin-bottom: 0;
   }
 }
@@ -112,6 +112,19 @@
   .form__fields:last-of-type {
     margin-bottom: 0;
   }
+}
+
+.section-edit {
+  margin: $unit 0;
+}
+
+.section-fields__control {
+  display: block;
+  margin: $half-unit $unit;
+}
+
+.section-item__header {
+  padding-left: $unit;
 }
 
 .form-item {
@@ -260,7 +273,7 @@
 }
 
 .form-item-add {
-  margin-top: $unit;
+  margin: $unit 0;
 }
 
 .form-field-add {

@@ -31,7 +31,7 @@ export default class SectionItem extends Component {
     return (
       <div>
         <div className="form-item">
-          <h5>{`${label} ${index + 1}`}</h5>
+          <h5 className="section-item__header">{`${label} ${index + 1}`}</h5>
           <div className="box--row">
             {raise}
             {lower}

@@ -46,6 +46,7 @@ export default class PageFormContents extends Component {
 
   render () {
     const { className, formState, session } = this.props;
+    const { moreActive } = this.state;
     const page = formState.object;
 
     const sections = (page.sections || []).map((section, index) => (
@@ -58,19 +59,35 @@ export default class PageFormContents extends Component {
         onClick={this._addSection(type)} />
     ));
 
-    let administeredBy;
-    if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
-        <option key={domain._id} label={domain.name} value={domain._id} />
-      ));
-      domains.unshift(<option key={0} />);
-      administeredBy = (
-        <FormField label="Administered by">
-          <select name="domainId" value={page.domainId || ''}
-            onChange={formState.change('domainId')}>
-            {domains}
-          </select>
+    let more;
+    if (moreActive) {
+      more = [
+        <FormField key="path" name="path" label="Path" help="unique url name">
+          <input name="path" value={page.path || ''}
+            onChange={formState.change('path')}/>
         </FormField>
+      ];
+
+      let administeredBy;
+      if (session.administrator) {
+        let domains = this.state.domains.map(domain => (
+          <option key={domain._id} label={domain.name} value={domain._id} />
+        ));
+        domains.unshift(<option key={0} />);
+        administeredBy = (
+          <FormField key="admin" label="Administered by">
+            <select name="domainId" value={page.domainId || ''}
+              onChange={formState.change('domainId')}>
+              {domains}
+            </select>
+          </FormField>
+        );
+        more.push(administeredBy);
+      }
+    } else {
+      more = (
+        <a className="section-fields__control"
+          onClick={() => this.setState({ moreActive: true })}>details</a>
       );
     }
 
@@ -81,11 +98,7 @@ export default class PageFormContents extends Component {
             <input name="name" value={page.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
-          <FormField name="path" label="Path" help="unique url name">
-            <input name="path" value={page.path || ''}
-              onChange={formState.change('path')}/>
-          </FormField>
-          {administeredBy}
+          {more}
         </fieldset>
         {sections}
         <FormFieldAdd>
