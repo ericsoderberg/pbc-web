@@ -111,6 +111,7 @@ const pageSectionSchema = Schema({
 });
 
 const pageSchema = Schema({
+  align: String,
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,

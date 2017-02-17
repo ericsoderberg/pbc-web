@@ -55,8 +55,8 @@ export default class PageContents extends Component {
 
       if ('calendar' !== section.type) {
         contents = (
-          <Section key={index} align='center' full={section.full}
-            color={section.color}
+          <Section key={index} align={page.align || 'center'}
+            full={section.full} color={section.color}
             backgroundImage={section.backgroundImage} plain={section.plain}>
             {contents}
           </Section>

@@ -62,6 +62,13 @@ export default class PageFormContents extends Component {
     let more;
     if (moreActive) {
       more = [
+        <FormField key="align">
+          <input name="align" type="checkbox"
+            checked={page.align !== 'start'}
+            onChange={() => formState.set('align',
+              page.align === 'start' ? 'center' : 'start')} />
+          <label htmlFor="align">center</label>
+        </FormField>,
         <FormField key="path" name="path" label="Path" help="unique url name">
           <input name="path" value={page.path || ''}
             onChange={formState.change('path')}/>

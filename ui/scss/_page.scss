@@ -29,6 +29,18 @@
       margin-left: auto;
       margin-right: auto;
     }
+
+    &.text {
+      li {
+        margin: 0;
+        padding: $unit $unit $unit $double-unit;
+        border-top: 1px solid $border-color;
+
+        &:last-child {
+          border-bottom: 1px solid $border-color;
+        }
+      }
+    }
   }
 }
 
@@ -78,6 +90,30 @@
       @media all and (min-width: 700px) {
         padding-left: 0;
         padding-right: 0;
+      }
+    }
+  }
+
+  &.text {
+    ul {
+      padding: 0;
+      list-style-type: none;
+    }
+
+    li {
+      position: relative;
+      margin: $unit 0;
+      padding-left: $double-unit;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: calc(50% - #{$quarter-unit});
+        left: $half-unit;
+        height: $half-unit;
+        width: $half-unit;
+        border-radius: $quarter-unit;
+        background-color: $border-color;
       }
     }
   }
