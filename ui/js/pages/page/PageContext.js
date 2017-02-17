@@ -27,7 +27,7 @@ export default class PageContext extends Component {
     if (filter) {
       getItems('pages', {
         filter: filter,
-        select: 'name'
+        select: 'name path'
       })
       .then(pages => {
         if (! this._unmounted) {
