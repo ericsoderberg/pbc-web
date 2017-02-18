@@ -32,18 +32,32 @@ export default class MessageItem extends Component {
     }
     const date = moment(message.date);
 
+    let linkContents;
+    if (message.series) {
+      linkContents = (
+        <div className="message-item__series-header">
+          <label className='tertiary'>Series</label>
+          <h2>{message.name}</h2>
+        </div>
+      );
+    } else {
+      linkContents = [
+        <div key="1">
+          <div className="item__name">{message.name}</div>
+          <div className="secondary">{message.verses}</div>
+        </div>,
+        <div key="2">
+          <div className="tertiary">{date.format('MMM Do YYYY')}</div>
+          <div className="secondary">{message.author}</div>
+        </div>
+      ];
+    }
+
     const link = (
       <Link className={classNames.join(' ')}
         to={`/messages/${message.path || message._id}`}>
         <div className="item message-item">
-          <div>
-            <div className="item__name">{message.name}</div>
-            <div className="secondary">{message.verses}</div>
-          </div>
-          <div>
-            <div className="tertiary">{date.format('MMM Do YYYY')}</div>
-            <div className="secondary">{message.author}</div>
-          </div>
+          {linkContents}
         </div>
       </Link>
     );

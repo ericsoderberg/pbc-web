@@ -78,21 +78,28 @@ export default class LibrarySummary extends Component {
     }
 
     let messageItem;
+    let seriesItem;
     if (message) {
-      messageItem = (
-        <MessageItem item={message} />
-      );
+      if (message.message) {
+        messageItem = <MessageItem item={message.message} />;
+        seriesItem = <MessageItem item={message.series} />;
+      } else {
+        messageItem = <MessageItem item={message} />;
+      }
     }
 
     return (
       <div className={classes.join(' ')}>
         <div className="library-summary__library">
           <Link to={`/libraries/${library.path || library._id}`}>
-            <h2>Message Library</h2><RightIcon />
+            <h2>{library.name} Library</h2><RightIcon />
           </Link>
         </div>
         <div className="library-summary__message">
           {messageItem}
+        </div>
+        <div className="library-summary__message">
+          {seriesItem}
         </div>
       </div>
     );

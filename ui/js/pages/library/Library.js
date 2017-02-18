@@ -1,12 +1,14 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import moment from 'moment';
+// import moment from 'moment';
 import { getItem, getItems } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
 import MessageItem from '../message/MessageItem';
 import Stored from '../../components/Stored';
+// import UpIcon from '../../icons/Up';
+// import DownIcon from '../../icons/Down';
 
 class LibraryMessageItem extends MessageItem {};
 LibraryMessageItem.defaultProps = {
@@ -48,15 +50,15 @@ class Library extends Component {
       result = <Loading />;
     } else {
 
-      const marker = {
-        property: 'date',
-        value: moment().startOf('day').toISOString(),
-        label: (
-          <div className="marker">
-            <span>Today</span><span>{moment().format('MMM Do YYYY')}</span>
-          </div>
-        )
-      };
+      // const marker = {
+      //   property: 'date',
+      //   value: moment().startOf('day').toISOString(),
+      //   label: (
+      //     <div className="marker">
+      //       <span>future <UpIcon /></span><span>past <DownIcon /></span>
+      //     </div>
+      //   )
+      // };
 
       const controls = (pages || []).map(page => (
         <Link key={page.name} to={page.path || `/pages/${page._id}`}>
@@ -76,8 +78,8 @@ class Library extends Component {
         <List location={location} homer={true}
           category="messages" title={`${library.name} Library`} path="/messages"
           filter={{ libraryId: library._id }}
-          select="name path verses date author" sort="-date"
-          Item={LibraryMessageItem} marker={marker}
+          select="name path verses date author series" sort="-date"
+          Item={LibraryMessageItem}
           addIfFilter="libraryId" actions={controls} />
       );
     }

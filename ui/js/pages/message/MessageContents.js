@@ -56,6 +56,11 @@ export default class MessageContents extends Component {
   render () {
     const message = this.props.item;
 
+    let upcoming;
+    if (! message.series && moment(message.date).isAfter(moment())) {
+      upcoming = <span> - upcoming</span>;
+    }
+
     let video;
     if (message.videoUrl) {
       video = <Video url={message.videoUrl} full={true} />;
@@ -109,51 +114,41 @@ export default class MessageContents extends Component {
         <MessageItem key={message._id} item={message} />
       ));
       seriesMessages = [
-        <Text key="header" text="## Messages" />,
         <div key="list" className="list">
           {messages}
         </div>
       ];
     }
 
-    let nextMessage;
-    if (message.nextMessage) {
-      nextMessage = this._renderMessageNav(message.nextMessage, 'next');
-    } else {
-      nextMessage = <span />;
-    }
+    let footer;
+    if (message.nextMessage || message.previousMessage) {
+      let nextMessage;
+      if (message.nextMessage) {
+        nextMessage = this._renderMessageNav(message.nextMessage, 'next');
+      } else {
+        nextMessage = <span />;
+      }
 
-    let previousMessage;
-    if (message.previousMessage) {
-      previousMessage =
-        this._renderMessageNav(message.previousMessage, 'previous');
-    } else {
-      previousMessage = <span />;
+      let previousMessage;
+      if (message.previousMessage) {
+        previousMessage =
+          this._renderMessageNav(message.previousMessage, 'previous');
+      } else {
+        previousMessage = <span />;
+      }
+
+      footer = (
+        <Section full={true}>
+          <div className="message__nav footer">
+            {previousMessage}
+            {nextMessage}
+          </div>
+        </Section>
+      );
     }
 
     let attributes;
     if (this.props.attributes) {
-
-      // let date;
-      // if (message.date) {
-      //   // The date could be a partial string, a moment object,
-      //   // or an ISO-8601 string
-      //   let dateProperty = message.date;
-      //   if (typeof dateProperty === 'string') {
-      //     if (dateProperty.match(/.+T.+Z/)) {
-      //       dateProperty = moment(dateProperty);
-      //     } else {
-      //       // match MessageFormContents
-      //       dateProperty = moment(dateProperty, 'M/D/YYYY');
-      //     }
-      //   }
-      //   if (dateProperty) {
-      //     date = [
-      //       <dt key="t">Date</dt>,
-      //       <dd key="d">{dateProperty.format('MMMM Do YYYY')}</dd>
-      //     ];
-      //   }
-      // }
 
       let series;
       if (message.seriesId) {
@@ -178,32 +173,24 @@ export default class MessageContents extends Component {
 
     return (
       <div>
-        {video}
+        {video || image}
         <header className='message__header'>
-          <div>
-            <h1>{message.name}</h1>
-            <div className="secondary">{message.verses}</div>
+          <h1>{message.name}</h1>
+          <div className="secondary">{message.verses}</div>
+          <div className="tertiary">
+            {moment(message.date).format('MMM Do YYYY')}
+            {upcoming}
           </div>
-          <div>
-            <div className="tertiary">
-              {moment(message.date).format('MMM Do YYYY')}
-            </div>
-            <div className="secondary">{message.author}</div>
-          </div>
+          <div className="secondary">{message.author}</div>
         </header>
 
         {audio}
-        {image}
+        {! video ? null : image}
         {text}
         {seriesMessages}
         {files}
         {attributes}
-        <Section full={true}>
-          <div className="message__nav footer">
-            {previousMessage}
-            {nextMessage}
-          </div>
-        </Section>
+        {footer}
       </div>
     );
   }

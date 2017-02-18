@@ -48,15 +48,14 @@ const populatePage = (page) => {
       })
       .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
       .then(message => {
-        // if (message && message.seriesId) {
-        //   // get series instead
-        //   return (
-        //     Message.findOne({ _id: message.seriesId })
-        //     .select(PAGE_MESSAGE_FIELDS).exec()
-        //   );
-        // } else {
-        return message;
-        // }
+        if (message && message.seriesId) {
+          // get series also
+          return Message.findOne({ _id: message.seriesId })
+          .select(PAGE_MESSAGE_FIELDS).exec()
+          .then(series => ({ message, series }));
+        } else {
+          return message;
+        }
       })
     );
   });

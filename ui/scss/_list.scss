@@ -7,6 +7,7 @@
 
 .list__marker {
   background-color: $hover-background;
+  padding: 0 $unit;
 }
 
 .list__count {
@@ -106,8 +107,8 @@ button.item__container {
 }
 
 .item--primary {
-  border-top: $half-unit solid $nav-background-color;
-  border-bottom: $half-unit solid $nav-background-color;
+  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
 }
 
 .box--row {

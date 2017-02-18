@@ -260,6 +260,11 @@ dd {
 
 .dark-background {
   color: $color-on-dark;
+
+  .secondary,
+  .tertiary {
+    color: inherit;
+  }
 }
 
 $fonts-path: "https://fonts.gstatic.com/s/worksans/v2";

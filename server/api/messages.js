@@ -28,7 +28,7 @@ const populateMessage = (message) => {
 
   // seriesMessages
   const seriesMessagesPromise = Doc.find({ seriesId: message.id })
-  .select(subFields).exec();
+  .sort('date').select(subFields).exec();
 
   return Promise.all([Promise.resolve(message), nextPromise,
     previousPromise, seriesMessagesPromise])
