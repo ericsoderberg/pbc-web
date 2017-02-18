@@ -60,7 +60,7 @@ export default class PageSummaries extends Component {
         link = (
           <Link key={index} className="page-tile page-summary" to={path}
             style={style}>
-            <Image image={pageRef.image} plain={true} />
+            <Image image={pageRef.image} />
             <Button>{page.name}</Button>
           </Link>
         );

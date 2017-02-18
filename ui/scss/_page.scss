@@ -207,6 +207,12 @@
   max-height: round($unit * 12);
 }
 
+.image--full {
+  width: 100%;
+  height: round($unit * 12);
+  object-fit: cover;
+}
+
 .map {
   position: relative;
   min-height: round($unit * 8);
