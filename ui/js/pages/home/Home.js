@@ -152,7 +152,7 @@ class Home extends Component {
       .forEach(section => {
         const library = section.libraryId;
         let path = `/libraries/${library.path || library._id}`;
-        links.push(<Link key={path} to={path}>{library.name}</Link>);
+        links.push(<Link key={path} to={path}>Library</Link>);
       });
 
     }
