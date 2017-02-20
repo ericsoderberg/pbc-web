@@ -153,7 +153,8 @@ export default function (router) {
       docs.forEach(doc => {
         let children = [];
         doc.sections.filter(s => 'pages' === s.type)
-        .forEach(s => s.pages.forEach(p => children.push(p.id._id)));
+        .forEach(s => s.pages.filter(p => p.id)
+          .forEach(p => children.push(p.id._id)));
         let page = { _id: doc._id, children: children, name: doc.name };
         pages[doc._id] = page;
       });
@@ -167,7 +168,10 @@ export default function (router) {
       return map;
     })
     .then(map => res.status(200).json(map))
-    .catch(error => res.status(400).json(error));
+    .catch(error => {
+      console.log('!!!', error);
+      res.status(400).json(error);
+    });
   });
 
   router.post('/pages/publicize', (req, res) => {
