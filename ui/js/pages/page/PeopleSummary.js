@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import markdownToJSX from 'markdown-to-jsx';
+import Markdown from 'markdown-to-jsx';
 import { getItem } from '../../actions';
 import Image from '../../components/Image';
 
@@ -67,7 +67,9 @@ export default class PeopleSummary extends Component {
           {image}
           <div className="person-summary__summary">
             <h2>{user.name}</h2>
-            {markdownToJSX(person.text || '')}
+            <Markdown>
+              {person.text}
+            </Markdown>
           </div>
         </Link>
       );

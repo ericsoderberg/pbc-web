@@ -6,7 +6,8 @@ var PRODUCTION = (mode === 'production');
 var DEVELOPMENT = (mode === 'development');
 
 var plugins = [new webpack.ProvidePlugin({
-  'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+  'fetch':
+    'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
 })];
 if (PRODUCTION) {
   // plugins.push(new webpack.optimize.OccurenceOrderPlugin());
@@ -16,9 +17,7 @@ if (PRODUCTION) {
     }
   }));
   plugins.push(new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      warnings: false
-    }
+    sourceMap: true
   }));
 } else if (DEVELOPMENT) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
@@ -43,45 +42,53 @@ const config = {
   devServer: DEVELOPMENT ? {
     hot: true,
     proxy: {
-      "/api/*": 'http://localhost:8091',
-      "/file/*": 'http://localhost:8091'
+      '/api/*': 'http://localhost:8091',
+      '/file/*': 'http://localhost:8091'
     }
   } : undefined,
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
-        loader: 'babel',
+        use: 'babel-loader',
         exclude: /(node_modules|ui\/lib)/
       },
       {
-        test: /\.json$/,
-        loader: 'json-loader'
-      },
-      {
         test: /\.svg$/,
-        loader: 'file-loader?mimetype=image/svg'
+        use: [{
+          loader: 'file-loader',
+          options: { mimetype: 'image/svg' }
+        }]
       },
       {
         test: /\.jpg$/,
-        loader: 'file-loader?mimetype=image/jpg'
+        use: [{
+          loader: 'file-loader',
+          options: { mimetype: 'image/jpg' }
+        }]
       },
       {
         test: /\.png$/,
-        loader: 'file-loader?mimetype=image/png'
+        use: [{
+          loader: 'file-loader',
+          options: { mimetype: 'image/png' }
+        }]
       },
       {
         test: /\.woff$/,
-        loader: 'file-loader?mimetype=application/font-woff'
+        use: [{
+          loader: 'file-loader',
+          options: { mimetype: 'application/font-woff' }
+        }]
       },
       {
         test: /\.scss$/,
-        loaders: ["style", "css", "sass"]
+        use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.css$/,
-        loaders: ["style", "css"]
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
@@ -90,7 +97,7 @@ const config = {
 
   resolve : {
     extensions:
-      ['', '.js', '.json', '.html', '.html', '.scss', '.md', '.svg']
+      ['.js', '.json', '.html', '.html', '.scss', '.md', '.svg']
   }
 
 };

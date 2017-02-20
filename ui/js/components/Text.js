@@ -1,6 +1,6 @@
 "use strict";
 import React, { PropTypes } from 'react';
-import markdownToJSX from 'markdown-to-jsx';
+import Markdown from 'markdown-to-jsx';
 
 const Text = (props) => {
   const { className, text } = props;
@@ -13,7 +13,9 @@ const Text = (props) => {
   const stripped = content.replace(/(<([^>]+)>)/ig,"");
   return (
     <div className={classes.join(' ')}>
-      {markdownToJSX(stripped)}
+      <Markdown>
+        {stripped}
+      </Markdown>
     </div>
   );
 };

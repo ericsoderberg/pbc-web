@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-import markdownToJSX from 'markdown-to-jsx';
+import Markdown from 'markdown-to-jsx';
 import { getItem, getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
@@ -88,7 +88,7 @@ class PaymentFormContents extends Component {
     if ('check' === payment.method && formTemplate) {
       checkInstructions = (
         <div className="form-field__text">
-          {markdownToJSX(formTemplate.payByCheckInstructions || '')}
+          <Markdown>{formTemplate.payByCheckInstructions || ''}</Markdown>
         </div>
       );
     }
