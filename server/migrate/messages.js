@@ -8,7 +8,7 @@ import results from './results';
 
 // Message
 
-const LIBRARY_NAME = 'Sermons';
+const LIBRARY_NAME = 'Sermon';
 
 function normalizeOldFile (item) {
   item._id = new mongoose.Types.ObjectId();
