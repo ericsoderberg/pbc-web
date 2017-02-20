@@ -5,10 +5,19 @@ var mode = process.env.NODE_ENV || 'production';
 var PRODUCTION = (mode === 'production');
 var DEVELOPMENT = (mode === 'development');
 
-var plugins = [new webpack.ProvidePlugin({
-  'fetch':
-    'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
-})];
+var plugins = [
+  new webpack.ProvidePlugin({
+    'fetch':
+      'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+  }),
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    minChunks: function (module) {
+      // this assumes your vendor imports exist in the node_modules directory
+      return module.context && module.context.indexOf('node_modules') !== -1;
+    }
+  })
+];
 if (PRODUCTION) {
   // plugins.push(new webpack.optimize.OccurenceOrderPlugin());
   plugins.push(new webpack.DefinePlugin({
@@ -25,16 +34,13 @@ if (PRODUCTION) {
 
 const config = {
   entry: {
-    app: [
-      // 'webpack-dev-server/client?http://localhost8080/',
-      // 'webpack/hot/only-dev-server',
-      './ui/js/index'
-    ]
+    app: './ui/js/index',
+    vendor: ['react-dom', 'react', 'moment', 'leaflet']
   },
 
   output: {
-    filename: 'index.js',
-    path: path.join(__dirname, 'dist'),
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '/'
   },
 
