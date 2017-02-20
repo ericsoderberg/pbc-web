@@ -175,7 +175,7 @@ export default class Audio extends Component {
       <Section color={color} full={full} plain={plain}>
         <div className={classes.join(' ')}>
           <audio ref="audio" preload="metadata">
-            <source src={path} type={file.type} />
+            <source src={path} type={'audio/mpeg' || file.type} />
             No audio with this browser
           </audio>
           <span className="audio__control">
