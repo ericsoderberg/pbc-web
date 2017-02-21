@@ -244,7 +244,7 @@ class FormContents extends Component {
     if ('instructions' === templateField.type) {
       result = (
         <div key={index} className="form__text">
-          <Markdown>(templateField.help}</Markdown>
+          <Markdown>{templateField.help}</Markdown>
         </div>
       );
     } else {
