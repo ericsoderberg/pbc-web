@@ -488,7 +488,10 @@ a.event-summary__text {
 
 .page-summaries {
   @media all and (min-width: 700px) {
-    justify-content: center;
+
+    .section__container--center & {
+      justify-content: center;
+    }
 
     > * {
       margin: $unit;
@@ -513,9 +516,12 @@ a.event-summary__text {
 
 .people-summaries {
   @media all and (min-width: 700px) {
-    justify-content: center;
     align-items: start;
     margin: 0 auto;
+
+    .section__container--center & {
+      justify-content: center;
+    }
 
     > * {
       padding: $half-unit;

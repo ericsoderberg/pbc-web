@@ -68,7 +68,7 @@ export default class PeopleSummary extends Component {
           <div className="person-summary__summary">
             <h2>{user.name}</h2>
             <Markdown>
-              {person.text}
+              {person.text || ''}
             </Markdown>
           </div>
         </Link>

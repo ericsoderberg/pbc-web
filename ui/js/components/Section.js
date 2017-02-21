@@ -100,7 +100,7 @@ export default class Section extends Component {
 }
 
 Section.propTypes = {
-  align: PropTypes.oneOf(['center', 'left', 'right']),
+  align: PropTypes.oneOf(['center', 'start', 'end']),
   backgroundImage: PropTypes.shape({
     data: PropTypes.string.isRequired
   }),
