@@ -310,7 +310,7 @@
   //   text-align: center;
   // }
 
-  .event-times__separator {
+  .event-times > .event-times__separator {
     display: none;
   }
 
@@ -629,7 +629,7 @@ a.event-summary__text {
 
 .event-times__separator {
   margin: 0 $half-unit;
-  color: $tertiary-color;
+  color: $secondary-color;
 }
 
 .event-times__date {
