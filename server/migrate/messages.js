@@ -1,6 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
+import moment from 'moment';
 import '../db';
 import { imageData, loadCategoryObject, loadCategoryArray, copyFile }
   from './utils';
@@ -271,7 +272,9 @@ export default function () {
       seriesMessages.forEach(seriesMessage => {
         Message.findOne({ seriesId: seriesMessage.id }).sort('-date').exec()
         .then(message => {
-          seriesMessage.date = message.date;
+          // ensure series comes after message
+          seriesMessage.date =
+            moment(message.date).add(1, 'hour').toISOString();
           seriesPromises.push(seriesMessage.save()
             .catch(error => console.log(error)));
         });

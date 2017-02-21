@@ -16,7 +16,7 @@ export default class MessageItem extends Component {
     const { detailsForMostRecent, item: message } = this.props;
     const date = moment(message.date);
     const now = moment().startOf('day').subtract(1, 'minute');
-    if (detailsForMostRecent &&
+    if (detailsForMostRecent && ! message.series &&
       date.isBetween(moment(now).subtract(7, 'days'), now, 'day')) {
       getItem('messages', message._id)
       .then(message => this.setState({ message: message }))

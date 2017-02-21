@@ -74,7 +74,7 @@ button.item__container {
 
 .item {
   display: flex;
-  max-width: $page-width;
+  max-width: $page-width + $double-unit;
   margin: 0 auto;
 
   @media all and (min-width: 700px) {
@@ -109,6 +109,10 @@ button.item__container {
 .item--primary {
   border-top: 1px solid $border-color;
   border-bottom: 1px solid $border-color;
+
+  > .item__container {
+    background-color: $secondary-background-color;
+  }
 }
 
 .box--row {
