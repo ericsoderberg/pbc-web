@@ -54,6 +54,28 @@ function normalizeMessage (item, mainLibrary, authors, messageFiles,
   item.text = item.description || undefined;
   item.author = authors[item.author_id].name;
   item.dpId = item.dpid || undefined;
+
+  // normalize verses, remove abbreviations
+  item.verses = item.verses.replace('Gen ', 'Genesis ');
+  item.verses = item.verses.replace('Num ', 'Numbers ');
+  item.verses = item.verses.replace('Deut ', 'Deuteronomy ');
+  item.verses = item.verses.replace('Sam ', 'Samuel ');
+  item.verses = item.verses.replace('Chr ', 'Chronicles ');
+  item.verses = item.verses.replace('Pro ', 'Proverbs ');
+  item.verses = item.verses.replace('Eccl. ', 'Ecclesiastes ');
+  item.verses = item.verses.replace('Isa ', 'Isaiah ');
+  item.verses = item.verses.replace('Hab ', 'Habakkuk ');
+  item.verses = item.verses.replace('Rom ', 'Romans ');
+  item.verses = item.verses.replace('Cor ', 'Corinthians ');
+  item.verses = item.verses.replace('Cor.', 'Corinthians');
+  item.verses = item.verses.replace('Eph ', 'Ephesians ');
+  item.verses = item.verses.replace('Col ', 'Colossians ');
+  item.verses = item.verses.replace('Thes ', 'Thessalonians ');
+  item.verses = item.verses.replace('Tim ', 'Timothy ');
+  item.verses = item.verses.replace('Heb ', 'Hebrews ');
+  item.verses = item.verses.replace('Pet ', 'Peter ');
+  item.verses = item.verses.replace('Rev ', 'Revelation ');
+
   if (item.image_file_name) {
     item.image = {
       data: imageData('images', item.id, item.image_file_name,
@@ -63,23 +85,35 @@ function normalizeMessage (item, mainLibrary, authors, messageFiles,
       type: item.image_content_type
     };
   }
+
   if (item.message_set_id) {
     item.seriesId = messageSets[item.message_set_id]._id;
   }
+
   item.files = (messageFiles[item.id] || [])
   .filter(item2 => item2 && item2.name)
-  .map(item2 => ({
-    _id: item2._id,
-    label: item2.label,
-    name: item2.name,
-    size: item2.size,
-    type: item2.type
-  }));
+  .map((item2) => {
+    let label;
+    if (item2.name.indexOf('_SQ_') !== -1) {
+      label = 'Questions';
+    } else if (item2.name.indexOf('_WEB_Format') !== -1) {
+      label = 'Message';
+    }
+    return {
+      _id: item2._id,
+      label: item2.label || label,
+      name: item2.name,
+      size: item2.size,
+      type: item2.type
+    };
+  });
+
   (messageFiles[item.id] || []).forEach(item2 => {
     if (item2 && item2.vimeo_id) {
       item.videoUrl = `https://vimeo.com/${item2.vimeo_id}`;
     }
   });
+
   return item;
 }
 
@@ -198,7 +232,7 @@ export default function () {
     return Promise.all(messagePromises);
   })
   // Once we've got all of the messages set up,
-  // set the date for series messages to the date of the first message
+  // set the date for series messages to the date of the last message
   // in the series
   .then(() => {
     console.log('!!! load series');
@@ -206,7 +240,7 @@ export default function () {
     .then(seriesMessages => {
       let seriesPromises = [];
       seriesMessages.forEach(seriesMessage => {
-        Message.findOne({ seriesId: seriesMessage.id }).sort('date').exec()
+        Message.findOne({ seriesId: seriesMessage.id }).sort('-date').exec()
         .then(message => {
           seriesMessage.date = message.date;
           seriesPromises.push(seriesMessage.save()

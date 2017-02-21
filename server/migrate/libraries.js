@@ -31,12 +31,14 @@ function normalizeAudioMessage (item, library, oldFile) {
   item.libraryId = library._id;
   item.name = item.caption || item.verses || undefined;
   item.text = item.description || undefined;
-  item.files = [{
-    _id: oldFile._id,
-    name: oldFile.name,
-    size: oldFile.size,
-    type: oldFile.type
-  }];
+  if (oldFile) {
+    item.files = [{
+      _id: oldFile._id,
+      name: oldFile.name,
+      size: oldFile.size,
+      type: oldFile.type
+    }];
+  }
   return item;
 }
 
