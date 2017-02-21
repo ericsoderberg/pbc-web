@@ -31,6 +31,7 @@ function normalizeMessageSet (item, mainLibrary, authors) {
   item.path = item.url || undefined;
   item.text = item.description || undefined;
   item.author = item.author_id ? authors[item.author_id].name : undefined;
+
   if (item.image_file_name) {
     item.image = {
       data: imageData('images', item.id, item.image_file_name,
@@ -40,6 +41,34 @@ function normalizeMessageSet (item, mainLibrary, authors) {
       type: item.image_content_type
     };
   }
+
+  // prevent path colisions with single messages
+  if (item.path === 'behind-the-scenes-of-history') {
+    item.path = 'behind-the-scenes-of-history-series';
+  } else if (item.path === 'the-tongues-question') {
+    item.path = 'the-tongues-question-series';
+  } else if (item.path === 'the-power-of-the-gospel') {
+    item.path = 'the-power-of-the-gospel-series';
+  } else if (item.path === 'life-lessons') {
+    item.path = 'life-lessons-series';
+  } else if (item.path === 'body-life') {
+    item.path = 'body-life-series';
+  } else if (item.path === 'let-god-be-god') {
+    item.path = 'let-god-be-god-series';
+  } else if (item.path === 'life-together') {
+    item.path = 'life-together-series';
+  } else if (item.path === 'a-womans-worth') {
+    item.path = 'a-womans-worth-series';
+  } else if (item.path === 'a-womans-worth') {
+    item.path = 'a-womans-worth-series';
+  } else if (item.path === 'the-surpassing-value-of-knowing-christ') {
+    item.path = 'the-surpassing-value-of-knowing-christ-series';
+  } else if (item.path === 'great-is-thy-faithfulness') {
+    item.path = 'great-is-thy-faithfulness-series';
+  } else if (item.path === 'when-kingdoms-collide') {
+    item.path = 'when-kingdoms-collide-series';
+  }
+
   return item;
 }
 

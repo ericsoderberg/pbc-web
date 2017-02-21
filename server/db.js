@@ -37,7 +37,7 @@ const userSchema = Schema({
   modified: Date,
   name: {type: String, required: true},
   oldId: Number,
-  path: String,
+  path: {type: String, unique: true, sparse: true},
   phone: String,
   relations: [{
     birthday: Date,
@@ -117,7 +117,7 @@ const pageSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: String,
+  path: {type: String, unique: true, sparse: true},
   public: Boolean,
   sections: [pageSectionSchema],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
@@ -134,7 +134,7 @@ const calendarSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true},
-  path: String,
+  path: {type: String, unique: true, sparse: true},
   public: Boolean,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
@@ -154,7 +154,7 @@ const eventSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: String,
+  path: {type: String, unique: true, sparse: true},
   // set in one-off cases
   primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' },
   public: Boolean,
@@ -296,7 +296,7 @@ const librarySchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true},
-  path: String,
+  path: {type: String, unique: true, sparse: true},
   podcast: podcastSchema,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
@@ -323,7 +323,7 @@ const messageSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: String,
+  path: {type: String, unique: true, sparse: true},
   series: Boolean,
   seriesId: { type: Schema.Types.ObjectId, ref: 'Message' },
   text: String,
