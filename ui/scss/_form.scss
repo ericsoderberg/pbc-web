@@ -929,3 +929,36 @@
     min-width: 100%;
   }
 }
+
+.text-help {
+  position: relative;
+
+  span {
+    cursor: pointer;
+    text-align: right;
+  }
+}
+
+.text-help__drop {
+  display: none;
+  position: absolute;
+  bottom: $unit;
+  right: -$half-unit;
+  margin: 0;
+  text-align: left;
+  padding: $half-unit;
+  border: 1px solid $border-color;
+  background-color: $secondary-background-color;
+
+  span {
+    display: block;
+    cursor: pointer;
+    text-align: right;
+  }
+}
+
+.text-help--active {
+  .text-help__drop {
+    display: block;
+  }
+}
