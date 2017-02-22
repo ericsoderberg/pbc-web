@@ -149,7 +149,7 @@ class List extends Component {
 
   _onSearch (event) {
     const searchText = event.target.value;
-    this._setLocation({ searchText: searchText, loading: true });
+    this._setLocation({ searchText, loading: true });
   }
 
   _filter (property) {

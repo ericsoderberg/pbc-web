@@ -1,11 +1,72 @@
 "use strict";
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
+import { execFile, spawn } from 'child_process';
 import { authorize, authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
-const MAILMAN_DIR = process.env.MAILMAN_DIR || '/usr/lib/mailman/bin';
+// const MAILMAN_DIR = process.env.MAILMAN_DIR || '/usr/lib/mailman/bin';
+const MAILMAN_ADMIN = process.env.MAILMAN_ADMIN || 'eric_soderberg@pbc.org';
+const MAILMAN_ADMIN_PASSWORD = process.env.MAILMAN_ADMIN_PASSWORD || '12345678';
+
+const addList = (name) => {
+  return new Promise((resolve, reject) => {
+    execFile('newlist', ['-a', name, MAILMAN_ADMIN, MAILMAN_ADMIN_PASSWORD],
+      (error, stdout, stderr) => {
+        if (error) {
+          console.log('!!! new error', error);
+          return reject(error);
+        }
+        console.log('!!! new output', stdout);
+        return resolve();
+      });
+  });
+};
+
+const removeList = (name) => {
+  return new Promise((resolve, reject) => {
+    execFile('rmlist', ['-a', name],
+      (error, stdout, stderr) => {
+        if (error) {
+          console.log('!!! rm error', error);
+          return reject(error);
+        }
+        console.log('!!! rm output', stdout);
+        return resolve();
+      });
+  });
+};
+
+const addAddresses = (listName, addresses) => {
+  return new Promise((resolve, reject) => {
+    const cmd = spawn('add_members', ['-r', '-', listName]);
+    cmd.stdin.write(addresses.join("\n"));
+    cmd.stdin.end();
+    cmd.on('close', (code) => {
+      if (code !== 0) {
+        console.log('!!! add_members process exited with', code);
+        return reject(code);
+      }
+      return resolve();
+    });
+  });
+};
+
+const removeAddresses = (listName, addresses) => {
+  return new Promise((resolve, reject) => {
+    const cmd = spawn('remove_members', ['-f', '-', listName]);
+    cmd.stdin.write(addresses.join("\n"));
+    cmd.stdin.end();
+    cmd.on('close', (code) => {
+      if (code !== 0) {
+        console.log('!!! remove_members process exited with', code);
+        return reject(code);
+      }
+      return resolve();
+    });
+  });
+};
 
 // /api/email-lists
 
@@ -23,7 +84,9 @@ const populateEmailList = (emailList) => {
     let emailListData = docs[0].toObject();
     emailListData.addresses.forEach((address, index) => {
       const user = docs[1 + index];
-      address.userId = { _id: user._id, name: user.name };
+      if (user) {
+        address.userId = { _id: user._id, name: user.name };
+      }
     });
     emailListData.addresses.sort((a, b) => {
       const aa = a.address.toLowerCase();
@@ -49,8 +112,20 @@ export default function (router) {
         return emailList;
       }
     },
+    post: {
+      transformOut: (emailList, req) => {
+        return addList(emailList.name)
+        .then(() => emailList);
+      }
+    },
     put: {
       transformIn: unsetDomainIfNeeded
+    },
+    delete: {
+      deleteRelated: (emailList, req) => {
+        return removeList(emailList.name)
+        .then(() => emailList);
+      }
     }
   });
 
@@ -74,8 +149,8 @@ export default function (router) {
       doc.modified = new Date();
       return doc.save();
     })
+    .then(doc => addAddresses(doc.name, req.body))
     .then(doc => res.status(200).send())
-    // TODO: update mailman
     .catch(error => res.status(400).json(error));
   });
 
@@ -98,6 +173,7 @@ export default function (router) {
       doc.modified = new Date();
       return doc.save();
     })
+    .then(doc => removeAddresses(doc.name, req.body))
     .then(doc => res.status(200).send())
     .catch(error => res.status(400).json(error));
   });

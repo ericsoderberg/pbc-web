@@ -1,14 +1,11 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
-// import moment from 'moment';
 import { getItem, getItems } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
 import MessageItem from '../message/MessageItem';
 import Stored from '../../components/Stored';
-// import UpIcon from '../../icons/Up';
-// import DownIcon from '../../icons/Down';
 
 class LibraryMessageItem extends MessageItem {};
 LibraryMessageItem.defaultProps = {
@@ -30,12 +27,12 @@ class Library extends Component {
     const { params: { id } } = this.props;
     getItem('libraries', id)
     .then(library => {
-      this.setState({ library: library });
+      this.setState({ library });
       getItems('pages', {
         filter: { 'sections.libraryId': library._id },
         select: 'name'
       })
-      .then(pages => this.setState({ pages: pages }))
+      .then(pages => this.setState({ pages }))
       .catch(error => console.log('!!! Library pages catch', error));
     })
     .catch(error => console.log('!!! Library catch', error));
@@ -49,16 +46,6 @@ class Library extends Component {
     if (! library) {
       result = <Loading />;
     } else {
-
-      // const marker = {
-      //   property: 'date',
-      //   value: moment().startOf('day').toISOString(),
-      //   label: (
-      //     <div className="marker">
-      //       <span>future <UpIcon /></span><span>past <DownIcon /></span>
-      //     </div>
-      //   )
-      // };
 
       const controls = (pages || []).map(page => (
         <Link key={page.name} to={page.path || `/pages/${page._id}`}>

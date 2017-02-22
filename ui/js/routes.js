@@ -12,6 +12,7 @@ import EmailLists from './pages/emailList/EmailLists';
 import EmailListAdd from './pages/emailList/EmailListAdd';
 import EmailList from './pages/emailList/EmailList';
 import EmailListEdit from './pages/emailList/EmailListEdit';
+import EmailListSubscribe from './pages/emailList/EmailListSubscribe';
 import Events from './pages/event/Events';
 import EventAdd from './pages/event/EventAdd';
 import Event from './pages/event/Event';
@@ -84,6 +85,7 @@ export default {
     { path: 'email-lists/add', component: EmailListAdd },
     { path: 'email-lists/:id', component: EmailList },
     { path: 'email-lists/:id/edit', component: EmailListEdit },
+    { path: 'email-lists/:id/subscribe', component: EmailListSubscribe },
     { path: 'email-lists', component: EmailLists },
     { path: 'events/add', component: EventAdd },
     { path: 'events/:id', component: Event },

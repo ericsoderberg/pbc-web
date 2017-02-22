@@ -7,6 +7,6 @@ export default class EmailListEdit extends Edit {};
 EmailListEdit.defaultProps = {
   category: 'email-lists',
   FormContents: EmailListFormContents,
-  removeBackLevel: 1,
+  removeBackLevel: 2,
   title: 'Edit Email List'
 };
