@@ -1,5 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
 import register from './register';

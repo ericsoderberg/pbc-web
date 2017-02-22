@@ -1,5 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';

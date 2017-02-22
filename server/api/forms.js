@@ -1,5 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
 import hat from 'hat';
 import moment from 'moment';
 import { authorize, authorizedForDomainOrSelf } from './auth';

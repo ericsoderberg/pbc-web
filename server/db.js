@@ -1,5 +1,6 @@
 "use strict";
 import mongoose, { Schema } from 'mongoose';
+mongoose.Promise = global.Promise;
 const { Types: { ObjectId } } = Schema;
 
 const DATABASE = process.env.DATABASE || 'pbc';

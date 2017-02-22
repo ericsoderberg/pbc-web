@@ -1,9 +1,17 @@
 "use strict";
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
+
+const ALLOWED_POST_ORIGINS =
+  ['https://www.pbc.org', 'https://test.pbc.org', 'http://localhost:8080'];
 
 export function authorize (req, res, required=true) {
+  // verify Origin, to avoid CSRF
+  const method = req.method;
+  const origin = req.headers.origin;
   const authorization = req.headers.authorization;
-  if (authorization) {
+  if (authorization &&
+    (method !== 'POST' || ALLOWED_POST_ORIGINS.indexOf(origin) !== -1)) {
     const token = authorization.split('=')[1];
     const Session = mongoose.model('Session');
     return Session.findOne({ token: token })

@@ -1,5 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
 // import moment from 'moment';
 import { authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';

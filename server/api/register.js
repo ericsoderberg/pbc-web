@@ -1,5 +1,6 @@
 "use strict";
 import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
 import { authorize } from './auth';
 
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;

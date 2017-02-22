@@ -332,8 +332,11 @@ export function postNewsletterRender (newsletter) {
 
 export function getGeocode (address) {
   const query = `?q=${encodeURIComponent(address)}&format=json`;
-  return fetch(`http://nominatim.openstreetmap.org/search${query}`, {
-    method: 'GET', headers: { ..._headers, Authorization: undefined }})
+
+  return fetch(
+    `${window.location.protocol}://nominatim.openstreetmap.org/search${query}`,
+    {
+      method: 'GET', headers: { ..._headers, Authorization: undefined }})
   .then(response => response.json());
 }
 
