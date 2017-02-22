@@ -10,6 +10,7 @@ import InstagramIcon from '../../icons/Instagram';
 import TwitterIcon from '../../icons/Twitter';
 import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
+import SearchIcon from '../../icons/Search';
 import Button from '../../components/Button';
 import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
@@ -26,6 +27,7 @@ class Home extends Component {
     this._siteReady = this._siteReady.bind(this);
     this._showMenu = this._showMenu.bind(this);
     this._hideMenu = this._hideMenu.bind(this);
+    this._onSearch = this._onSearch.bind(this);
     this.state = { menuHeight: 0, showMenu: false };
   }
 
@@ -101,6 +103,12 @@ class Home extends Component {
 
   _hideMenu (event) {
     this.setState({ showMenu: false });
+  }
+
+  _onSearch (event) {
+    const { searchText } = this.state;
+    event.preventDefault();
+    this.context.router.push(`/search?q=${searchText}`);
   }
 
   _renderSession () {
@@ -209,7 +217,7 @@ class Home extends Component {
     }
 
     return (
-      <Section key="footer">
+      <Section key="footer" className="home__footer">
         <div>
           <div className="footer__links">
             <div className="home__brand">
@@ -218,13 +226,10 @@ class Home extends Component {
                 {socialLinks}
               </div>
             </div>
-            <div className="home__nav">
-              <Link to="/search"><Button>Search</Button></Link>
-            </div>
             {editControl}
             {sessionControl}
           </div>
-          <footer className="home__footer footer">
+          <footer className="footer">
             <a href={`maps://?daddr=${encodeURIComponent(site.address)}`}>
               {site.address}
             </a>
@@ -238,7 +243,7 @@ class Home extends Component {
 
   _renderContents () {
     const { page, site } = this.props;
-    const { showMenu } = this.state;
+    const { searchText, showMenu } = this.state;
 
     let splash = this._renderSplash();
 
@@ -272,6 +277,17 @@ class Home extends Component {
       </div>
     );
 
+    let search = (
+      <form key="search" className="home__search" onSubmit={this._onSearch}>
+        <input type="text" placeholder="Search" value={searchText || ''}
+          onChange={e => this.setState({ searchText: e.target.value })} />
+        <button className="button-icon" type='submit'
+          onClick={this._onSearch}>
+          <SearchIcon />
+        </button>
+      </form>
+    );
+
     let footer = this._renderFooter();
 
     return [
@@ -284,6 +300,7 @@ class Home extends Component {
       </header>,
       splash,
       pageContents,
+      search,
       footer
     ];
   }
