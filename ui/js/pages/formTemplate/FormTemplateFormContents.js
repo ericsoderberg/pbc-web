@@ -54,7 +54,7 @@ export default class FormTemplateFormContents extends Component {
 
   render () {
     const { className, formState, session } = this.props;
-    const { expandedSections } = this.state;
+    const { expandedSections, moreActive } = this.state;
     const formTemplate = formState.object;
 
     // build field id/name list for dependencies
@@ -128,31 +128,76 @@ export default class FormTemplateFormContents extends Component {
       );
     });
 
-    let payableByCheck;
-    if (formTemplate.payable) {
-      payableByCheck = (
-        <FormField label="Check instructions"
-          help="Leave blank to not allow checks">
-          <textarea name="payByCheckInstructions"
-            value={formTemplate.payByCheckInstructions || ''}
-            onChange={formState.change('payByCheckInstructions')} />
+    let more;
+    if (moreActive) {
+      more = [
+        <FormField key="submit" label="Submit button label">
+          <input name="submitLabel"
+            value={formTemplate.submitLabel || 'Submit'}
+            onChange={formState.change('submitLabel')} />
+        </FormField>,
+        <FormField key="message" label="Post submit message">
+          <textarea name="postSubmitMessage" rows={2}
+            value={formTemplate.postSubmitMessage || ''}
+            onChange={formState.change('postSubmitMessage')}/>
+        </FormField>,
+        <FormField key="ack">
+          <input name="acknowledge" type="checkbox"
+            checked={formTemplate.acknowledge || false}
+            onChange={formState.toggle('acknowledge')} />
+          <label htmlFor="acknowledge">acknowledge via email</label>
+        </FormField>,
+        <FormField key="auth">
+          <input name="authenticate" type="checkbox"
+            checked={formTemplate.authenticate || false}
+            onChange={formState.toggle('authenticate')} />
+          <label htmlFor="authenticate">authenticate</label>
+        </FormField>,
+        <FormField key="pay">
+          <input name="payable" type="checkbox"
+            checked={formTemplate.payable || false}
+            onChange={formState.toggle('payable')} />
+          <label htmlFor="payable">accept payment</label>
+        </FormField>
+      ];
+
+      if (formTemplate.payable) {
+        more.push(
+          <FormField key="check" label="Check instructions"
+            help="Leave blank to not allow checks">
+            <textarea name="payByCheckInstructions"
+              value={formTemplate.payByCheckInstructions || ''}
+              onChange={formState.change('payByCheckInstructions')} />
+          </FormField>
+        );
+      }
+
+      more.push(
+        <FormField key="notify" label="Notify email addresses">
+          <input name="notify"
+            value={formTemplate.notify || ''}
+            onChange={formState.change('notify')} />
         </FormField>
       );
-    }
 
-    let administeredBy;
-    if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
-        <option key={domain._id} label={domain.name} value={domain._id} />
-      ));
-      domains.unshift(<option key={0} />);
-      administeredBy = (
-        <FormField label="Administered by">
-          <select name="domainId" value={formTemplate.domainId || ''}
-            onChange={formState.change('domainId')}>
-            {domains}
-          </select>
-        </FormField>
+      if (session.administrator) {
+        let domains = this.state.domains.map(domain => (
+          <option key={domain._id} label={domain.name} value={domain._id} />
+        ));
+        domains.unshift(<option key={0} />);
+        more.push(
+          <FormField key="admin" label="Administered by">
+            <select name="domainId" value={formTemplate.domainId || ''}
+              onChange={formState.change('domainId')}>
+              {domains}
+            </select>
+          </FormField>
+        );
+      }
+    } else {
+      more = (
+        <a className="form-fields__more-control"
+          onClick={() => this.setState({ moreActive: true })}>details</a>
       );
     }
 
@@ -163,36 +208,7 @@ export default class FormTemplateFormContents extends Component {
             <input name="name" value={formTemplate.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
-          <FormField label="Submit button label">
-            <input name="submitLabel"
-              value={formTemplate.submitLabel || 'Submit'}
-              onChange={formState.change('submitLabel')} />
-          </FormField>
-          <FormField>
-            <input name="acknowledge" type="checkbox"
-              checked={formTemplate.acknowledge || false}
-              onChange={formState.toggle('acknowledge')} />
-            <label htmlFor="acknowledge">acknowledge via email</label>
-          </FormField>
-          <FormField>
-            <input name="authenticate" type="checkbox"
-              checked={formTemplate.authenticate || false}
-              onChange={formState.toggle('authenticate')} />
-            <label htmlFor="authenticate">authenticate</label>
-          </FormField>
-          <FormField>
-            <input name="payable" type="checkbox"
-              checked={formTemplate.payable || false}
-              onChange={formState.toggle('payable')} />
-            <label htmlFor="payable">accept payment</label>
-          </FormField>
-          {payableByCheck}
-          <FormField label="Notify email addresses">
-            <input name="notify"
-              value={formTemplate.notify || ''}
-              onChange={formState.change('notify')} />
-          </FormField>
-          {administeredBy}
+          {more}
         </fieldset>
         {sections}
         <fieldset className="form__fields">

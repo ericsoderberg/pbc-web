@@ -232,6 +232,7 @@ const formTemplateSchema = Schema({
   oldId: Number,
   payable: Boolean,
   payByCheckInstructions: String,
+  postSubmitMessage: String,
   sections: [formTemplateSectionSchema],
   submitLabel: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },

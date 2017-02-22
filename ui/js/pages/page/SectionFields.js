@@ -35,7 +35,7 @@ export default class SectionFields extends Component {
       );
     } else {
       result = (
-        <a className="section-fields__control"
+        <a className="form-fields__more-control"
           onClick={() => this.setState({ active: true })}>style</a>
       );
     }

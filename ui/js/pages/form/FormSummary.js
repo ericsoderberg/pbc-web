@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
+import Markdown from 'markdown-to-jsx';
 import { getItems, getItem } from '../../actions';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
@@ -10,13 +11,14 @@ import AddIcon from '../../icons/Add';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
 import PaymentPay from '../payment/PaymentPay';
+import RightIcon from '../../icons/Right';
 import { calculateTotal } from './FormUtils';
 
 const LABEL = {
-  'Register': 'registered',
-  'Sign Up': 'signed up',
-  'Submit': 'submitted',
-  'Subscribe': 'subscribed'
+  'Register': 'Registered',
+  'Sign Up': 'Signed up',
+  'Submit': 'Submitted',
+  'Subscribe': 'Subscribed'
 };
 
 const FormItem = (props) => {
@@ -25,16 +27,15 @@ const FormItem = (props) => {
   const timestamp = moment(form.modified).format('MMM Do YYYY');
   let message;
   if (distinguish) {
-    message = `You ${verb} for ${form.name} on ${timestamp}`;
+    message = `${verb} for ${form.name} ${timestamp}`;
   } else {
-    message = `You ${verb} on ${timestamp}`;
+    message = `${verb} ${timestamp}`;
   }
 
   return (
     <div className={classNames.join(' ')}>
       <div className="item item--full">
-        <span>{message}</span>
-        <Button label="Change" plain={true} onClick={onClick} />
+        <a onClick={onClick}>{message}</a>
       </div>
     </div>
   );
@@ -231,11 +232,12 @@ class FormSummary extends Component {
 
       contents = (
         <div className="form-summary">
-          <div className="box--between">
-            <div className="box--row box--static">
-              <h2>{formTemplate.name}</h2>
-            </div>
-            <Button plain={true} icon={<AddIcon />} onClick={this._onAdd} />
+          <Button className="form-summary__add" plain={true}
+            icon={<AddIcon />} onClick={this._onAdd} />
+          <div className="form-summary__message">
+            <Markdown>
+              {formTemplate.postSubmitMessage || `## ${formTemplate.name}`}
+            </Markdown>
           </div>
           <ul className="list">
             {items}

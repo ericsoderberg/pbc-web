@@ -94,13 +94,7 @@ export default class FormEdit extends Component {
       }
 
       let header;
-      if (inline) {
-        header = (
-          <div className='form__text'>
-            <h2>{formTemplate.name}</h2>
-          </div>
-        );
-      } else {
+      if (! inline) {
         const cancelControl = [
           <button key="cancel" type="button" className="button"
             onClick={this._onCancel}>

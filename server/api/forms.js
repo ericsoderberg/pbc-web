@@ -42,13 +42,16 @@ const sendEmails = (req, transporter) => {
       if (formTemplate.acknowledge) {
         const url = `${req.headers.origin}/forms/${form._id}/edit`;
         const instructions =
-`### Thank you for your submittal for
+`### Thank you for filling out
 
 
 # [${formTemplate.name}](${url})
 
 
 ### on ${moment(form.modified).format('MMMM Do YYYY')}
+
+
+${formTemplate.postSubmitMessage}
 `;
         transporter.sendMail({
           from: site.email,
@@ -67,13 +70,13 @@ const sendEmails = (req, transporter) => {
       if (formTemplate.notify) {
         const url = `${req.headers.origin}/forms/${form._id}/edit`;
         const instructions =
-`### Submittal from ${session.name} (${session.email}) for
-
-
+`
 # [${formTemplate.name}](${url})
 
 
-### on ${moment(form.modified).format('MMMM Do YYYY')}
+### Submitted by ${session.name} (${session.email}) on ${moment(form.modified).format('MMMM Do YYYY')}
+
+Just letting you know.
 `;
         transporter.sendMail({
           from: site.email,

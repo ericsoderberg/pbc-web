@@ -150,7 +150,7 @@ export default class EventDetails extends Component {
       <div>
         <fieldset className="form__fields">
           <FormField label="Name">
-            <input ref="name" name="name" value={event.name || ''}
+            <input name="name" value={event.name || ''}
               onChange={formState.change('name')}/>
           </FormField>
           <FormField label="Starts">
@@ -171,7 +171,7 @@ export default class EventDetails extends Component {
           <ImageField label="Image" name="image"
             formState={formState} property="image" />
           <FormField label="Text">
-            <textarea ref="text" name="text" value={event.text || ''} rows={4}
+            <textarea name="text" value={event.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
           <FormField label="Address">

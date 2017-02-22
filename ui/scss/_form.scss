@@ -118,7 +118,8 @@
   margin: $unit 0;
 }
 
-.section-fields__control {
+.form-fields__more-control,
+.form-fields__more-control {
   display: block;
   margin: $half-unit $unit;
 }
@@ -779,6 +780,11 @@
 .form-summary {
   max-width: $form-width;
   margin: 0 auto;
+  text-align: left;
+
+  .item--full .button-plain {
+    padding: 0;
+  }
 }
 
 .form-summary__container {
@@ -799,7 +805,8 @@
 
   form {
     > .form__text:first-child {
-      > *:first-child {
+      h1:first-child,
+      h2:first-child {
         margin-top: 0;
       }
     }
@@ -815,6 +822,26 @@
 
   .item__container {
     padding: 0;
+  }
+}
+
+.form-summary__message {
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.form-summary__add {
+  position: absolute;
+
+  @media all and (min-width: 700px) {
+    top: $unit + $half-unit;
+    right: $unit;
+  }
+
+  @media all and (max-width: 699px) {
+    top: $half-unit;
+    right: 0;
   }
 }
 

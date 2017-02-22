@@ -93,7 +93,7 @@ export default class PageFormContents extends Component {
       }
     } else {
       more = (
-        <a className="section-fields__control"
+        <a className="form-fields__more-control"
           onClick={() => this.setState({ moreActive: true })}>details</a>
       );
     }
