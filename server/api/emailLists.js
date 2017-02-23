@@ -10,9 +10,9 @@ import register from './register';
 const MAILMAN_ADMIN = process.env.MAILMAN_ADMIN || 'eric_soderberg@pbc.org';
 const MAILMAN_ADMIN_PASSWORD = process.env.MAILMAN_ADMIN_PASSWORD || '12345678';
 
-const addList = (name) => {
+const addList = (listName) => {
   return new Promise((resolve, reject) => {
-    execFile('newlist', ['-a', name, MAILMAN_ADMIN, MAILMAN_ADMIN_PASSWORD],
+    execFile('newlist', ['-a', listName, MAILMAN_ADMIN, MAILMAN_ADMIN_PASSWORD],
       (error, stdout, stderr) => {
         if (error) {
           console.log('!!! new error', error);
@@ -26,15 +26,14 @@ const addList = (name) => {
 
 const removeList = (name) => {
   return new Promise((resolve, reject) => {
-    execFile('rmlist', ['-a', name],
-      (error, stdout, stderr) => {
-        if (error) {
-          console.log('!!! rm error', error);
-          return reject(error);
-        }
-        console.log('!!! rm output', stdout);
-        return resolve();
-      });
+    execFile('rmlist', ['-a', name], (error, stdout, stderr) => {
+      if (error) {
+        console.log('!!! rm error', error);
+        return reject(error);
+      }
+      console.log('!!! rm output', stdout);
+      return resolve();
+    });
   });
 };
 
@@ -68,6 +67,18 @@ const removeAddresses = (listName, addresses) => {
   });
 };
 
+const checkAddresses = (listName) => {
+  return new Promise((resolve, reject) => {
+    execFile('list_members', ['-n', listName], (error, stdout, stderr) => {
+      if (error) {
+        console.log('!!! check error', error);
+        return reject(error);
+      }
+      return resolve(stdout.split("\n").filter(a => a));
+    });
+  });
+};
+
 // /api/email-lists
 
 const populateEmailList = (emailList) => {
@@ -94,6 +105,19 @@ const populateEmailList = (emailList) => {
       return (aa < ba ? -1 : (aa > ba ? 1 : 0));
     });
     return emailListData;
+  })
+  .then(emailList => {
+    // determine address state
+    return checkAddresses(emailList.name)
+    .then(disabledAddresses => {
+      console.log('!!! disabled', disabledAddresses);
+      emailList.addresses = emailList.addresses.map(address => ({
+        ...address,
+        state: (disabledAddresses.indexOf(address.address) === -1 ?
+          'ok' : 'disabled')
+      }));
+      return emailList;
+    });
   });
 };
 

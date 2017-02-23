@@ -106,6 +106,8 @@ class EmailList extends Component {
       }
 
       const items = addresses.map((address, index) => {
+        const classNames = ['item'];
+
         let user;
         if (address.userId) {
           user = (
@@ -114,12 +116,20 @@ class EmailList extends Component {
             </Link>
           );
         }
+
+        let state;
+        if (address.state === 'disabled') {
+          classNames.push('error');
+          state = <span>{address.state}</span>;
+        }
+
         return (
           <div key={address._id} className="item__container">
-            <div className="item">
+            <div className={classNames.join(' ')}>
               <span className="item__name">{address.address}</span>
               <div className="box--row">
                 {user}
+                {state}
                 <button type="button" className="button-icon"
                   onClick={this._unsubscribe(address.address)}>
                   <TrashIcon />

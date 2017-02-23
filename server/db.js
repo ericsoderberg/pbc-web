@@ -392,7 +392,7 @@ const emailListSchema = Schema({
   addresses: [{
     address: String,
     state: { type: String,
-      enum: ['pending', 'ok', 'bouncing', 'disabled']
+      enum: ['pending', 'ok', 'disabled']
     }
   }],
   created: Date,
