@@ -29,7 +29,7 @@ export default function () {
         if (emailList) {
           return results.skipped('EmailList', emailList);
         } else {
-          const emailList = new EmailList({ name: listName });
+          const emailList = new EmailList({ name: listName, path: listName });
           return emailList.save()
           .then(emailList => results.saved('EmailList', emailList))
           .catch(error => results.errored('EmailList', emailList, error));

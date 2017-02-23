@@ -399,6 +399,7 @@ const emailListSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: {type: String, required: true, unique: true},
+  path: {type: String, unique: true, sparse: true},
   public: Boolean,
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
