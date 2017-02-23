@@ -10,7 +10,7 @@ import results from './results';
 export default function () {
   const EmailList = mongoose.model('EmailList');
   return new Promise((resolve, reject) => {
-    execFile('list_lists', [], (error, stdout, stderr) => {
+    execFile('list_lists', ['-b'], (error, stdout, stderr) => {
       if (error) {
         return reject(error);
       }
