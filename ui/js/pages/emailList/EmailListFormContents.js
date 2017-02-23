@@ -53,6 +53,10 @@ export default class EmailListFormContents extends Component {
             <textarea name="text" value={emailList.text || ''} rows={4}
               onChange={formState.change('text')}/>
           </FormField>
+          <FormField label="Path" help="unique url name">
+            <input name="path" value={emailList.path || ''}
+              onChange={formState.change('path')}/>
+          </FormField>
           <FormField>
             <input name="public" type="checkbox"
               checked={emailList.public || false}
