@@ -11,6 +11,7 @@ import forms from './forms';
 import pages from './pages';
 import calendars from './calendars';
 import domains from './domains';
+import emailLists from './emailLists';
 import results from './results';
 
 Promise.resolve()
@@ -22,6 +23,7 @@ Promise.resolve()
 .then(() => pages())
 .then(() => calendars())
 .then(() => domains())
+.then(() => emailLists())
 .then(() => console.log(results.log()))
 .then(() => console.log(`Finished`))
 .catch(error => console.log(error));

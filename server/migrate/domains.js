@@ -48,7 +48,7 @@ export default function () {
         } else {
           const domain = new Domain({ name: spec.name });
           return domain.save()
-          .then(calendar => results.saved('Domain', domain))
+          .then(domain => results.saved('Domain', domain))
           .catch(error => results.errored('Domain', domain, error));
         }
       })
