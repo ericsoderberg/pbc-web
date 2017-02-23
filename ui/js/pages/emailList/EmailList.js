@@ -16,7 +16,6 @@ class EmailList extends Component {
   }
 
   componentDidMount () {
-    document.title = this.props.title;
     this._setStateFromLocation(this.props);
     this._loadEmailList();
   }
@@ -49,6 +48,7 @@ class EmailList extends Component {
         addresses = addresses.filter(a => exp.test(a));
       }
       this.setState({ addresses, emailList });
+      document.title = emailList.name;
     })
     .catch(error => console.log('!!! EmailList catch', error));
   }
