@@ -359,7 +359,17 @@
 }
 
 .form__footer {
-  padding: 0 $unit;
+  @media all and (max-width: 699px) {
+    padding: 0 $unit;
+  }
+
+  & + .form__footer {
+    margin-top: $unit;
+
+    a {
+      margin: $unit 0;
+    }
+  }
 }
 
 // confirm-remove

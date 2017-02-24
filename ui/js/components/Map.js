@@ -51,15 +51,15 @@ export default class Map extends Component {
     }
   }
 
-  _renderPopup () {
-    const { address, title } = this.props;
-    const { mergedAddress } = this.state;
-    const header = title ? `<h5>${title}</h5>` : '';
-    return `<div className="map__tip">
-        ${header}
-        <a href="maps://?daddr=${encodeURIComponent(mergedAddress)}">${address}</a>
-      </div>`;
-  }
+  // _renderPopup () {
+  //   const { address, title } = this.props;
+  //   const { mergedAddress } = this.state;
+  //   const header = title ? `<h5>${title}</h5>` : '';
+  //   return `<div className="map__tip">
+  //       ${header}
+  //       <a href="maps://?daddr=${encodeURIComponent(mergedAddress)}">${address}</a>
+  //     </div>`;
+  // }
 
   _setMap (mapSize) {
     const { map, lat, lon } = this.state;
@@ -67,7 +67,8 @@ export default class Map extends Component {
     Leaflet.tileLayer(TILES_URL, {
       attribution: '© Mapbox © OpenStreetMap'
     }).addTo(map);
-    const circle = Leaflet.circleMarker([lat, lon], {
+    // const circle =
+    Leaflet.circleMarker([lat, lon], {
       radius: 8,
       stroke: true,
       weight: 6,

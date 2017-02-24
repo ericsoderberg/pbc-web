@@ -88,9 +88,9 @@ class VerifyEmail extends Component {
             <button type="submit" className="button" onClick={this._onSendLink}>
               Send Email
             </button>
-            <Button path="/sign-in" secondary={true}>
-              Sign In With Password
-            </Button>
+          </footer>
+          <footer className="form__footer">
+            <Link to="/sign-in">Sign in with a password</Link>
           </footer>
         </form>
       </div>

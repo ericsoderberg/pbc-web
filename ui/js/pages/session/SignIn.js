@@ -1,10 +1,10 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { postSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
-import Button from '../../components/Button';
 import FormState from '../../utils/FormState';
 
 export default class SignIn extends Component {
@@ -70,12 +70,12 @@ export default class SignIn extends Component {
             <button type="submit" className="button" onClick={this._onSignIn}>
               Sign In
             </button>
-            <Button path="/verify-email" secondary={true} replaceHistory={true}>
-              Sign In Via Email
-            </Button>
-            <Button path="/sign-up" secondary={true}>
-              Sign Up
-            </Button>
+          </footer>
+          <footer className="form__footer">
+            <Link to="/verify-email">Sign in via email</Link>
+          </footer>
+          <footer className="form__footer">
+            <Link to="/sign-up">Sign up</Link>
           </footer>
         </form>
       </div>
