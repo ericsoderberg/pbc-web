@@ -18,7 +18,6 @@ const addList = (listName) => {
           console.log('!!! new error', error);
           return reject(error);
         }
-        console.log('!!! new output', stdout);
         return resolve();
       });
   });
@@ -31,7 +30,6 @@ const removeList = (name) => {
         console.log('!!! rm error', error);
         return reject(error);
       }
-      console.log('!!! rm output', stdout);
       return resolve();
     });
   });
@@ -110,7 +108,6 @@ const populateEmailList = (emailList) => {
     // determine address state
     return checkAddresses(emailList.name)
     .then(disabledAddresses => {
-      console.log('!!! disabled', disabledAddresses);
       emailList.addresses = emailList.addresses.map(address => ({
         ...address,
         state: (disabledAddresses.indexOf(address.address) === -1 ?
@@ -129,6 +126,9 @@ export default function (router) {
       authorize: authorizedForDomain
     },
     get: {
+      populate: [
+        { path: 'formTemplateId', select: 'name path' }
+      ],
       transformOut: (emailList, req) => {
         if (emailList) {
           return populateEmailList(emailList);
