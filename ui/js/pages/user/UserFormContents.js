@@ -211,6 +211,12 @@ export default class UserFormContents extends Component {
 
         <div className="form-section">
           <div className="form-item">
+            <h3><Link to={formPath}>Forms</Link></h3>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <div className="form-item">
             <h3>Email Lists</h3>
             {emailLists.length === 0 ? addEmailListControl : undefined}
           </div>
@@ -220,12 +226,7 @@ export default class UserFormContents extends Component {
           </div>
         </div>
 
-        <div className="form-section">
-          <div className="form-item">
-            <h3>Forms</h3>
-            <Link to={formPath}>Filled out forms</Link>
-          </div>
-        </div>
+
       </div>
     );
   }
