@@ -43,6 +43,13 @@ const deleteUserRelated = (doc) => {
   .then(() => doc);
 };
 
+const populateUser = (user) => {
+  const Family = mongoose.model('Family');
+  return Family.findOne({ "adults.userId": user._id })
+  .then(family => ({ ...user, familyId: (family || {})._id }));
+};
+
+
 export default function (router, transporter) {
   router.post('/users/sign-up', (req, res) => {
     let data = req.body;
@@ -126,10 +133,11 @@ It will allow sign you in to the ${site.name} web site.
       deleteRelated: deleteUserRelated
     },
     get: {
-      transformOut: (user) => {
+      transformOut: (user, req) => {
         if (user) {
           user = user.toObject();
           delete user.encryptedPassword;
+          return populateUser(user);
         }
         return user;
       }
@@ -150,6 +158,51 @@ It will allow sign you in to the ${site.name} web site.
     },
     put: {
       transformIn: prepareUser
+    }
+  });
+}
+
+export function createUser (email, name) {
+  if (! email || ! name) {
+    return Promise.reject('No email or name');
+  }
+  const User = mongoose.model('User');
+  return User.findOne({ email: email }).exec()
+  .then(user => {
+    if (user) {
+      return Promise.reject('Exists');
+    }
+    // create a new user
+    const now = new Date();
+    user = new User({
+      created: now,
+      email: email,
+      modified: now,
+      name: name
+    });
+    return user.save();
+  });
+}
+
+export function findOrCreateUser (email, name) {
+  if (! email || ! name) {
+    return Promise.reject('No email or name');
+  }
+  const User = mongoose.model('User');
+  return User.findOne({ email: email }).exec()
+  .then(user => {
+    if (!user) {
+      // create a new user
+      const now = new Date();
+      user = new User({
+        created: now,
+        email: email,
+        modified: now,
+        name: name
+      });
+      return user.save();
+    } else {
+      return user;
     }
   });
 }

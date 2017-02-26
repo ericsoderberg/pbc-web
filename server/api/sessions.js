@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import hat from 'hat';
 import moment from 'moment';
 import { authorize } from './auth';
+import { createUser } from './users';
 
 // /api/sessions
 
@@ -74,3 +75,22 @@ export default function (router) {
     .catch(error => res.status(401).json({ error: 'Not authorized' }));
   });
 };
+
+export function useOrCreateSession (session, email, name) {
+  if (! session) {
+    return createUser(email, name)
+    .then(user => {
+      // create a new session
+      const Session = mongoose.model('Session');
+      const session = new Session({
+        email: user.email,
+        name: user.name,
+        token: hat(), // better to encrypt this before storing it, someday
+        userId: user._id
+      });
+      return session.save();
+    });
+  } else {
+    return session;
+  }
+}

@@ -8,7 +8,6 @@ import SelectSearch from '../../components/SelectSearch';
 import TextHelp from '../../components/TextHelp';
 import AddIcon from '../../icons/Add';
 import TrashIcon from '../../icons/Trash';
-import RelationEdit from './RelationEdit';
 
 export default class UserFormContents extends Component {
 
@@ -124,27 +123,6 @@ export default class UserFormContents extends Component {
       );
     }
 
-    let relations = (user.relations || []).map((relation, index) => (
-      <div key={index}>
-        <div className="form-item">
-          <h4>{relation.name}</h4>
-          <button type="button" className="button-icon"
-            onClick={formState.removeAt('relations', index)}>
-            <TrashIcon />
-          </button>
-        </div>
-        <RelationEdit relation={relation}
-          onChange={formState.changeAt('relations', index)} />
-      </div>
-    ));
-
-    const addRelationControl = (
-      <button type="button" className="button-icon"
-        onClick={this._addRelation()}>
-        <AddIcon />
-      </button>
-    );
-
     let emailLists = (user.emailLists || [])
     .filter(emailList => ! emailList.unsubscribe)
     .map((emailList, index) => {
@@ -186,6 +164,13 @@ export default class UserFormContents extends Component {
       `userId=${encodeURIComponent(user._id)}` +
       `&userId-name=${encodeURIComponent(user.name)}`;
 
+    let family;
+    if (user.familyId) {
+      family = <Link to={`/families/${user.familyId}/edit`}>Family</Link>;
+    } else {
+      family = <Link to={`/families/add`}>Add Family</Link>;
+    }
+
     return (
       <div className={className}>
         <fieldset className="form__fields">
@@ -210,18 +195,17 @@ export default class UserFormContents extends Component {
             <textarea name="text" value={user.text || ''} rows={8}
               onChange={formState.change('text')}/>
           </FormField>
+          <FormField name="phone" label="Phone">
+            <input name="phone" value={user.phone || ''}
+              onChange={formState.change('phone')}/>
+          </FormField>
         </fieldset>
 
         {adminFields}
 
         <div className="form-section">
           <div className="form-item">
-            <h3>Family</h3>
-            {relations.length === 0 ? addRelationControl : undefined}
-          </div>
-          {relations}
-          <div className="form-item">
-            {relations.length > 0 ? addRelationControl : undefined}
+            <h3>{family}</h3>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { postItem } from '../actions';
+import { postItem, haveSession, setSession } from '../actions';
 import Form from './Form';
 
 export default class Add extends Component {
@@ -23,11 +23,19 @@ export default class Add extends Component {
   }
 
   _onAdd (item) {
-    const { category, showable } = this.props;
+    const { category, createSession, showable } = this.props;
     postItem(category, item)
-    .then(newItem => {
+    .then(response => {
+      if (createSession) {
+        // if we didn't have a session and we created one as part of adding,
+        // remember it.
+        if (! haveSession() && response.token) {
+          console.log('!!! Add set session', response);
+          setSession(response);
+        }
+      }
       if (showable) {
-        this.context.router.push(`/${category}/${newItem._id}`);
+        this.context.router.push(`/${category}/${response._id}`);
       } else {
         this.context.router.goBack();
       }
@@ -55,6 +63,7 @@ export default class Add extends Component {
 
 Add.propTypes = {
   category: PropTypes.string.isRequired,
+  createSession: PropTypes.bool,
   default: PropTypes.object,
   FormContents: PropTypes.func.isRequired,
   onChange: PropTypes.func,

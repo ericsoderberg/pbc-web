@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
-import SectionEdit from './SectionEdit';
 
 export default class CalendarSectionEdit extends Component {
 

@@ -50,8 +50,7 @@ export default class PageFormContents extends Component {
     const page = formState.object;
 
     const sections = (page.sections || []).map((section, index) => (
-      <PageFormSection key={index} formState={formState} section={section}
-        index={index} />
+      <PageFormSection key={index} formState={formState} index={index} />
     ));
 
     const addControls = SECTION_TYPES.map(type => (

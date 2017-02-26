@@ -34,6 +34,8 @@ import site from './api/site';
 site(router);
 import users from './api/users';
 users(router, transporter);
+import families from './api/families';
+families(router);
 import domains from './api/domains';
 domains(router);
 import resources from './api/resources';

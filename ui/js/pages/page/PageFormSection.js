@@ -99,5 +99,5 @@ export default class PageFormSection extends Component {
 
 PageFormSection.propTypes = {
   formState: PropTypes.object.isRequired,
-  label: PropTypes.string
+  index: PropTypes.number.isRequired
 };

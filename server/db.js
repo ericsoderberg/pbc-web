@@ -40,19 +40,30 @@ const userSchema = Schema({
   oldId: Number,
   path: {type: String, unique: true, sparse: true},
   phone: String,
-  relations: [{
-    birthday: Date,
-    grade: String,
-    name: String,
-    notes: String,
-    relationship: String
-  }],
   temporaryToken: String,
   text: String,
   verified: Boolean
 });
 
 mongoose.model('User', userSchema);
+
+const familySchema = Schema({
+  adults: [{
+    relation: String,
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    verified: Boolean
+  }],
+  children: [{
+    birthday: Date,
+    grade: String,
+    name: String,
+    notes: String
+  }],
+  created: Date,
+  modified: Date
+});
+
+mongoose.model('Family', familySchema);
 
 const domainSchema = Schema({
   created: Date,

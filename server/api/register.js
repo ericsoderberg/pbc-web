@@ -58,6 +58,7 @@ export default (router, options) => {
         getOpts.transformOut(doc, req) : doc))
       .then(doc => res.json(doc))
       .catch(error => {
+        console.log('!!! get', error);
         res.status(typeof error === 'number' ? error : 400).json(error);
       });
     });

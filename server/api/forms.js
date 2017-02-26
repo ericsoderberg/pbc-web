@@ -1,16 +1,16 @@
 "use strict";
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
-import hat from 'hat';
 import moment from 'moment';
 import { authorize, authorizedForDomainOrSelf } from './auth';
+import { useOrCreateSession } from './sessions';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
 // /api/forms
 
-const FORM_SIGN_IN_MESSAGE =
-  '[Sign In](/sign-in) to be able to submit this form.';
+// const FORM_SIGN_IN_MESSAGE =
+//   '[Sign In](/sign-in) to be able to submit this form.';
 
 function formValueForFieldName (formTemplate, form, fieldName) {
   let result;
@@ -193,52 +193,15 @@ export default function (router, transporter) {
     })
     .then(context => {
       const { session, formTemplate } = context;
-      const data = req.body;
-      if (! session) {
-        // we don't have a session, try to create one
-        const email = formValueForFieldName(formTemplate, data, 'email');
-        const name = formValueForFieldName(formTemplate, data, 'name');
-        if (! email || ! name) {
-          console.log('!!! No email or name');
-          return Promise.reject({ error: FORM_SIGN_IN_MESSAGE});
-        }
-
-        // see if we have an account for this email already
-        console.log('!!! have an email, look for user', email);
-        const User = mongoose.model('User');
-        return User.findOne({ email: email }).exec()
-        .then(user => {
-          if (user) {
-            console.log('!!! already have a user');
-            return Promise.reject({ error: FORM_SIGN_IN_MESSAGE});
-          }
-          console.log('!!! no user, create one');
-
-          // create a new user
-          const now = new Date();
-          user = new User({
-            created: now,
-            email: email,
-            modified: now,
-            name: name
-          });
-          return user.save();
-        })
-        .then(user => {
-          // create a new session
-          const Session = mongoose.model('Session');
-          const session = new Session({
-            email: user.email,
-            name: user.name,
-            token: hat(), // better to encrypt this before storing it, someday
-            userId: user._id
-          });
-          return session.save();
-        })
-        .then(session => ({ ...context, session, formTemplate }));
-      } else {
-        return context;
+      // AUTH
+      if (! session && formTemplate.authenticate) {
+        return Promise.reject({ status: 403 });
       }
+      const data = req.body;
+      const email = formValueForFieldName(formTemplate, data, 'email');
+      const name = formValueForFieldName(formTemplate, data, 'name');
+      return useOrCreateSession(session, email, name)
+      .then(session => ({ ...context, session }));
     })
     .then(context => {
       const { session, formTemplate } = context;
@@ -246,11 +209,11 @@ export default function (router, transporter) {
       let data = req.body;
       data.created = new Date();
       data.modified = data.created;
+      const admin = (session.administrator || (formTemplate.domainId &&
+        formTemplate.domainId.equals(session.administratorDomainId)));
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
-      if (! data.userId ||
-        ! (session.administrator || (formTemplate.domainId &&
-          formTemplate.domainId.equals(session.administratorDomainId)))) {
+      if (! admin || ! data.userId) {
         data.userId = session.userId;
       }
       const form = new Form(data);
@@ -295,12 +258,11 @@ export default function (router, transporter) {
       if (! formTemplate._id.equals(data.formTemplateId)) {
         return Promise.reject({ error: 'Mismatched template' });
       }
-      // Allow an administrator to set the userId. Otherwise, set it to
-      // the current session user
-      if (! data.userId ||
-        ! (session.administrator || (formTemplate.domainId &&
-          formTemplate.domainId.equals(session.administratorDomainId)))) {
-        data.userId = session.userId;
+      // AUTH
+      const admin = (session.administrator || (formTemplate.domainId &&
+        formTemplate.domainId.equals(session.administratorDomainId)));
+      if (! admin && ! form.userID.equals(session.userId)) {
+        return Promise.reject({ status: 403 });
       }
       data.modified = new Date();
       data = unsetDomainIfNeeded(data, session);
@@ -311,7 +273,7 @@ export default function (router, transporter) {
     .then(context => res.status(200).json(context.form))
     .catch(error => {
       console.log('!!! post form catch', error);
-      res.status(400).json(error);
+      res.status(error.status || 400).json(error);
     });
   });
 }
