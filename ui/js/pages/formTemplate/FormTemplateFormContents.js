@@ -153,6 +153,12 @@ export default class FormTemplateFormContents extends Component {
             onChange={formState.toggle('authenticate')} />
           <label htmlFor="authenticate">authenticate</label>
         </FormField>,
+        <FormField key="family">
+          <input name="family" type="checkbox"
+            checked={formTemplate.family || false}
+            onChange={formState.toggle('family')} />
+          <label htmlFor="family">family</label>
+        </FormField>,
         <FormField key="pay">
           <input name="payable" type="checkbox"
             checked={formTemplate.payable || false}

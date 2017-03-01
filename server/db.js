@@ -227,6 +227,7 @@ const formTemplateFieldSchema = Schema({
 
 const formTemplateSectionSchema = Schema({
   administrative: Boolean,
+  child: Boolean,
   dependsOnId: ObjectId,
   fields: [formTemplateFieldSchema],
   name: String,
@@ -238,6 +239,7 @@ const formTemplateSchema = Schema({
   authenticate: Boolean,
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  family: Boolean,
   modified: Date,
   name: {type: String, required: true, unique: true},
   notify: String,
