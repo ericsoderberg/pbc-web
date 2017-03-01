@@ -5,11 +5,21 @@ export default class FormField extends Component {
 
   constructor () {
     super();
+    this._onClick = this._onClick.bind(this);
     this._onDragEnter = this._onDragEnter.bind(this);
     this._onDragOver = this._onDragOver.bind(this);
     this._onDragLeave = this._onDragLeave.bind(this);
     this._onDrop = this._onDrop.bind(this);
     this.state = {};
+  }
+
+  _onClick (event) {
+    // focus on contained input
+    const component = this.refs.component;
+    const input = component.querySelector('input, textarea');
+    if (input) {
+      input.focus();
+    }
   }
 
   _onDragOver (event) {
@@ -61,7 +71,9 @@ export default class FormField extends Component {
     let close;
     if (this.props.closeControl) {
       classNames.push('form-field--closable');
-      close = <div className="form-field__close">{this.props.closeControl}</div>;
+      close = (
+        <div className="form-field__close">{this.props.closeControl}</div>
+      );
     }
 
     let labels;
@@ -86,7 +98,8 @@ export default class FormField extends Component {
     }
 
     return (
-      <div className={classNames.join(' ')}
+      <div ref="component" className={classNames.join(' ')}
+        onClick={this._onClick}
         onDragEnter={onDragEnter} onDragOver={onDragOver}
         onDragLeave={onDragLeave} onDrop={onDrop} >
         {labels}

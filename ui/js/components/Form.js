@@ -6,6 +6,7 @@ import FormState from '../utils/FormState';
 import Button from './Button';
 import ConfirmRemove from './ConfirmRemove';
 import Stored from './Stored';
+import Loading from './Loading';
 
 class Form extends Component {
 
@@ -48,7 +49,7 @@ class Form extends Component {
   render () {
     const {
       action, contentsProps, error, footerActions, FormContents,
-      inline, onCancel, onRemove, Preview, session, submitLabel, title
+      inline, loading, onCancel, onRemove, Preview, session, submitLabel, title
     } = this.props;
     let { actions } = this.props;
     const { formState } = this.state;
@@ -88,22 +89,33 @@ class Form extends Component {
       classes.push('form__container--preview');
     }
 
+    let contents;
+    if (loading) {
+      contents = <Loading />;
+    } else {
+      contents = (
+        <FormContents className="form__contents" {...contentsProps}
+          formState={formState} session={session} />
+      );
+    }
+
     return (
       <div className={classes.join(' ')}>
         <form className="form" action={action}
           onSubmit={this._onSubmit}>
           {header}
           <FormError message={error} />
-          <FormContents className="form__contents" {...contentsProps}
-            formState={formState} session={session} />
-          <footer className="form__footer">
-            <button type="submit" className="button" onClick={this._onSubmit}>
-              {submitLabel}
-            </button>
-            {footerActions}
-            {removeControl}
-            {footerCancelControl}
-          </footer>
+          {contents}
+          <div className="form__footer-container">
+            <footer className="form__footer">
+              <button type="submit" className="button" onClick={this._onSubmit}>
+                {submitLabel}
+              </button>
+              {footerActions}
+              {removeControl}
+              {footerCancelControl}
+            </footer>
+          </div>
         </form>
         {preview}
       </div>
@@ -120,6 +132,7 @@ Form.propTypes = {
   FormContents: PropTypes.func.isRequired,
   item: PropTypes.object,
   inline: PropTypes.bool,
+  loading: PropTypes.bool,
   onCancel: PropTypes.func.isRequired,
   onChange: PropTypes.func,
   onRemove: PropTypes.func,

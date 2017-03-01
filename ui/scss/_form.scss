@@ -358,10 +358,12 @@
   }
 }
 
+.form__footer-container {
+  padding: 0 $unit;
+}
+
 .form__footer {
-  @media all and (max-width: 699px) {
-    padding: 0 $unit;
-  }
+  padding: 0;
 
   & + .form__footer {
     margin-top: $unit;

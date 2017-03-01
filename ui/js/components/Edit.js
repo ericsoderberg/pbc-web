@@ -25,10 +25,11 @@ export default class Edit extends Component {
 
   _load (props) {
     document.title = props.title;
+    this.setState({ loading: true });
     getItem(props.category, props.params.id)
     .then(item => {
       const { onChange } = props;
-      this.setState({ item: item });
+      this.setState({ item: item, loading: false });
       if (onChange) {
         onChange(item);
       }
@@ -65,10 +66,10 @@ export default class Edit extends Component {
       actions, category, params: { id }, footerActions, FormContents,
       onChange, Preview, submitLabel, title
     } = this.props;
-    const { item, error } = this.state;
+    const { item, error, loading } = this.state;
     return (
       <Form title={title} actions={actions} footerActions={footerActions}
-        submitLabel={submitLabel || "Update"}
+        submitLabel={submitLabel || "Update"} loading={loading}
         action={`/api/${category}/${id}`}
         FormContents={FormContents} Preview={Preview} item={item}
         onChange={onChange}
