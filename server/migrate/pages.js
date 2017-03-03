@@ -28,7 +28,7 @@ function normalizePage (item, arg) {
         size: style.banner_file_size || undefined,
         type: style.banner_content_type
       };
-      item.sections.push({ image: image, type: 'image' });
+      item.sections.push({ image, type: 'image' });
     }
   }
 
@@ -55,7 +55,7 @@ function normalizePage (item, arg) {
         text: `${item2.role ? '### ' + item2.role : ''} ${item2.bio}`
       };
     });
-    item.sections.push({ people: people, type: 'people' });
+    item.sections.push({ people, type: 'people' });
   }
 
   if ((! item.aspect_order || item.aspect_order.indexOf('e') !== -1) &&
@@ -89,7 +89,7 @@ function normalizePage (item, arg) {
           size: item2.photo_file_size || undefined,
           type: item2.photo_content_type
         };
-        item.sections.push({ image: image, type: 'image' });
+        item.sections.push({ image, type: 'image' });
       }
     });
   }
@@ -102,7 +102,7 @@ function normalizePage (item, arg) {
       size: item2.size,
       type: item2.type
     }));
-    item.sections.push({ files: files, type: 'files' });
+    item.sections.push({ files, type: 'files' });
   }
 
   if ((! item.aspect_order || item.aspect_order.indexOf('f') !== -1) &&

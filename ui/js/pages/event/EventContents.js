@@ -4,8 +4,9 @@ import moment from 'moment';
 import Section from '../../components/Section';
 import Text from '../../components/Text';
 import Map from '../../components/Map';
-import FormSummary from '../form/FormSummary';
-import EventSummary from './EventSummary';
+// import FormSummary from '../form/FormSummary';
+import Sections from '../../components/Sections';
+import EventSection from './EventSection';
 
 const EventContents = (props) => {
   const event = props.item;
@@ -29,13 +30,13 @@ const EventContents = (props) => {
   }
 
   let form;
-  if (event.formTemplateId) {
-    form = (
-      <Section align='left'>
-        <FormSummary formTemplateId={event.formTemplateId} />
-      </Section>
-    );
-  }
+  // if (event.formTemplateId) {
+  //   form = (
+  //     <Section align='left'>
+  //       <FormSummary formTemplateId={event.formTemplateId} />
+  //     </Section>
+  //   );
+  // }
 
   let upcoming;
   let now = moment();
@@ -60,8 +61,9 @@ const EventContents = (props) => {
   return (
     <div>
       <Section full={false} align='start' backgroundImage={event.image}>
-        <EventSummary id={event} navigable={false} />
+        <EventSection id={event} navigable={false} />
       </Section>
+      <Sections sections={event.sections} />
       {text}
       {map}
       {form}

@@ -20,7 +20,11 @@ function normalizeEvent (item, slaveEvents, reservations) {
   item.created = item.created_at;
   item.modified = item.updated_at;
   item.public = ! item.private;
-  item.text = item.notes;
+  item.sections = [];
+  if (item.notes) {
+    item.sections.push({ text: item.notes, type: 'text' });
+  }
+  // item.text = item.notes;
   // set date to latest slaveEvent date (if any)
   let latest;
   (slaveEvents[item.id] || []).forEach(item2 => {

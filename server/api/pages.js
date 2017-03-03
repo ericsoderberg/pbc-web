@@ -113,7 +113,10 @@ const publicize = (data) => {
       if (id && ! pagesVisited[id]) {
         pagesRelatedToHome[id] = true;
         pagesVisited[id] = true;
-        pageMap[id].forEach(childId => descend(childId));
+        let children = pageMap[id];
+        if (children) {
+          children.forEach(childId => descend(childId));
+        }
       }
     };
     if (site.homePageId) {
@@ -134,7 +137,11 @@ const publicize = (data) => {
     });
     return Promise.all(promises);
   })
-  .then(() => data);
+  .then(() => data)
+  .catch(error => {
+    console.log('!!!', error);
+    return data;
+  });
 };
 
 export default function (router) {
@@ -193,15 +200,17 @@ export default function (router) {
     },
     get: {
       populate: [
-        { path: 'sections.pages.id', select: 'name path' },
-        { path: 'sections.people.id', select: 'name image' },
+        { path: 'sections.pages.id', select: 'name path', model: 'Page' },
+        { path: 'sections.people.id', select: 'name image', model: 'User' },
         {
           path: 'sections.eventId',
           select: 'name path start end dates times address location ' +
-            'image'
+            'image',
+          model: 'Event'
         },
-        { path: 'sections.libraryId', select: 'name path' },
-        { path: 'sections.formTemplateId', select: 'name' }
+        { path: 'sections.libraryId', select: 'name path', model: 'Library' },
+        { path: 'sections.formTemplateId', select: 'name',
+          model: 'FormTemplate' }
       ],
       transformOut: (page, req) => {
         if (page && req.query.populate) {

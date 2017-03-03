@@ -5,7 +5,7 @@ import { getItem } from '../../actions';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
 
-export default class PageSummaries extends Component {
+export default class PagesSection extends Component {
 
   constructor () {
     super();
@@ -83,6 +83,6 @@ export default class PageSummaries extends Component {
   }
 };
 
-PageSummaries.propTypes = {
+PagesSection.propTypes = {
   pages: PropTypes.array
 };

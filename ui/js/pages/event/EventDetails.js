@@ -7,8 +7,6 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
 import DateTimeInput from '../../components/DateTimeInput';
 import SelectSearch from '../../components/SelectSearch';
-import ImageField from '../../components/ImageField';
-import TextHelp from '../../components/TextHelp';
 import TrashIcon from '../../icons/Trash';
 import { getLocationParams } from '../../utils/Params';
 
@@ -25,46 +23,44 @@ export default class EventDetails extends Component {
 
   constructor () {
     super();
-    this._onStartChange = this._onStartChange.bind(this);
+    this._onToggle = this._onToggle.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
     this._onChangePrimaryEvent = this._onChangePrimaryEvent.bind(this);
-    this.state = { domains: [], calendars: [] };
+    this.state = { active: false, domains: [], calendars: [] };
   }
 
   componentDidMount () {
     const { formState, session } = this.props;
+    const params = getLocationParams();
+    if (params.calendarId) {
+      formState.change('calendarId')(params.calendarId);
+    }
+    if (session.administratorDomainId) {
+      formState.change('domainId')(session.administratorDomainId);
+    }
+  }
+
+  _get () {
+    const { session } = this.props;
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(domains => this.setState({ domains: domains }))
-      .catch(error => console.log('EventFormContents catch', error));
-    } else if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+      .catch(error => console.log('EventDetails catch', error));
     }
 
     getItems('calendars', { sort: 'name' })
     .then(calendars => this.setState({ calendars: calendars }))
-    .catch(error => console.log('EventFormContents calendars catch', error));
-
-    const params = getLocationParams();
-    if (params.calendarId) {
-      this.props.formState.change('calendarId')(params.calendarId);
-    }
+    .catch(error => console.log('EventDetails calendars catch', error));
   }
 
-  _onStartChange (start) {
-    const { formState } = this.props;
-    const event = formState.object;
-    let props = {};
-    // Set end date to match if unset or earlier
-    if (moment.isMoment(start)) {
-      if (! event.end || start.isAfter(event.end)) {
-        props.end = moment(start).add(1, 'hour').toISOString();
-      }
-      start = start.toISOString();
+  _onToggle () {
+    const { calendars } = this.state;
+    const active = ! this.state.active;
+    if (active && calendars.length === 0) {
+      this._get();
     }
-    props.start = start;
-    formState.set(props);
+    this.setState({ active: ! this.state.active });
   }
 
   _otherTimeChange (field, index) {
@@ -90,109 +86,66 @@ export default class EventDetails extends Component {
 
   render () {
     const { formState, session } = this.props;
-    const { calendars, domains } = this.state;
+    const { active, calendars, domains } = this.state;
     const event = formState.object;
 
-    let primaryEvent;
-    if (! event.dates || event.dates.length === 0) {
-      primaryEvent = (
-        <FormField label="Primary event" help="For recurring event one-offs">
-          <SelectSearch category="events"
-            options={{select: 'name start', sort: '-start'}}
-            Suggestion={Suggestion} clearable={true}
-            value={(event.primaryEventId || {}).name || ''}
-            onChange={this._onChangePrimaryEvent} />
-        </FormField>
-      );
-    }
+    let contents;
+    if (active) {
+      let primaryEvent;
+      if (! event.dates || event.dates.length === 0) {
+        primaryEvent = (
+          <FormField label="Primary event" help="For recurring event one-offs">
+            <SelectSearch category="events"
+              options={{select: 'name start', sort: '-start'}}
+              Suggestion={Suggestion} clearable={true}
+              value={(event.primaryEventId || {}).name || ''}
+              onChange={this._onChangePrimaryEvent} />
+          </FormField>
+        );
+      }
 
-    let otherTimes;
-    if (event.times && event.times.length > 0) {
-      otherTimes = event.times.map((time, index) => [
-        <FormField key={`start-${index}`} label="Also starts"
-          closeControl={
-            <button type="button" className="button-icon"
-              onClick={formState.removeAt('times', index)}>
-              <TrashIcon secondary={true} />
-            </button>
-          }>
-          <DateTimeInput value={time.start || ''}
-            onChange={this._otherTimeChange('start', index)} />
-        </FormField>,
-        <FormField key={`end-${index}`} label="Also ends">
-          <DateTimeInput value={time.end || ''}
-            onChange={this._otherTimeChange('end', index)} />
-        </FormField>
-      ]);
-    }
+      let otherTimes;
+      if (event.times && event.times.length > 0) {
+        otherTimes = event.times.map((time, index) => [
+          <FormField key={`start-${index}`} label="Also starts"
+            closeControl={
+              <button type="button" className="button-icon"
+                onClick={formState.removeAt('times', index)}>
+                <TrashIcon secondary={true} />
+              </button>
+            }>
+            <DateTimeInput value={time.start || ''}
+              onChange={this._otherTimeChange('start', index)} />
+          </FormField>,
+          <FormField key={`end-${index}`} label="Also ends">
+            <DateTimeInput value={time.end || ''}
+              onChange={this._otherTimeChange('end', index)} />
+          </FormField>
+        ]);
+      }
 
-    let administeredBy;
-    if (session.administrator) {
-      let domainOptions = domains.map(domain => (
-        <option key={domain._id} label={domain.name} value={domain._id} />
+      let administeredBy;
+      if (session.administrator) {
+        let domainOptions = domains.map(domain => (
+          <option key={domain._id} label={domain.name} value={domain._id} />
+        ));
+        domainOptions.unshift(<option key={0} />);
+        administeredBy = (
+          <FormField label="Administered by">
+            <select name="domainId" value={event.domainId || ''}
+              onChange={formState.change('domainId')}>
+              {domainOptions}
+            </select>
+          </FormField>
+        );
+      }
+
+      let calendarOptions = calendars.map(calendar => (
+        <option key={calendar._id} label={calendar.name} value={calendar._id} />
       ));
-      domainOptions.unshift(<option key={0} />);
-      administeredBy = (
-        <FormField label="Administered by">
-          <select name="domainId" value={event.domainId || ''}
-            onChange={formState.change('domainId')}>
-            {domainOptions}
-          </select>
-        </FormField>
-      );
-    }
+      calendarOptions.unshift(<option key={0} />);
 
-    let calendarOptions = calendars.map(calendar => (
-      <option key={calendar._id} label={calendar.name} value={calendar._id} />
-    ));
-    calendarOptions.unshift(<option key={0} />);
-
-    return (
-      <div>
-        <fieldset className="form__fields">
-          <FormField label="Name">
-            <input name="name" value={event.name || ''}
-              onChange={formState.change('name')}/>
-          </FormField>
-          <FormField label="Starts">
-            <DateTimeInput value={event.start || ''}
-              onChange={this._onStartChange} />
-          </FormField>
-          <FormField label="Ends">
-            <DateTimeInput value={event.end || ''}
-              onChange={formState.change('end')} />
-          </FormField>
-          <FormField label="Location">
-            <input name="location" value={event.location || ''}
-              onChange={formState.change('location')}/>
-          </FormField>
-        </fieldset>
-
-        <fieldset className="form__fields">
-          <ImageField label="Image" name="image"
-            formState={formState} property="image" />
-          <FormField label="Text" help={<TextHelp />}>
-            <textarea name="text" value={event.text || ''} rows={4}
-              onChange={formState.change('text')}/>
-          </FormField>
-          <FormField label="Address">
-            <input name="address" value={event.address || ''}
-              onChange={formState.change('address')}/>
-          </FormField>
-          <FormField name="formTemplateId" label="Form template">
-            <SelectSearch category="form-templates" clearable={true}
-              value={(event.formTemplateId || {}).name || ''}
-              onChange={(suggestion) => {
-                if (suggestion) {
-                  formState.change('formTemplateId')({
-                    _id: suggestion._id, name: suggestion.name });
-                } else {
-                  formState.set('formTemplateId', undefined);
-                }
-              }} />
-          </FormField>
-        </fieldset>
-
+      contents = (
         <fieldset className="form__fields">
           <FormField label="Calendar">
             <select name="calendarId"
@@ -213,9 +166,6 @@ export default class EventDetails extends Component {
           </FormField>
           {administeredBy}
           {primaryEvent}
-        </fieldset>
-
-        <fieldset className="form__fields">
           {otherTimes}
           <FormFieldAdd>
             <Button label="Add another time" secondary={true}
@@ -223,6 +173,16 @@ export default class EventDetails extends Component {
                 { start: event.start, end: event.end })} />
           </FormFieldAdd>
         </fieldset>
+      );
+    }
+
+    return (
+      <div>
+        <div type="button" className="form-item">
+          <Button secondary={true} label="Details"
+            onClick={this._onToggle} />
+        </div>
+        {contents}
       </div>
     );
   }

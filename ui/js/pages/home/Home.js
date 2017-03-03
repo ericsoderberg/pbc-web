@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import { getSite, getItem, deleteSession } from '../../actions';
-import PageContents from '../page/PageContents';
+import Sections from '../../components/Sections';
 import Section from '../../components/Section';
 import FacebookIcon from '../../icons/Facebook';
 import InstagramIcon from '../../icons/Instagram';
@@ -247,11 +247,14 @@ class Home extends Component {
 
     let splash = this._renderSplash();
 
-    let pageContents;
+    let sections;
     if (page) {
-      pageContents = <PageContents key="page" item={page} />;
+      sections = (
+        <Sections key="page" align={page.align}
+          sections={page.sections} />
+      );
     } else {
-      pageContents = <Loading key="page" />;
+      sections = <Loading key="page" />;
     }
 
     let menuControlClasses = ["home__menu-control"];
@@ -299,7 +302,7 @@ class Home extends Component {
         </Button>
       </header>,
       splash,
-      pageContents,
+      sections,
       search,
       footer
     ];

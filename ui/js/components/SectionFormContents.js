@@ -1,18 +1,19 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
-import TrashIcon from '../../icons/Trash';
+import DownIcon from '../icons/Down';
+import UpIcon from '../icons/Up';
+import TrashIcon from '../icons/Trash';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
-import CalendarSectionEdit from './CalendarSectionEdit';
-import EventSectionEdit from './EventSectionEdit';
-import FilesSectionEdit from './FilesSectionEdit';
-import LibrarySectionEdit from './LibrarySectionEdit';
-import PeopleSectionEdit from './PeopleSectionEdit';
-import PagesSectionEdit from './PagesSectionEdit';
+import CalendarSectionEdit from '../pages/calendar/CalendarSectionEdit';
+import EventSectionEdit from '../pages/event/EventSectionEdit';
+import FilesSectionEdit from '../pages/file/FilesSectionEdit';
+import LibrarySectionEdit from '../pages/library/LibrarySectionEdit';
+import PeopleSectionEdit from '../pages/user/PeopleSectionEdit';
+import PagesSectionEdit from '../pages/page/PagesSectionEdit';
 import VideoSectionEdit from './VideoSectionEdit';
-import FormSectionEdit from './FormSectionEdit';
+import FormSectionEdit from '../pages/form/FormSectionEdit';
+import MapSectionEdit from './MapSectionEdit';
 
 const SECTIONS = {
   calendar: CalendarSectionEdit,
@@ -21,13 +22,14 @@ const SECTIONS = {
   form: FormSectionEdit,
   image: ImageSectionEdit,
   library: LibrarySectionEdit,
+  map: MapSectionEdit,
   pages: PagesSectionEdit,
   text: TextSectionEdit,
   people: PeopleSectionEdit,
   video: VideoSectionEdit
 };
 
-export default class PageFormSection extends Component {
+export default class SectionFormContents extends Component {
 
   constructor () {
     super();
@@ -42,8 +44,8 @@ export default class PageFormSection extends Component {
   render () {
     const { formState, index } = this.props;
     const { expanded } = this.state;
-    const page = formState.object;
-    const section = page.sections[index];
+    const item = formState.object;
+    const section = item.sections[index];
 
     const Section = SECTIONS[section.type];
 
@@ -58,7 +60,7 @@ export default class PageFormSection extends Component {
     }
 
     let lower;
-    if (index < (page.sections.length - 1)) {
+    if (index < (item.sections.length - 1)) {
       lower = (
         <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index+1)}>
@@ -77,8 +79,8 @@ export default class PageFormSection extends Component {
 
     return (
       <div>
-        <div type="button" className="form-item">
-          <button type="button" className="button-plain form-item-control"
+        <div type="button" className="form-item form-item__controls">
+          <button type="button" className="button-plain form-item__control"
             onClick={this._onToggle}>
             <h3>{section.type}</h3>
           </button>
@@ -97,7 +99,7 @@ export default class PageFormSection extends Component {
   }
 };
 
-PageFormSection.propTypes = {
+SectionFormContents.propTypes = {
   formState: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired
 };

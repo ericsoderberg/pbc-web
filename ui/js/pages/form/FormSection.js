@@ -11,7 +11,6 @@ import AddIcon from '../../icons/Add';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
 import PaymentPay from '../payment/PaymentPay';
-import RightIcon from '../../icons/Right';
 import { calculateTotal } from './FormUtils';
 
 const LABEL = {
@@ -49,7 +48,7 @@ FormItem.propTypes = {
   verb: PropTypes.string.isRequired
 };
 
-class FormSummary extends Component {
+class FormSection extends Component {
 
   constructor (props) {
     super(props);
@@ -258,7 +257,7 @@ class FormSummary extends Component {
   }
 };
 
-FormSummary.propTypes = {
+FormSection.propTypes = {
   formTemplate: PropTypes.object, // when does this happen?
   formTemplateId: PropTypes.oneOfType([
     PropTypes.string, PropTypes.object]),
@@ -273,4 +272,4 @@ const select = (state, props) => ({
   session: state.session
 });
 
-export default Stored(FormSummary, select);
+export default Stored(FormSection, select);

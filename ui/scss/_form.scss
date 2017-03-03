@@ -261,8 +261,12 @@
   max-width: $form-width - $double-unit;
 }
 
-.form-item-control {
+.form-item__controls {
+  margin-top: $unit;
+  background-color: rgba($control-background-color, 0.1);
+}
 
+.form-item__control {
   &:hover {
     background-color: $control-hover-background;
     color: $control-hover-color;
@@ -281,7 +285,7 @@
   display: flex;
   flex-direction: column;
   max-width: $form-width;
-  margin: 0 auto;
+  margin: $unit auto;
 }
 
 .form-field-add__control {

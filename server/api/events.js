@@ -132,6 +132,16 @@ function eventDates (event) {
 const unsetReferences = (data) => {
   data = unsetCalendarIfNeeded(data);
   data = unsetDomainIfNeeded(data);
+  // remove deprecated text property
+  if (! data.$unset) {
+    data.$unset = {};
+  }
+  data.$unset.text = '';
+  // remove deprecated address property
+  if (! data.$unset) {
+    data.$unset = {};
+  }
+  data.$unset.address = '';
   return data;
 };
 
@@ -191,8 +201,26 @@ export default function (router) {
       populate: [
         { path: 'primaryEventId', select: 'name path' },
         { path: 'calendarId', select: 'name path' },
-        { path: 'formTemplateId', select: 'name' }
-      ]
+        { path: 'sections.formTemplateId', select: 'name',
+          model: 'FormTemplate' }
+      ],
+      transformOut: (doc) => {
+        // convert deprecated text property to a section
+        doc = doc.toObject();
+        if (doc.text) {
+          if (doc.sections.length === 0) {
+            doc.sections.push({ type: 'text', text: doc.text });
+          }
+          delete doc.text;
+        }
+        if (doc.address) {
+          if (doc.sections.length === 0) {
+            doc.sections.push({ type: 'map', address: doc.address });
+          }
+          delete doc.address;
+        }
+        return doc;
+      }
     },
     put: {
       transformIn: unsetReferences

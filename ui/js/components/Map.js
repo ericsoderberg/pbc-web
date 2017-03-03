@@ -110,13 +110,18 @@ export default class Map extends Component {
   }
 
   render () {
+    const { className } = this.props;
     const { address, busy, lat, mergedAddress } = this.state;
+    let classNames = ['map'];
+    if (className) {
+      classNames.push(className);
+    }
     let addressElement;
     if (! busy && ! lat) {
       addressElement = <div className="map__address">{address}</div>;
     }
     return (
-      <div className="map">
+      <div className={classNames.join(' ')}>
         <a className="map__link"
           href={`maps://?daddr=${encodeURIComponent(mergedAddress)}`} />
         <div ref="map" id="map" className="map__map">

@@ -124,6 +124,7 @@
 
   .section.image,
   .section.video,
+  .section.map,
   .footer {
     max-width: none;
     margin: 0;
@@ -216,6 +217,10 @@
 .map {
   position: relative;
   min-height: round($unit * 8);
+}
+
+.section.map {
+  height: round($unit * 12);
 }
 
 .map__link {

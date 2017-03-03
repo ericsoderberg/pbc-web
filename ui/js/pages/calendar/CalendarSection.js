@@ -1,15 +1,12 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import moment from 'moment';
 import { getItem, getItems } from '../../actions';
-import EventTimes from '../../components/EventTimes';
-import Map from '../../components/Map';
 import Section from '../../components/Section';
 import Button from '../../components/Button';
-import EventSummary from '../event/EventSummary';
+import EventSection from '../event/EventSection';
 
-export default class CalendarSummary extends Component {
+export default class CalendarSection extends Component {
 
   constructor (props) {
     super(props);
@@ -84,7 +81,7 @@ export default class CalendarSummary extends Component {
       .map(event => (
         <Section key={event._id} align='center' full={true}
           backgroundImage={event.image}>
-          <EventSummary key={event._id} id={event} />
+          <EventSection key={event._id} id={event} />
         </Section>
       ));
     } else {
@@ -114,7 +111,7 @@ export default class CalendarSummary extends Component {
   }
 };
 
-CalendarSummary.propTypes = {
+CalendarSection.propTypes = {
   excludeEventIds: PropTypes.arrayOf(PropTypes.string),
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 };

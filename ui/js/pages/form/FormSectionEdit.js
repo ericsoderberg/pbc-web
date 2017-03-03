@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
-import SectionEdit from './SectionEdit';
+import SectionEdit from '../../components/SectionEdit';
 
 export default class FormSectionEdit extends Component {
 

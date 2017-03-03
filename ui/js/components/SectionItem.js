@@ -1,8 +1,8 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
-import TrashIcon from '../../icons/Trash';
+import DownIcon from '../icons/Down';
+import UpIcon from '../icons/Up';
+import TrashIcon from '../icons/Trash';
 
 export default class SectionItem extends Component {
   render () {

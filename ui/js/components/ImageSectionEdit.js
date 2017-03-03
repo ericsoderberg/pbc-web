@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import FormField from '../../components/FormField';
-import FormState from '../../utils/FormState';
+import FormField from './FormField';
+import FormState from '../utils/FormState';
 import SectionEdit from './SectionEdit';
 
 export default class ImageSectionEdit extends Component {

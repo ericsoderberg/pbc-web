@@ -56,7 +56,7 @@ export default class ChildEdit extends Component {
     return (
       <div>
         <div type="button" className="form-item">
-          <button type="button" className="button-plain form-item-control"
+          <button type="button" className="button-plain form-item__control"
             onClick={this._onToggle}>
             <h3>{child.name}</h3>
           </button>

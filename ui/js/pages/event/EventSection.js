@@ -8,7 +8,7 @@ import RightIcon from '../../icons/Right';
 // import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 
-export default class EventSummary extends Component {
+export default class EventSection extends Component {
 
   constructor (props) {
     super(props);
@@ -103,7 +103,7 @@ export default class EventSummary extends Component {
   }
 };
 
-EventSummary.propTypes = {
+EventSection.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   includeMap: PropTypes.bool,
   navigable: PropTypes.bool

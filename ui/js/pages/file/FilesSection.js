@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { getItem } from '../../actions';
 import Audio from '../../components/Audio';
 
-export default class FilesSummary extends Component {
+export default class FilesSection extends Component {
 
   constructor () {
     super();
@@ -90,6 +90,6 @@ export default class FilesSummary extends Component {
   }
 };
 
-FilesSummary.propTypes = {
+FilesSection.propTypes = {
   files: PropTypes.array
 };

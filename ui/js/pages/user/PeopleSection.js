@@ -5,7 +5,7 @@ import Markdown from 'markdown-to-jsx';
 import { getItem } from '../../actions';
 import Image from '../../components/Image';
 
-export default class PeopleSummary extends Component {
+export default class PeopleSection extends Component {
 
   constructor () {
     super();
@@ -83,6 +83,6 @@ export default class PeopleSummary extends Component {
   }
 };
 
-PeopleSummary.propTypes = {
+PeopleSection.propTypes = {
   people: PropTypes.array
 };

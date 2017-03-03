@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
-import PageContents from './PageContents';
+import Sections from '../../components/Sections';
 
 export default class PagePreview extends Component {
 
@@ -11,7 +11,7 @@ export default class PagePreview extends Component {
     return (
       <main className="page-preview">
         <PageHeader title="Preview" />
-        <PageContents item={page} />
+        <Sections align={page.align} sections={page.sections} />
       </main>
     );
   }

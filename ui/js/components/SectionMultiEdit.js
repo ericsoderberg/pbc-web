@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import FormFieldAdd from '../../components/FormFieldAdd';
-import Button from '../../components/Button';
+import FormFieldAdd from './FormFieldAdd';
+import Button from './Button';
 import SectionFields from './SectionFields';
 import SectionItem from './SectionItem';
 

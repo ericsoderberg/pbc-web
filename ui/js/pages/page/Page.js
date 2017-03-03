@@ -6,7 +6,7 @@ import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
 import Stored from '../../components/Stored';
-import PageContents from './PageContents';
+import Sections from '../../components/Sections';
 
 class Page extends Component {
 
@@ -46,7 +46,7 @@ class Page extends Component {
     let actions;
     let contents;
     if (page) {
-      contents = <PageContents item={page} />;
+      contents = <Sections align={page.align} sections={page.sections} />;
       if (session && (session.administrator ||
         session.administratorDomainId === page.domainId)) {
         actions = [

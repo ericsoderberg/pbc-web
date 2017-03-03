@@ -94,7 +94,7 @@ export default class AdultEdit extends Component {
     return (
       <div>
         <div type="button" className="form-item">
-          <button type="button" className="button-plain form-item-control"
+          <button type="button" className="button-plain form-item__control"
             onClick={this._onToggle}>
             <h3>{adult.name || user.name }</h3>
           </button>

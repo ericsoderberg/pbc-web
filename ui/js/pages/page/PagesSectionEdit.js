@@ -4,7 +4,7 @@ import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
-import SectionMultiEdit from './SectionMultiEdit';
+import SectionMultiEdit from '../../components/SectionMultiEdit';
 
 class PageItemEdit extends Component {
 

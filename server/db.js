@@ -73,53 +73,70 @@ const domainSchema = Schema({
 
 mongoose.model('Domain', domainSchema);
 
-const pageSectionSchema = Schema({
+// page sections
+
+const sectionDef = {
   backgroundImage: image,
-  // calendar type
-  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   color: String,
-  // event type
+  full: Boolean
+};
+
+const textSectionDef = { text: String };
+const imageSectionDef = { image };
+const videoSectionDef = { url: String };
+const calendarSectionDef = {
+  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' }
+};
+const eventSectionDef = {
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
-  // files type
+  includeMap: Boolean,
+  navigable: Boolean
+};
+const librarySectionDef ={
+  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' }
+};
+const formSectionDef = {
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' }
+};
+const peopleSectionDef = {
+  people: [{
+    id: { type: Schema.Types.ObjectId, ref: 'User' },
+    image: image,
+    text: String
+  }]
+};
+const pagesSectionDef = {
+  pages: [{
+    id: { type: Schema.Types.ObjectId, ref: 'Page' },
+    image: image
+  }]
+};
+const filesSectionDef = {
   files: [{
     _id: String,
     label: String,
     name: String,
     size: Number,
     type: { type: String }
-  }],
-  // form type
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
-  full: Boolean,
-  // event type
-  includeMap: Boolean,
-  // image type
-  image: image,
-  // library type
-  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
-  // event type
-  navigable: Boolean,
-  // pages type
-  pages: [{
-    id: { type: Schema.Types.ObjectId, ref: 'Page' },
-    image: image
-  }],
-  // people type
-  people: [{
-    id: { type: Schema.Types.ObjectId, ref: 'User' },
-    image: image,
-    text: String
-  }],
-  // text type
-  text: String,
-  type: { type: String,
-    enum: [
-      'calendar', 'event', 'files', 'form', 'image', 'library',
-      'people', 'pages', 'text', 'video'
-    ]
-  },
-  // video type
-  url: String
+  }]
+};
+const mapSectionDef = {
+  address: String
+};
+
+const pageSectionSchema = Schema({
+  type: { type: String },
+  ...sectionDef,
+  ...textSectionDef,
+  ...imageSectionDef,
+  ...videoSectionDef,
+  ...calendarSectionDef,
+  ...eventSectionDef,
+  ...librarySectionDef,
+  ...formSectionDef,
+  ...peopleSectionDef,
+  ...pagesSectionDef,
+  ...filesSectionDef
 });
 
 const pageSchema = Schema({
@@ -132,8 +149,28 @@ const pageSchema = Schema({
   path: {type: String, unique: true, sparse: true},
   public: Boolean,
   sections: [pageSectionSchema],
+  // sections: [Schema(sectionDef, {
+  //   discriminatorKey: 'type', _id: false, toObject: { retainKeyOrder: true }
+  // })],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
+
+// var pageSections = pageSchema.path('sections');
+//
+// pageSections.discriminator('text',
+//   Schema(textSectionDef), { toObject: { retainKeyOrder: true } });
+// pageSections.discriminator('image', Schema(imageSectionDef, { _id: false }));
+// pageSections.discriminator('video', Schema(videoSectionDef, { _id: false }));
+// pageSections.discriminator('calendar',
+//   Schema(calendarSectionDef, { _id: false }));
+// pageSections.discriminator('event', Schema(eventSectionDef, { _id: false }));
+// pageSections.discriminator('library',
+//   Schema(librarySectionDef, { _id: false }));
+// pageSections.discriminator('form', Schema(formSectionDef, { _id: false }));
+// pageSections.discriminator('people',
+//   Schema(peopleSectionDef, { _id: false }));
+// pageSections.discriminator('pages', Schema(pagesSectionDef, { _id: false }));
+// pageSections.discriminator('files', Schema(filesSectionDef, { _id: false }));
 
 pageSchema.index({ name: 'text', 'sections.text': 'text' },
   { weights: { name: 5, 'sections.text': 1 } });
@@ -153,6 +190,18 @@ const calendarSchema = Schema({
 
 mongoose.model('Calendar', calendarSchema);
 
+const eventSectionSchema = Schema({
+  type: { type: String },
+  ...sectionDef,
+  ...textSectionDef,
+  ...mapSectionDef,
+  ...imageSectionDef,
+  ...videoSectionDef,
+  ...formSectionDef,
+  ...peopleSectionDef,
+  ...filesSectionDef
+});
+
 const eventSchema = Schema({
   address: String, // mappable
   calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
@@ -160,7 +209,7 @@ const eventSchema = Schema({
   dates: [Date],
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   end: Date,
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
+  // formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   image: image,
   location: String, // room, house owner's name, etc.
   modified: Date,
@@ -171,14 +220,29 @@ const eventSchema = Schema({
   primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' },
   public: Boolean,
   resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }],
+  sections: [eventSectionSchema],
+  // sections: [Schema(sectionDef, { discriminatorKey: 'type', _id: false })],
   start: Date,
-  text: String,
+  text: String, // deprecated but leave for now while upgrading to sections
   times: [{
     end: Date,
     start: Date
   }],
   userId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
+
+// var eventSections = eventSchema.path('sections');
+//
+// eventSections.discriminator('text', Schema(textSectionDef, { _id: false }));
+// eventSections.discriminator('image',
+//   Schema(imageSectionDef, { _id: false }));
+// eventSections.discriminator('video',
+//   Schema(videoSectionDef, { _id: false }));
+// eventSections.discriminator('form', Schema(formSectionDef, { _id: false }));
+// eventSections.discriminator('people',
+//   Schema(peopleSectionDef, { _id: false }));
+// eventSections.discriminator('files',
+//   Schema(filesSectionDef, { _id: false }));
 
 eventSchema.index({ name: 'text', text: 'text' },
   { weights: { name: 5, text: 1 } });

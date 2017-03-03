@@ -6,7 +6,7 @@ import { getItems, getItem } from '../../actions';
 import RightIcon from '../../icons/Right';
 import MessageItem from '../message/MessageItem';
 
-export default class LibrarySummary extends Component {
+export default class LibrarySection extends Component {
 
   constructor (props) {
     super(props);
@@ -106,7 +106,7 @@ export default class LibrarySummary extends Component {
   }
 };
 
-LibrarySummary.propTypes = {
+LibrarySection.propTypes = {
   message: PropTypes.object,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 };

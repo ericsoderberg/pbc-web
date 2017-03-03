@@ -4,7 +4,7 @@ import moment from 'moment';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
-import SectionEdit from './SectionEdit';
+import SectionEdit from '../../components/SectionEdit';
 
 const Suggestion = (props) => (
   <div className="box--between">

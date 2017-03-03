@@ -4,7 +4,7 @@ import { postFile } from '../../actions';
 import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
 import FormState from '../../utils/FormState';
-import SectionMultiEdit from './SectionMultiEdit';
+import SectionMultiEdit from '../../components/SectionMultiEdit';
 
 class FilesItemEdit extends Component {
 

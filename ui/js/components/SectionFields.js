@@ -1,7 +1,7 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import FormField from '../../components/FormField';
-import ImageField from '../../components/ImageField';
+import FormField from './FormField';
+import ImageField from './ImageField';
 
 export default class SectionFields extends Component {
 

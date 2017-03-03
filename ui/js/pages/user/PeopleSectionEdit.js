@@ -5,7 +5,7 @@ import FormState from '../../utils/FormState';
 import SelectSearch from '../../components/SelectSearch';
 import ImageField from '../../components/ImageField';
 import TextHelp from '../../components/TextHelp';
-import SectionMultiEdit from './SectionMultiEdit';
+import SectionMultiEdit from '../../components/SectionMultiEdit';
 
 const Suggestion = (props) => (
   <div className="box--between">

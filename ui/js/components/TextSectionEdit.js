@@ -1,10 +1,11 @@
 "use strict";
 import React, { Component, PropTypes } from 'react';
-import FormField from '../../components/FormField';
-import FormState from '../../utils/FormState';
+import FormField from './FormField';
+import TextHelp from './TextHelp';
+import FormState from '../utils/FormState';
 import SectionEdit from './SectionEdit';
 
-export default class VideoSectionEdit extends Component {
+export default class TextSectionEdit extends Component {
 
   constructor (props) {
     super(props);
@@ -24,16 +25,16 @@ export default class VideoSectionEdit extends Component {
 
     return (
       <SectionEdit formState={formState}>
-        <FormField label="Url" help="Vimeo or YouTube only">
-          <input type="text" name="url" value={section.url || ''}
-            onChange={formState.change('url')}/>
+        <FormField name="text" label="Text" help={<TextHelp />}>
+          <textarea ref="text" name="text" value={section.text || ''} rows={8}
+            onChange={formState.change('text')}/>
         </FormField>
       </SectionEdit>
     );
   }
 };
 
-VideoSectionEdit.defaultProps = {
+TextSectionEdit.defaultProps = {
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired
 };
