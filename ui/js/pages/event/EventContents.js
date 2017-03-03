@@ -3,8 +3,6 @@ import React, { PropTypes } from 'react';
 import moment from 'moment';
 import Section from '../../components/Section';
 import Text from '../../components/Text';
-import Map from '../../components/Map';
-// import FormSummary from '../form/FormSummary';
 import Sections from '../../components/Sections';
 import EventSection from './EventSection';
 
@@ -20,34 +18,18 @@ const EventContents = (props) => {
     );
   }
 
-  let map;
-  if (event.address) {
-    map = (
-      <div className="event-summary__map">
-        <Map address={event.address} title={event.location} plain={true} />
-      </div>
-    );
-  }
-
-  let form;
-  // if (event.formTemplateId) {
-  //   form = (
-  //     <Section align='left'>
-  //       <FormSummary formTemplateId={event.formTemplateId} />
-  //     </Section>
-  //   );
-  // }
-
   let upcoming;
   let now = moment();
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
   .filter(date => date.isAfter(now)).slice(0, 3)
   .map(date => (
-    <li key={date} className="item">{date.format('MMMM Do YYYY')}</li>
+    <li key={date} className="item item--center">
+      {date.format('MMMM Do YYYY')}
+    </li>
   ));
   if (upcomingDates.length > 0) {
     upcoming = (
-      <Section full={false}>
+      <Section align='center' full={false}>
         <div>
           <h3>Upcoming</h3>
           <ul className="list">
@@ -65,8 +47,6 @@ const EventContents = (props) => {
       </Section>
       <Sections sections={event.sections} />
       {text}
-      {map}
-      {form}
       {upcoming}
     </div>
   );

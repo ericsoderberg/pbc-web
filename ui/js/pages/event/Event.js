@@ -54,7 +54,7 @@ class Event extends Component {
       <main>
         <ItemHeader category="events" item={event} actions={actions} />
         {contents}
-        <PageContext
+        <PageContext align='center'
           filter={event ? { 'sections.eventId': event._id } : undefined} />
       </main>
     );

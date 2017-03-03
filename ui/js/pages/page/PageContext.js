@@ -39,12 +39,13 @@ export default class PageContext extends Component {
   }
 
   render () {
+    const { align } = this.props;
     const { pages } = this.state;
     let result = null;
     if (pages.length > 0) {
       const pageItems = pages.map(page => (
         <li key={page._id}>
-          <PageItem item={page} />
+          <PageItem align={align} item={page} />
         </li>
       ));
       result = (
@@ -58,5 +59,6 @@ export default class PageContext extends Component {
 }
 
 PageContext.propTypes = {
+  align: PropTypes.oneOf(['start', 'center', 'end']),
   filter: PropTypes.object
 };

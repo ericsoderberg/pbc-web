@@ -98,6 +98,15 @@ button.item__container {
   }
 }
 
+.item--center {
+  @media all and (min-width: 700px) {
+    justify-content: center;
+  }
+  @media all and (max-width: 699px) {
+    text-align: center;
+  }
+}
+
 .item--full {
   padding: $quarter-unit 0;
 }

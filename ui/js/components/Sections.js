@@ -24,9 +24,9 @@ export default class PageContents extends Component {
       } else if ('image' === section.type) {
         contents =  <Image image={section.image} />;
       } else if ('calendar' === section.type) {
-        // exclude events already in page
+        // exclude events already in sections
         const excludeEventIds =
-          page.sections.filter(s => 'event' === s.type)
+          sections.filter(s => 'event' === s.type)
           .map(s => s.eventId._id || s.eventId);
         contents = (
           <CalendarSection key={index} id={section.calendarId}

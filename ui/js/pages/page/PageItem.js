@@ -3,12 +3,16 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
 const PageItem = (props) => {
-  const { className, item: page } = props;
-  let classNames = ['item__container', className];
+  const { align, className, item: page } = props;
+  const classNames = ['item__container', className];
+  const itemClassNames = ['item'];
+  if (align) {
+    itemClassNames.push(`item--${align}`);
+  }
   return (
     <Link className={classNames.join(' ')}
       to={page.path || `/pages/${page._id}`}>
-      <div className="item">
+      <div className={itemClassNames.join(' ')}>
         <span className="item__name">{page.name}</span>
       </div>
     </Link>
@@ -16,6 +20,7 @@ const PageItem = (props) => {
 };
 
 PageItem.propTypes = {
+  align: PropTypes.oneOf(['start', 'center', 'end']),
   item: PropTypes.object
 };
 
