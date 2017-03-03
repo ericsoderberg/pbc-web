@@ -40,7 +40,7 @@ export default class EventSection extends Component {
     const { className, includeMap, navigable } = this.props;
     const { event } = this.state;
 
-    let classes = ["event-summary"];
+    let classes = ["event-section"];
     if (className) {
       classes.push(className);
     }
@@ -51,15 +51,15 @@ export default class EventSection extends Component {
       let location;
       if (event.location) {
         location = (
-          <div className='event-summary__location'>{event.location}</div>
+          <div className='event-section__location'>{event.location}</div>
         );
       }
 
       if (false === navigable) {
         contents = (
-          <div className="event-summary__text-container">
-            <div className="event-summary__text">
-              <h2 className='event-summary__name'>{event.name}</h2>
+          <div className="event-section__text-container">
+            <div className="event-section__text">
+              <h2 className='event-section__name'>{event.name}</h2>
               <EventTimes event={event} reverse={true} size="large" />
               {location}
             </div>
@@ -67,10 +67,10 @@ export default class EventSection extends Component {
         );
       } else {
         contents = (
-          <div className="event-summary__text-container">
-            <Link className="event-summary__text"
+          <div className="event-section__text-container">
+            <Link className="event-section__text"
               to={`/events/${event.path || event._id}`}>
-              <div className='event-summary__name'>
+              <div className='event-section__name'>
                 <h2>{event.name}</h2>
                 <RightIcon />
               </div>
@@ -83,7 +83,7 @@ export default class EventSection extends Component {
 
       if (includeMap && event.address) {
         map = (
-          <div className="event-summary__map">
+          <div className="event-section__map">
             <Map address={event.address} plain={true} />
           </div>
         );
@@ -94,7 +94,7 @@ export default class EventSection extends Component {
 
     return (
       <div className={classes.join(' ')}>
-        <div className="event-summary__contents">
+        <div className="event-section__contents">
           {contents}
           {map}
         </div>
@@ -105,6 +105,7 @@ export default class EventSection extends Component {
 
 EventSection.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  includeBackground: PropTypes.bool,
   includeMap: PropTypes.bool,
   navigable: PropTypes.bool
 };

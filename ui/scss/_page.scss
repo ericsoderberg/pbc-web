@@ -258,11 +258,11 @@
   }
 }
 
-.event-summary {
+.event-section {
   @include section-content;
 }
 
-.event-summary__contents {
+.event-section__contents {
   position: relative;
   display: flex;
 
@@ -279,7 +279,7 @@
   }
 }
 
-.event-summary__text-container {
+.event-section__text-container {
   text-align: center;
 
   .section__container--left & {
@@ -296,7 +296,7 @@
   }
 }
 
-.event-summary__text {
+.event-section__text {
   display: inline-block;
 
   h1,
@@ -324,7 +324,7 @@
   }
 }
 
-a.event-summary__text {
+a.event-section__text {
   padding: $unit;
   text-decoration: none;
 
@@ -338,13 +338,13 @@ a.event-summary__text {
     }
   }
 
-  .event-summary__name {
+  .event-section__name {
     padding-left: $unit;
     padding-right: $unit;
   }
 }
 
-.event-summary__name {
+.event-section__name {
   position: relative;
   display: inline-block;
   margin-bottom: $unit;
@@ -358,19 +358,19 @@ a.event-summary__text {
   }
 }
 
-.event-summary__date {
+.event-section__date {
   font-size: 1.5rem;
   font-weight: 100;
   margin: $half-unit 0;
 }
 
-.event-summary__location {
+.event-section__location {
   font-size: 1.1rem;
   font-weight: 100;
   margin: $half-unit 0;
 }
 
-.event-summary__map {
+.event-section__map {
 
   @media all and (min-width: 700px) {
     flex: 0 0 50%;

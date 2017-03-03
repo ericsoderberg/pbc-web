@@ -13,12 +13,13 @@ import FormSection from '../pages/form/FormSection';
 import FilesSection from '../pages/file/FilesSection';
 import Map from './Map';
 
-export default class PageContents extends Component {
+export default class Sections extends Component {
   render () {
     const { align, sections } = this.props;
     const elements = sections.map((section, index) => {
 
       let contents;
+      let backgroundImage = section.backgroundImage;
       if ('text' === section.type) {
         contents = <Text text={section.text} />;
       } else if ('image' === section.type) {
@@ -35,8 +36,12 @@ export default class PageContents extends Component {
       } else if ('event' === section.type) {
         contents = (
           <EventSection id={section.eventId} includeMap={section.includeMap}
-            navigable={section.navigable} />
+            navigable={section.navigable}
+            includeBackground={section.backgroundImage === undefined} />
         );
+        if (! backgroundImage) {
+          backgroundImage = section.eventId.image;
+        }
       } else if ('library' === section.type) {
         contents =
           <LibrarySection id={section.libraryId} message={section.message} />;
@@ -62,7 +67,7 @@ export default class PageContents extends Component {
         contents = (
           <Section key={index} align={align}
             full={section.full} color={section.color}
-            backgroundImage={section.backgroundImage} plain={section.plain}>
+            backgroundImage={backgroundImage} plain={section.plain}>
             {contents}
           </Section>
         );
@@ -74,12 +79,12 @@ export default class PageContents extends Component {
   }
 }
 
-PageContents.PropTypes = {
+Sections.PropTypes = {
   align: PropTypes.oneOf(['start', 'center', 'end']),
   sections: PropTypes.arrayOf(PropTypes.object)
 };
 
-PageContents.defaultProps = {
+Sections.defaultProps = {
   align: 'center',
   sections: []
 };
