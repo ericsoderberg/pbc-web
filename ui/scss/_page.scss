@@ -155,7 +155,7 @@
 
 .section__container--colored {
 
-  a {
+  a:not(.button-circle) {
     color: inherit;
   }
 }
