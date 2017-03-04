@@ -52,10 +52,14 @@ class Message extends Component {
 }
 
 Message.propTypes = {
-  message: PropTypes.object.isRequired,
+  message: PropTypes.object,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+};
+
+Message.defaultProps = {
+  message: undefined,
 };
 
 const select = (state, props) => {

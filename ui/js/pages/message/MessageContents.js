@@ -56,6 +56,20 @@ export default class MessageContents extends Component {
   render() {
     const message = this.props.item;
 
+    let seriesMessages;
+    let align = 'center';
+    if (message.seriesMessages && message.seriesMessages.length > 0) {
+      const messages = message.seriesMessages.map(seriesMessage => (
+        <MessageItem key={seriesMessage._id} item={seriesMessage} />
+      ));
+      seriesMessages = [
+        <div key="list" className="list">
+          {messages}
+        </div>,
+      ];
+      align = 'start';
+    }
+
     let upcoming;
     if (!message.series && moment(message.date).isAfter(moment())) {
       upcoming = <span> - upcoming</span>;
@@ -69,7 +83,7 @@ export default class MessageContents extends Component {
     let text;
     if (message.text) {
       text = (
-        <Section full={false}>
+        <Section full={false} align={align}>
           <Text text={message.text} />
         </Section>
       );
@@ -92,7 +106,7 @@ export default class MessageContents extends Component {
         } else {
           files.push(
             <a key={file._id} className="item__container" href={path}>
-              <div className="item">{file.label || file.name}</div>
+              <div className="item item--center">{file.label || file.name}</div>
             </a>,
           );
         }
@@ -100,24 +114,12 @@ export default class MessageContents extends Component {
     });
     if (files.length > 0) {
       files = (
-        <Section full={true}>
+        <Section full={true} align={align}>
           <div className="list">
             {files}
           </div>
         </Section>
       );
-    }
-
-    let seriesMessages;
-    if (message.seriesMessages && message.seriesMessages.length > 0) {
-      const messages = message.seriesMessages.map(seriesMessage => (
-        <MessageItem key={seriesMessage._id} item={seriesMessage} />
-      ));
-      seriesMessages = [
-        <div key="list" className="list">
-          {messages}
-        </div>,
-      ];
     }
 
     let footer;
@@ -162,7 +164,7 @@ export default class MessageContents extends Component {
       }
 
       attributes = (
-        <Section>
+        <Section align={align}>
           <dl className="page-attributes section">
             {series}
           </dl>
@@ -173,15 +175,17 @@ export default class MessageContents extends Component {
     return (
       <div>
         {video || image}
-        <header className="message__header">
-          <h1>{message.name}</h1>
-          <div className="secondary">{message.verses}</div>
-          <div className="tertiary">
-            {moment(message.date).format('MMM Do YYYY')}
-            {upcoming}
+        <Section align={align}>
+          <div className="message__header">
+            <h1>{message.name}</h1>
+            <div className="secondary">{message.verses}</div>
+            <div className="tertiary">
+              {moment(message.date).format('MMM Do YYYY')}
+              {upcoming}
+            </div>
+            <div className="secondary">{message.author}</div>
           </div>
-          <div className="secondary">{message.author}</div>
-        </header>
+        </Section>
 
         {audio}
         {!video ? null : image}

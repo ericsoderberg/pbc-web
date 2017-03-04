@@ -200,7 +200,9 @@ export default class Audio extends Component {
 }
 
 Audio.propTypes = {
+  ...Section.propTypes,
   autoPlay: PropTypes.bool,
+  children: PropTypes.any,
   full: PropTypes.bool,
   file: PropTypes.shape({
     _id: PropTypes.string.isRequired,
@@ -210,11 +212,11 @@ Audio.propTypes = {
   }).isRequired,
   onEnd: PropTypes.func,
   onStart: PropTypes.func,
-  ...Section.propTypes,
 };
 
 Audio.defaultProps = {
   autoPlay: false,
+  children: null,
   full: false,
   onEnd: undefined,
   onStart: undefined,
