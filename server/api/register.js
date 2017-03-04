@@ -57,12 +57,14 @@ export default (router, options) => {
       .then(doc => (getOpts.transformOut ?
         getOpts.transformOut(doc, req) : doc))
       .then((doc) => {
-        res.setHeader('Last-Modified',
-          moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'));
+        if (doc.modified) {
+          res.setHeader('Last-Modified',
+            moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'));
+        }
         res.json(doc);
       })
       .catch((error) => {
-        console.error('!!! get', error);
+        console.error('!!! get error', error);
         res.status(typeof error === 'number' ? error : 400).json(error);
       });
     });

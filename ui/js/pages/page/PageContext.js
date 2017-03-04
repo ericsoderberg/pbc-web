@@ -64,6 +64,6 @@ PageContext.propTypes = {
 };
 
 PageContext.defaultProps = {
-  align: undefined,
+  align: 'center',
   filter: undefined,
 };

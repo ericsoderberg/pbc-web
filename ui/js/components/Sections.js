@@ -42,7 +42,7 @@ export default class Sections extends Component {
         }
       } else if (section.type === 'library') {
         contents =
-          <LibrarySection id={section._id} message={section.message} />;
+          <LibrarySection id={section.libraryId} message={section.message} />;
       } else if (section.type === 'people') {
         contents = <PeopleSection people={section.people} />;
       } else if (section.type === 'pages') {

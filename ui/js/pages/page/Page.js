@@ -7,6 +7,7 @@ import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
 import Stored from '../../components/Stored';
 import Sections from '../../components/Sections';
+import PageContext from './PageContext';
 
 class Page extends Component {
 
@@ -63,6 +64,8 @@ class Page extends Component {
       <main>
         <ItemHeader category="pages" item={page} actions={actions} />
         {contents}
+        <PageContext align={(page || {}).align}
+          filter={page ? { 'sections.pages.id': page._id } : undefined} />
       </main>
     );
   }

@@ -1,21 +1,22 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
+import moment from 'moment';
 import '../db';
 import { loadCategoryArray, copyFile } from './utils';
 import results from './results';
+
+mongoose.Promise = global.Promise;
 
 const LIBRARIES = [
   { name: 'Forum', path: 'forum', oldPageIds: [], parentPageId: 510 },
   { name: 'High School', path: 'high-school', oldPageIds: [214] },
   { name: 'Step Closer', path: 'step-closer', oldPageIds: [430] },
   { name: 'Women', path: 'women', oldPageIds: [495, 558] },
-  { name: 'Young Adult', path: 'young-adult', oldPageIds: [431] }
+  { name: 'Young Adult', path: 'young-adult', oldPageIds: [431] },
 ];
 
 // Library
 
-function normalizeOldAudioFile (item) {
+function normalizeOldAudioFile(item) {
   item._id = new mongoose.Types.ObjectId();
   item.oldId = `${item.id}.1`; // to avoid collisions with messages
   item.name = item.audio_file_name;
@@ -24,7 +25,7 @@ function normalizeOldAudioFile (item) {
   return item;
 }
 
-function normalizeAudioMessage (item, library, oldFile) {
+function normalizeAudioMessage(item, library, oldFile) {
   item.oldId = `${item.id}.1`; // to avoid collisions with messages
   item.created = item.created_at || undefined;
   item.modified = item.updated_at || undefined;
@@ -36,13 +37,13 @@ function normalizeAudioMessage (item, library, oldFile) {
       _id: oldFile._id,
       name: oldFile.name,
       size: oldFile.size,
-      type: oldFile.type
+      type: oldFile.type,
     }];
   }
   return item;
 }
 
-function normalizeMessageSeries (item, library) {
+function normalizeMessageSeries(item, library) {
   item._id = new mongoose.Types.ObjectId();
   item.oldId = item.id;
   item.created = item.created_at || undefined;
@@ -52,26 +53,25 @@ function normalizeMessageSeries (item, library) {
   return item;
 }
 
-function audioToOldFile (item, results) {
+function audioToOldFile(item, results) {
   const OldFile = mongoose.model('OldFile');
   return OldFile.findOne({ oldId: `${item.id}.1` }).exec()
-  .then(oldFile => {
+  .then((oldFile) => {
     if (oldFile) {
       return results.skipped('OldFile', oldFile);
-    } else {
-      item = normalizeOldAudioFile(item);
-      // copy before saving
-      return copyFile(item,
-        `audios/${item.id}/original/${item.audio_file_name}`)
-      .then(() => {
-        results.copied('OldFile', oldFile);
-        oldFile = new OldFile(item);
-        return oldFile.save()
-        .then(oldFile => results.saved('OldFile', oldFile))
-        .catch(error => results.errored('OldFile', oldFile, error));
-      })
-      .catch(error => results.errored('OldFile', item, error));
     }
+    item = normalizeOldAudioFile(item);
+    // copy before saving
+    return copyFile(item,
+      `audios/${item.id}/original/${item.audio_file_name}`)
+    .then(() => {
+      results.copied('OldFile', oldFile);
+      oldFile = new OldFile(item);
+      return oldFile.save()
+      .then(oldFileResponse => results.saved('OldFile', oldFileResponse))
+      .catch(error => results.errored('OldFile', oldFile, error));
+    })
+    .catch(error => results.errored('OldFile', item, error));
   });
 }
 
@@ -84,7 +84,7 @@ export default function () {
   const pagesData = loadCategoryArray('pages');
 
   let libraryPromise = Promise.resolve();
-  LIBRARIES.forEach(spec => {
+  LIBRARIES.forEach((spec) => {
 
     // process libraries sequentially
     libraryPromise = libraryPromise
@@ -98,7 +98,13 @@ export default function () {
         if (library) {
           return results.skipped('Library', library);
         } else {
-          const library = new Library({ name: spec.name, path: spec.path });
+          const now = moment.utc().toISOString();
+          const library = new Library({
+            name: spec.name,
+            path: spec.path,
+            created: now,
+            modified: now,
+          });
           return library.save()
           .then(library => results.saved('Library', library))
           .catch(error => results.errored('Library', library, error));
