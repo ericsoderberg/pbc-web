@@ -30,7 +30,8 @@ export default class TextHelp extends Component {
     }
     return (
       <div className={classNames.join(' ')}>
-        <button onClick={this._onToggle}>syntax</button>
+        <button className="button-plain" type="button"
+          onClick={this._onToggle}>syntax</button>
         <pre className="text-help__drop">{HELP}</pre>
       </div>
     );

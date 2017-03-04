@@ -967,6 +967,11 @@
 .text-help {
   position: relative;
 
+  button {
+    line-height: $unit;
+    padding: 0;
+  }
+
   span {
     cursor: pointer;
     text-align: right;
