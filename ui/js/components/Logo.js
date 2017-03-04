@@ -16,13 +16,13 @@ const Logo = (props) => {
         <path d="M61.9,10.2 C61.9,10.2 89.4,-9.3 123.4,6 L123.4,14.8 C123.3,14.8 105.5,4.5 61.9,10.2 Z"
           className="logo__right" />
       </g>
-      <text fontFamily="WorkSans-Light, Work Sans" fontSize="140" fontWeight="300" fill="#FFFFFF">
+      <text fontFamily="WorkSans-Light, 'Work Sans'" fontSize="140" fontWeight="300" fill="#FFFFFF">
         <tspan className="logo__p" x="14.02" y="158">p</tspan>
       </text>
-      <text fontFamily="WorkSans-Light, Work Sans" fontSize="140" fontWeight="300" fill="#FFFFFF">
+      <text fontFamily="WorkSans-Light, 'Work Sans'" fontSize="140" fontWeight="300" fill="#FFFFFF">
         <tspan className="logo__b" x="82.52" y="158">b</tspan>
       </text>
-      <text fontFamily="WorkSans-Light, Work Sans" fontSize="140" fontWeight="300" fill="#FFFFFF">
+      <text fontFamily="WorkSans-Light, 'Work Sans'" fontSize="140" fontWeight="300" fill="#FFFFFF">
         <tspan className="logo__c" x="155" y="158">c</tspan>
       </text>
     </svg>
