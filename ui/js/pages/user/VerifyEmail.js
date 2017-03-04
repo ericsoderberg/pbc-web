@@ -73,25 +73,30 @@ class VerifyEmail extends Component {
         <form className="form" action="/api/users/sign-up">
           <PageHeader title="Verify Email" actions={cancelControl} />
           <FormError message={errorMessage} />
-          <fieldset className="form__fields">
-            <div className="form__text">
-              <p>You can sign in via a link we'll send to your email
-              address.</p>
-            </div>
-            <FormField name="email" label="Email" error={errors.email}>
-              <input ref="email" name="email" value={email}
-                onChange={(event) => this.setState({
-                  email: event.target.value, errors: {} })}/>
-            </FormField>
-          </fieldset>
-          <footer className="form__footer">
-            <button type="submit" className="button" onClick={this._onSendLink}>
-              Send Email
-            </button>
-          </footer>
-          <footer className="form__footer">
-            <Link to="/sign-in">Sign in with a password</Link>
-          </footer>
+          <div className='form__contents'>
+            <fieldset className="form__fields">
+              <div className="form__text">
+                <p>You can sign in via a link we'll send to your email
+                address.</p>
+              </div>
+              <FormField name="email" label="Email" error={errors.email}>
+                <input ref="email" name="email" value={email}
+                  onChange={(event) => this.setState({
+                    email: event.target.value, errors: {} })}/>
+              </FormField>
+            </fieldset>
+          </div>
+          <div className="form__footer-container">
+            <footer className="form__footer">
+              <button type="submit" className="button"
+                onClick={this._onSendLink}>
+                Send Email
+              </button>
+            </footer>
+            <footer className="form__footer">
+              <Link to="/sign-in">Sign in with a password</Link>
+            </footer>
+          </div>
         </form>
       </div>
     );
@@ -103,16 +108,20 @@ class VerifyEmail extends Component {
       <div className="form__container">
         <div className="form">
           <PageHeader title="Verify Email" />
-          <fieldset className="form__fields">
-            <div className="form__text">
-              We've sent an email to {email}. Check your email for a message
-              with the subject 'Verify Email' and click the link in it to
-              sign in.
-            </div>
-          </fieldset>
-          <footer className="form__footer">
-            <Link to="/">Home</Link>
-          </footer>
+          <div className='form__contents'>
+            <fieldset className="form__fields">
+              <div className="form__text">
+                We've sent an email to {email}. Check your email for a message
+                with the subject 'Verify Email' and click the link in it to
+                sign in.
+              </div>
+            </fieldset>
+          </div>
+          <div className="form__footer-container">
+            <footer className="form__footer">
+              <Link to="/">Home</Link>
+            </footer>
+          </div>
         </div>
       </div>
     );
@@ -123,11 +132,13 @@ class VerifyEmail extends Component {
       <div className="form__container">
         <div className="form">
           <PageHeader title="Verify Email" />
-          <fieldset className="form__fields">
-            <div className="form__text">
-              Verifying
-            </div>
-          </fieldset>
+          <div className='form__contents'>
+            <fieldset className="form__fields">
+              <div className="form__text">
+                Verifying
+              </div>
+            </fieldset>
+          </div>
         </div>
       </div>
     );
@@ -139,18 +150,22 @@ class VerifyEmail extends Component {
       <div className="form__container">
         <div className="form">
           <PageHeader title="Verify Email" />
-          <fieldset className="form__fields">
-            <div className="form__text">
-              Thanks for verifying your email {session.name}.
-              You can set a password for your account or just use the site.
-            </div>
+          <div className='form__contents'>
+            <fieldset className="form__fields">
+              <div className="form__text">
+                Thanks for verifying your email {session.name}.
+                You can set a password for your account or just use the site.
+              </div>
             </fieldset>
-          <footer className="form__footer">
-            <Button path={`/users/${session.userId}/edit`} secondary={true}>
-              Edit Account
-            </Button>
-            <Button path="/" secondary={true}>Home</Button>
-          </footer>
+          </div>
+          <div className="form__footer-container">
+            <footer className="form__footer">
+              <Button path={`/users/${session.userId}/edit`} secondary={true}>
+                Edit Account
+              </Button>
+              <Button path="/" secondary={true}>Home</Button>
+            </footer>
+          </div>
         </div>
       </div>
     );

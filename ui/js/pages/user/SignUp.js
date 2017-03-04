@@ -80,28 +80,34 @@ export default class SignUp extends Component {
           onSubmit={this._onSignUp}>
           <PageHeader title="Sign Up" actions={cancelControl} />
           <FormError message={errorMessage} />
-          <fieldset className="form__fields">
-            <FormField name="name" label="Name" error={errors.name}>
-              <input ref="name" name="name" value={user.name || ''}
-                onChange={formState.change('name')}/>
-            </FormField>
-            <FormField name="email" label="Email" error={errors.email}>
-              <input name="email" value={user.email || ''}
-                onChange={formState.change('email')}/>
-            </FormField>
-            <FormField name="password" label="Password" error={errors.password}>
-              <input name="password" type="password" value={user.password || ''}
-                onChange={formState.change('password')}/>
-            </FormField>
-          </fieldset>
-          <footer className="form__footer">
-            <button type="submit" className="button" onClick={this._onSignUp}>
-              Sign Up
-            </button>
-          </footer>
-          <footer className="form__footer">
-            <Link to="/sign-in">Sign in</Link>
-          </footer>
+          <div className='form__contents'>
+            <fieldset className="form__fields">
+              <FormField name="name" label="Name" error={errors.name}>
+                <input ref="name" name="name" value={user.name || ''}
+                  onChange={formState.change('name')}/>
+              </FormField>
+              <FormField name="email" label="Email" error={errors.email}>
+                <input name="email" value={user.email || ''}
+                  onChange={formState.change('email')}/>
+              </FormField>
+              <FormField name="password" label="Password"
+                error={errors.password}>
+                <input name="password" type="password"
+                  value={user.password || ''}
+                  onChange={formState.change('password')}/>
+              </FormField>
+            </fieldset>
+          </div>
+          <div className="form__footer-container">
+            <footer className="form__footer">
+              <button type="submit" className="button" onClick={this._onSignUp}>
+                Sign Up
+              </button>
+            </footer>
+            <footer className="form__footer">
+              <Link to="/sign-in">Sign in</Link>
+            </footer>
+          </div>
         </form>
       </div>
     );

@@ -1,15 +1,3 @@
-// .form__container {
-//   display: flex;
-//   min-height: 100vh;
-//
-//   @media all and (min-width: 700px) {
-//     flex-direction: row;
-//   }
-//
-//   @media all and (max-width: 699px) {
-//     flex-direction: column;
-//   }
-// }
 
 .form__container:not(.form__container--inline) {
   @media all and (min-width: 700px) {
@@ -61,6 +49,10 @@
 
 .form__contents {
   padding: 0 $unit;
+
+  @media all and (max-width: 699px) {
+    margin-top: $unit;
+  }
 
   .form__fields:not(.section-edit):first-child {
     margin-top: 0;

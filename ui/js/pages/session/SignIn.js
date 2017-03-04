@@ -54,29 +54,33 @@ export default class SignIn extends Component {
         <form className="form" action="/api/sessions" onSubmit={this._onSignIn}>
           <PageHeader title="Sign In" actions={cancelControl} />
           <FormError message={error} />
-          <fieldset className="form__fields">
-            <FormField name="email" label="Email">
-              <input ref="email" name="email" type='email'
-                value={session.email || ''}
-                onChange={formState.change('email')}/>
-            </FormField>
-            <FormField name="password" label="Password">
-              <input name="password" type="password"
-                value={session.password || ''}
-                onChange={formState.change('password')}/>
-            </FormField>
-          </fieldset>
-          <footer className="form__footer">
-            <button type="submit" className="button" onClick={this._onSignIn}>
-              Sign In
-            </button>
-          </footer>
-          <footer className="form__footer">
-            <Link to="/verify-email">Sign in via email</Link>
-          </footer>
-          <footer className="form__footer">
-            <Link to="/sign-up">Sign up</Link>
-          </footer>
+          <div className='form__contents'>
+            <fieldset className="form__fields">
+              <FormField name="email" label="Email">
+                <input ref="email" name="email" type='email'
+                  value={session.email || ''}
+                  onChange={formState.change('email')}/>
+              </FormField>
+              <FormField name="password" label="Password">
+                <input name="password" type="password"
+                  value={session.password || ''}
+                  onChange={formState.change('password')}/>
+              </FormField>
+            </fieldset>
+          </div>
+          <div className="form__footer-container">
+            <footer className="form__footer">
+              <button type="submit" className="button" onClick={this._onSignIn}>
+                Sign In
+              </button>
+            </footer>
+            <footer className="form__footer">
+              <Link to="/verify-email">Sign in via email</Link>
+            </footer>
+            <footer className="form__footer">
+              <Link to="/sign-up">Sign up</Link>
+            </footer>
+          </div>
         </form>
       </div>
     );
