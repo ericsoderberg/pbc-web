@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import { authorize } from './auth';
 
 mongoose.Promise = global.Promise;
@@ -55,7 +56,11 @@ export default (router, options) => {
       })
       .then(doc => (getOpts.transformOut ?
         getOpts.transformOut(doc, req) : doc))
-      .then(doc => res.json(doc))
+      .then((doc) => {
+        res.setHeader('Last-Modified',
+          moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'));
+        res.json(doc);
+      })
       .catch((error) => {
         console.error('!!! get', error);
         res.status(typeof error === 'number' ? error : 400).json(error);
@@ -70,7 +75,7 @@ export default (router, options) => {
       authorize(req, res)
       .then((session) => {
         const data = req.body;
-        data.modified = new Date();
+        data.modified = moment.utc();
         data.userId = session.userId;
         return data;
       })
@@ -186,7 +191,7 @@ export default (router, options) => {
       authorize(req, res)
       .then((session) => {
         const data = req.body;
-        data.created = new Date();
+        data.created = moment.utc();
         data.modified = data.created;
         data.userId = session.userId;
         return data;

@@ -14,19 +14,20 @@ const PORT = process.env.PORT || 8091;
 const app = express();
 const router = express.Router();
 
-app.use(compression())
-  .use(cookieParser())
-  .use(morgan('tiny'))
-  .use(bodyParser.json({ limit: '16mb' })) // allow for embedded images
-  .use(busboy())
-  .use('', router)
-  .use('/api', api)
-  .use('/file', file)
-  .use('/', rss)
-  .use('/', express.static(path.join(__dirname, '/../dist')))
-  .get('/*', (req, res) => {
-    res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
-  });
+app.set('etag', false)
+.use(compression())
+.use(cookieParser())
+.use(morgan('tiny'))
+.use(bodyParser.json({ limit: '16mb' })) // allow for embedded images
+.use(busboy())
+.use('', router)
+.use('/api', api)
+.use('/file', file)
+.use('/', rss)
+.use('/', express.static(path.join(__dirname, '/../dist')))
+.get('/*', (req, res) => {
+  res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+});
 
 const server = http.createServer(app);
 server.listen(PORT);
