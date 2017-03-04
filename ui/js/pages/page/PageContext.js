@@ -24,6 +24,7 @@ export default class PageContext extends Component {
 
   _load(props) {
     const { filter } = props;
+    this.setState({ pages: [] });
     if (filter) {
       getItems('pages', {
         filter: { public: true, ...filter },
