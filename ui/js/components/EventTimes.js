@@ -62,7 +62,7 @@ const EventTimes = (props) => {
     if (event.times && event.times.length > 0) {
       event.times.forEach((time) => {
         times.push(
-          <span key={time.start} className="event-times__separator">&</span>,
+          <span key="separator" className="event-times__separator">&</span>,
         );
         times.push(
           <span key={time.start} className="event-times__time">
