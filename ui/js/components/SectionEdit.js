@@ -1,21 +1,20 @@
-"use strict";
-import React, { Component, PropTypes } from 'react';
+import React, { PropTypes } from 'react';
 import SectionFields from './SectionFields';
 
-export default class SectionEdit extends Component {
+const SectionEdit = (props) => {
+  const { children, formState } = props;
 
-  render () {
-    const { children, formState } = this.props;
-
-    return (
-      <fieldset className="form__fields section-edit">
-        {children}
-        <SectionFields formState={formState} />
-      </fieldset>
-    );
-  }
-}
+  return (
+    <fieldset className="form__fields section-edit">
+      {children}
+      <SectionFields formState={formState} />
+    </fieldset>
+  );
+};
 
 SectionEdit.propTypes = {
-  formState: PropTypes.object.isRequired
+  children: PropTypes.any.isRequired,
+  formState: PropTypes.object.isRequired,
 };
+
+export default SectionEdit;

@@ -1,14 +1,14 @@
-"use strict";
-import React from 'react';
+
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: family } = props;
-  let classNames = ['item__container', className];
-  let adults = family.adults.map(adult =>
+  const classNames = ['item__container', className];
+  const adults = family.adults.map(adult =>
     (adult.userId || {}).name || (adult.userId || {}).email);
-  let children = family.children.map(child => child.name);
+  const children = family.children.map(child => child.name);
   return (
     <Link className={classNames.join(' ')}
       to={`/families/${family._id}/edit`}>
@@ -20,13 +20,22 @@ const Item = (props) => {
   );
 };
 
-export default class Families extends List {};
+Item.propTypes = {
+  className: PropTypes.string,
+  item: PropTypes.object.isRequired,
+};
+
+Item.defaultProps = {
+  className: undefined,
+};
+
+export default class Families extends List {}
 
 Families.defaultProps = {
   ...List.defaultProps,
   category: 'families',
-  Item: Item,
+  Item,
   path: '/families',
   populate: true,
-  title: 'Families'
+  title: 'Families',
 };

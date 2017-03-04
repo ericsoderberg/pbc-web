@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getSearch } from '../../actions';
@@ -8,7 +7,7 @@ import EventTimes from '../../components/EventTimes';
 import Loading from '../../components/Loading';
 import { getLocationParams } from '../../utils/Params';
 
-const Item = (props) => (
+const Item = props => (
   <div className="search__item">
     <Link className="search__link" to={props.path}>
       {props.item.name}
@@ -17,17 +16,28 @@ const Item = (props) => (
   </div>
 );
 
+Item.propTypes = {
+  children: PropTypes.any,
+  item: PropTypes.shape({
+    name: PropTypes.string,
+  }).isRequired,
+  path: PropTypes.string.isRequired,
+};
+
+Item.defaultProps = {
+  children: null,
+};
 
 export default class Search extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
     this._get = this._get.bind(this);
     this.state = { categories: {}, searchText: '' };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Search';
     const params = getLocationParams();
     if (params.q) {
@@ -35,61 +45,61 @@ export default class Search extends Component {
     }
   }
 
-  _get () {
+  _get() {
     const { searchText } = this.state;
     if (searchText) {
       document.title = `Search - ${searchText}`;
       getSearch(searchText)
       .then(categories => this.setState({ categories, loading: false }))
-      .catch(error => console.log('!!! Search catch', error));
+      .catch(error => console.error('!!! Search catch', error));
     } else {
       document.title = 'Search';
       this.setState({ categories: {}, loading: false });
     }
   }
 
-  _onSearch (event) {
+  _onSearch(event) {
     const searchText = event.target.value;
-    this.setState({ searchText: searchText, loading: true });
+    this.setState({ searchText, loading: true });
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
     // Put the search term in the browser location
     this.context.router.replace({
       pathname: '/search',
-      search: `?q=${encodeURIComponent(searchText)}`
+      search: `?q=${encodeURIComponent(searchText)}`,
     });
   }
 
-  render () {
+  render() {
     const { categories, loading, searchText } = this.state;
 
     let contents = [];
-    (categories.pages || []).map(page => {
-      const content = page.sections.map((section, index) => (
-        <Text key={index}>{section.text}</Text>
+    (categories.pages || []).forEach((page) => {
+      const content = page.sections.map(section => (
+        <Text key={section._id}>{section.text}</Text>
       ));
       contents.push(
         <Item key={page._id} item={page}
           path={page.path || `/pages/${page._id}`}>
           {content}
-        </Item>
+        </Item>,
       );
     });
 
-    (categories.events || []).map(event => {
+    (categories.events || []).forEach((event) => {
       contents.push(
         <Item key={event._id} item={event}
           path={`/events/${event.path || event._id}`}>
           <EventTimes event={event} />
           <Text text={event.text} />
-        </Item>
+        </Item>,
       );
     });
 
-    (categories.libraries || []).map(library => {
+    (categories.libraries || []).forEach((library) => {
       contents.push(
         <Item key={library._id} item={library}
-          path={`/libraries/${library.path || library._id}`} />
+          path={`/libraries/${library.path || library._id}`} />,
       );
     });
 
@@ -110,8 +120,8 @@ export default class Search extends Component {
       </main>
     );
   }
-};
+}
 
 Search.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

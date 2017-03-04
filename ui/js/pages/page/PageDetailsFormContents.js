@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -6,38 +6,38 @@ import Button from '../../components/Button';
 
 export default class PageDetailsFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onToggle = this._onToggle.bind(this);
     this.state = { active: false, domains: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { formState, session } = this.props;
     if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
   }
 
-  _get () {
+  _get() {
     const { session } = this.props;
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('PageDetailsFormContents catch', error));
+      .catch(error => console.error('PageDetailsFormContents catch', error));
     }
   }
 
-  _onToggle () {
+  _onToggle() {
     const { domains } = this.state;
-    const active = ! this.state.active;
+    const active = !this.state.active;
     if (active && domains.length === 0) {
       this._get();
     }
-    this.setState({ active: ! this.state.active });
+    this.setState({ active: !this.state.active });
   }
 
-  render () {
+  render() {
     const { formState, session } = this.props;
     const { active } = this.state;
     const page = formState.object;
@@ -54,13 +54,13 @@ export default class PageDetailsFormContents extends Component {
         </FormField>,
         <FormField key="path" name="path" label="Path" help="unique url name">
           <input name="path" value={page.path || ''}
-            onChange={formState.change('path')}/>
-        </FormField>
+            onChange={formState.change('path')} />
+        </FormField>,
       ];
 
       let administeredBy;
       if (session.administrator) {
-        let domains = this.state.domains.map(domain => (
+        const domains = this.state.domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));
         domains.unshift(<option key={0} />);
@@ -77,7 +77,7 @@ export default class PageDetailsFormContents extends Component {
     }
 
     return (
-      <fieldset ref="container" className="form__fields">
+      <fieldset className="form__fields">
         <div type="button" className="form-item">
           <Button secondary={true} label="Details"
             onClick={this._onToggle} />
@@ -86,9 +86,9 @@ export default class PageDetailsFormContents extends Component {
       </fieldset>
     );
   }
-};
+}
 
 PageDetailsFormContents.propTypes = {
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired
+  session: PropTypes.object.isRequired,
 };

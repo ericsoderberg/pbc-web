@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 import { getItem, getItems } from '../../actions';
@@ -8,27 +7,26 @@ import EventSection from '../event/EventSection';
 
 export default class CalendarSection extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       calendar: (typeof props.id === 'string' ? props.id : {}),
-      events: []
+      events: [],
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (this.props.id !== nextProps.id) {
       this._load(nextProps);
     }
   }
 
-  _load (props) {
+  _load(props) {
     if (props.id) {
-
       let calendarId;
       if (typeof props.id === 'object') {
         calendarId = props.id._id;
@@ -37,7 +35,7 @@ export default class CalendarSection extends Component {
         calendarId = props.id;
         getItem('calendars', props.id)
         .then(calendar => this.setState({ calendar }))
-        .catch(error => console.log('!!! CalendarSummary calendar catch',
+        .catch(error => console.error('!!! CalendarSummary calendar catch',
           error));
       }
 
@@ -45,18 +43,18 @@ export default class CalendarSection extends Component {
       const end = moment(start).add(2, 'month');
       getItems('events', {
         filter: {
-          calendarId: calendarId,
+          calendarId,
           // TODO: move this logic to the server side
           $or: [
             { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-            { dates: { $gte: start.toDate(), $lt: end.toDate() }}
-          ]
-        }
+            { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+          ],
+        },
       })
-      .then(events => {
+      .then((events) => {
         // sort by which comes next
-        const nextDate = (event) => (
-          [ ...event.dates, event.start ]
+        const nextDate = event => (
+          [...event.dates, event.start]
             .map(d => moment(d))
             .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0]
         );
@@ -67,11 +65,11 @@ export default class CalendarSection extends Component {
         });
         this.setState({ events });
       })
-      .catch(error => console.log('!!! CalendarSummary events catch', error));
+      .catch(error => console.error('!!! CalendarSummary events catch', error));
     }
   }
 
-  _renderCalendar () {
+  _renderCalendar() {
     const { excludeEventIds } = this.props;
     const { calendar, events } = this.state;
     let result;
@@ -79,7 +77,7 @@ export default class CalendarSection extends Component {
       result = events
       .filter(event => excludeEventIds.indexOf(event._id) === -1)
       .map(event => (
-        <Section key={event._id} align='center' full={true}
+        <Section key={event._id} align="center" full={true}
           backgroundImage={event.image}>
           <EventSection key={event._id} id={event} />
         </Section>
@@ -96,22 +94,28 @@ export default class CalendarSection extends Component {
     return result;
   }
 
-  render () {
+  render() {
     const { className } = this.props;
-    let classes = ['calendar-summary'];
+    const classes = ['calendar-summary'];
     if (className) {
       classes.push(className);
     }
-    let contents = this._renderCalendar();
+    const contents = this._renderCalendar();
     return (
       <div className={classes.join(' ')}>
         {contents}
       </div>
     );
   }
-};
+}
 
 CalendarSection.propTypes = {
-  excludeEventIds: PropTypes.arrayOf(PropTypes.string),
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+  className: PropTypes.string,
+  excludeEventIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+};
+
+CalendarSection.defaultProps = {
+  className: undefined,
+  id: undefined,
 };

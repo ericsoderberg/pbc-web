@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItem, putItem, deleteItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -9,7 +9,7 @@ import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
 export default class FormEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
     this._onCancel = this._onCancel.bind(this);
@@ -18,42 +18,42 @@ export default class FormEdit extends Component {
     this.state = {
       form: {
         fields: [],
-        formTemplateId: props.formTemplateId || (props.formTemplate || {})._id
+        formTemplateId: props.formTemplateId || (props.formTemplate || {})._id,
       },
-      formTemplate: props.formTemplate || {}
+      formTemplate: props.formTemplate || {},
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     getItem('forms', this.props.id || this.props.params.id)
-    .then(form => {
-      this.setState({ form: form });
+    .then((form) => {
+      this.setState({ form });
       return getItem('form-templates', form.formTemplateId);
     })
-    .then(formTemplate => {
-      this.setState({ formTemplate: formTemplate });
+    .then((formTemplate) => {
+      this.setState({ formTemplate });
       document.title = formTemplate.name;
     })
-    .catch(error => console.log("!!! FormEdit catch", error));
+    .catch(error => console.error('!!! FormEdit catch', error));
   }
 
-  _onUpdate (event) {
+  _onUpdate(event) {
     event.preventDefault();
     const { onDone } = this.props;
     const { formTemplate, form } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
-      this.setState({ error: error });
+      this.setState({ error });
     } else {
       finalizeForm(formTemplate, form);
       putItem('forms', this.state.form)
-      .then(response => (onDone ? onDone() : this.context.router.goBack()))
-      .catch(error => this.setState({ error: error }));
+      .then(() => (onDone ? onDone() : this.context.router.goBack()))
+      .catch(error2 => this.setState({ error2 }));
     }
   }
 
-  _onCancel () {
+  _onCancel() {
     const { onCancel } = this.props;
     if (onCancel) {
       onCancel();
@@ -62,44 +62,43 @@ export default class FormEdit extends Component {
     }
   }
 
-  _onRemove (event) {
+  _onRemove(event) {
     const { onDone } = this.props;
     event.preventDefault();
     deleteItem('forms', this.props.id || this.props.params.id)
-    .then(response => onDone ? onDone() : this.context.router.goBack())
-    .catch(error => this.setState({ error: error }));
+    .then(() => (onDone ? onDone() : this.context.router.goBack()))
+    .catch(error => this.setState({ error }));
   }
 
-  _onChange (form) {
+  _onChange(form) {
     const { formTemplate } = this.state;
     // clear any error for fields that have changed
     const error = clearFormError(formTemplate, form, this.state.error);
-    this.setState({ form: form, error: error });
+    this.setState({ form, error });
   }
 
-  render () {
-    const { full, inline } = this.props;
+  render() {
+    const { className, full, inline } = this.props;
     const { form, formTemplate } = this.state;
-    let classNames = ['form'];
-    if (this.props.className) {
-      classNames.push(this.props.className);
+    const classNames = ['form'];
+    if (className) {
+      classNames.push(className);
     }
 
     let result;
     if (form && formTemplate) {
-
       let submitLabel = 'Update';
       if (formTemplate.payable && form.paymentIds.length === 0) {
         submitLabel = 'Pay';
       }
 
       let header;
-      if (! inline) {
+      if (!inline) {
         const cancelControl = [
           <button key="cancel" type="button" className="button"
             onClick={this._onCancel}>
             Cancel
-          </button>
+          </button>,
         ];
         header = (
           <PageHeader title={formTemplate.name} actions={cancelControl} />
@@ -123,32 +122,38 @@ export default class FormEdit extends Component {
         </form>
       );
 
-      if (! inline) {
+      if (!inline) {
         result = <div className="form__container">{result}</div>;
       }
-
     } else {
       result = <Loading />;
     }
     return result;
   }
-};
+}
 
 FormEdit.propTypes = {
+  className: PropTypes.string,
+  formTemplate: PropTypes.object,
+  formTemplateId: PropTypes.string,
   full: PropTypes.bool,
-  id: PropTypes.string,
+  id: PropTypes.string.isRequired,
   inline: PropTypes.bool,
-  onCancel: PropTypes.func,
-  onDone: PropTypes.func,
+  onCancel: PropTypes.func.isRequired,
+  onDone: PropTypes.func.isRequired,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  })
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 FormEdit.defaultProps = {
-  full: true
+  className: undefined,
+  formTemplate: undefined,
+  formTemplateId: undefined,
+  full: true,
+  inline: false,
 };
 
 FormEdit.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

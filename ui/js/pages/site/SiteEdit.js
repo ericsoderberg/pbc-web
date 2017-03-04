@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { getSite, postSite } from '../../actions';
 import Form from '../../components/Form';
@@ -6,32 +5,32 @@ import SiteFormContents from './SiteFormContents';
 
 export default class SiteEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this.state = { site: {} };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Site';
     getSite()
     // allow for no site existing yet
     .then(site => this.setState({ site: site || {} }))
-    .catch(error => console.log('!!! SiteEdit catch', error));
+    .catch(error => console.error('!!! SiteEdit catch', error));
   }
 
-  _onUpdate (site) {
+  _onUpdate(site) {
     postSite(site)
-    .then(response => this.context.router.goBack())
-    .catch(error => this.setState({ error: error }));
+    .then(() => this.context.router.goBack())
+    .catch(error => this.setState({ error }));
   }
 
-  _onCancel () {
+  _onCancel() {
     this.context.router.goBack();
   }
 
-  render () {
+  render() {
     const { site, error } = this.state;
 
     return (
@@ -40,8 +39,8 @@ export default class SiteEdit extends Component {
         onSubmit={this._onUpdate} error={error} onCancel={this._onCancel} />
     );
   }
-};
+}
 
 SiteEdit.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

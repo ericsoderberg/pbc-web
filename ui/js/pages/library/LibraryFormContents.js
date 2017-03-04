@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -6,30 +6,30 @@ import PodcastEdit from './PodcastEdit';
 
 export default class LibraryFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { domains: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { formState, session } = this.props;
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('LibraryFormContents domains catch', error));
+      .catch(error => console.error('LibraryFormContents domains catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
   }
 
-  render () {
+  render() {
     const { className, formState, session } = this.props;
     const library = formState.object;
 
     let administeredBy;
     if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
+      const domains = this.state.domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
       domains.unshift(<option key={0} />);
@@ -56,16 +56,16 @@ export default class LibraryFormContents extends Component {
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={library.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           <FormField name="path" label="Path" help="unique url name">
             <input name="path" value={library.path || ''}
-              onChange={formState.change('path')}/>
+              onChange={formState.change('path')} />
           </FormField>
           {administeredBy}
           <FormField>
             <input name="podcast" type="checkbox"
-              checked={library.podcast ? true : false}
+              checked={library.podcast}
               onChange={() =>
                 formState.set('podcast', library.podcast ? undefined : {})} />
             <label htmlFor="podcast">podcast</label>
@@ -75,9 +75,14 @@ export default class LibraryFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 LibraryFormContents.propTypes = {
+  className: PropTypes.string,
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired
+  session: PropTypes.object.isRequired,
+};
+
+LibraryFormContents.defaultProps = {
+  className: undefined,
 };

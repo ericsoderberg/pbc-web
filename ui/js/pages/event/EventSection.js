@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
@@ -10,56 +9,56 @@ import Loading from '../../components/Loading';
 
 export default class EventSection extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = { event: (typeof props.id === 'string' ? props.id : {}) };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.id !== this.props.id) {
       this._load(nextProps);
     }
   }
 
-  _load (props) {
+  _load(props) {
     const { id } = props;
     if (typeof id === 'object') {
       this.setState({ event: id });
     } else if (typeof id === 'string') {
       getItem('events', id)
-      .then(event => this.setState({ event: event }))
-      .catch(error => console.log('!!! EventSummary catch', error));
+      .then(event => this.setState({ event }))
+      .catch(error => console.error('!!! EventSummary catch', error));
     }
   }
 
-  render () {
+  render() {
     const { className, includeMap, navigable } = this.props;
     const { event } = this.state;
 
-    let classes = ["event-section"];
+    const classes = ['event-section'];
     if (className) {
       classes.push(className);
     }
 
-    let contents, map;
+    let contents;
+    let map;
     if (event) {
-
       let location;
       if (event.location) {
         location = (
-          <div className='event-section__location'>{event.location}</div>
+          <div className="event-section__location">{event.location}</div>
         );
       }
 
-      if (false === navigable) {
+      if (navigable === false) {
         contents = (
           <div className="event-section__text-container">
             <div className="event-section__text">
-              <h2 className='event-section__name'>{event.name}</h2>
+              <h2 className="event-section__name">{event.name}</h2>
               <EventTimes event={event} reverse={true} size="large" />
               {location}
             </div>
@@ -70,7 +69,7 @@ export default class EventSection extends Component {
           <div className="event-section__text-container">
             <Link className="event-section__text"
               to={`/events/${event.path || event._id}`}>
-              <div className='event-section__name'>
+              <div className="event-section__name">
                 <h2>{event.name}</h2>
                 <RightIcon />
               </div>
@@ -101,11 +100,18 @@ export default class EventSection extends Component {
       </div>
     );
   }
-};
+}
 
 EventSection.propTypes = {
+  className: PropTypes.string,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  includeBackground: PropTypes.bool,
   includeMap: PropTypes.bool,
-  navigable: PropTypes.bool
+  navigable: PropTypes.bool,
+};
+
+EventSection.defaultProps = {
+  className: undefined,
+  id: undefined,
+  includeMap: false,
+  navigable: true,
 };

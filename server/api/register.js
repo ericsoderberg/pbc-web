@@ -1,13 +1,13 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import { authorize } from './auth';
+
+mongoose.Promise = global.Promise;
 
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 // Generic
 
-function addPopulate (query, populate) {
+export function addPopulate(query, populate) {
   if (Array.isArray(populate)) {
     populate.forEach(pop => query.populate(pop));
   } else {
@@ -20,21 +20,21 @@ export default (router, options) => {
   const Doc = mongoose.model(modelName);
   let methods = options.methods || ['get', 'put', 'delete', 'index', 'post'];
   if (options.omit) {
-    methods = methods.filter(m => ! options.omit.some(o => o === m));
+    methods = methods.filter(m => !options.omit.some(o => o === m));
   }
 
   if (methods.indexOf('get') >= 0) {
     const getOpts = options.get || {};
     router.get(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
-      const criteria = ID_REGEXP.test(id) ? {_id: id} : {path: id};
-      let query = Doc.findOne(criteria);
+      const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+      const query = Doc.findOne(criteria);
       if (req.query.select) {
         query.select(req.query.select);
       }
       if (req.query.populate) {
         const populate = JSON.parse(req.query.populate);
-        if (true === populate) {
+        if (populate === true) {
           // populate from options
           if (getOpts.populate) {
             addPopulate(query, getOpts.populate);
@@ -46,19 +46,18 @@ export default (router, options) => {
         addPopulate(query, getOpts.populate);
       }
       query.exec()
-      .then(doc => {
-        if (! doc) {
+      .then((doc) => {
+        if (!doc) {
           res.status(404);
           return Promise.reject(404);
-        } else {
-          return doc;
         }
+        return doc;
       })
       .then(doc => (getOpts.transformOut ?
         getOpts.transformOut(doc, req) : doc))
       .then(doc => res.json(doc))
-      .catch(error => {
-        console.log('!!! get', error);
+      .catch((error) => {
+        console.error('!!! get', error);
         res.status(typeof error === 'number' ? error : 400).json(error);
       });
     });
@@ -69,8 +68,8 @@ export default (router, options) => {
     router.put(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       authorize(req, res)
-      .then(session => {
-        let data = req.body;
+      .then((session) => {
+        const data = req.body;
         data.modified = new Date();
         data.userId = session.userId;
         return data;
@@ -82,8 +81,8 @@ export default (router, options) => {
       .then(doc => (putOpts.transformOut ?
         putOpts.transformOut(doc, req) : doc))
       .then(doc => res.status(200).json(doc))
-      .catch(error => {
-        console.log('!!!', error);
+      .catch((error) => {
+        console.error('!!!', error);
         res.status(400).json(error);
       });
     });
@@ -94,7 +93,7 @@ export default (router, options) => {
     router.delete(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
       authorize(req, res)
-      .then(session => Doc.findById(id).exec())
+      .then(() => Doc.findById(id).exec())
       .then(doc => doc.remove())
       .then(doc => (deleteOpts.deleteRelated ?
         deleteOpts.deleteRelated(doc, req) : doc))
@@ -107,9 +106,9 @@ export default (router, options) => {
     const indexOpts = options.index || {};
     router.get(`/${category}`, (req, res) => {
       authorize(req, res, false)
-      .then(session => {
+      .then((session) => {
         const searchProperties = indexOpts.searchProperties || 'name';
-        let query = Doc.find();
+        const query = Doc.find();
         if (indexOpts.authorize) {
           query.find(indexOpts.authorize(session));
         }
@@ -118,19 +117,19 @@ export default (router, options) => {
             // This isn't working :(
             query.find(
               { $text: { $search: req.query.search } },
-              { score: { $meta: "textScore" } }
+              { score: { $meta: 'textScore' } },
             );
-            query.sort({ score: { $meta: "textScore" }, modified: -1 });
+            query.sort({ score: { $meta: 'textScore' }, modified: -1 });
           } else {
             const exp = new RegExp(req.query.search, 'i');
             if (Array.isArray(searchProperties)) {
-              query.or(searchProperties.map(property => {
-                let obj = {};
+              query.or(searchProperties.map((property) => {
+                const obj = {};
                 obj[property] = exp;
                 return obj;
               }));
             } else {
-              let obj = {};
+              const obj = {};
               obj[searchProperties] = exp;
               query.find(obj);
             }
@@ -145,7 +144,7 @@ export default (router, options) => {
           }
           query.find(filter);
         }
-        if (req.query.sort && (! indexOpts.textSearch || ! req.query.search) ) {
+        if (req.query.sort && (!indexOpts.textSearch || !req.query.search)) {
           query.sort(req.query.sort);
         }
         if (req.query.select) {
@@ -153,7 +152,7 @@ export default (router, options) => {
         }
         if (req.query.populate) {
           const populate = JSON.parse(req.query.populate);
-          if (true === populate) {
+          if (populate === true) {
             // populate from options
             if (indexOpts.populate) {
               addPopulate(query, indexOpts.populate);
@@ -185,8 +184,8 @@ export default (router, options) => {
     const postOpts = options.post || {};
     router.post(`/${category}`, (req, res) => {
       authorize(req, res)
-      .then(session => {
-        let data = req.body;
+      .then((session) => {
+        const data = req.body;
         data.created = new Date();
         data.modified = data.created;
         data.userId = session.userId;
@@ -198,8 +197,8 @@ export default (router, options) => {
       .then(doc => (postOpts.transformOut ?
         postOpts.transformOut(doc, req) : doc))
       .then(doc => res.status(200).json(doc))
-      .catch(error => {
-        console.log(error);
+      .catch((error) => {
+        console.error(error);
         res.status(400).json(error);
       });
     });

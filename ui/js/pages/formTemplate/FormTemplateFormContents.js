@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -11,86 +11,86 @@ import FormTemplateSectionEdit from './FormTemplateSectionEdit';
 
 export default class FormTemplateFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = {
       domains: [],
       expandedSections: {}, // _id or id
-      newSectionId: 1
+      newSectionId: 1,
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { formState, session } = this.props;
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('FormTemplateFormContents catch', error));
+      .catch(error => console.error('FormTemplateFormContents catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
   }
 
-  _addSection () {
+  _addSection() {
     return this.props.formState.addTo('sections', () => {
       const id = this.state.newSectionId;
-      let expandedSections = { ...this.state.expandedSections };
+      const expandedSections = { ...this.state.expandedSections };
       expandedSections[id] = true;
       this.setState({
-        expandedSections: expandedSections,
-        newSectionId: this.state.newSectionId + 1
+        expandedSections,
+        newSectionId: this.state.newSectionId + 1,
       });
-      return { id: id };
+      return { id };
     });
   }
 
-  _toggleSection (id) {
+  _toggleSection(id) {
     return () => {
-      let expandedSections = { ...this.state.expandedSections };
-      expandedSections[id] = ! expandedSections[id];
-      this.setState({ expandedSections: expandedSections });
+      const expandedSections = { ...this.state.expandedSections };
+      expandedSections[id] = !expandedSections[id];
+      this.setState({ expandedSections });
     };
   }
 
-  render () {
+  render() {
     const { className, formState, session } = this.props;
     const { expandedSections, moreActive } = this.state;
     const formTemplate = formState.object;
 
     // build field id/name list for dependencies
-    let dependableFields = [];
-    (formTemplate.sections || []).forEach(section => {
-      (section.fields || []).forEach(field => {
-        if ('instructions' !== field.type) {
+    const dependableFields = [];
+    (formTemplate.sections || []).forEach((section) => {
+      (section.fields || []).forEach((field) => {
+        if (field.type !== 'instructions') {
           dependableFields.push({
             id: field._id || field.id,
             name: field.name,
-            sectionId: section._id || section.id
+            sectionId: section._id || section.id,
           });
         }
       });
     });
 
     const sections = (formTemplate.sections || []).map((section, index) => {
-      let className;
+      let sectionClassName;
 
       const raise = (index === 0 ? undefined : (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index-1)}>
+          onClick={formState.swapWith('sections', index, index - 1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (formTemplate.sections.length - 1) ?
         undefined : (
-        <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index+1)}>
-          <DownIcon />
-        </button>
-      ));
+          <button type="button" className="button-icon"
+            onClick={formState.swapWith('sections', index, index + 1)}>
+            <DownIcon />
+          </button>
+        ));
 
       let header;
       if (formTemplate.sections.length > 1) {
-        className = "form-section";
+        sectionClassName = 'form-section';
         header = (
           <div className="form-item">
             <button type="button" className="button-plain"
@@ -110,10 +110,10 @@ export default class FormTemplateFormContents extends Component {
       }
 
       let edit;
-      if (! header || expandedSections[section._id] ||
+      if (!header || expandedSections[section._id] ||
         expandedSections[section.id]) {
         edit = (
-          <FormTemplateSectionEdit key={index} section={section}
+          <FormTemplateSectionEdit section={section}
             dependableFields={dependableFields}
             includeName={formTemplate.sections.length > 1}
             onChange={formState.changeAt('sections', index)} />
@@ -121,7 +121,7 @@ export default class FormTemplateFormContents extends Component {
       }
 
       return (
-        <div key={index} className={className}>
+        <div key={section._id} className={sectionClassName}>
           {header}
           {edit}
         </div>
@@ -139,7 +139,7 @@ export default class FormTemplateFormContents extends Component {
         <FormField key="message" label="Post submit message">
           <textarea name="postSubmitMessage" rows={2}
             value={formTemplate.postSubmitMessage || ''}
-            onChange={formState.change('postSubmitMessage')}/>
+            onChange={formState.change('postSubmitMessage')} />
         </FormField>,
         <FormField key="ack">
           <input name="acknowledge" type="checkbox"
@@ -164,7 +164,7 @@ export default class FormTemplateFormContents extends Component {
             checked={formTemplate.payable || false}
             onChange={formState.toggle('payable')} />
           <label htmlFor="payable">accept payment</label>
-        </FormField>
+        </FormField>,
       ];
 
       if (formTemplate.payable) {
@@ -174,7 +174,7 @@ export default class FormTemplateFormContents extends Component {
             <textarea name="payByCheckInstructions"
               value={formTemplate.payByCheckInstructions || ''}
               onChange={formState.change('payByCheckInstructions')} />
-          </FormField>
+          </FormField>,
         );
       }
 
@@ -183,11 +183,11 @@ export default class FormTemplateFormContents extends Component {
           <input name="notify"
             value={formTemplate.notify || ''}
             onChange={formState.change('notify')} />
-        </FormField>
+        </FormField>,
       );
 
       if (session.administrator) {
-        let domains = this.state.domains.map(domain => (
+        const domains = this.state.domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));
         domains.unshift(<option key={0} />);
@@ -197,13 +197,13 @@ export default class FormTemplateFormContents extends Component {
               onChange={formState.change('domainId')}>
               {domains}
             </select>
-          </FormField>
+          </FormField>,
         );
       }
     } else {
       more = (
-        <a className="form-fields__more-control"
-          onClick={() => this.setState({ moreActive: true })}>details</a>
+        <button className="form-fields__more-control button button-plain"
+          onClick={() => this.setState({ moreActive: true })}>details</button>
       );
     }
 
@@ -212,7 +212,7 @@ export default class FormTemplateFormContents extends Component {
         <fieldset className="form__fields">
           <FormField label="Form name">
             <input name="name" value={formTemplate.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           {more}
         </fieldset>
@@ -226,9 +226,14 @@ export default class FormTemplateFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 FormTemplateFormContents.propTypes = {
+  className: PropTypes.string,
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired
+  session: PropTypes.object.isRequired,
+};
+
+FormTemplateFormContents.defaultProps = {
+  className: undefined,
 };

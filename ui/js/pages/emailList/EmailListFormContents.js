@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -6,29 +5,29 @@ import TextHelp from '../../components/TextHelp';
 
 export default class EmailListFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { domains: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { formState, session } = this.props;
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('EmailListFormContents catch', error));
+      .catch(error => console.error('EmailListFormContents catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
   }
 
-  render () {
+  render() {
     const { className, formState, session } = this.props;
     const emailList = formState.object;
 
     let administeredBy;
     if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
+      const domains = this.state.domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
       domains.unshift(<option key={0} />);
@@ -47,20 +46,20 @@ export default class EmailListFormContents extends Component {
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={emailList.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           <FormField name="text" label="Description" help={<TextHelp />}>
             <textarea name="text" value={emailList.text || ''} rows={4}
-              onChange={formState.change('text')}/>
+              onChange={formState.change('text')} />
           </FormField>
           <FormField label="Path" help="unique url name">
             <input name="path" value={emailList.path || ''}
-              onChange={formState.change('path')}/>
+              onChange={formState.change('path')} />
           </FormField>
           <FormField>
             <input name="public" type="checkbox"
               checked={emailList.public || false}
-              onChange={formState.toggle('public')}/>
+              onChange={formState.toggle('public')} />
             <label htmlFor="public">Allow self subscription</label>
           </FormField>
           {administeredBy}
@@ -68,9 +67,14 @@ export default class EmailListFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 EmailListFormContents.propTypes = {
+  className: PropTypes.string,
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired
+  session: PropTypes.object.isRequired,
+};
+
+EmailListFormContents.defaultProps = {
+  className: undefined,
 };

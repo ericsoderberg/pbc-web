@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import Markdown from 'markdown-to-jsx';
@@ -7,44 +6,44 @@ import Image from '../../components/Image';
 
 export default class PeopleSection extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { users: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this._load(nextProps);
   }
 
-  _load (props) {
+  _load(props) {
     // When editing, we only have ids, get the rest
-    (props.people || []).forEach(person => {
-      if (typeof person.id === 'string' && ! person.image &&
-        ! this.state.users[person.id]) {
+    (props.people || []).forEach((person) => {
+      if (typeof person.id === 'string' && !person.image &&
+        !this.state.users[person.id]) {
         getItem('users', person.id)
-        .then(user => {
-          let users = { ...this.state.users };
+        .then((user) => {
+          const users = { ...this.state.users };
           users[person.id] = user;
-          this.setState({ users: users });
+          this.setState({ users });
         })
-        .catch(error => console.log('!!! PeopleSummary catch', error));
+        .catch(error => console.error('!!! PeopleSummary catch', error));
       }
     });
   }
 
-  render () {
+  render() {
     const { className, people } = this.props;
 
-    let classes = ['people-summaries'];
+    const classes = ['people-summaries'];
     if (className) {
       classes.push(className);
     }
 
-    const links = (people || []).map((person, index) => {
+    const links = (people || []).map((person) => {
       let user;
       if (typeof person.id === 'object') {
        // populated on server
@@ -63,7 +62,8 @@ export default class PeopleSection extends Component {
       }
 
       return (
-        <Link key={index} to={`/users/${user._id}`} className="person-summary">
+        <Link key={user._id} to={`/users/${user._id}`}
+          className="person-summary">
           {image}
           <div className="person-summary__summary">
             <h2>{user.name}</h2>
@@ -81,8 +81,13 @@ export default class PeopleSection extends Component {
       </div>
     );
   }
-};
+}
 
 PeopleSection.propTypes = {
-  people: PropTypes.array
+  className: PropTypes.string,
+  people: PropTypes.array.isRequired,
+};
+
+PeopleSection.defaultProps = {
+  className: undefined,
 };

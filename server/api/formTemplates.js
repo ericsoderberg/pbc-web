@@ -1,9 +1,9 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import register from './register';
 import { authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
+
+mongoose.Promise = global.Promise;
 
 // /api/form-templates
 
@@ -12,7 +12,7 @@ export default function (router) {
     category: 'form-templates',
     modelName: 'FormTemplate',
     index: {
-      authorize: authorizedForDomain
+      authorize: authorizedForDomain,
     },
     put: {
       transformIn: unsetDomainIfNeeded,
@@ -22,7 +22,7 @@ export default function (router) {
         return Form.update({ formTemplateId: formTemplate._id },
           { $set: { domainId: formTemplate.domainId } }, { multi: true }).exec()
           .then(() => formTemplate);
-      }
-    }
+      },
+    },
   });
 }

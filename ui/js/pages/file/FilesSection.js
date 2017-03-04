@@ -1,51 +1,51 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItem } from '../../actions';
 import Audio from '../../components/Audio';
 
 export default class FilesSection extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { files: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this._load(nextProps);
   }
 
-  _load (props) {
+  _load(props) {
     // When editing, we only have ids, get the rest
-    (props.files || []).forEach(file => {
-      if (typeof file.id === 'string' && ! file.name &&
-        ! this.state.files[file.id]) {
+    (props.files || []).forEach((file) => {
+      if (typeof file.id === 'string' && !file.name &&
+        !this.state.files[file.id]) {
         getItem('files', file.id)
-        .then(file => {
-          let files = { ...this.state.files };
-          files[file.id] = file;
+        .then((fileResponse) => {
+          const files = { ...this.state.files };
+          files[file.id] = fileResponse;
           this.setState({ files });
         })
-        .catch(error => console.log('!!! FilesSummary catch', error));
+        .catch(error => console.error('!!! FilesSummary catch', error));
       }
     });
   }
 
-  render () {
+  render() {
     const { className, files } = this.props;
     const { playIndex } = this.state;
 
-    let classes = ['list'];
+    const classes = ['list'];
     if (className) {
       classes.push(className);
     }
 
     // In case there are multiple audio files, we chain their playing
     // together. Remember what audio file to play next when one finshes.
-    let nextPlayIndex = {};
+    const nextPlayIndex = {};
     let previousFile;
     (files || []).forEach((file, index) => {
       if (file.type && file.type.match(/audio/)) {
@@ -57,7 +57,7 @@ export default class FilesSection extends Component {
     });
 
     const items = (files || []).map((file, index) => {
-      if (! file._id) {
+      if (!file._id) {
         // populated via _load
         file = this.state.files[file.id] || {};
       }
@@ -73,13 +73,12 @@ export default class FilesSection extends Component {
                 playIndex: nextPlayIndex[file._id] })} />
           </div>
         );
-      } else {
-        return (
-          <a key={key} className="item__container" href={path}>
-            <div className="item">{file.label || file.name}</div>
-          </a>
-        );
       }
+      return (
+        <a key={key} className="item__container" href={path}>
+          <div className="item">{file.label || file.name}</div>
+        </a>
+      );
     });
 
     return (
@@ -88,8 +87,14 @@ export default class FilesSection extends Component {
       </div>
     );
   }
-};
+}
 
 FilesSection.propTypes = {
-  files: PropTypes.array
+  className: PropTypes.string,
+  files: PropTypes.array,
+};
+
+FilesSection.defaultProps = {
+  className: undefined,
+  files: [],
 };

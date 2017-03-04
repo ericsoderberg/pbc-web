@@ -1,35 +1,35 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import FilterIcon from '../icons/Filter';
 
 export default class Filter extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onActivate = this._onActivate.bind(this);
     this._onBlur = this._onBlur.bind(this);
     this.state = { active: false };
   }
 
-  _onActivate (event) {
+  _onActivate() {
     this.setState({ active: true }, () => {
-      this.refs.select.focus();
+      this._selectRef.focus();
     });
   }
 
-  _onBlur (event) {
+  _onBlur() {
     this.setState({ active: false });
   }
 
-  render () {
+  render() {
     const { allLabel, onChange, value, options } = this.props;
     const { active } = this.state;
-    let classNames = ['filter'];
+    const classNames = ['filter'];
     if (active) {
       classNames.push('filter--active');
     }
 
-    let optionElements = (options || []).map(option => (
+    const optionElements = (options || []).map(option => (
       <option key={option.value || option} value={option.value}>
         {option.label || option}
       </option>
@@ -38,7 +38,8 @@ export default class Filter extends Component {
 
     return (
       <div className={classNames.join(' ')}>
-        <select ref="select" className="filter__select"
+        <select ref={(ref) => { this._selectRef = ref; }}
+          className="filter__select"
           value={value} onChange={onChange} onBlur={this._onBlur}>
           {optionElements}
         </select>
@@ -49,7 +50,7 @@ export default class Filter extends Component {
       </div>
     );
   }
-};
+}
 
 Filter.propTypes = {
   allLabel: PropTypes.string,
@@ -59,11 +60,12 @@ Filter.propTypes = {
     PropTypes.string,
     PropTypes.shape({
       label: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired
-    })
-  ])).isRequired
+      value: PropTypes.string.isRequired,
+    }),
+  ])).isRequired,
 };
 
 Filter.defaultProps = {
-  allLabel: 'All'
+  allLabel: 'All',
+  value: '',
 };

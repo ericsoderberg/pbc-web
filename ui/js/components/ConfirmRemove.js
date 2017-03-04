@@ -1,28 +1,28 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 
 export default class ConfirmRemove extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onRemove = this._onRemove.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this.state = { confirming: false };
   }
 
-  _onRemove (event) {
+  _onRemove(event) {
     event.preventDefault();
     this.setState({ confirming: true });
   }
 
-  _onCancel (event) {
+  _onCancel(event) {
     event.preventDefault();
     this.setState({ confirming: false });
   }
 
-  render () {
+  render() {
     const { confirming } = this.state;
-    let classNames = ['confirm-remove'];
+    const classNames = ['confirm-remove'];
     if (confirming) {
       classNames.push('confirm-remove--confirming');
     }
@@ -40,8 +40,8 @@ export default class ConfirmRemove extends Component {
       </div>
     );
   }
-};
+}
 
 ConfirmRemove.propTypes = {
-  onConfirm: PropTypes.func
+  onConfirm: PropTypes.func.isRequired,
 };

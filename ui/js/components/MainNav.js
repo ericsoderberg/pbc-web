@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { deleteSession } from '../actions';
@@ -7,7 +6,7 @@ import Stored from './Stored';
 const MAIN_ROUTES = [
   { label: 'Home', path: '/' },
   { label: 'Calendar', path: '/calendar' },
-  { label: 'Search', path: '/search' }
+  { label: 'Search', path: '/search' },
 ];
 
 const DOMAIN_ADMIN_ROUTES = [
@@ -17,7 +16,7 @@ const DOMAIN_ADMIN_ROUTES = [
   { label: 'Forms', path: '/forms' },
   { label: 'Form Templates', path: '/form-templates' },
   { label: 'Payments', path: '/payments' },
-  { label: 'Email Lists', path: '/email-lists' }
+  { label: 'Email Lists', path: '/email-lists' },
 ];
 
 const ADMIN_ROUTES = [
@@ -28,27 +27,27 @@ const ADMIN_ROUTES = [
   { label: 'Calendars', path: '/calendars' },
   { label: 'Libraries', path: '/libraries' },
   { label: 'Files', path: '/files' },
-  { label: 'Site', path: '/site' }
+  { label: 'Site', path: '/site' },
 ];
 
 class MainNav extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._signOut = this._signOut.bind(this);
   }
 
-  _signOut () {
+  _signOut() {
     deleteSession()
-    .then(() => window.location = '/')
-    .catch(error => console.log('!!! MainNav _signOut catch', error));
+    .then(() => { window.location = '/'; })
+    .catch(error => console.error('!!! MainNav _signOut catch', error));
   }
 
   _renderLinks(routes) {
-    const links = routes.map(route => {
-      let classes = ["main-nav__link"];
+    const links = routes.map((route) => {
+      const classes = ['main-nav__link'];
       if (this.context.router.isActive(route.path, true)) {
-        classes.push("main-nav__link--active");
+        classes.push('main-nav__link--active');
       }
       return (
         <li key={route.path}>
@@ -66,18 +65,21 @@ class MainNav extends Component {
     );
   }
 
-  render () {
-    const { session, onClick } = this.props;
+  render() {
+    const { className, session, onClick } = this.props;
     const mainLinks = this._renderLinks(MAIN_ROUTES);
 
-    let sessionControls, domainAdminLinks, adminLinks;
+    let sessionControls;
+    let domainAdminLinks;
+    let adminLinks;
     if (session) {
       sessionControls = [
         <Link key="name" className="main-nav__link"
           to={`/users/${session.userId}/edit`}>{session.name}</Link>,
-        <a key="out" className="main-nav__link" onClick={this._signOut}>
+        <button key="out" className="main-nav__link button"
+          onClick={this._signOut}>
           Sign Out
-        </a>
+        </button>,
       ];
       if (session.administrator || session.administratorDomainId) {
         domainAdminLinks = this._renderLinks(DOMAIN_ADMIN_ROUTES);
@@ -92,7 +94,7 @@ class MainNav extends Component {
     }
 
     return (
-      <nav className={`main-nav ${this.props.className}`}
+      <nav className={`main-nav ${className}`}
         onClick={onClick}>
         {mainLinks}
         {domainAdminLinks}
@@ -103,24 +105,29 @@ class MainNav extends Component {
       </nav>
     );
   }
-};
+}
 
 MainNav.propTypes = {
-  onClick: PropTypes.func,
+  className: PropTypes.string,
+  onClick: PropTypes.func.isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
     name: PropTypes.string,
-    userId: PropTypes.string
-  })
+    userId: PropTypes.string,
+  }).isRequired,
+};
+
+MainNav.defaultProps = {
+  className: undefined,
 };
 
 MainNav.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(MainNav, select);

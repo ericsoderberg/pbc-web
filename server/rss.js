@@ -1,9 +1,9 @@
-"use strict";
 import express from 'express';
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import moment from 'moment';
 import escape from 'escape-html';
+
+mongoose.Promise = global.Promise;
 
 const router = express.Router();
 
@@ -11,23 +11,23 @@ const router = express.Router();
 
 const FILE_TYPE_REGEXP = /^audio/;
 
-function rfc822 (date) {
+function rfc822(date) {
   return moment(date).format('ddd, DD MMM YYYY HH:mm:ss ZZ');
 }
 
-function renderRSS (req, library, messages, pages, site) {
+function renderRSS(req, library, messages, pages, site) {
   const { podcast } = library;
   const urlBase = `${req.headers.origin}`;
   const page = pages[0];
   const path = (page._id.equals(site.homePageId) ? '' : page.path || page._id);
 
-  const items = messages.map(message => {
+  const items = messages.map((message) => {
     const enclosures = message.files
     .filter(file => FILE_TYPE_REGEXP.test(file.type))
     .map(file => (
       `<enclosure url="${urlBase}/api/files/${file._id}/${file.name}"
 length="${file.size}" type="${file.type}" />`
-    )).join("\n");
+    )).join('\n');
 
     return `<item>
       <title>${message.name}</title>
@@ -44,7 +44,7 @@ length="${file.size}" type="${file.type}" />`
       <itunes:subtitle>${message.text}</itunes:subtitle>
       <itunes:summary>${message.text}</itunes:summary>
     </item>`;
-  }).join("\n\n    ");
+  }).join('\n\n    ');
 
   const channel = `<channel>
     <title>${podcast.title}</title>
@@ -86,39 +86,42 @@ router.get('/:id.rss', (req, res) => {
   const id = req.params.id;
   const Library = mongoose.model('Library');
   Library.findOne({ _id: id }).populate('userId', 'name email').exec()
-  .then(library => {
+  .then((library) => {
     // do we have a podcast for this library?
-    if (! library.podcast) {
+    if (!library.podcast) {
       return Promise.reject({ error: 'No feed' });
-    } else {
-      let promises = [Promise.resolve(library)];
-
-      // Get the latest messages
-      const Message = mongoose.model('Message');
-      const today = moment();
-      promises.push(
-        Message.find({ libraryId: id, date: { $lte: today.toDate() },
-          "files.type": { $regex: /^audio/ } })
-        .sort('-date').limit(10).exec()
-      );
-
-      // find the page hosting this library
-      const Page = mongoose.model('Page');
-      promises.push(
-        Page.find({ "sections.libraryId": library._id })
-        .select('name path').exec()
-      );
-
-      // get the site so we can check if this is the home page
-      const Site = mongoose.model('Site');
-      promises.push(
-        Site.findOne({}).select('homePageId').exec()
-      );
-
-      return Promise.all(promises);
     }
+    const promises = [Promise.resolve(library)];
+
+    // Get the latest messages
+    const Message = mongoose.model('Message');
+    const today = moment();
+    promises.push(
+      Message.find({
+        libraryId: id,
+        date: { $lte: today.toDate() },
+        'files.type': { $regex: /^audio/ },
+      })
+      .sort('-date').limit(10)
+      .exec(),
+    );
+
+    // find the page hosting this library
+    const Page = mongoose.model('Page');
+    promises.push(
+      Page.find({ 'sections.libraryId': library._id })
+      .select('name path').exec(),
+    );
+
+    // get the site so we can check if this is the home page
+    const Site = mongoose.model('Site');
+    promises.push(
+      Site.findOne({}).select('homePageId').exec(),
+    );
+
+    return Promise.all(promises);
   })
-  .then(docs => {
+  .then((docs) => {
     // build RSS
     const library = docs[0];
     const messages = docs[1];

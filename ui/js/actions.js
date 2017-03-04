@@ -1,50 +1,49 @@
-"use strict";
+
 import { dispatch } from './store';
 
-let _headers = {
-  'Accept': 'application/json',
-  'Content-Type': 'application/json'
+const _headers = {
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
 };
 let _sessionId;
 
 const processStatus = (response) => {
   if (response.ok) {
     return Promise.resolve(response);
-  } else {
-    return response.json()
-    .then(json => Promise.reject(json || response.statusText));
   }
+  return response.json()
+  .then(json => Promise.reject(json || response.statusText));
 };
 
 // Session
-export function haveSession () {
+export function haveSession() {
   return _sessionId ? true : false;
 }
 
-export function setSession (session) {
+export function setSession(session) {
   _sessionId = session._id;
   _headers.Authorization = `Token token=${session.token}`;
-  dispatch(state => ({ ...state, session: session }));
+  dispatch(state => ({ ...state, session }));
   localStorage.session = JSON.stringify(session);
   return session;
-};
+}
 
-export function clearSession (object) {
+export function clearSession(object) {
   _sessionId = undefined;
   delete _headers.Authorization;
-  dispatch(state => ({ session: undefined }));
+  dispatch(() => ({ session: undefined }));
   localStorage.removeItem('session');
   return object;
-};
+}
 
-export function initialize () {
+export function initialize() {
   if (localStorage.session) {
     const session = JSON.parse(localStorage.session);
     setSession(session);
   }
 }
 
-export function postSession (session) {
+export function postSession(session) {
   return fetch('/api/sessions', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
   .then(processStatus)
@@ -52,7 +51,7 @@ export function postSession (session) {
   .then(setSession);
 }
 
-export function postSessionViaToken (session) {
+export function postSessionViaToken(session) {
   return fetch('/api/sessions/token', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
   .then(processStatus)
@@ -60,7 +59,7 @@ export function postSessionViaToken (session) {
   .then(setSession);
 }
 
-export function deleteSession () {
+export function deleteSession() {
   return fetch(`/api/sessions/${_sessionId}`, {
     method: 'DELETE', headers: _headers })
   .then(processStatus)
@@ -70,12 +69,12 @@ export function deleteSession () {
 
 // Generic
 
-function cacheAdd (category, item) {
-  dispatch(state => {
-    let cache = { ...(state[category] || {}) };
+function cacheAdd(category, item) {
+  dispatch((state) => {
+    const cache = { ...(state[category] || {}) };
     // also store the id -> path mapping so we can remove cached paths
     // when we only have an id
-    let paths = { ...(state[`${category}-paths`] || {}) };
+    const paths = { ...(state[`${category}-paths`] || {}) };
     cache[item._id] = item;
     if (item.path) {
       cache[item.path] = item;
@@ -88,10 +87,10 @@ function cacheAdd (category, item) {
   });
 }
 
-function cacheRemove (category, item) {
-  dispatch(state => {
-    let cache = { ...(state[category] || {}) };
-    let paths = { ...(state[`${category}-paths`] || {}) };
+function cacheRemove(category, item) {
+  dispatch((state) => {
+    const cache = { ...(state[category] || {}) };
+    const paths = { ...(state[`${category}-paths`] || {}) };
     delete cache[item.path];
     delete cache[item._id];
     delete paths[item._id];
@@ -102,7 +101,7 @@ function cacheRemove (category, item) {
   });
 }
 
-export function getItems (category, options={}) {
+export function getItems(category, options = {}) {
   const params = [];
   if (options.search) {
     params.push(`search=${encodeURIComponent(options.search)}`);
@@ -121,7 +120,7 @@ export function getItems (category, options={}) {
   }
   if (options.populate) {
     params.push(
-      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`
+      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
     );
   }
   if (options.limit) {
@@ -130,36 +129,36 @@ export function getItems (category, options={}) {
   if (options.skip) {
     params.push(`skip=${encodeURIComponent(options.skip)}`);
   }
-  const q = params.length > 0 ? `?${params.join('&')}`: '';
+  const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/${category}${q}`, {
     method: 'GET', headers: _headers })
   .then(processStatus)
   .then(response => response.json());
 }
 
-export function postItem (category, item) {
+export function postItem(category, item) {
   return fetch(`/api/${category}`, {
     method: 'POST', headers: _headers, body: JSON.stringify(item) })
   .then(processStatus)
   .then(response => response.json());
 }
 
-export function getItem (category, id, options={}) {
+export function getItem(category, id, options = {}) {
   const params = [];
   if (options.select) {
     params.push(`select=${encodeURIComponent(options.select)}`);
   }
   if (options.populate) {
     params.push(
-      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`
+      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
     );
   }
-  const q = params.length > 0 ? `?${params.join('&')}`: '';
+  const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
     method: 'GET', headers: _headers })
   .then(processStatus)
   .then(response => response.json())
-  .then(item => {
+  .then((item) => {
     if (options.cache) {
       cacheAdd(category, item);
     }
@@ -167,22 +166,22 @@ export function getItem (category, id, options={}) {
   });
 }
 
-export function putItem (category, item) {
+export function putItem(category, item) {
   return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
     method: 'PUT', headers: _headers, body: JSON.stringify(item) })
   .then(processStatus)
   .then(response => response.json())
-  .then(item => {
-    cacheRemove(category, item);
-    return item;
+  .then((itemResponse) => {
+    cacheRemove(category, itemResponse);
+    return itemResponse;
   });
 }
 
-export function deleteItem (category, id) {
+export function deleteItem(category, id) {
   return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
     method: 'DELETE', headers: _headers })
   .then(processStatus)
-  .then(response => {
+  .then((response) => {
     cacheRemove(category, { _id: id });
     return response;
   });
@@ -190,32 +189,12 @@ export function deleteItem (category, id) {
 
 // Page
 
-// export function getPage (id) {
-//   return getItem('pages', id, {
-//     populate: [
-//       { path: 'sections.pages.id', select: 'name path' }
-//     ]
-//   });
-// }
-
-// export function putPage (page) {
-//   return putItem ('pages', page)
-//   .then(page => {
-//     dispatch(state => {
-//       let pages = state.pages || {};
-//       pages[page.path || page._id] = page;
-//       return { ...state, pages: pages };
-//     });
-//     return page;
-//   });
-// }
-
-export function getPageMap (id) {
+export function getPageMap(id) {
   return fetch(`/api/pages/${id}/map`, { method: 'GET', headers: _headers })
   .then(response => response.json());
 }
 
-export function postPublicize () {
+export function postPublicize() {
   return fetch('/api/pages/publicize', { method: 'POST', headers: _headers })
   .then(processStatus)
   .then(response => response.json());
@@ -223,68 +202,42 @@ export function postPublicize () {
 
 // User
 
-export function postSignUp (user) {
+export function postSignUp(user) {
   return fetch('/api/users/sign-up', {
     method: 'POST', headers: _headers, body: JSON.stringify(user) })
   .then(processStatus)
   .then(response => response.json());
 }
 
-export function postVerifyEmail (email) {
+export function postVerifyEmail(email) {
   return fetch('/api/users/verify-email', {
-    method: 'POST', headers: _headers, body: JSON.stringify({ email: email }) })
+    method: 'POST', headers: _headers, body: JSON.stringify({ email }) })
   .then(processStatus)
   .then(response => response.json());
 }
 
 // Site
 
-export function getSite () {
+export function getSite() {
   return fetch('/api/site', { method: 'GET', headers: _headers })
   .then(response => response.json())
-  .then(site => {
-    dispatch(state => ({ ...state, site: site }));
+  .then((site) => {
+    dispatch(state => ({ ...state, site }));
     return site;
   });
 }
 
-export function postSite (site) {
+export function postSite(site) {
   return fetch('/api/site', {
     method: 'POST', headers: _headers, body: JSON.stringify(site) })
   .then(processStatus)
   .then(response => response.json());
 }
 
-// Messages
-
-// export function getMessage (id) {
-//   return getItem('messages', id, { populate: true })
-//   .then(message => {
-//     dispatch(state => {
-//       let messages = state.messages || {};
-//       messages[message.path || message._id] = message;
-//       return { ...state, messages: messages };
-//     });
-//     return message;
-//   });
-// }
-
-// export function putMessage (message) {
-//   return putItem ('messages', message)
-//   .then(message => {
-//     dispatch(state => {
-//       let messages = state.messages || {};
-//       messages[message.path || message._id] = message;
-//       return { ...state, messages: messages };
-//     });
-//     return message;
-//   });
-// }
-
 // Calendar
 
-export function getCalendar (options={}) {
-  let params = [];
+export function getCalendar(options = {}) {
+  const params = [];
   if (options.searchText) {
     params.push(`search=${encodeURIComponent(options.searchText)}`);
   }
@@ -295,7 +248,7 @@ export function getCalendar (options={}) {
     params.push(`id=${encodeURIComponent(options.id)}`);
   }
   if (options.ids) {
-    options.ids.forEach(id => {
+    options.ids.forEach((id) => {
       params.push(`id=${encodeURIComponent(id)}`);
     });
   }
@@ -307,13 +260,13 @@ export function getCalendar (options={}) {
 
 // Events
 
-export function getResources (event) {
+export function getResources(event) {
   return fetch('/api/events/resources', {
     method: 'POST', headers: _headers, body: JSON.stringify(event) })
   .then(response => response.json());
 }
 
-export function getUnavailableDates (event) {
+export function getUnavailableDates(event) {
   return fetch('/api/events/unavailable-dates', {
     method: 'POST', headers: _headers, body: JSON.stringify(event) })
   .then(response => response.json());
@@ -321,35 +274,35 @@ export function getUnavailableDates (event) {
 
 // Newsletter
 
-export function postNewsletterRender (newsletter) {
+export function postNewsletterRender(newsletter) {
   return fetch('/api/newsletters/render', {
     method: 'POST', headers: _headers, body: JSON.stringify(newsletter) })
   .then(processStatus)
-  .then(response => response.text());;
+  .then(response => response.text());
 }
 
 // Map
 
-export function getGeocode (address) {
+export function getGeocode(address) {
   const query = `?q=${encodeURIComponent(address)}&format=json`;
   const url =
     `${window.location.protocol}//nominatim.openstreetmap.org/search${query}`;
   return fetch(url, {
-    method: 'GET', headers: { ..._headers, Authorization: undefined }})
+    method: 'GET', headers: { ..._headers, Authorization: undefined } })
   .then(response => response.json());
 }
 
 // Files
 
-export function postFile (data) {
-  let headers = {..._headers};
+export function postFile(data) {
+  const headers = { ..._headers };
   delete headers['Content-Type'];
-  return fetch('/api/files', { method: 'POST', headers: headers, body: data })
+  return fetch('/api/files', { method: 'POST', headers, body: data })
   .then(processStatus)
   .then(response => response.json());
 }
 
-export function deleteFile (id) {
+export function deleteFile(id) {
   return fetch(`/api/files/${id}`, {
     method: 'DELETE', headers: _headers })
   .then(processStatus);
@@ -357,13 +310,13 @@ export function deleteFile (id) {
 
 // Email lists
 
-export function postSubscribe (emailList, addresses) {
+export function postSubscribe(emailList, addresses) {
   return fetch(`/api/email-lists/${emailList._id}/subscribe`, {
     method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
   .then(processStatus);
 }
 
-export function postUnsubscribe (emailList, addresses) {
+export function postUnsubscribe(emailList, addresses) {
   return fetch(`/api/email-lists/${emailList._id}/unsubscribe`, {
     method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
   .then(processStatus);
@@ -371,8 +324,8 @@ export function postUnsubscribe (emailList, addresses) {
 
 // Search
 
-export function getSearch (searchText) {
-  let params = [];
+export function getSearch(searchText) {
+  const params = [];
   params.push(`search=${encodeURIComponent(searchText)}`);
   const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/search${q}`, {

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
@@ -14,10 +14,10 @@ import PaymentPay from '../payment/PaymentPay';
 import { calculateTotal } from './FormUtils';
 
 const LABEL = {
-  'Register': 'Registered',
+  Register: 'Registered',
   'Sign Up': 'Signed up',
-  'Submit': 'Submitted',
-  'Subscribe': 'Subscribed'
+  Submit: 'Submitted',
+  Subscribe: 'Subscribed',
 };
 
 const FormItem = (props) => {
@@ -34,23 +34,30 @@ const FormItem = (props) => {
   return (
     <div className={classNames.join(' ')}>
       <div className="item item--full">
-        <a onClick={onClick}>{message}</a>
+        <button className="button button-plain" onClick={onClick}>
+          {message}
+        </button>
       </div>
     </div>
   );
-
 };
 
 FormItem.propTypes = {
+  className: PropTypes.string,
   distinguish: PropTypes.bool,
   item: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
-  verb: PropTypes.string.isRequired
+  verb: PropTypes.string.isRequired,
+};
+
+FormItem.defaultProps = {
+  className: undefined,
+  distinguish: false,
 };
 
 class FormSection extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
     this._onCancel = this._onCancel.bind(this);
@@ -60,84 +67,84 @@ class FormSection extends Component {
     this.state = { forms: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
     // window.addEventListener('resize', this._onResize);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.formTemplateId !== this.props.formTemplateId) {
       this._load(nextProps);
     }
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     if (this.state.layoutNeeded) {
       this.setState({ layoutNeeded: undefined });
       this._onResize();
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     // window.removeEventListener('resize', this._onResize);
     clearTimeout(this._layoutTimer);
   }
 
-  _onResize () {
+  _onResize() {
     clearTimeout(this._layoutTimer);
     this._layoutTimer = setTimeout(this._layout, 300);
   }
 
-  _load (props) {
+  _load(props) {
     const { formTemplate, formTemplateId } = props;
-    if (formTemplateId && ! formTemplate) {
+    if (formTemplateId && !formTemplate) {
       getItem('form-templates', formTemplateId._id || formTemplateId)
         // { select: 'name submitLabel authenticate payable' })
-      .then(formTemplate => this.setState({ formTemplate: formTemplate },
-        this._loadForms))
-      .catch(error => console.log('!!! FormSummary formTemplate catch', error));
+      .then(formTemplateResponse =>
+        this.setState({ formTemplate: formTemplateResponse }, this._loadForms))
+      .catch(error => console.error('!!! FormSummary formTemplate catch', error));
     } else if (formTemplate) {
-      this.setState({ formTemplate: formTemplate }, this._loadForms);
+      this.setState({ formTemplate }, this._loadForms);
     }
   }
 
-  _loadForms () {
+  _loadForms() {
     const { session } = this.props;
     const { formTemplate } = this.state;
     if (session) {
       getItems('forms', {
         filter: {
           formTemplateId: formTemplate._id,
-          userId: session.userId
+          userId: session.userId,
         },
         // select: 'modified userId name',
-        populate: true
+        populate: true,
       })
-      .then(forms => {
+      .then((forms) => {
         let paymentFormId;
         if (formTemplate.payable) {
           // see if any require payment
-          forms.forEach(form => {
+          forms.forEach((form) => {
             const formTotal = calculateTotal(formTemplate, form);
             let paymentTotal = 0;
-            (form.paymentIds || []).forEach(payment => {
+            (form.paymentIds || []).forEach((payment) => {
               paymentTotal += payment.amount;
             });
             if (formTotal > paymentTotal) {
               form.needsPayment = true;
-              if (! paymentFormId) {
+              if (!paymentFormId) {
                 paymentFormId = form._id;
               }
             }
           });
         }
-        this.setState({ forms: forms, paymentFormId });
+        this.setState({ forms, paymentFormId });
       })
-      .catch(error => console.log('!!! FormSummary forms catch', error));
+      .catch(error => console.error('!!! FormSummary forms catch', error));
     }
   }
 
-  _layout () {
+  _layout() {
     // const contents = this.refs.contents;
     // const height = contents.offsetHeight;
     // if (this.state.height !== height) {
@@ -149,35 +156,37 @@ class FormSection extends Component {
     // }
   }
 
-  _onAdd () {
+  _onAdd() {
     this.setState({ adding: true, layoutNeeded: true });
   }
 
-  _edit (id) {
+  _edit(id) {
     return () => {
       this.setState({ editId: id, layoutNeeded: true });
     };
   }
 
-  _onCancel () {
+  _onCancel() {
     this.setState({
-      adding: undefined, editId: undefined, paymentFormId: undefined,
-      layoutNeeded: true
+      adding: undefined,
+      editId: undefined,
+      paymentFormId: undefined,
+      layoutNeeded: true,
     });
   }
 
-  _onDone () {
+  _onDone() {
     this.setState({ adding: undefined, editId: undefined, layoutNeeded: true });
     this._loadForms();
   }
 
-  render () {
+  render() {
     const { className, formTemplateId, session } = this.props;
     const {
-      formTemplate, forms, adding, editId, height, paymentFormId
+      formTemplate, forms, adding, editId, height, paymentFormId,
     } = this.state;
 
-    let classes = ['form-summary__container'];
+    const classes = ['form-summary__container'];
     if (className) {
       classes.push(className);
     }
@@ -186,16 +195,16 @@ class FormSection extends Component {
     if (session && session.administrator && formTemplate) {
       const formTemplatePath = `/form-templates/${formTemplate._id}`;
       formTemplateLink = (
-        <Link className='form-summary__template' to={formTemplatePath}>
+        <Link className="form-summary__template" to={formTemplatePath}>
           {formTemplate.name}
         </Link>
       );
     }
 
     let contents;
-    if (! formTemplateId || ! forms || ! formTemplate) {
+    if (!formTemplateId || !forms || !formTemplate) {
       contents = <Loading />;
-    } else if (! session && formTemplate.authenticate) {
+    } else if (!session && formTemplate.authenticate) {
       contents = (
         <div className="form-summary">
           <h2>{formTemplate.name}</h2>
@@ -246,30 +255,35 @@ class FormSection extends Component {
     }
 
     return (
-      <div ref="container" className={classes.join(' ')}
+      <div className={classes.join(' ')}
         style={{ height }}>
-        <div ref="contents">
+        <div>
           {contents}
         </div>
         {formTemplateLink}
       </div>
     );
   }
-};
+}
 
 FormSection.propTypes = {
-  formTemplate: PropTypes.object, // when does this happen?
+  className: PropTypes.string,
   formTemplateId: PropTypes.oneOfType([
     PropTypes.string, PropTypes.object]),
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-    userId: PropTypes.string
-  })
+    userId: PropTypes.string,
+  }).isRequired,
 };
 
-const select = (state, props) => ({
-  session: state.session
+FormSection.defaultProps = {
+  className: undefined,
+  formTemplateId: undefined,
+};
+
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(FormSection, select);

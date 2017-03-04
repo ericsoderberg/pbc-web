@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem, postUnsubscribe } from '../../actions';
@@ -9,22 +9,22 @@ import TrashIcon from '../../icons/Trash';
 
 class EmailList extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
     this.state = { addresses: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._setStateFromLocation(this.props);
     this._loadEmailList();
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this._setStateFromLocation(nextProps);
   }
 
-  _setStateFromLocation (props) {
+  _setStateFromLocation(props) {
     const { emailList } = this.state;
     const searchText = props.location.query.search || '';
     let addresses = (emailList || {}).addresses || [];
@@ -37,11 +37,11 @@ class EmailList extends Component {
     this.setState({ addresses, searchText });
   }
 
-  _loadEmailList () {
+  _loadEmailList() {
     const { params: { id } } = this.props;
     const { searchText } = this.state;
     getItem('email-lists', id)
-    .then(emailList => {
+    .then((emailList) => {
       let addresses = emailList.addresses;
       if (searchText) {
         const exp = new RegExp(searchText, 'i');
@@ -50,62 +50,60 @@ class EmailList extends Component {
       this.setState({ addresses, emailList });
       document.title = emailList.name;
     })
-    .catch(error => console.log('!!! EmailList catch', error));
+    .catch(error => console.error('!!! EmailList catch', error));
   }
 
-  _setLocation (options) {
+  _setLocation(options) {
     const { router } = this.context;
-    let searchParams = [];
+    const searchParams = [];
 
-    const searchText = options.hasOwnProperty('searchText') ?
-      options.searchText : this.state.searchText || undefined;
+    const searchText = options.searchText || this.state.searchText || undefined;
     if (searchText) {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
 
     router.replace({
       pathname: window.location.pathname,
-      search: `?${searchParams.join('&')}`
+      search: `?${searchParams.join('&')}`,
     });
   }
 
-  _onSearch (event) {
+  _onSearch(event) {
     const searchText = event.target.value;
     this._setLocation({ searchText, loading: true });
   }
 
-  _unsubscribe (address) {
-    return (event) => {
+  _unsubscribe(address) {
+    return () => {
       const { emailList } = this.state;
       postUnsubscribe(emailList, [address])
       .then(() => this._loadEmailList())
-      .catch(error => this.setState({ error: error }));
+      .catch(error => this.setState({ error }));
     };
   }
 
-  render () {
+  render() {
     const { session } = this.props;
     const { addresses, emailList, loading, searchText } = this.state;
 
     let result;
-    if (! emailList) {
+    if (!emailList) {
       result = <Loading />;
     } else {
-
       const actions = [];
       if (session && (session.administrator ||
-        session.administratorDomainId === library.domainId)) {
+        session.administratorDomainId === emailList.domainId)) {
         actions.push(
-          <Link key='edit' to={`/email-lists/${emailList._id}/edit`}>
+          <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
             Edit
           </Link>,
-          <Link key='add' to={`/email-lists/${emailList._id}/subscribe`}>
+          <Link key="add" to={`/email-lists/${emailList._id}/subscribe`}>
             Subscribe
-          </Link>
+          </Link>,
         );
       }
 
-      const items = addresses.map((address, index) => {
+      const items = addresses.map((address) => {
         const classNames = ['item'];
 
         let user;
@@ -165,25 +163,24 @@ class EmailList extends Component {
     }
     return result;
   }
-};
+}
 
 EmailList.propTypes = {
-  location: PropTypes.object,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }),
+    id: PropTypes.string.isRequired,
+  }).isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string
-  })
+    administratorDomainId: PropTypes.string,
+  }).isRequired,
 };
 
 EmailList.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(EmailList, select);

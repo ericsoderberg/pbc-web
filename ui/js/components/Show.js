@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem } from '../actions';
 import ItemHeader from './ItemHeader';
@@ -6,38 +5,38 @@ import Loading from './Loading';
 
 export default class Show extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if ((nextProps.category !== this.props.category ||
       nextProps.params.id !== this.props.params.id)) {
       this._load(nextProps);
     }
   }
 
-  _load (props) {
+  _load(props) {
     if (props.item) {
       document.title = props.item.name;
       this.setState({ item: props.item });
     } else {
       this.setState({ item: undefined });
       getItem(props.category, props.params.id)
-      .then(item => {
+      .then((item) => {
         document.title = item.name;
-        this.setState({ item: item });
+        this.setState({ item });
       })
-      .catch(error => console.log('!!! Show catch', error));
+      .catch(error => console.error('!!! Show catch', error));
     }
   }
 
-  render () {
+  render() {
     const { actions, category, Contents, title } = this.props;
     const { item } = this.state;
 
@@ -56,19 +55,23 @@ export default class Show extends Component {
       </main>
     );
   }
-};
+}
 
 Show.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
   Contents: PropTypes.func.isRequired,
-  item: PropTypes.object,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }),
-  title: PropTypes.string
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+  title: PropTypes.string,
+};
+
+Show.defaultProps = {
+  actions: [],
+  title: undefined,
 };
 
 Show.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

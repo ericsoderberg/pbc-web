@@ -1,22 +1,40 @@
-"use strict";
 import express from 'express';
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
-import './db';
 import nodemailer from 'nodemailer';
 import { markdown } from 'nodemailer-markdown';
+import './db';
+import sessions from './api/sessions';
+import site from './api/site';
+import users from './api/users';
+import families from './api/families';
+import domains from './api/domains';
+import resources from './api/resources';
+import formTemplates from './api/formTemplates';
+import forms from './api/forms';
+import payments from './api/payments';
+import emailLists from './api/emailLists';
+import libraries from './api/libraries';
+import messages from './api/messages';
+import events from './api/events';
+import calendars from './api/calendars';
+import newsletters from './api/newsletters';
+import files from './api/files';
+import search from './api/search';
+import pages from './api/pages';
+
+mongoose.Promise = global.Promise;
 
 const TRANSPORT_OPTIONS = {
   host: process.env.SMTP_HOST || 'localhost',
   port: process.env.SMTP_PORT || 25,
-  tls: { rejectUnauthorized: false }
+  tls: { rejectUnauthorized: false },
   // logger: true,
   // debug: true
 };
 if (process.env.SMTP_USER) {
   TRANSPORT_OPTIONS.auth = {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD
+    pass: process.env.SMTP_PASSWORD,
   };
 }
 const transporter = nodemailer.createTransport(TRANSPORT_OPTIONS);
@@ -24,45 +42,27 @@ transporter.use('compile', markdown());
 
 transporter.verify()
 .then(() => console.log('Email is sendable'))
-.catch(error => console.log('!!! Email verification error', error));
+.catch(error => console.error('!!! Email verification error', error));
 
 const router = express.Router();
 
-import sessions from './api/sessions';
 sessions(router);
-import site from './api/site';
 site(router);
-import users from './api/users';
 users(router, transporter);
-import families from './api/families';
 families(router);
-import domains from './api/domains';
 domains(router);
-import resources from './api/resources';
 resources(router);
-import formTemplates from './api/formTemplates';
 formTemplates(router);
-import forms from './api/forms';
 forms(router, transporter);
-import payments from './api/payments';
 payments(router);
-import emailLists from './api/emailLists';
 emailLists(router);
-import libraries from './api/libraries';
 libraries(router);
-import messages from './api/messages';
 messages(router);
-import events from './api/events';
 events(router);
-import calendars from './api/calendars';
 calendars(router);
-import newsletters from './api/newsletters';
 newsletters(router, transporter);
-import files from './api/files';
 files(router);
-import search from './api/search';
 search(router);
-import pages from './api/pages';
 pages(router);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import Button from './Button';
@@ -7,39 +7,39 @@ import Stored from './Stored';
 
 class App extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onToggle = this._onToggle.bind(this);
     this.state = this._stateFromProps(props);
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._hideNavControl();
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({ ...this._stateFromProps(nextProps) });
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     this._hideNavControl();
   }
 
-  _stateFromProps (props) {
+  _stateFromProps(props) {
     const { session } = props;
     return {
       navigable: (session &&
-        (session.administrator || session.administratorDomainId))
+        (session.administrator || session.administratorDomainId)),
     };
   }
 
-  _hideNavControl () {
+  _hideNavControl() {
     clearTimeout(this._navTimer);
-    this._navTimer = setTimeout (() => {
+    this._navTimer = setTimeout(() => {
       const { navActive, navigable } = this.state;
-      if (navigable && ! navActive &&
-        0 === window.scrollY && window.innerWidth < 700) {
-        const navControl = this.refs.navControl;
+      if (navigable && !navActive &&
+        window.scrollY === 0 && window.innerWidth < 700) {
+        const navControl = this._navControlRef;
         if (navControl) {
           window.scrollTo(0, findDOMNode(navControl).offsetHeight);
         }
@@ -47,23 +47,24 @@ class App extends Component {
     }, 40);
   }
 
-  _onToggle () {
-    this.setState({ navActive: ! this.state.navActive });
+  _onToggle() {
+    this.setState({ navActive: !this.state.navActive });
     window.scrollTo(0, 0);
   }
 
-  render () {
+  render() {
     const { navActive, navigable } = this.state;
-    let classNames = ['app'];
+    const classNames = ['app'];
 
-    let nav, navControl;
+    let nav;
+    let navControl;
     if (navigable) {
       nav = <MainNav onClick={this._onToggle} />;
       if (navActive) {
         classNames.push('app--nav');
       } else {
         navControl = (
-          <Button ref="navControl"
+          <Button ref={(ref) => { this._navControlRef = ref; }}
             className="app__nav-control" onClick={this._onToggle}>
             admin
           </Button>
@@ -81,17 +82,18 @@ class App extends Component {
       </div>
     );
   }
-};
+}
 
 App.propTypes = {
+  children: PropTypes.any.isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string
-  })
+    administratorDomainId: PropTypes.string,
+  }).isRequired,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(App, select);

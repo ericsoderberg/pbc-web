@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
@@ -14,52 +14,52 @@ const FIELD_TYPES = ['line', 'lines', 'choice', 'choices', 'count',
 
 export default class FormTemplateSectionEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { section, onChange } = props;
     this.state = {
       expandedFields: {}, // _id or id
       formState: new FormState(section, onChange),
-      newFieldId: 1
+      newFieldId: 1,
     };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { section, onChange } = nextProps;
     this.setState({
-      formState: new FormState(section, onChange)
+      formState: new FormState(section, onChange),
     });
   }
 
-  _addField (type) {
+  _addField(type) {
     return this.state.formState.addTo('fields', () => {
       const id = this.state.newFieldId;
-      let expandedFields = { ...this.state.expandedFields };
+      const expandedFields = { ...this.state.expandedFields };
       expandedFields[id] = true;
       this.setState({
-        expandedFields: expandedFields,
-        newFieldId: this.state.newFieldId + 1
+        expandedFields,
+        newFieldId: this.state.newFieldId + 1,
       });
-      return { type: type, id: id };
+      return { type, id };
     });
   }
 
-  _toggleField (id) {
+  _toggleField(id) {
     return () => {
-      let expandedFields = { ...this.state.expandedFields };
-      expandedFields[id] = ! expandedFields[id];
-      this.setState({ expandedFields: expandedFields });
+      const expandedFields = { ...this.state.expandedFields };
+      expandedFields[id] = !expandedFields[id];
+      this.setState({ expandedFields });
     };
   }
 
-  render () {
+  render() {
     const { includeName, dependableFields } = this.props;
     const { formState, expandedFields } = this.state;
     const section = formState.object;
 
     let sectionFields;
     if (includeName) {
-      let dependsOnOptions = dependableFields
+      const dependsOnOptions = dependableFields
       .filter(dependableField => (
         dependableField.sectionId !== (section._id || section.id)
       ))
@@ -72,7 +72,7 @@ export default class FormTemplateSectionEdit extends Component {
         <fieldset className="form__fields">
           <FormField label="Section name">
             <input name="name" value={section.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           <FormField label="Depends on">
             <select name="dependsOnId" value={section.dependsOnId || ''}
@@ -83,13 +83,13 @@ export default class FormTemplateSectionEdit extends Component {
           <FormField>
             <input name="child" type="checkbox"
               checked={section.child || false}
-              onChange={formState.toggle('child')}/>
+              onChange={formState.toggle('child')} />
             <label htmlFor="child">per child</label>
           </FormField>
           <FormField>
             <input name="administrative" type="checkbox"
               checked={section.administrative || false}
-              onChange={formState.toggle('administrative')}/>
+              onChange={formState.toggle('administrative')} />
             <label htmlFor="administrative">administrative</label>
           </FormField>
         </fieldset>
@@ -97,16 +97,15 @@ export default class FormTemplateSectionEdit extends Component {
     }
 
     const fields = (section.fields || []).map((field, index) => {
-
       const raise = (index === 0 ? undefined : (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('fields', index, index-1)}>
+          onClick={formState.swapWith('fields', index, index - 1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (section.fields.length - 1) ? undefined : (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('fields', index, index+1)}>
+          onClick={formState.swapWith('fields', index, index + 1)}>
           <DownIcon />
         </button>
         ));
@@ -114,14 +113,14 @@ export default class FormTemplateSectionEdit extends Component {
       let edit;
       if (expandedFields[field._id] || expandedFields[field.id]) {
         edit = (
-          <FormTemplateFieldEdit key={index} field={field} index={index}
+          <FormTemplateFieldEdit field={field} index={index}
             dependableFields={dependableFields}
             onChange={formState.changeAt('fields', index)} />
         );
       }
 
       return (
-        <div key={index}>
+        <div key={field.id}>
           <div className="form-item">
             <button type="button" className="button-plain"
               onClick={this._toggleField(field._id || field.id)}>
@@ -156,11 +155,11 @@ export default class FormTemplateSectionEdit extends Component {
       </div>
     );
   }
-};
+}
 
 FormTemplateSectionEdit.propTypes = {
-  dependableFields: PropTypes.arrayOf(PropTypes.object),
-  includeName: PropTypes.bool,
+  dependableFields: PropTypes.arrayOf(PropTypes.object).isRequired,
+  includeName: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
-  section: PropTypes.object.isRequired
+  section: PropTypes.object.isRequired,
 };

@@ -1,34 +1,34 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 
 export default class CalendarFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { domains: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { formState, session } = this.props;
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
-      .catch(error => console.log('CalendarFormContents domains catch', error));
+      .catch(error => console.error('CalendarFormContents domains catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
     }
   }
 
-  render () {
+  render() {
     const { className, formState, session } = this.props;
     const calendar = formState.object;
 
     let administeredBy;
     if (session.administrator) {
-      let domains = this.state.domains.map(domain => (
+      const domains = this.state.domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
       domains.unshift(<option key={0} />);
@@ -47,16 +47,16 @@ export default class CalendarFormContents extends Component {
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={calendar.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           <FormField name="path" label="Path" help="unique url name">
             <input name="path" value={calendar.path || ''}
-              onChange={formState.change('path')}/>
+              onChange={formState.change('path')} />
           </FormField>
           <FormField>
             <input name="public" type="checkbox"
               checked={calendar.public || false}
-              onChange={formState.toggle('public')}/>
+              onChange={formState.toggle('public')} />
             <label htmlFor="public">public</label>
           </FormField>
           {administeredBy}
@@ -64,9 +64,14 @@ export default class CalendarFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 CalendarFormContents.propTypes = {
+  className: PropTypes.string,
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired
+  session: PropTypes.object.isRequired,
+};
+
+CalendarFormContents.defaultProps = {
+  className: undefined,
 };

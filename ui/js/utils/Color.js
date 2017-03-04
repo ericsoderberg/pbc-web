@@ -1,8 +1,7 @@
-"use strict";
 
 const COLOR_RGB_REGEXP = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})/;
 
-export function isDarkBackground (colorString) {
+export function isDarkBackground(colorString) {
   // convert to RGB elements
   const match = colorString.match(COLOR_RGB_REGEXP);
   let result = false;

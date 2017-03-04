@@ -1,44 +1,44 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import PageItem from './PageItem';
 
 export default class PageContext extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { pages: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this._load(nextProps);
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this._unmounted = true;
   }
 
-  _load (props) {
+  _load(props) {
     const { filter } = props;
     if (filter) {
       getItems('pages', {
-        filter: filter,
-        select: 'name path'
+        filter,
+        select: 'name path',
       })
-      .then(pages => {
-        if (! this._unmounted) {
-          this.setState({ pages: pages });
+      .then((pages) => {
+        if (!this._unmounted) {
+          this.setState({ pages });
         }
       })
-      .catch(error => console.log('!!! PageContext pages catch', error));
+      .catch(error => console.error('!!! PageContext pages catch', error));
     }
   }
 
-  render () {
+  render() {
     const { align } = this.props;
     const { pages } = this.state;
     let result = null;
@@ -55,10 +55,15 @@ export default class PageContext extends Component {
       );
     }
     return result;
-  };
+  }
 }
 
 PageContext.propTypes = {
   align: PropTypes.oneOf(['start', 'center', 'end']),
-  filter: PropTypes.object
+  filter: PropTypes.object,
+};
+
+PageContext.defaultProps = {
+  align: undefined,
+  filter: undefined,
 };

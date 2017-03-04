@@ -27,19 +27,25 @@ export default class DateInput extends Component {
     this.state.active = false;
   }
 
-  componentDidMount () {
-    if (! hasNativeDateSelector() && this.refs.dateInput) {
-      this.refs.dateInput.addEventListener('focus', this._onActivate);
+  componentDidMount() {
+    if (!hasNativeDateSelector() && this._dateInputRef) {
+      this._dateInputRef.addEventListener('focus', this._onActivate);
     }
   }
 
-  componentWillReceiveProps (newProps) {
+  componentWillReceiveProps(newProps) {
     this.setState(this._stateFromProps(newProps));
   }
 
-  _stateFromProps (props) {
+  componentWillUnmount() {
+    if (!hasNativeDateSelector() && this._dateInputRef) {
+      this._dateInputRef.removeEventListener('focus', this._onActivate);
+    }
+  }
+
+  _stateFromProps(props) {
     const { value } = props;
-    let result = {};
+    const result = {};
     const date = moment(value);
     if (date.isValid()) {
       result.current = date;
@@ -51,7 +57,7 @@ export default class DateInput extends Component {
     return result;
   }
 
-  _onChange (event) {
+  _onChange(event) {
     const { onChange } = this.props;
     const dateValue = event.target.value;
     this.setState({ dateValue });
@@ -66,23 +72,23 @@ export default class DateInput extends Component {
     }
   }
 
-  _onSelect (date) {
+  _onSelect(date) {
     this.setState({ active: false });
     if (this.props.onChange) {
       this.props.onChange(date);
     }
   }
 
-  _onActivate (event) {
+  _onActivate(event) {
     event.preventDefault();
     this.setState({ active: true });
     document.addEventListener('click', this._onDeactivate);
   }
 
-  _isDescendant (parent, child) {
-    var node = child.parentNode;
+  _isDescendant(parent, child) {
+    let node = child.parentNode;
     while (node != null) {
-      if (node == parent) {
+      if (node === parent) {
         return true;
       }
       node = node.parentNode;
@@ -90,17 +96,17 @@ export default class DateInput extends Component {
     return false;
   }
 
-  _onDeactivate (event) {
-    if (! this._isDescendant(this.refs.component, event.target)) {
+  _onDeactivate(event) {
+    if (!this._isDescendant(this._componentRef, event.target)) {
       this.setState({ active: false });
       document.removeEventListener('click', this._onDeactivate);
     }
   }
 
-  render () {
+  render() {
     const { className, inline } = this.props;
     const { active, current, dateValue } = this.state;
-    let classes = ['date-input'];
+    const classes = ['date-input'];
     if (inline) {
       classes.push('date-input--inline');
     }
@@ -108,10 +114,12 @@ export default class DateInput extends Component {
       classes.push(className);
     }
 
-    let input, selector;
-    if (! inline) {
+    let input;
+    let selector;
+    if (!inline) {
       input = (
-        <input ref='dateInput' className={'date-input__input'} type='date'
+        <input ref={(ref) => { this._dateInputRef = ref; }}
+          className={'date-input__input'} type="date"
           value={dateValue}
           onChange={this._onChange} onFocus={this._onOpen} />
       );
@@ -123,7 +131,8 @@ export default class DateInput extends Component {
     }
 
     return (
-      <div ref='component' className={classes.join(' ')}>
+      <div ref={(ref) => { this._componentRef = ref; }}
+        className={classes.join(' ')}>
         {input}
         {selector}
       </div>
@@ -133,7 +142,13 @@ export default class DateInput extends Component {
 }
 
 DateInput.propTypes = {
+  className: PropTypes.string,
   inline: PropTypes.bool,
-  onChange: PropTypes.func,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+};
+
+DateInput.defaultProps = {
+  className: undefined,
+  inline: false,
 };

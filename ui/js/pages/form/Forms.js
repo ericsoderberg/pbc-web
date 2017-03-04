@@ -1,12 +1,12 @@
-"use strict";
-import React, { Component, PropTypes } from 'react';
+
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: form } = props;
-  let classNames = ['item__container', className];
+  const classNames = ['item__container', className];
   return (
     <Link className={classNames.join(' ')}
       to={`/forms/${form._id}/edit`}>
@@ -23,31 +23,40 @@ const Item = (props) => {
   );
 };
 
-export default class Forms extends Component {
+Item.propTypes = {
+  className: PropTypes.string,
+  item: PropTypes.object.isRequired,
+};
 
-  render () {
-    const { location } = this.props;
-    const populate = [
-      { path: 'formTemplateId', select: 'name' },
-      { path: 'userId', select: 'name' }
-    ];
+Item.defaultProps = {
+  className: undefined,
+};
 
-    return (
-      <List location={location}
-        category="forms" title="Forms" path="/forms"
-        filters={[{
-          property: 'formTemplateId', category: 'form-templates',
-          allLabel: 'All templates'
-        }, {
-          property: 'userId', category: 'users', allLabel: 'Anyone'
-        }]} sort="-modified"
-        populate={populate}
-        addIfFilter="formTemplateId"
-        Item={Item} />
-    );
-  }
+const Forms = (props) => {
+  const { location } = props;
+  const populate = [
+    { path: 'formTemplateId', select: 'name' },
+    { path: 'userId', select: 'name' },
+  ];
+
+  return (
+    <List location={location}
+      category="forms" title="Forms" path="/forms"
+      filters={[{
+        property: 'formTemplateId',
+        category: 'form-templates',
+        allLabel: 'All templates',
+      }, {
+        property: 'userId', category: 'users', allLabel: 'Anyone',
+      }]} sort="-modified"
+      populate={populate}
+      addIfFilter="formTemplateId"
+      Item={Item} />
+  );
 };
 
 Forms.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object.isRequired,
 };
+
+export default Forms;

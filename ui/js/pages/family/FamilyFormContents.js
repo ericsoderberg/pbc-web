@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import AddIcon from '../../icons/Add';
 import AdultEdit from './AdultEdit';
@@ -6,22 +6,22 @@ import ChildEdit from './ChildEdit';
 
 export default class FamilyFormContents extends Component {
 
-  _addPerson (property) {
+  _addPerson(property) {
     return () => {
       const { formState } = this.props;
       const family = formState.object;
-      let people = family[property].slice(0);
+      const people = family[property].slice(0);
       people.push({});
       formState.set(property, people);
     };
   }
 
-  render () {
+  render() {
     const { className, formState } = this.props;
     const family = formState.object;
 
     const adults = (family.adults || []).map((adult, index) => (
-      <AdultEdit key={index} adult={adult}
+      <AdultEdit key={adult._id} adult={adult}
         defaultActive={true || !adult.userId || !adult.relation}
         onChange={formState.changeAt('adults', index)}
         onRemove={family.adults.length > 1 ?
@@ -29,7 +29,8 @@ export default class FamilyFormContents extends Component {
     ));
 
     const children = (family.children || []).map((child, index) => (
-      <ChildEdit key={index} child={child} defaultActive={true || ! child.name}
+      <ChildEdit key={child._id} child={child}
+        defaultActive={true || !child.name}
         onChange={formState.changeAt('children', index)}
         onRemove={formState.removeAt('children', index)} />
     ));
@@ -60,8 +61,13 @@ export default class FamilyFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 FamilyFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  className: PropTypes.string,
+  formState: PropTypes.object.isRequired,
+};
+
+FamilyFormContents.defaultProps = {
+  className: undefined,
 };

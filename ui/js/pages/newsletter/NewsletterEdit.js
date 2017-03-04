@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { postItem } from '../../actions';
 import Edit from '../../components/Edit';
@@ -8,19 +8,19 @@ import NewsletterPreview from './NewsletterPreview';
 
 export default class NewsletterEdit extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onChange = this._onChange.bind(this);
     this._onCopy = this._onCopy.bind(this);
     this.state = { submitLabel: 'Update' };
   }
 
-  _onChange (newsletter) {
+  _onChange(newsletter) {
     const submitLabel = newsletter.address ? 'Send' : 'Update';
     this.setState({ newsletter, submitLabel });
   }
 
-  _onCopy (event) {
+  _onCopy(event) {
     event.preventDefault();
     const { newsletter } = this.state;
     const copyItem = { ...newsletter };
@@ -28,13 +28,13 @@ export default class NewsletterEdit extends Component {
     copyItem.name += ' - Copy';
     delete copyItem.address;
     postItem('newsletters', copyItem)
-    .then(newItem => {
+    .then((newItem) => {
       this.context.router.replace(`/newsletters/${newItem._id}/edit`);
     })
-    .catch(error => console.log('!!! NewsletterEdit catch', error));
+    .catch(error => console.error('!!! NewsletterEdit catch', error));
   }
 
-  render () {
+  render() {
     const { params } = this.props;
     const { submitLabel } = this.state;
     const copyControl = (
@@ -47,14 +47,14 @@ export default class NewsletterEdit extends Component {
         submitLabel={submitLabel} onChange={this._onChange} />
     );
   }
-};
+}
 
 NewsletterEdit.propTypes = {
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }).isRequired
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 NewsletterEdit.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

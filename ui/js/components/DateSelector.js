@@ -8,7 +8,6 @@ export default class DateSelector extends Component {
   constructor(props) {
     super(props);
 
-    this._onDay = this._onDay.bind(this);
     this._onToday = this._onToday.bind(this);
     this._onPrevious = this._onPrevious.bind(this);
     this._onNext = this._onNext.bind(this);
@@ -16,67 +15,69 @@ export default class DateSelector extends Component {
     this.state = this._stateFromProps(props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const state = this._stateFromProps(nextProps);
     this.setState(state);
   }
 
-  _stateFromProps (props) {
+  _stateFromProps(props) {
     const { value } = props;
     return { reference: value };
   }
 
-  _onDay (date) {
-    this.props.onChange(date);
+  _day(date) {
+    return () => {
+      this.props.onChange(date);
+    };
   }
 
-  _onToday () {
+  _onToday() {
     const reference = moment().startOf('day');
     this.setState({ reference });
   }
 
-  _onPrevious () {
+  _onPrevious() {
     const { reference } = this.state;
     const nextReference = moment(reference).subtract(1, 'month');
     this.setState({ reference: nextReference });
   }
 
-  _onNext () {
+  _onNext() {
     const { reference } = this.state;
     const nextReference = moment(reference).add(1, 'month');
     this.setState({ reference: nextReference });
   }
 
-  render () {
+  render() {
     const { value } = this.props;
     const { reference } = this.state;
 
-    const headerCells = WEEK_DAYS.map(function (day) {
-      return <th key={day}>{day}</th>;
-    });
+    const headerCells = WEEK_DAYS.map(day => (
+      <th key={day}>{day}</th>
+    ));
 
     const start = moment(reference).startOf('month').startOf('week');
     const end = moment(reference).endOf('month').endOf('week');
-    let date = moment(start);
-    let rows = [];
+    const date = moment(start);
+    const rows = [];
 
     while (date.valueOf() <= end.valueOf()) {
-      let days = [];
+      const days = [];
       for (let i = 0; i < 7; i += 1) {
         const classes = ['date-selector__day'];
         if (date.isSame(value, 'day')) {
           classes.push('date-selector__day--active');
         }
-        if (! date.isSame(value, 'month')) {
+        if (!date.isSame(value, 'month')) {
           classes.push('date-selector__day--other-month');
         }
         days.push(
           <td key={date.valueOf()}>
             <div className={classes.join(' ')}
-              onClick={this._onDay.bind(this, moment(date))}>
+              onClick={this._day(moment(date))}>
               {date.date()}
             </div>
-          </td>
+          </td>,
         );
         date.add(1, 'day');
       }
@@ -124,5 +125,5 @@ export default class DateSelector extends Component {
 
 DateSelector.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.object.isRequired
+  value: PropTypes.object.isRequired,
 };

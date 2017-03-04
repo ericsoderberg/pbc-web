@@ -1,11 +1,10 @@
-"use strict";
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: calendar } = props;
-  let classNames = ['item__container', className];
+  const classNames = ['item__container', className];
   return (
     <Link className={classNames.join(' ')}
       to={`/calendars/${calendar.path || calendar._id}`}>
@@ -16,12 +15,21 @@ const Item = (props) => {
   );
 };
 
-export default class Calendars extends List {};
+Item.propTypes = {
+  className: PropTypes.string,
+  item: PropTypes.object.isRequired,
+};
+
+Item.defaultProps = {
+  className: undefined,
+};
+
+export default class Calendars extends List {}
 
 Calendars.defaultProps = {
   ...List.defaultProps,
   category: 'calendars',
-  Item: Item,
+  Item,
   path: '/calendars',
-  title: 'Calendars'
+  title: 'Calendars',
 };

@@ -1,40 +1,40 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import moment from 'moment';
 import { authorize } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetCalendarIfNeeded } from './calendars';
 import register from './register';
 
+mongoose.Promise = global.Promise;
+
 // /api/events
 
 // Supporting functions for /events/resources
 
-function eventMoments (event) {
+function eventMoments(event) {
   let result = [{
     start: moment(event.start),
-    end: moment(event.end)
+    end: moment(event.end),
   }];
   if (event.times) {
     result.concat(event.times.map(time => ({
       start: moment(time.start),
-      end: moment(time.end)
+      end: moment(time.end),
     })));
   }
   if (event.dates) {
-    let recurrence = [];
-    event.dates.forEach(date => {
-      result.forEach(time => {
+    const recurrence = [];
+    event.dates.forEach((date) => {
+      result.forEach((time) => {
         recurrence.push({
           start: moment(date).set({
             hour: time.start.hour(),
-            minute: time.start.minute()
+            minute: time.start.minute(),
           }),
           end: moment(date).set({
             hour: time.end.hour(),
-            minute: time.end.minute()
-          })
+            minute: time.end.minute(),
+          }),
         });
       });
     });
@@ -43,34 +43,34 @@ function eventMoments (event) {
   return result;
 }
 
-function overlapsMoments (event, moments) {
+function overlapsMoments(event, moments) {
   const moments2 = eventMoments(event);
-  return moments.some(moment => {
-    return moments2.some(moment2 => {
-      return (moment.end.isAfter(moment2.start) &&
-        moment.start.isBefore(moment2.end));
-    });
-  });
+  return moments.some(moment1 => (
+    moments2.some(moment2 => (
+      moment1.end.isAfter(moment2.start) &&
+      moment1.start.isBefore(moment2.end)
+    ))
+  ));
 }
 
-function overlappingEvents (event) {
+function overlappingEvents(event) {
   const Event = mongoose.model('Event');
   const moments = eventMoments(event);
   return Event.find({ _id: { $ne: event._id } }).exec()
   .then(events => events.filter(event2 => overlapsMoments(event2, moments)));
 }
 
-function resourceIdsWithEvents (events) {
-  let resourceIdsEvents = {}; // _id => [{ _id: <event id>, name: <event name }]
-  events.forEach(event2 => {
+function resourceIdsWithEvents(events) {
+  const resourceIdsEvents = {}; // _id => [{ _id: <event id>, name: <event name }]
+  events.forEach((event2) => {
     if (event2.resourceIds) {
-      event2.resourceIds.forEach(resourceId => {
+      event2.resourceIds.forEach((resourceId) => {
         const stringId = resourceId.toString();
-        if (! resourceIdsEvents[stringId]) {
+        if (!resourceIdsEvents[stringId]) {
           resourceIdsEvents[stringId] = [];
         }
         resourceIdsEvents[stringId].push(
-          { _id: event2._id, name: event2.name }
+          { _id: event2._id, name: event2.name },
         );
       });
     }
@@ -78,32 +78,32 @@ function resourceIdsWithEvents (events) {
   return resourceIdsEvents;
 }
 
-function resourcesWithEvents (resourceIdsEvents) {
+function resourcesWithEvents(resourceIdsEvents) {
   const Resource = mongoose.model('Resource');
   return Resource.find({}).sort('name').exec()
-  .then(resources => {
+  .then(resources => (
     // Decorate with the overlapping events used by the resources.
-    return resources.map(resource => {
+    resources.map((resource) => {
       // Annotated with events already using them
-      let object = resource.toObject();
+      const object = resource.toObject();
       object.events = resourceIdsEvents[object._id.toString()];
       return object;
-    });
-  });
+    })
+  ));
 }
 
 // Supporting functions for /events/unavailable-dates
 
-function timeInHours (time) {
+function timeInHours(time) {
   const start = moment(time.start);
   const end = moment(time.end);
   return {
     start: start.hour() + (start.minute() / 60.0),
-    end: end.hour() + (end.minute() / 60.0)
+    end: end.hour() + (end.minute() / 60.0),
   };
 }
 
-function eventInHours (event) {
+function eventInHours(event) {
   let hours = [timeInHours(event)];
   if (event.times) {
     hours = hours.concat(event.times.map(timeInHours));
@@ -111,21 +111,21 @@ function eventInHours (event) {
   return hours;
 }
 
-function hoursOverlap (event2, hours) {
+function hoursOverlap(event2, hours) {
   const hours2 = eventInHours(event2);
   return hours.some(hour => (
     hours2.some(hour2 => (hour2.end > hour.start && hour2.start < hour.end))
   ));
 }
 
-function resourcesOverlap (event2, resourceIds) {
+function resourcesOverlap(event2, resourceIds) {
   return resourceIds.some(resourceId => (
     event2.resourceIds.some(resourceId2 => resourceId.equals(resourceId2))
   ));
 }
 
-function eventDates (event) {
-  let dates = [event.start];
+function eventDates(event) {
+  const dates = [event.start];
   return dates.concat(event.dates || []);
 }
 
@@ -133,12 +133,12 @@ const unsetReferences = (data) => {
   data = unsetCalendarIfNeeded(data);
   data = unsetDomainIfNeeded(data);
   // remove deprecated text property
-  if (! data.$unset) {
+  if (!data.$unset) {
     data.$unset = {};
   }
   data.$unset.text = '';
   // remove deprecated address property
-  if (! data.$unset) {
+  if (!data.$unset) {
     data.$unset = {};
   }
   data.$unset.address = '';
@@ -146,11 +146,10 @@ const unsetReferences = (data) => {
 };
 
 export default function (router) {
-
   router.post('/events/resources', (req, res) => {
     authorize(req, res)
     // Get all events that overlap this event.
-    .then(session => {
+    .then(() => {
       const Event = mongoose.model('Event');
       const event = new Event(req.body);
       return overlappingEvents(event);
@@ -165,7 +164,7 @@ export default function (router) {
 
   router.post('/events/unavailable-dates', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then(() => {
       const Event = mongoose.model('Event');
       const event = new Event(req.body);
 
@@ -175,20 +174,20 @@ export default function (router) {
       // Find all events using the resources this event is using at the same
       // times of day.
       return Event.find({ _id: { $ne: event._id } }).exec()
-      .then(events => {
+      .then(events => (
         // events using a same resource
-        return events.filter(event2 => resourcesOverlap(event2, resourceIds))
+        events.filter(event2 => resourcesOverlap(event2, resourceIds))
         // events at the same time of day
         .filter(event2 => hoursOverlap(event2, hours))
-        .map(eventDates);
-      });
+        .map(eventDates)
+      ));
     })
-    .then(unavailableDatess => {
-      let unavailableDates = [];
-      unavailableDatess.forEach(dates => {
-        unavailableDates = unavailableDates.concat(dates);
+    .then((unavailableDates) => {
+      let unavailableDatesMerged = [];
+      unavailableDates.forEach((dates) => {
+        unavailableDatesMerged = unavailableDatesMerged.concat(dates);
       });
-      return unavailableDates;
+      return unavailableDatesMerged;
     })
     .then(unavailableDates => res.status(200).json(unavailableDates))
     .catch(error => res.status(400).json(error));
@@ -201,8 +200,9 @@ export default function (router) {
       populate: [
         { path: 'primaryEventId', select: 'name path' },
         { path: 'calendarId', select: 'name path' },
-        { path: 'sections.formTemplateId', select: 'name',
-          model: 'FormTemplate' }
+        { path: 'sections.formTemplateId',
+          select: 'name',
+          model: 'FormTemplate' },
       ],
       transformOut: (doc) => {
         // convert deprecated text property to a section
@@ -220,10 +220,10 @@ export default function (router) {
           delete doc.address;
         }
         return doc;
-      }
+      },
     },
     put: {
-      transformIn: unsetReferences
-    }
+      transformIn: unsetReferences,
+    },
   });
 }

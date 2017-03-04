@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
@@ -11,25 +11,25 @@ import Loading from '../../components/Loading';
 import PageContext from '../page/PageContext';
 
 const FIXED_FIELDS = ['created', 'modified'];
-const FiXED_LABELS = { created: 'Submitted', modified: 'Updated'};
+const FiXED_LABELS = { created: 'Submitted', modified: 'Updated' };
 
 export default class FormTemplate extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._layout = this._layout.bind(this);
     this.state = { sortReverse: false };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._loadFormTemplate();
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     setTimeout(this._layout, 20);
   }
 
-  _layout () {
+  _layout() {
     const flexed = findDOMNode(this._flexedHeaderRef);
     if (flexed) {
       const rect = flexed.getBoundingClientRect();
@@ -39,60 +39,63 @@ export default class FormTemplate extends Component {
     }
   }
 
-  _loadFormTemplate () {
+  _loadFormTemplate() {
     const { params: { id } } = this.props;
     getItem('form-templates', id)
-    .then(formTemplate => {
+    .then((formTemplate) => {
       document.title = formTemplate.name;
-      this._annotateFormTemplate(formTemplate);
-      this.setState({ formTemplate: formTemplate }, this._loadForm);
+      this.setState({ formTemplate: this._annotateFormTemplate(formTemplate) },
+        this._loadForm);
     })
-    .catch(error => console.log('!!! FormTemplate template catch', error));
+    .catch(error => console.error('!!! FormTemplate template catch', error));
   }
 
-  _loadForm () {
+  _loadForm() {
     const { params: { id } } = this.props;
     const { formTemplate } = this.state;
     getItems('forms', {
-      filter: { formTemplateId: id }, populate: true
+      filter: { formTemplateId: id }, populate: true,
     })
-    .then(forms => {
-      this._annotateForms(forms, formTemplate);
-      this.setState({ forms: forms, formTemplate: formTemplate });
+    .then((forms) => {
+      const annotatedForms = this._annotateForms(forms, formTemplate);
+      this.setState({ forms: annotatedForms, formTemplate });
     })
-    .catch(error => console.log('!!! FormTemplate forms catch', error));
+    .catch(error => console.error('!!! FormTemplate forms catch', error));
   }
 
-  _annotateFormTemplate (formTemplate) {
-    let fieldMap = {};
-    let optionMap = {};
-    let columnFields = [];
-    formTemplate.sections.forEach(section => {
-      section.fields.forEach(field => {
+  _annotateFormTemplate(formTemplate) {
+    const fieldMap = {};
+    const optionMap = {};
+    const columnFields = [];
+    formTemplate.sections.forEach((section) => {
+      section.fields.forEach((field) => {
         fieldMap[field._id] = field;
-        field.options.forEach(option => optionMap[option._id] = option);
-        if ('instructions' !== field.type) {
-          field.index = columnFields.length;
-          if ('count' === field.type || field.monetary) {
-            field.total = 0;
+        field.options.forEach((option) => { optionMap[option._id] = option; });
+        if (field.type !== 'instructions') {
+          const columnField = { ...field };
+          columnField.index = columnFields.length;
+          if (field.type === 'count' || field.monetary) {
+            columnField.total = 0;
           }
-          columnFields.push(field);
+          columnFields.push(columnField);
         }
       });
     });
-    formTemplate.fieldMap = fieldMap;
-    formTemplate.optionMap = optionMap;
-    formTemplate.columnFields = columnFields;
-    formTemplate.fixedFields = FIXED_FIELDS.map((name, index) => ({
-      name: name,
-      index: columnFields.length + index
+    const result = { ...formTemplate };
+    result.fieldMap = fieldMap;
+    result.optionMap = optionMap;
+    result.columnFields = columnFields;
+    result.fixedFields = FIXED_FIELDS.map((name, index) => ({
+      name,
+      index: columnFields.length + index,
     }));
+    return result;
   }
 
-  _annotateForms (forms, formTemplate) {
-    forms.forEach(form => {
-      let fieldMap = {};
-      form.fields.forEach(field => {
+  _annotateForms(forms, formTemplate) {
+    return forms.map((form) => {
+      const fieldMap = {};
+      form.fields.forEach((field) => {
         // hash fields for sorting
         fieldMap[field.templateFieldId] = field;
         // calculate totals
@@ -105,20 +108,20 @@ export default class FormTemplate extends Component {
         }
       });
 
-      form.fieldMap = fieldMap;
+      return { ...form, fieldMap };
     });
   }
 
-  _fieldValue (field, formTemplate) {
+  _fieldValue(field, formTemplate) {
     const templateField = formTemplate.fieldMap[field.templateFieldId];
     let value;
-    if ('count' === templateField.type) {
+    if (templateField.type === 'count') {
       value = templateField.value * field.value;
-    } else if ('choice' === templateField.type && field.optionId) {
+    } else if (templateField.type === 'choice' && field.optionId) {
       const option = formTemplate.optionMap[field.optionId];
       value = option.value;
-    } else if ('choices' === templateField.type && field.optionIds.length > 0) {
-      value = field.optionIds.map(optionId => {
+    } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
+      value = field.optionIds.map((optionId) => {
         const option = formTemplate.optionMap[optionId];
         return option.value;
       });
@@ -129,10 +132,10 @@ export default class FormTemplate extends Component {
     return value;
   }
 
-  _fieldContents (field, formTemplate) {
+  _fieldContents(field, formTemplate) {
     const templateField = formTemplate.fieldMap[field.templateFieldId];
     let contents = field.value;
-    if ('count' === templateField.type) {
+    if (templateField.type === 'count') {
       let prefix;
       if (templateField.monetary) {
         prefix = '$ ';
@@ -143,29 +146,28 @@ export default class FormTemplate extends Component {
           {field.value}
         </span>
       );
-    } else if ('choice' === templateField.type && field.optionId) {
+    } else if (templateField.type === 'choice' && field.optionId) {
       const option = formTemplate.optionMap[field.optionId];
       contents = option.name;
-    } else if ('choices' === templateField.type && field.optionIds) {
-      contents = field.optionIds.map(optionId => {
+    } else if (templateField.type === 'choices' && field.optionIds) {
+      contents = field.optionIds.map((optionId) => {
         const option = formTemplate.optionMap[optionId];
         return option.name;
       }).join(', ');
     } else if (templateField.monetary) {
-      contents = <span><span className='secondary'>$ </span>{contents}</span>;
+      contents = <span><span className="secondary">$ </span>{contents}</span>;
     }
     return contents;
   }
 
-  _sortForms (templateFieldId) {
+  _sortForms(templateFieldId) {
     return () => {
       const { forms, formTemplate, sortFieldId, sortReverse } = this.state;
       const nextSortReverse = (templateFieldId === sortFieldId ?
-        ! sortReverse : false);
+        !sortReverse : false);
       const fixed = FIXED_FIELDS.indexOf(templateFieldId) !== -1;
 
-      let nextForms = forms.sort((form1, form2) => {
-
+      const nextForms = forms.sort((form1, form2) => {
         let value1;
         if (fixed) {
           value1 = form1[templateFieldId];
@@ -195,7 +197,7 @@ export default class FormTemplate extends Component {
         if (value1 && (!value2 || value1 < value2)) {
           return nextSortReverse ? 1 : -1;
         }
-        if (value2  && (!value1 || value2 < value1)) {
+        if (value2 && (!value1 || value2 < value1)) {
           return nextSortReverse ? -1 : 1;
         }
         return 0;
@@ -204,24 +206,24 @@ export default class FormTemplate extends Component {
       this.setState({
         forms: nextForms,
         sortFieldId: templateFieldId,
-        sortReverse: nextSortReverse
+        sortReverse: nextSortReverse,
       });
     };
   }
 
-  _totalForms () {
+  _totalForms() {
     const { filteredForms, forms, formTemplate } = this.state;
     // zero out totals
-    formTemplate.sections.forEach(section => {
-      section.fields.forEach(field => {
-        if (field.total >= 0) {
-          field.total = 0;
+    formTemplate.sections.forEach((section) => {
+      section.fields.forEach((templateField) => {
+        if (templateField.total >= 0) {
+          templateField.total = 0;
         }
       });
     });
 
-    (filteredForms || forms).forEach(form => {
-      form.fields.forEach(field => {
+    (filteredForms || forms).forEach((form) => {
+      form.fields.forEach((field) => {
         // calculate totals
         const templateField = formTemplate.fieldMap[field.templateFieldId];
         if (templateField.total >= 0) {
@@ -232,28 +234,28 @@ export default class FormTemplate extends Component {
         }
       });
     });
-    this.setState({ formTemplate: formTemplate });
+    this.setState({ formTemplate });
   }
 
-  _filterForms () {
+  _filterForms() {
     const { fromDate, toDate } = this.state;
     const filteredForms = this.state.forms.filter(form => (
-      (! fromDate || moment(form.created).isAfter(fromDate)) &&
-      (! toDate || moment(form.created).isBefore(toDate))
+      (!fromDate || moment(form.created).isAfter(fromDate)) &&
+      (!toDate || moment(form.created).isBefore(toDate))
     ));
-    this.setState({ filteredForms: filteredForms }, this._totalForms);
+    this.setState({ filteredForms }, this._totalForms);
   }
 
-  _editForm (id) {
+  _editForm(id) {
     return () => {
       this.context.router.push(`/forms/${id}/edit`);
     };
   }
 
-  _renderHeaderCells () {
+  _renderHeaderCells() {
     const { formTemplate, sortFieldId, sortReverse } = this.state;
-    let cells = formTemplate.columnFields.map(field => {
-      let classes = [];
+    const cells = formTemplate.columnFields.map((field) => {
+      const classes = [];
       if (sortFieldId === field._id) {
         classes.push('sort');
         if (sortReverse) {
@@ -271,23 +273,25 @@ export default class FormTemplate extends Component {
       );
     });
 
-    cells = cells.concat(formTemplate.fixedFields.map(field => {
-      let classes = (sortFieldId === field.name ?
-        (sortReverse ? 'sort sort--reverse' : 'sort') : undefined);
+    formTemplate.fixedFields.forEach((field) => {
+      let className;
+      if (sortFieldId === field.name) {
+        className = (sortReverse ? 'sort sort--reverse' : 'sort');
+      }
       cells.push(
-        <th key={field.name} className={classes}
+        <th key={field.name} className={className}
           onClick={this._sortForms(field.name)}>
           {FiXED_LABELS[field.name]}
-        </th>
+        </th>,
       );
-    }));
+    });
 
     return cells;
   }
 
-  _renderFooterCells () {
+  _renderFooterCells() {
     const { formTemplate, sortFieldId } = this.state;
-    return formTemplate.columnFields.map(field => {
+    return formTemplate.columnFields.map((field) => {
       let classes = (field.total >= 0 ? 'total' : '');
       if (field._id === sortFieldId) {
         classes += ' sort';
@@ -300,12 +304,12 @@ export default class FormTemplate extends Component {
     });
   }
 
-  _renderCells (form) {
+  _renderCells(form) {
     const { formTemplate, sortFieldId } = this.state;
     const templateFieldMap = formTemplate.fieldMap;
 
     let cells = [];
-    form.fields.forEach(field => {
+    form.fields.forEach((field) => {
       const templateField = templateFieldMap[field.templateFieldId];
 
       let classes = (field.templateFieldId === sortFieldId ? 'sort' : '');
@@ -313,7 +317,7 @@ export default class FormTemplate extends Component {
         classes += ' numeric';
       }
 
-      let contents = this._fieldContents(field, formTemplate);
+      const contents = this._fieldContents(field, formTemplate);
       cells[templateField.index] = (
         <td key={field._id} className={classes}>{contents}</td>
       );
@@ -330,7 +334,7 @@ export default class FormTemplate extends Component {
     cells.push(
       <td key="created" className={classes}>
         {created.format('MMM Do YYYY')}
-      </td>
+      </td>,
     );
 
     classes = 'secondary';
@@ -339,37 +343,37 @@ export default class FormTemplate extends Component {
     }
     const modified = moment(form.modified);
     let contents;
-    if (! modified.isSame(created, 'day')) {
+    if (!modified.isSame(created, 'day')) {
       contents = modified.format('MMM Do YYYY');
     }
     cells.push(
-      <td key="modified" className={classes}>{contents}</td>
+      <td key="modified" className={classes}>{contents}</td>,
     );
 
     return cells;
   }
 
-  _renderRows () {
+  _renderRows() {
     const { filteredForms, forms } = this.state;
-    let fixedRows = [];
-    let flexedRows = [];
-    (filteredForms || forms).forEach(form => {
-      let cells = this._renderCells(form);
+    const fixedRows = [];
+    const flexedRows = [];
+    (filteredForms || forms).forEach((form) => {
+      const cells = this._renderCells(form);
       fixedRows.push(
         <tr key={form._id} onClick={this._editForm(form._id)}>
           {cells.slice(0, 1)}
-        </tr>
+        </tr>,
       );
       flexedRows.push(
         <tr key={form._id} onClick={this._editForm(form._id)}>
           {cells.slice(1)}
-        </tr>
+        </tr>,
       );
     });
     return [fixedRows, flexedRows];
   }
 
-  _renderTable () {
+  _renderTable() {
     const { headerHeight } = this.state;
     const headerCells = this._renderHeaderCells();
     const footerCells = this._renderFooterCells();
@@ -395,7 +399,7 @@ export default class FormTemplate extends Component {
         </table>
         <div className="form-table__flexed">
           <table>
-            <thead ref={ref => this._flexedHeaderRef = ref}>
+            <thead ref={(ref) => { this._flexedHeaderRef = ref; }}>
               <tr>{headerCells.slice(1)}</tr>
             </thead>
             <tbody>
@@ -411,7 +415,7 @@ export default class FormTemplate extends Component {
     );
   }
 
-  _renderFilter () {
+  _renderFilter() {
     const { fromDate, toDate } = this.state;
     return (
       <div className="page-header__drop box--row">
@@ -431,7 +435,7 @@ export default class FormTemplate extends Component {
     );
   }
 
-  render () {
+  render() {
     const { params: { id } } = this.props;
     const { filterActive, formTemplate, forms } = this.state;
 
@@ -440,27 +444,27 @@ export default class FormTemplate extends Component {
       filter = this._renderFilter();
     }
 
-    let actions = [];
+    const actions = [];
     actions.push(
       <span key="filter" className="page-header__dropper">
         <Button label="Filter"
           onClick={() => this.setState({
-            filterActive: ! this.state.filterActive})}/>
+            filterActive: !this.state.filterActive })} />
         {filter}
-      </span>
+      </span>,
     );
 
     actions.push(
       <Link key="download" to={`/form-templates/${id}/download`}>
         Download
-      </Link>
+      </Link>,
     );
 
     actions.push(
       <Link key="add"
         to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}>
         Add
-      </Link>
+      </Link>,
     );
 
     let title;
@@ -479,19 +483,19 @@ export default class FormTemplate extends Component {
         <ItemHeader category="form-templates" item={formTemplate}
           title={title} actions={actions} />
         {contents}
-        <PageContext
-          filter={id ? { 'sections.formTemplateId': id } : undefined} />
+        <PageContext filter={id ? { 'sections.formTemplateId': id } :
+          undefined} />
       </main>
     );
   }
-};
+}
 
 FormTemplate.propTypes = {
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  })
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 FormTemplate.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -10,41 +10,41 @@ import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
 class FormAdd extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
     this._onChange = this._onChange.bind(this);
     this.state = {
       form: {
-        fields: []
-      }
+        fields: [],
+      },
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.formTemplateId !== this.props.formTemplateId) {
       this._load(nextProps);
     }
   }
 
-  _load (props) {
+  _load(props) {
     const formTemplateId =
       props.formTemplateId || props.location.query.formTemplateId;
     const session = props.session;
     getItem('form-templates', formTemplateId)
-    .then(formTemplate => {
-      let fields = [];
-      formTemplate.sections.forEach(section => {
-        section.fields.forEach(field => {
+    .then((formTemplate) => {
+      const fields = [];
+      formTemplate.sections.forEach((section) => {
+        section.fields.forEach((field) => {
           if (session) {
             // pre-fill out name and email from session, if possible
-            if ('Name' === field.name) {
+            if (field.name === 'Name') {
               fields.push({ templateFieldId: field._id, value: session.name });
-            } else if ('Email' === field.name) {
+            } else if (field.name === 'Email') {
               fields.push({ templateFieldId: field._id, value: session.email });
             }
           }
@@ -56,65 +56,64 @@ class FormAdd extends Component {
       });
 
       this.setState({
-        form: { fields: fields, formTemplateId: formTemplate._id },
-        formTemplate: formTemplate
+        form: { fields, formTemplateId: formTemplate._id },
+        formTemplate,
       });
     })
-    .catch(error => console.log("!!! FormAdd catch", error));
+    .catch(error => console.error('!!! FormAdd catch', error));
   }
 
-  _onAdd (event) {
+  _onAdd(event) {
     event.preventDefault();
     const { onDone } = this.props;
     const { formTemplate, form } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
-      this.setState({ error: error });
+      this.setState({ error });
     } else {
       finalizeForm(formTemplate, form);
       postItem('forms', form)
-      .then(response => {
+      .then((response) => {
         // if we didn't have a session and we created one as part of adding,
         // remember it.
-        if (! haveSession() && response.token) {
-          console.log('!!! FormAdd set session', response);
+        if (!haveSession() && response.token) {
+          // console.log('!!! FormAdd set session', response);
           setSession(response);
         }
         return {};
       })
-      .then(response => (onDone ? onDone() : this.context.router.goBack()))
-      .catch(error => {
-        console.log('!!! FormAdd post error', error);
-        this.setState({ error: error });
+      .then(() => (onDone ? onDone() : this.context.router.goBack()))
+      .catch((error2) => {
+        console.error('!!! FormAdd post error', error);
+        this.setState({ error: error2 });
       })
-      .catch(error => console.log('!!! FormAdd post 2', error));
+      .catch(error2 => console.error('!!! FormAdd post 2', error2));
     }
   }
 
-  _onChange (form) {
+  _onChange(form) {
     const { formTemplate } = this.state;
     // clear any error for fields that have changed
     const error = clearFormError(formTemplate, form, this.state.error);
-    this.setState({ form: form, error: error });
+    this.setState({ form, error });
   }
 
-  render () {
-    const { onCancel, full, inline } = this.props;
+  render() {
+    const { className, onCancel, full, inline } = this.props;
     const { form, formTemplate, error } = this.state;
-    let classNames = ['form'];
-    if (this.props.className) {
-      classNames.push(this.props.className);
+    const classNames = ['form'];
+    if (className) {
+      classNames.push(className);
     }
 
     let result;
     if (formTemplate) {
-
-      let cancelControl, headerCancelControl;
+      let cancelControl;
+      let headerCancelControl;
       if (onCancel || (this.props.location &&
         this.props.location.query.formTemplateId)) {
-        let cancelFunc = onCancel ? onCancel :
-          (() => this.context.router.goBack());
+        const cancelFunc = onCancel || (() => this.context.router.goBack());
         cancelControl = (
           <Button secondary={true} label="Cancel" onClick={cancelFunc} />
         );
@@ -122,12 +121,12 @@ class FormAdd extends Component {
           <button key="cancel" type="button" className="button"
             onClick={cancelFunc}>
             Cancel
-          </button>
+          </button>,
         ];
       }
 
       let header;
-      if (! inline) {
+      if (!inline) {
         header = (
           <PageHeader title={formTemplate.name} actions={headerCancelControl} />
         );
@@ -147,33 +146,41 @@ class FormAdd extends Component {
           </footer>
         </form>
       );
-
     } else {
       result = <Loading />;
     }
     return result;
   }
-};
+}
 
 FormAdd.propTypes = {
-  formTemplateId: PropTypes.string,
-  formTemplate: PropTypes.object,
+  className: PropTypes.string,
+  formTemplateId: PropTypes.string.isRequired,
   full: PropTypes.bool,
   inline: PropTypes.bool,
+  location: PropTypes.shape({
+    query: PropTypes.shape({
+      formTemplateId: PropTypes.string,
+    }),
+  }),
   onCancel: PropTypes.func,
-  onDone: PropTypes.func
+  onDone: PropTypes.func.isRequired,
 };
 
 FormAdd.defaultProps = {
-  full: true
+  className: undefined,
+  full: true,
+  inline: false,
+  location: undefined,
+  onCancel: undefined,
 };
 
 FormAdd.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(FormAdd, select);

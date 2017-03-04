@@ -1,21 +1,20 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import moment from 'moment';
 import register from './register';
 import { authorize, authorizedAdministrator } from './auth';
+
+mongoose.Promise = global.Promise;
 
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 // /api/calendars and /api/calendar
 
 export default function (router) {
-
   register(router, {
     category: 'calendars',
     modelName: 'Calendar',
     index: {
-      authorize: authorizedAdministrator
+      authorize: authorizedAdministrator,
     },
     put: {
       transformOut: (calendar) => {
@@ -24,13 +23,13 @@ export default function (router) {
         return Event.update({ calendarId: calendar._id },
           { $set: { domainId: calendar.domainId } }, { multi: true }).exec()
           .then(() => calendar);
-      }
-    }
+      },
+    },
   });
 
   router.get('/calendar', (req, res) => {
     authorize(req, res, false) // don't require session yet
-    .then(session => {
+    .then((session) => {
       const Calendar = mongoose.model('Calendar');
       const id = req.query.id;
 
@@ -50,7 +49,7 @@ export default function (router) {
       }
       return promise;
     })
-    .then(context => {
+    .then((context) => {
       const { calendars, session } = context;
       const Event = mongoose.model('Event');
       const date = moment(req.query.date || undefined);
@@ -59,12 +58,12 @@ export default function (router) {
       const previous = moment(date).subtract(1, 'month').startOf('month');
       const next = moment(date).add(1, 'month').startOf('month');
 
-      let query = Event.find();
+      const query = Event.find();
 
       // find events withing the time window
-      let dateCriteria = [
+      const dateCriteria = [
         { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-        { dates: { $gte: start.toDate(), $lt: end.toDate() }}
+        { dates: { $gte: start.toDate(), $lt: end.toDate() } },
       ];
       query.find({ $or: dateCriteria });
 
@@ -74,24 +73,24 @@ export default function (router) {
       }
       if (calendars.length > 0) {
         query.find({
-          $or: calendars.map(calendar => ( { calendarId: calendar._id }))
+          $or: calendars.map(calendar => ({ calendarId: calendar._id })),
         });
       }
-      if (! session ||
-        ! (session.administrator || session.administratorDomainId)) {
+      if (!session ||
+        !(session.administrator || session.administratorDomainId)) {
         query.find({ public: true });
-      } else if (! session.administrator) {
+      } else if (!session.administrator) {
         query.find({ $or: [{
-          public: true, domainId: session.administratorDomainId
-        }]});
+          public: true, domainId: session.administratorDomainId,
+        }] });
       }
 
       return query.sort('start').exec()
       .then(events => ({
-        calendars, events, session, dates: { date, start, end, previous, next }
+        calendars, events, session, dates: { date, start, end, previous, next },
       }));
     })
-    .then(context => {
+    .then((context) => {
       const { calendars, dates, events } = context;
       const calendar = calendars.length === 1 ? calendars[0].toObject() : {};
       res.status(200).json({ ...calendar, ...dates, events });
@@ -100,10 +99,10 @@ export default function (router) {
   });
 }
 
-export function unsetCalendarIfNeeded (data) {
-  if (! data.calendarId) {
+export function unsetCalendarIfNeeded(data) {
+  if (!data.calendarId) {
     delete data.calendarId;
-    if (! data.$unset) {
+    if (!data.$unset) {
       data.$unset = {};
     }
     data.$unset.calendarId = '';

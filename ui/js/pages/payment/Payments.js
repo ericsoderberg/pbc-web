@@ -1,12 +1,11 @@
-"use strict";
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 import List from '../../components/List';
 
 const Item = (props) => {
   const { className, item: payment } = props;
-  let classNames = ['item__container', className];
+  const classNames = ['item__container', className];
   return (
     <Link className={classNames.join(' ')}
       to={`/payments/${payment._id}/edit`}>
@@ -20,14 +19,23 @@ const Item = (props) => {
   );
 };
 
-export default class Payments extends List {};
+Item.propTypes = {
+  className: PropTypes.string,
+  item: PropTypes.object.isRequired,
+};
+
+Item.defaultProps = {
+  className: undefined,
+};
+
+export default class Payments extends List {}
 
 Payments.defaultProps = {
   ...List.defaultProps,
   category: 'payments',
-  Item: Item,
+  Item,
   path: '/payments',
   populate: true,
   sort: '-sent',
-  title: 'Payments'
+  title: 'Payments',
 };

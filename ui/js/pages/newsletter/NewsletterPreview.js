@@ -1,21 +1,20 @@
-"use strict";
-import React, { Component, PropTypes } from 'react';
+
+import React, { PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
 import NewsletterContents from './NewsletterContents';
 
-export default class NewsletterPreview extends Component {
-
-  render () {
-    const { item: newsletter } = this.props;
-    return (
-      <main className="page-preview">
-        <PageHeader title="Preview" />
-        <NewsletterContents item={newsletter} />
-      </main>
-    );
-  }
+const NewsletterPreview = (props) => {
+  const { item: newsletter } = props;
+  return (
+    <main className="page-preview">
+      <PageHeader title="Preview" />
+      <NewsletterContents item={newsletter} />
+    </main>
+  );
 };
 
 NewsletterPreview.propTypes = {
-  item: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired,
 };
+
+export default NewsletterPreview;

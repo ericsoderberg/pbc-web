@@ -1,45 +1,45 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { postNewsletterRender } from '../../actions';
 
 export default class NewsletterContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this._load(nextProps);
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this._unmounted = true;
   }
 
-  _load (props) {
+  _load(props) {
     if (props.item.name || props.item.text) {
       postNewsletterRender(props.item)
-      .then(rendered => {
-        if (! this._unmounted) {
-          this.setState({ rendered: rendered });
+      .then((rendered) => {
+        if (!this._unmounted) {
+          this.setState({ rendered });
         }
       })
-      .catch(error => console.log('!!! NewsletterContents catch', error));
+      .catch(error => console.error('!!! NewsletterContents catch', error));
     }
   }
 
-  render () {
+  render() {
     return (
       <div dangerouslySetInnerHTML={{ __html: this.state.rendered }} />
     );
   }
-};
+}
 
 NewsletterContents.PropTypes = {
-  item: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired,
 };

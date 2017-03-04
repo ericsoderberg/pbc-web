@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
@@ -8,26 +8,26 @@ import MessageItem from '../message/MessageItem';
 
 export default class LibrarySection extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       library: (typeof props.id === 'string' ? props.id : {}),
-      message: props.message
+      message: props.message,
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (this.props.id !== nextProps.id ||
       this.props.message !== nextProps.message) {
       this._load(nextProps);
     }
   }
 
-  _load (props) {
+  _load(props) {
     let libraryId;
     if (props.id) {
       if (typeof props.id === 'object') {
@@ -36,43 +36,42 @@ export default class LibrarySection extends Component {
       } else {
         libraryId = props.id;
         getItem('libraries', props.id)
-        .then(library => this.setState({ library: library }))
-        .catch(error => console.log('!!! LibrarySummary library catch', error));
+        .then(library => this.setState({ library }))
+        .catch(error => console.error('!!! LibrarySummary library catch', error));
       }
     }
 
     if (props.message) {
       this.setState({ message: props.message });
     } else if (libraryId) {
-
-      let date = moment().add(1, 'day');
+      const date = moment().add(1, 'day');
       getItems('messages', {
         filter: {
-          libraryId: libraryId,
-          date: { $lt: date.toString() }
+          libraryId,
+          date: { $lt: date.toString() },
         },
         sort: '-date',
-        limit: 1
+        limit: 1,
       })
-      .then(messages => {
+      .then((messages) => {
         const message = messages[0];
         // if (message && message.seriesId) {
         //   return getItem('messages', message.seriesId);
         // } else {
-        this.setState({ message: message });
+        this.setState({ message });
         //   return undefined;
         // }
       })
       // .then(series => this.setState({ series: series }))
-      .catch(error => console.log('!!! LibrarySummary messages catch', error));
+      .catch(error => console.error('!!! LibrarySummary messages catch', error));
     }
   }
 
-  render () {
+  render() {
     const { className } = this.props;
     const { library, message } = this.state;
 
-    let classes = ['library-summary'];
+    const classes = ['library-summary'];
     if (className) {
       classes.push(className);
     }
@@ -104,9 +103,16 @@ export default class LibrarySection extends Component {
       </div>
     );
   }
-};
+}
 
 LibrarySection.propTypes = {
+  className: PropTypes.string,
   message: PropTypes.object,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+};
+
+LibrarySection.defaultProps = {
+  className: undefined,
+  message: undefined,
+  id: undefined,
 };

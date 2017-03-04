@@ -1,31 +1,31 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import PageHeader from '../../components/PageHeader';
 import FormContents from './FormContents';
 
 export default class FormPreview extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onChange = this._onChange.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
     this.state = {
       form: {
-        fields: []
-      }
+        fields: [],
+      },
     };
   }
 
-  _onChange (form) {
-    this.setState({ form: form });
+  _onChange(form) {
+    this.setState({ form });
   }
 
-  _onSubmit (event) {
+  _onSubmit(event) {
     event.preventDefauls();
     // no-op
   }
 
-  render () {
+  render() {
     const { item: formTemplate } = this.props;
     const { form } = this.state;
 
@@ -44,8 +44,8 @@ export default class FormPreview extends Component {
       </main>
     );
   }
-};
+}
 
 FormPreview.propTypes = {
-  item: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired,
 };

@@ -1,14 +1,13 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import register from './register';
 import { authorize, authorizedForDomainOrSelf } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 
+mongoose.Promise = global.Promise;
+
 // /api/payments
 
 export default function (router) {
-
   register(router, {
     category: 'payments',
     modelName: 'Payment',
@@ -16,33 +15,34 @@ export default function (router) {
     index: {
       authorize: authorizedForDomainOrSelf,
       populate: [
-        { path: 'userId', select: 'name' }
-      ]
+        { path: 'userId', select: 'name' },
+      ],
     },
     get: {
       populate: [
-        { path: 'userId', select: 'name' }
-      ]
+        { path: 'userId', select: 'name' },
+      ],
     },
     put: {
-      transformIn: unsetDomainIfNeeded
-    }
+      transformIn: unsetDomainIfNeeded,
+    },
   });
 
-  router.post(`/payments`, (req, res) => {
+  router.post('/payments', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then((session) => {
       const Payment = mongoose.model('Payment');
-      let data = req.body;
+      const data = req.body;
       data.created = new Date();
       data.modified = data.created;
-      if (! data.sent) {
+      if (!data.sent) {
         data.sent = data.created;
       }
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
-      if (! data.userId ||
-        ! (session.administrator || (formTemplate.domainId &&
+      if (!data.userId ||
+        // TODO: get formTemplate so we have the domainId
+        !(session.administrator || (formTemplate.domainId &&
           formTemplate.domainId.equals(session.administratorDomainId)))) {
         data.userId = session.userId;
       }
@@ -50,25 +50,25 @@ export default function (router) {
       return payment.save()
       .then(doc => res.status(200).send(doc));
     })
-    .catch(error => {
-      console.log('!!! post payment catch', error);
+    .catch((error) => {
+      console.error('!!! post payment catch', error);
       res.status(400).json(error);
     });
   });
 
-  router.put(`/payments/:id`, (req, res) => {
+  router.put('/payments/:id', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then((session) => {
       const id = req.params.id;
       const Payment = mongoose.model('Payment');
       return Payment.findOne({ _id: id }).exec()
-      .then(payment => {
+      .then((payment) => {
         let data = req.body;
         // Allow an administrator to set the userId. Otherwise, set it to
         // the current session user
-        if (! data.userId ||
-          ! (session.administrator || (formTemplate.domainId &&
-            formTemplate.domainId.equals(session.administratorDomainId)))) {
+        if (!data.userId ||
+          !(session.administrator || (payment.domainId &&
+            payment.domainId.equals(session.administratorDomainId)))) {
           data.userId = session.userId;
         }
         data.modified = new Date();
@@ -77,8 +77,8 @@ export default function (router) {
       });
     })
     .then(doc => res.status(200).json(doc))
-    .catch(error => {
-      console.log('!!! post payment catch', error);
+    .catch((error) => {
+      console.error('!!! post payment catch', error);
       res.status(400).json(error);
     });
   });

@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 
 const VIMEO_REGEXP = /vimeo\.com\/(\d+)/;
@@ -6,7 +5,7 @@ const YOUTUBE_REGEXP = /youtube\.com\/(\w+)|youtu\.be\/(\w+)/;
 
 export default class Video extends Component {
 
-  render () {
+  render() {
     const { url } = this.props;
 
     let contents = <span>Unknown type</span>;
@@ -20,7 +19,7 @@ export default class Video extends Component {
           <iframe className="video vimeo-player" type="text/html"
             width="960" height="540"
             src={src}
-            frameBorder="0" allowFullScreen />
+            frameBorder="0" allowFullScreen={true} />
         );
       }
       match = url.match(YOUTUBE_REGEXP);
@@ -36,8 +35,12 @@ export default class Video extends Component {
 
     return contents;
   }
-};
+}
 
 Video.propTypes = {
-  url: PropTypes.string
+  url: PropTypes.string,
+};
+
+Video.defaultProps = {
+  url: undefined,
 };

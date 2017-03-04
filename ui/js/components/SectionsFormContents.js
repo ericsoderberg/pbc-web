@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import FormFieldAdd from './FormFieldAdd';
 import Button from './Button';
@@ -6,25 +5,26 @@ import SectionFormContents from './SectionFormContents';
 
 export default class SectionsFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { newSectionId: 1 };
   }
 
-  _addSection (type) {
+  _addSection(type) {
     return this.props.formState.addTo('sections', () => {
       const id = this.state.newSectionId;
       this.setState({ newSectionId: this.state.newSectionId + 1 });
-      return { type: type, id: id };
+      return { type, id };
     });
   }
 
-  render () {
+  render() {
     const { formState, types } = this.props;
     const item = formState.object;
 
     const sections = (item.sections || []).map((section, index) => (
-      <SectionFormContents key={index} formState={formState} index={index} />
+      <SectionFormContents key={section._id || section.id} formState={formState}
+        index={index} />
     ));
 
     const addControls = types.map(type => (
@@ -41,9 +41,9 @@ export default class SectionsFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 SectionsFormContents.propTypes = {
   formState: PropTypes.object.isRequired,
-  types: PropTypes.arrayOf(PropTypes.string)
+  types: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

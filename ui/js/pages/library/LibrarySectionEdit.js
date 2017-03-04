@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -7,25 +7,25 @@ import SectionEdit from '../../components/SectionEdit';
 
 export default class LibrarySectionEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange), libraries: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     getItems('libraries', { sort: 'name' })
     .then(response => this.setState({ libraries: response }))
-    .catch(error => console.log('LibrarySectionEdit catch', error));
+    .catch(error => console.error('LibrarySectionEdit catch', error));
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
-      formState: new FormState(nextProps.section, nextProps.onChange)
+      formState: new FormState(nextProps.section, nextProps.onChange),
     });
   }
 
-  render () {
+  render() {
     const { formState } = this.state;
     const section = formState.object;
 
@@ -53,9 +53,9 @@ export default class LibrarySectionEdit extends Component {
       </SectionEdit>
     );
   }
-};
+}
 
-LibrarySectionEdit.defaultProps = {
+LibrarySectionEdit.propTypes = {
   onChange: PropTypes.func.isRequired,
-  section: PropTypes.object.isRequired
+  section: PropTypes.object.isRequired,
 };

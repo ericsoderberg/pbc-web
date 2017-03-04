@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import DownIcon from '../icons/Down';
 import UpIcon from '../icons/Up';
@@ -26,22 +25,22 @@ const SECTIONS = {
   pages: PagesSectionEdit,
   text: TextSectionEdit,
   people: PeopleSectionEdit,
-  video: VideoSectionEdit
+  video: VideoSectionEdit,
 };
 
 export default class SectionFormContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onToggle = this._onToggle.bind(this);
     this.state = {};
   }
 
-  _onToggle () {
-    this.setState({ expanded: ! this.state.expanded });
+  _onToggle() {
+    this.setState({ expanded: !this.state.expanded });
   }
 
-  render () {
+  render() {
     const { formState, index } = this.props;
     const { expanded } = this.state;
     const item = formState.object;
@@ -53,7 +52,7 @@ export default class SectionFormContents extends Component {
     if (index > 0) {
       raise = (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index-1)}>
+          onClick={formState.swapWith('sections', index, index - 1)}>
           <UpIcon />
         </button>
       );
@@ -63,7 +62,7 @@ export default class SectionFormContents extends Component {
     if (index < (item.sections.length - 1)) {
       lower = (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index+1)}>
+          onClick={formState.swapWith('sections', index, index + 1)}>
           <DownIcon />
         </button>
       );
@@ -97,9 +96,9 @@ export default class SectionFormContents extends Component {
       </div>
     );
   }
-};
+}
 
 SectionFormContents.propTypes = {
   formState: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired
+  index: PropTypes.number.isRequired,
 };

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
@@ -7,39 +7,39 @@ import Button from '../../components/Button';
 
 export default class PagesSection extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { pages: {} };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this._load(nextProps);
   }
 
-  _load (props) {
+  _load(props) {
     // When editing, we have id's but not names, get the names we need
-    (props.pages || []).forEach(pageRef => {
+    (props.pages || []).forEach((pageRef) => {
       if (typeof pageRef.id === 'string' &&
-        ! this.state.pages[pageRef.id]) {
+        !this.state.pages[pageRef.id]) {
         getItem('pages', pageRef.id, { select: 'name path' })
-        .then(page => {
-          let pages = { ...this.state.pages };
+        .then((page) => {
+          const pages = { ...this.state.pages };
           pages[pageRef.id] = page;
-          this.setState({ pages: pages });
+          this.setState({ pages });
         })
-        .catch(error => console.log('!!! PageSummaries catch', error));
+        .catch(error => console.error('!!! PageSummaries catch', error));
       }
     });
   }
 
-  render () {
+  render() {
     const { className, pages } = this.props;
 
-    let classes = ['page-summaries'];
+    const classes = ['page-summaries'];
     if (className) {
       classes.push(className);
     }
@@ -53,12 +53,12 @@ export default class PagesSection extends Component {
         // populated via _load
         page = this.state.pages[pageRef.id] || {};
       }
-      let path = page.path ? `/${page.path}` : `/pages/${page._id}`;
+      const path = page.path ? `/${page.path}` : `/pages/${page._id}`;
       const style = { transitionDelay: `${100 + (100 * index)}ms` };
       let link;
       if (pageRef.image) {
         link = (
-          <Link key={index} className="page-tile page-summary" to={path}
+          <Link key={page._id} className="page-tile page-summary" to={path}
             style={style}>
             <Image image={pageRef.image} />
             <Button>{page.name}</Button>
@@ -66,7 +66,7 @@ export default class PagesSection extends Component {
         );
       } else {
         link = (
-          <Button key={index} className="page-summary"
+          <Button key={page._id} className="page-summary"
             circle={true} path={path} style={style}>
             {page.name}
           </Button>
@@ -81,8 +81,14 @@ export default class PagesSection extends Component {
       </div>
     );
   }
-};
+}
 
 PagesSection.propTypes = {
-  pages: PropTypes.array
+  className: PropTypes.string,
+  pages: PropTypes.array,
+};
+
+PagesSection.defaultProps = {
+  className: undefined,
+  pages: [],
 };

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem, getItems } from '../../actions';
@@ -7,46 +7,46 @@ import Loading from '../../components/Loading';
 import MessageItem from '../message/MessageItem';
 import Stored from '../../components/Stored';
 
-class LibraryMessageItem extends MessageItem {};
+class LibraryMessageItem extends MessageItem {}
+
 LibraryMessageItem.defaultProps = {
-  detailsForMostRecent: true
+  detailsForMostRecent: true,
 };
 
 class Library extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._loadLibrary();
   }
 
-  _loadLibrary () {
+  _loadLibrary() {
     const { params: { id } } = this.props;
     getItem('libraries', id)
-    .then(library => {
+    .then((library) => {
       this.setState({ library });
       getItems('pages', {
         filter: { 'sections.libraryId': library._id },
-        select: 'name'
+        select: 'name',
       })
       .then(pages => this.setState({ pages }))
-      .catch(error => console.log('!!! Library pages catch', error));
+      .catch(error => console.error('!!! Library pages catch', error));
     })
-    .catch(error => console.log('!!! Library catch', error));
+    .catch(error => console.error('!!! Library catch', error));
   }
 
-  render () {
+  render() {
     const { location, session } = this.props;
     const { library, pages } = this.state;
 
     let result;
-    if (! library) {
+    if (!library) {
       result = <Loading />;
     } else {
-
       const controls = (pages || []).map(page => (
         <Link key={page.name} to={page.path || `/pages/${page._id}`}>
           {page.name}
@@ -55,9 +55,9 @@ class Library extends Component {
       if (session && (session.administrator ||
         session.administratorDomainId === library.domainId)) {
         controls.push(
-          <Link key='edit' to={`/libraries/${library._id}/edit`}>
+          <Link key="edit" to={`/libraries/${library._id}/edit`}>
             Edit
-          </Link>
+          </Link>,
         );
       }
 
@@ -72,21 +72,21 @@ class Library extends Component {
     }
     return result;
   }
-};
+}
 
 Library.propTypes = {
-  location: PropTypes.object,
+  location: PropTypes.object.isRequired,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }),
+    id: PropTypes.string.isRequired,
+  }).isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string
-  })
+    administratorDomainId: PropTypes.string,
+  }).isRequired,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(Library, select);

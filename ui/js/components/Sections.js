@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import Section from './Section';
 import Text from './Text';
@@ -14,58 +13,57 @@ import FilesSection from '../pages/file/FilesSection';
 import Map from './Map';
 
 export default class Sections extends Component {
-  render () {
+  render() {
     const { align, sections } = this.props;
-    const elements = sections.map((section, index) => {
-
+    const elements = sections.map((section) => {
       let contents;
       let backgroundImage = section.backgroundImage;
-      if ('text' === section.type) {
+      if (section.type === 'text') {
         contents = <Text text={section.text} />;
-      } else if ('image' === section.type) {
-        contents =  <Image image={section.image} />;
-      } else if ('calendar' === section.type) {
+      } else if (section.type === 'image') {
+        contents = <Image image={section.image} />;
+      } else if (section.type === 'calendar') {
         // exclude events already in sections
         const excludeEventIds =
-          sections.filter(s => 'event' === s.type)
+          sections.filter(s => s.type === 'event')
           .map(s => s.eventId._id || s.eventId);
         contents = (
-          <CalendarSection key={index} id={section.calendarId}
-            excludeEventIds={excludeEventIds}/>
+          <CalendarSection key={section._id || section.id}
+            id={section.calendarId} excludeEventIds={excludeEventIds} />
         );
-      } else if ('event' === section.type) {
+      } else if (section.type === 'event') {
         contents = (
           <EventSection id={section.eventId} includeMap={section.includeMap}
             navigable={section.navigable}
             includeBackground={section.backgroundImage === undefined} />
         );
-        if (! backgroundImage) {
+        if (!backgroundImage) {
           backgroundImage = section.eventId.image;
         }
-      } else if ('library' === section.type) {
+      } else if (section.type === 'library') {
         contents =
-          <LibrarySection id={section.libraryId} message={section.message} />;
-      } else if ('people' === section.type) {
+          <LibrarySection id={section._id} message={section.message} />;
+      } else if (section.type === 'people') {
         contents = <PeopleSection people={section.people} />;
-      } else if ('pages' === section.type) {
+      } else if (section.type === 'pages') {
         contents = <PagesSection pages={section.pages} />;
-      } else if ('video' === section.type) {
+      } else if (section.type === 'video') {
         contents = <Video url={section.url} />;
-      } else if ('form' === section.type) {
+      } else if (section.type === 'form') {
         contents = <FormSection formTemplateId={section.formTemplateId} />;
-      } else if ('files' === section.type) {
+      } else if (section.type === 'files') {
         contents = <FilesSection files={section.files} />;
-      } else if ('map' === section.type) {
+      } else if (section.type === 'map') {
         contents = (
-          <Map className='section' address={section.address} plain={true} />
+          <Map className="section" address={section.address} plain={true} />
         );
       } else {
         contents = <span>TBD</span>;
       }
 
-      if ('calendar' !== section.type) {
+      if (section.type !== 'calendar') {
         contents = (
-          <Section key={index} align={align}
+          <Section key={section._id || section.id} align={align}
             full={section.full} color={section.color}
             backgroundImage={backgroundImage} plain={section.plain}>
             {contents}
@@ -79,12 +77,12 @@ export default class Sections extends Component {
   }
 }
 
-Sections.PropTypes = {
+Sections.propTypes = {
   align: PropTypes.oneOf(['start', 'center', 'end']),
-  sections: PropTypes.arrayOf(PropTypes.object)
+  sections: PropTypes.arrayOf(PropTypes.object),
 };
 
 Sections.defaultProps = {
   align: 'center',
-  sections: []
+  sections: [],
 };

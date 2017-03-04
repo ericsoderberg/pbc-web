@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
@@ -12,38 +12,46 @@ import FormTemplateOptionEdit from './FormTemplateOptionEdit';
 
 export default class FormTemplateFieldEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { field, onChange } = props;
     this.state = { formState: new FormState(field, onChange) };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
-      formState: new FormState(nextProps.field, nextProps.onChange)
+      formState: new FormState(nextProps.field, nextProps.onChange),
     });
   }
 
-  render () {
+  render() {
     const { dependableFields } = this.props;
     const { formState } = this.state;
     const field = formState.object;
 
-    let name, help, value, required, monetary, discount, limit, max, min;
+    let name;
+    let help;
+    let value;
+    let required;
+    let monetary;
+    let discount;
+    let limit;
+    let max;
+    let min;
 
-    if ('line' === field.type || 'choice' === field.type ||
-      'choices' === field.type || 'count' === field.type) {
+    if (field.type === 'line' || field.type === 'choice' ||
+      field.type === 'choices' || field.type === 'count') {
       monetary = (
         <FormField>
           <input name="monetary" type="checkbox"
             checked={field.monetary || false}
-            onChange={formState.toggle('monetary')}/>
+            onChange={formState.toggle('monetary')} />
           <label htmlFor="monetary">Monetary</label>
         </FormField>
       );
     }
 
-    if ('count' === field.type) {
+    if (field.type === 'count') {
       let prefix;
       if (field.monetary) {
         prefix = <span className="prefix">$</span>;
@@ -53,7 +61,7 @@ export default class FormTemplateFieldEdit extends Component {
           <div className="box--row">
             {prefix}
             <input name="value" value={field.value || ''}
-              onChange={formState.change('value')}/>
+              onChange={formState.change('value')} />
           </div>
         </FormField>
       );
@@ -61,56 +69,53 @@ export default class FormTemplateFieldEdit extends Component {
       limit = (
         <FormField label="Total available">
           <input name="limit" type="number" min="0" value={field.limit || ''}
-            onChange={formState.change('limit')}/>
+            onChange={formState.change('limit')} />
         </FormField>
       );
       min = (
         <FormField label="Minimum">
           <input name="min" type="number" min="0" value={field.min || ''}
-            onChange={formState.change('min')}/>
+            onChange={formState.change('min')} />
         </FormField>
       );
       max = (
         <FormField label="Maximum">
           <input name="max" type="number" min="0" value={field.max || ''}
-            onChange={formState.change('max')}/>
+            onChange={formState.change('max')} />
         </FormField>
       );
     }
 
-    if ('line' === field.type && field.monetary) {
+    if (field.type === 'line' && field.monetary) {
       discount = (
         <FormField>
           <input name="discount" type="checkbox"
             checked={field.discount || false}
-            onChange={formState.toggle('discount')}/>
+            onChange={formState.toggle('discount')} />
           <label htmlFor="discount">Discount</label>
         </FormField>
       );
     }
 
-    if ('instructions' === field.type) {
-
+    if (field.type === 'instructions') {
       help = (
         <FormField label="Help" help={<TextHelp />}>
           <textarea name="help" value={field.help || ''} rows={4}
             onChange={formState.change('help')} />
         </FormField>
       );
-
     } else {
-
       name = (
         <FormField label="Label">
           <input name="name" value={field.name || ''}
-            onChange={formState.change('name')}/>
+            onChange={formState.change('name')} />
         </FormField>
       );
 
       help = (
         <FormField label="Help">
           <input name="help" value={field.help || ''}
-            onChange={formState.change('help')}/>
+            onChange={formState.change('help')} />
         </FormField>
       );
 
@@ -118,29 +123,28 @@ export default class FormTemplateFieldEdit extends Component {
         <FormField>
           <input name="required" type="checkbox"
             checked={field.required || false}
-            onChange={formState.toggle('required')}/>
+            onChange={formState.toggle('required')} />
           <label htmlFor="required">Required</label>
         </FormField>
       );
-
     }
 
     const options = (field.options || []).map((option, index) => {
       const raise = (index === 0 ? undefined : (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('options', index, index-1)}>
+          onClick={formState.swapWith('options', index, index - 1)}>
           <UpIcon />
         </button>
       ));
       const lower = (index === (field.options.length - 1) ? undefined : (
         <button type="button" className="button-icon"
-          onClick={formState.swapWith('options', index, index+1)}>
+          onClick={formState.swapWith('options', index, index + 1)}>
           <DownIcon />
         </button>
         ));
 
       return (
-        <div key={index}>
+        <div key={option._id}>
           <div className="form-item">
             <legend>{`Option ${index + 1}`}</legend>
             <div className="box--row">
@@ -152,14 +156,14 @@ export default class FormTemplateFieldEdit extends Component {
               </button>
             </div>
           </div>
-          <FormTemplateOptionEdit key={index} option={option} index={index}
+          <FormTemplateOptionEdit option={option} index={index}
             onChange={formState.changeAt('options', index)} />
         </div>
       );
     });
 
     let addOptionControl;
-    if ('choice' === field.type || 'choices' === field.type) {
+    if (field.type === 'choice' || field.type === 'choices') {
       addOptionControl = (
         <fieldset className="form__fields">
           <FormFieldAdd>
@@ -170,7 +174,7 @@ export default class FormTemplateFieldEdit extends Component {
       );
     }
 
-    let dependsOnOptions = dependableFields
+    const dependsOnOptions = dependableFields
     .filter(dependableField => (
       dependableField.id !== (field._id || field.id)
     ))
@@ -207,11 +211,14 @@ export default class FormTemplateFieldEdit extends Component {
       </div>
     );
   }
-};
+}
 
 FormTemplateFieldEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object),
   field: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+};
+
+FormTemplateFieldEdit.defaultProps = {
+  dependableFields: [],
 };

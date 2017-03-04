@@ -1,36 +1,36 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { postItem, haveSession, setSession } from '../actions';
 import Form from './Form';
 
 export default class Add extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this.state = { item: props.default };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = this.props.title;
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.default && ! this.props.default) {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.default && !this.props.default) {
       this.setState({ item: nextProps.default });
     }
   }
 
-  _onAdd (item) {
+  _onAdd(item) {
     const { category, createSession, showable } = this.props;
     postItem(category, item)
-    .then(response => {
+    .then((response) => {
       if (createSession) {
         // if we didn't have a session and we created one as part of adding,
         // remember it.
-        if (! haveSession() && response.token) {
-          console.log('!!! Add set session', response);
+        if (!haveSession() && response.token) {
+          // console.log('!!! Add set session', response);
           setSession(response);
         }
       }
@@ -40,14 +40,14 @@ export default class Add extends Component {
         this.context.router.goBack();
       }
     })
-    .catch(error => this.setState({ error: error, item: item }));
+    .catch(error => this.setState({ error, item }));
   }
 
-  _onCancel () {
+  _onCancel() {
     this.context.router.goBack();
   }
 
-  render () {
+  render() {
     const { category, FormContents, onChange, Preview, title } = this.props;
     const { item, error } = this.state;
     return (
@@ -59,7 +59,7 @@ export default class Add extends Component {
         onCancel={this._onCancel} />
     );
   }
-};
+}
 
 Add.propTypes = {
   category: PropTypes.string.isRequired,
@@ -69,9 +69,17 @@ Add.propTypes = {
   onChange: PropTypes.func,
   Preview: PropTypes.func,
   showable: PropTypes.bool,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+};
+
+Add.defaultProps = {
+  createSession: false,
+  default: undefined,
+  onChange: undefined,
+  Preview: undefined,
+  showable: false,
 };
 
 Add.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

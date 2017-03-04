@@ -1,4 +1,3 @@
-"use strict";
 import register from './register';
 import { authorizedAdministrator } from './auth';
 
@@ -9,7 +8,7 @@ export default function (router) {
     category: 'resources',
     modelName: 'Resource',
     index: {
-      authorize: authorizedAdministrator
-    }
+      authorize: authorizedAdministrator,
+    },
   });
 }

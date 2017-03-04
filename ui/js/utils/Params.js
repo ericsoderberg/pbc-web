@@ -1,10 +1,9 @@
-"use strict";
 
-export function getLocationParams () {
+export function getLocationParams() {
   const params = {};
   if (window.location.search) {
-    window.location.search.slice(1).split('&').forEach(param => {
-      const [ name, value ] = param.split('=');
+    window.location.search.slice(1).split('&').forEach((param) => {
+      const [name, value] = param.split('=');
       params[name] = decodeURIComponent(value);
     });
   }

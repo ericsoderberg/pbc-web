@@ -1,47 +1,46 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 
 export default class Button extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._layout = this._layout.bind(this);
     this._onClick = this._onClick.bind(this);
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { left, right } = this.props;
     if (left || right) {
       this._layout();
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if ((nextProps.left || nextProps.right) &&
       nextProps.label !== this.props.label) {
-      this.setState({ needLayout: true });
+      this._needLayout = true;
     }
   }
 
-  componentDidUpdate () {
-    const { needLayout } = this.state;
-    if (needLayout) {
-      this.setState({ needLayout: false }, this._layout);
+  componentDidUpdate() {
+    if (this._needLayout) {
+      this._needLayout = false;
+      this._layout();
     }
   }
 
-  _layout () {
+  _layout() {
     // avoid sub-pixel label width for left/right buttons
     setTimeout(() => {
-      const element = this.refs.component;
-      const width = element.offsetWidth;
+      const width = this._componentRef.offsetWidth;
       // align to even pixels to avoid gap, who knows why
       this.setState({ width: width + (width % 2) });
     }, 10);
   }
 
-  _onClick (event) {
+  _onClick(event) {
     event.preventDefault();
     if (this.props.replaceHistory) {
       this.context.router.replace(this.props.path);
@@ -50,54 +49,55 @@ export default class Button extends Component {
     }
   }
 
-  render () {
-    const { children, circle, className, icon, label, left, path, plain, right,
-      secondary, tag, type
+  render() {
+    const {
+      children, circle, className, icon, label, left, path, plain, right,
+      secondary, tag, type,
     } = this.props;
     const { width } = this.state;
     const Tag = tag || (path ? 'a' : 'button');
 
-    let classNames = [];
+    const classNames = [];
     let contents = label || icon || children;
     let arrow;
-    let style = this.props.style ? { ...this.props.style } : {};
+    const style = this.props.style ? { ...this.props.style } : {};
     if (circle) {
       classNames.push('button-circle');
       contents = <span className="button__label">{contents}</span>;
     } else if (left) {
       classNames.push('button-left');
       arrow = (
-        <svg viewBox='0 0 24 24' preserveAspectRatio='none'
+        <svg viewBox="0 0 24 24" preserveAspectRatio="none"
           className="button__arrow">
-          <path d='M24,0 L24,24 L0,12 Z' />
+          <path d="M24,0 L24,24 L0,12 Z" />
         </svg>
       );
       if (width) {
         style.minWidth = width;
       }
       contents = (
-        <span ref="label" className="button__label">{contents}</span>
+        <span className="button__label">{contents}</span>
       );
     } else if (right) {
       classNames.push('button-right');
       arrow = (
-        <svg viewBox='0 0 24 24' preserveAspectRatio='none'
+        <svg viewBox="0 0 24 24" preserveAspectRatio="none"
           className="button__arrow">
-          <path d='M0,0 L24,12 L0,24 Z' />
+          <path d="M0,0 L24,12 L0,24 Z" />
         </svg>
       );
       if (width) {
         style.minWidth = width;
       }
       contents = (
-        <span ref="label" className="button__label">{contents}</span>
+        <span className="button__label">{contents}</span>
       );
-    } else if (icon && ! label) {
+    } else if (icon && !label) {
       classNames.push('button-icon');
     } else if (plain) {
       classNames.push('button-plain');
     } else {
-      classNames.push(`button`);
+      classNames.push('button');
     }
     if (secondary) {
       classNames.push('button--secondary');
@@ -106,7 +106,8 @@ export default class Button extends Component {
       classNames.push(className);
     }
 
-    let href, onClick;
+    let href;
+    let onClick;
     if (this.props.onClick) {
       onClick = this.props.onClick;
     } else if (this.props.path) {
@@ -115,17 +116,20 @@ export default class Button extends Component {
     }
 
     return (
-      <Tag ref="component" className={classNames.join(' ')}
+      <Tag ref={(ref) => { this._componentRef = ref; }}
+        className={classNames.join(' ')}
         href={href} type={type} onClick={onClick} style={style}>
         {contents}
         {arrow}
       </Tag>
     );
   }
-};
+}
 
 Button.propTypes = {
+  children: PropTypes.any,
   circle: PropTypes.bool,
+  className: PropTypes.string,
   icon: PropTypes.node,
   label: PropTypes.node,
   left: PropTypes.bool,
@@ -135,14 +139,33 @@ Button.propTypes = {
   replaceHistory: PropTypes.bool,
   right: PropTypes.bool,
   secondary: PropTypes.bool,
+  style: PropTypes.object,
   tag: PropTypes.string,
-  type: PropTypes.oneOf(['button', 'submit'])
+  type: PropTypes.oneOf(['button', 'submit']),
 };
 
 Button.defaultProps = {
-  type: 'button'
+  children: undefined,
+  circle: false,
+  className: undefined,
+  icon: undefined,
+  label: undefined,
+  left: false,
+  onClick: undefined,
+  path: undefined,
+  plain: false,
+  replaceHistory: false,
+  right: false,
+  secondary: false,
+  style: undefined,
+  tag: undefined,
+  type: 'button',
+};
+
+Button.defaultProps = {
+  type: 'button',
 };
 
 Button.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
 };

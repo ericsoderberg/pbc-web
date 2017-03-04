@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 import { getItems } from '../../actions';
@@ -10,7 +10,7 @@ import SelectSearch from '../../components/SelectSearch';
 import TrashIcon from '../../icons/Trash';
 import { getLocationParams } from '../../utils/Params';
 
-const Suggestion = (props) => (
+const Suggestion = props => (
   <div className="box--between">
     <span>{props.item.name}</span>
     <span className="secondary">
@@ -19,9 +19,16 @@ const Suggestion = (props) => (
   </div>
 );
 
+Suggestion.propTypes = {
+  item: PropTypes.shape({
+    start: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    name: PropTypes.string,
+  }).isRequired,
+};
+
 export default class EventDetails extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onToggle = this._onToggle.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
@@ -29,7 +36,7 @@ export default class EventDetails extends Component {
     this.state = { active: false, domains: [], calendars: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { formState, session } = this.props;
     const params = getLocationParams();
     if (params.calendarId) {
@@ -40,40 +47,40 @@ export default class EventDetails extends Component {
     }
   }
 
-  _get () {
+  _get() {
     const { session } = this.props;
 
     if (session.administrator) {
       getItems('domains', { sort: 'name' })
-      .then(domains => this.setState({ domains: domains }))
-      .catch(error => console.log('EventDetails catch', error));
+      .then(domains => this.setState({ domains }))
+      .catch(error => console.error('EventDetails catch', error));
     }
 
     getItems('calendars', { sort: 'name' })
-    .then(calendars => this.setState({ calendars: calendars }))
-    .catch(error => console.log('EventDetails calendars catch', error));
+    .then(calendars => this.setState({ calendars }))
+    .catch(error => console.error('EventDetails calendars catch', error));
   }
 
-  _onToggle () {
+  _onToggle() {
     const { calendars } = this.state;
-    const active = ! this.state.active;
+    const active = !this.state.active;
     if (active && calendars.length === 0) {
       this._get();
     }
-    this.setState({ active: ! this.state.active });
+    this.setState({ active: !this.state.active });
   }
 
-  _otherTimeChange (field, index) {
+  _otherTimeChange(field, index) {
     return (value) => {
       const { formState } = this.props;
       const event = formState.object;
-      let times = event.times.splice(0);
+      const times = event.times.splice(0);
       times[index][field] = value;
       formState.set('times', times);
     };
   }
 
-  _onChangePrimaryEvent (suggestion) {
+  _onChangePrimaryEvent(suggestion) {
     const { formState } = this.props;
     let value;
     if (suggestion) {
@@ -84,7 +91,7 @@ export default class EventDetails extends Component {
     formState.set('primaryEventId', value);
   }
 
-  render () {
+  render() {
     const { formState, session } = this.props;
     const { active, calendars, domains } = this.state;
     const event = formState.object;
@@ -92,11 +99,11 @@ export default class EventDetails extends Component {
     let contents;
     if (active) {
       let primaryEvent;
-      if (! event.dates || event.dates.length === 0) {
+      if (!event.dates || event.dates.length === 0) {
         primaryEvent = (
           <FormField label="Primary event" help="For recurring event one-offs">
             <SelectSearch category="events"
-              options={{select: 'name start', sort: '-start'}}
+              options={{ select: 'name start', sort: '-start' }}
               Suggestion={Suggestion} clearable={true}
               value={(event.primaryEventId || {}).name || ''}
               onChange={this._onChangePrimaryEvent} />
@@ -107,7 +114,7 @@ export default class EventDetails extends Component {
       let otherTimes;
       if (event.times && event.times.length > 0) {
         otherTimes = event.times.map((time, index) => [
-          <FormField key={`start-${index}`} label="Also starts"
+          <FormField key={`start-${time._id}`} label="Also starts"
             closeControl={
               <button type="button" className="button-icon"
                 onClick={formState.removeAt('times', index)}>
@@ -117,16 +124,16 @@ export default class EventDetails extends Component {
             <DateTimeInput value={time.start || ''}
               onChange={this._otherTimeChange('start', index)} />
           </FormField>,
-          <FormField key={`end-${index}`} label="Also ends">
+          <FormField key={`end-${time._id}`} label="Also ends">
             <DateTimeInput value={time.end || ''}
               onChange={this._otherTimeChange('end', index)} />
-          </FormField>
+          </FormField>,
         ]);
       }
 
       let administeredBy;
       if (session.administrator) {
-        let domainOptions = domains.map(domain => (
+        const domainOptions = domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));
         domainOptions.unshift(<option key={0} />);
@@ -140,7 +147,7 @@ export default class EventDetails extends Component {
         );
       }
 
-      let calendarOptions = calendars.map(calendar => (
+      const calendarOptions = calendars.map(calendar => (
         <option key={calendar._id} label={calendar.name} value={calendar._id} />
       ));
       calendarOptions.unshift(<option key={0} />);
@@ -156,12 +163,12 @@ export default class EventDetails extends Component {
           </FormField>
           <FormField label="Path" help="unique url name">
             <input name="path" value={event.path || ''}
-              onChange={formState.change('path')}/>
+              onChange={formState.change('path')} />
           </FormField>
           <FormField>
             <input name="public" type="checkbox"
               checked={event.public || false}
-              onChange={formState.toggle('public')}/>
+              onChange={formState.toggle('public')} />
             <label htmlFor="public">public</label>
           </FormField>
           {administeredBy}
@@ -190,5 +197,5 @@ export default class EventDetails extends Component {
 
 EventDetails.propTypes = {
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired
+  session: PropTypes.object.isRequired,
 };

@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -6,25 +5,25 @@ import FormState from '../../utils/FormState';
 
 export default class CalendarSectionEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange), calendars: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     getItems('calendars', { sort: 'name' })
     .then(calendars => this.setState({ calendars }))
-    .catch(error => console.log('CalendarSectionEdit catch', error));
+    .catch(error => console.error('CalendarSectionEdit catch', error));
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
-      formState: new FormState(nextProps.section, nextProps.onChange)
+      formState: new FormState(nextProps.section, nextProps.onChange),
     });
   }
 
-  render () {
+  render() {
     const { formState } = this.state;
     const section = formState.object;
 
@@ -52,9 +51,9 @@ export default class CalendarSectionEdit extends Component {
       </fieldset>
     );
   }
-};
+}
 
-CalendarSectionEdit.defaultProps = {
+CalendarSectionEdit.propTypes = {
   onChange: PropTypes.func.isRequired,
-  section: PropTypes.object.isRequired
+  section: PropTypes.object.isRequired,
 };

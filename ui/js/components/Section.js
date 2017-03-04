@@ -1,50 +1,49 @@
-"use strict";
 import React, { Component, PropTypes, Children } from 'react';
 import Image from './Image';
 import { isDarkBackground } from '../utils/Color';
 
 export default class Section extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onScroll = this._onScroll.bind(this);
     this._layout = this._layout.bind(this);
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { plain } = this.props;
-    if (! plain) {
+    if (!plain) {
       window.addEventListener('scroll', this._onScroll);
       this._layout();
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { plain } = this.props;
-    if (! plain) {
+    if (!plain) {
       window.removeEventListener('scroll', this._onScroll);
     }
   }
 
-  _onScroll () {
+  _onScroll() {
     // debounce
     clearTimeout(this._scrollTimer);
     this._scrollTimer = setTimeout(this._layout, 10);
   }
 
-  _layout () {
+  _layout() {
     const { active } = this.state;
-    const rect = this.refs.component.getBoundingClientRect();
+    const rect = this._componentRef.getBoundingClientRect();
     const nextActive = (rect.top + 48) < window.innerHeight;
     if (nextActive !== active) {
       this.setState({ active: nextActive });
     }
   }
 
-  render () {
+  render() {
     const {
-      align, backgroundImage, className, color, footer, full, plain
+      align, backgroundImage, className, color, footer, full, plain,
     } = this.props;
     let { style } = this.props;
     const { active } = this.state;
@@ -81,14 +80,15 @@ export default class Section extends Component {
       let background;
       if (backgroundImage) {
         background =
-          <Image className='section__background' image={backgroundImage} />;
+          <Image className="section__background" image={backgroundImage} />;
       }
 
       child = React.cloneElement(child, {
-        className: `${child.props.className || ''} section`});
+        className: `${child.props.className || ''} section` });
 
       result = (
-        <div ref='component' className={classNames.join(' ')} style={style}>
+        <div ref={(ref) => { this._componentRef = ref; }}
+          className={classNames.join(' ')} style={style}>
           {background}
           {child}
         </div>
@@ -102,10 +102,24 @@ export default class Section extends Component {
 Section.propTypes = {
   align: PropTypes.oneOf(['center', 'start', 'end']),
   backgroundImage: PropTypes.shape({
-    data: PropTypes.string.isRequired
+    data: PropTypes.string.isRequired,
   }),
+  children: PropTypes.any.isRequired,
+  className: PropTypes.string,
   color: PropTypes.string,
   footer: PropTypes.bool,
   full: PropTypes.bool,
-  plain: PropTypes.bool
+  plain: PropTypes.bool,
+  style: PropTypes.object,
+};
+
+Section.defaultProps = {
+  align: 'center',
+  backgroundImage: undefined,
+  className: undefined,
+  color: undefined,
+  footer: false,
+  full: false,
+  plain: false,
+  style: undefined,
 };

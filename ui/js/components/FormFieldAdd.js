@@ -1,23 +1,22 @@
-"use strict";
-import React, { Component, Children } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import Button from './Button';
 import AddIcon from '../icons/Add';
 
 export default class FormField extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onClick = this._onClick.bind(this);
     this.state = { active: false };
   }
 
-  _onClick () {
-    this.setState({ active: ! this.state.active });
+  _onClick() {
+    this.setState({ active: !this.state.active });
   }
 
-  render () {
+  render() {
     const { active } = this.state;
-    let classNames = ['form-field-add'];
+    const classNames = ['form-field-add'];
     if (active) {
       classNames.push('form-field-add--active');
     }
@@ -43,4 +42,8 @@ export default class FormField extends Component {
       </div>
     );
   }
+}
+
+FormField.propTypes = {
+  children: PropTypes.any.isRequired,
 };

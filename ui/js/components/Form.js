@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import PageHeader from './PageHeader';
 import FormError from './FormError';
@@ -10,35 +9,35 @@ import Loading from './Loading';
 
 class Form extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onSubmit = this._onSubmit.bind(this);
     this._onRemove = this._onRemove.bind(this);
     this._setItem = this._setItem.bind(this);
     this.state = {
-      formState: new FormState(props.item || {}, this._setItem)
+      formState: new FormState(props.item || {}, this._setItem),
     };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.item && nextProps.item._id !== this.props.item._id) {
       this.setState({
-        formState: new FormState(nextProps.item, this._setItem)
+        formState: new FormState(nextProps.item, this._setItem),
       });
     }
   }
 
-  _onSubmit (event) {
+  _onSubmit(event) {
     event.preventDefault();
     this.props.onSubmit(this.state.formState.object);
   }
 
-  _onRemove (event) {
+  _onRemove(event) {
     event.preventDefault();
     this.props.onRemove();
   }
 
-  _setItem (item) {
+  _setItem(item) {
     const { onChange } = this.props;
     this.setState({ formState: new FormState(item, this._setItem) });
     if (onChange) {
@@ -46,30 +45,31 @@ class Form extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       action, contentsProps, error, footerActions, FormContents,
-      inline, loading, onCancel, onRemove, Preview, session, submitLabel, title
+      inline, loading, onCancel, onRemove, Preview, session, submitLabel, title,
     } = this.props;
     let { actions } = this.props;
     const { formState } = this.state;
-    let classes = ['form__container'];
+    const classes = ['form__container'];
     if (inline) {
       classes.push('form__container--inline');
     }
 
-    let header, footerCancelControl;
+    let header;
+    let footerCancelControl;
     if (inline) {
-      header = <div className='form__text'><h2>{title}</h2></div>;
+      header = <div className="form__text"><h2>{title}</h2></div>;
       footerCancelControl = (
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
     } else {
-      actions = [ ...actions,
+      actions = [...actions,
         <button key="cancel" type="button" className="button"
           onClick={onCancel}>
           Cancel
-        </button>
+        </button>,
       ];
       header = <PageHeader title={title} actions={actions} />;
     }
@@ -121,7 +121,7 @@ class Form extends Component {
       </div>
     );
   }
-};
+}
 
 Form.propTypes = {
   action: PropTypes.string,
@@ -141,22 +141,32 @@ Form.propTypes = {
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-    name: PropTypes.string
-  }),
+    name: PropTypes.string,
+  }).isRequired,
   submitLabel: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
 };
 
 Form.defaultProps = {
-  actions: []
+  action: undefined,
+  actions: [],
+  contentsProps: undefined,
+  error: undefined,
+  footerActions: undefined,
+  item: undefined,
+  inline: false,
+  loading: false,
+  onChange: undefined,
+  onRemove: undefined,
+  Preview: undefined,
 };
 
 Form.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(Form, select);

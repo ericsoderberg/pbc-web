@@ -1,11 +1,10 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem, putItem, deleteItem } from '../actions';
 import Form from './Form';
 
 export default class Edit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
     this._onRemove = this._onRemove.bind(this);
@@ -13,63 +12,62 @@ export default class Edit extends Component {
     this.state = { item: {} };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.params.id !== this.props.params.id) {
       this._load(nextProps);
     }
   }
 
-  _load (props) {
+  _load(props) {
     document.title = props.title;
     this.setState({ loading: true });
     getItem(props.category, props.params.id)
-    .then(item => {
+    .then((item) => {
       const { onChange } = props;
-      this.setState({ item: item, loading: false });
+      this.setState({ item, loading: false });
       if (onChange) {
         onChange(item);
       }
     })
-    .catch(error => console.log("!!! Edit catch", error));
+    .catch(error => console.error('!!! Edit catch', error));
   }
 
-  _onUpdate (item) {
+  _onUpdate(item) {
     putItem(this.props.category, item)
-    .then(response => {
+    .then((response) => {
       if (this.props.onUpdate) {
         return this.props.onUpdate(item);
-      } else {
-        return response;
       }
+      return response;
     })
-    .then(response => this.context.router.goBack())
-    .catch(error => this.setState({ error: error }));
+    .then(() => this.context.router.goBack())
+    .catch(error => this.setState({ error }));
   }
 
-  _onRemove () {
+  _onRemove() {
     const { category, params: { id }, removeBackLevel } = this.props;
     deleteItem(category, id)
-    .then(response => this.context.router.go(- (removeBackLevel || 2)))
-    .catch(error => this.setState({ error: error }));
+    .then(() => this.context.router.go(-(removeBackLevel)))
+    .catch(error => this.setState({ error }));
   }
 
-  _onCancel () {
+  _onCancel() {
     this.context.router.goBack();
   }
 
-  render () {
+  render() {
     const {
       actions, category, params: { id }, footerActions, FormContents,
-      onChange, Preview, submitLabel, title
+      onChange, Preview, submitLabel, title,
     } = this.props;
     const { item, error, loading } = this.state;
     return (
       <Form title={title} actions={actions} footerActions={footerActions}
-        submitLabel={submitLabel || "Update"} loading={loading}
+        submitLabel={submitLabel} loading={loading}
         action={`/api/${category}/${id}`}
         FormContents={FormContents} Preview={Preview} item={item}
         onChange={onChange}
@@ -77,7 +75,7 @@ export default class Edit extends Component {
         error={error} onCancel={this._onCancel} />
     );
   }
-};
+}
 
 Edit.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
@@ -87,14 +85,24 @@ Edit.propTypes = {
   onChange: PropTypes.func,
   onUpdate: PropTypes.func,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired,
   }).isRequired,
   Preview: PropTypes.func,
   removeBackLevel: PropTypes.number,
   submitLabel: PropTypes.string,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+};
+
+Edit.defaultProps = {
+  actions: undefined,
+  footerActions: undefined,
+  onChange: undefined,
+  onUpdate: undefined,
+  Preview: undefined,
+  removeBackLevel: 2,
+  submitLabel: 'Update',
 };
 
 Edit.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

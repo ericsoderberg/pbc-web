@@ -1,49 +1,49 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
-import { getItem, postItem } from '../../actions';
+import { getItem, postItem, putItem } from '../../actions';
 import Loading from '../../components/Loading';
 import Form from '../../components/Form';
 import PaymentFormContents from './PaymentFormContents';
 
 export default class PaymentAdd extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onAdd = this._onAdd.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this.state = { payment: {} };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this._load(this.props);
   }
 
-  _load (props) {
+  _load(props) {
     const { formId } = props;
     getItem('forms', formId)
     .then(form => this.setState({ form }))
-    .catch(error => console.log("!!! PaymentAdd catch", error));
+    .catch(error => console.error('!!! PaymentAdd catch', error));
   }
 
-  _onAdd (payment) {
+  _onAdd(payment) {
     const { onDone } = this.props;
     const { form, error } = this.state;
 
     if (error) {
-      this.setState({ error: error });
+      this.setState({ error });
     } else {
       postItem('payments', payment)
-      .then(payment => {
+      .then(() => {
         // link payment to form
         form.paymentIds.push(form._id);
         return putItem('forms', form);
       })
-      .then(response => (onDone ? onDone() : this.context.router.goBack()))
-      .catch(error => this.setState({ error: error }));
+      .then(() => (onDone ? onDone() : this.context.router.goBack()))
+      .catch(error2 => this.setState({ error: error2 }));
     }
   }
 
-  _onCancel () {
+  _onCancel() {
     const { onCancel } = this.props;
     if (onCancel) {
       onCancel();
@@ -52,38 +52,41 @@ export default class PaymentAdd extends Component {
     }
   }
 
-  render () {
+  render() {
     const { formId, formTemplateId, inline } = this.props;
     const { form, error, payment } = this.state;
 
     let result;
     if (form) {
-
-      const FormContents =
-        inline ? PaymentFormContentsInline : PaymentFormContents;
+      const FormContents = PaymentFormContents;
+        // inline ? PaymentFormContentsInline : PaymentFormContents;
       result = (
         <Form title="Payment" submitLabel="Submit" inline={inline}
-          action={`/api/payments`}
+          action="/api/payments"
           contentsProps={{ formId, formTemplateId }}
           FormContents={FormContents} item={payment}
           onSubmit={this._onAdd} error={error}
           onCancel={this._onCancel} />
       );
-
     } else {
       result = <Loading />;
     }
     return result;
   }
-};
+}
 
 PaymentAdd.propTypes = {
   formId: PropTypes.string.isRequired,
   formTemplateId: PropTypes.string.isRequired,
-  onCancel: PropTypes.func,
-  onDone: PropTypes.func
+  inline: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
+  onDone: PropTypes.func.isRequired,
+};
+
+PaymentAdd.defaultProps = {
+  inline: false,
 };
 
 PaymentAdd.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

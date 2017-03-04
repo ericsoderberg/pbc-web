@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from './FormField';
 import FormState from '../utils/FormState';
@@ -6,25 +5,27 @@ import SectionEdit from './SectionEdit';
 
 export default class ImageSectionEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange) };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
-      formState: new FormState(nextProps.section, nextProps.onChange)
+      formState: new FormState(nextProps.section, nextProps.onChange),
     });
   }
 
-  render () {
+  render() {
     const { formState } = this.state;
     const section = formState.object;
     const imageHelp = (
       <span>
         {"Don't forget to "}
-        <a href="https://tinyjpg.com" target="_blank">optimize</a>!
+        <a href="https://tinyjpg.com" target="_blank" rel="noreferrer noopener">
+          optimize
+        </a>!
       </span>
     );
 
@@ -32,17 +33,17 @@ export default class ImageSectionEdit extends Component {
       <SectionEdit formState={formState}>
         <FormField name="image" label="Image" help={imageHelp}
           onDrop={formState.dropImageFile('image')}>
-          <img className="form-field__image"
+          <img className="form-field__image" alt=""
             src={section.image ? section.image.data : ''} />
           <input name="image" type="file"
-            onChange={formState.changeImageFile('image')}/>
+            onChange={formState.changeImageFile('image')} />
         </FormField>
       </SectionEdit>
     );
   }
-};
+}
 
-ImageSectionEdit.defaultProps = {
+ImageSectionEdit.propTypes = {
   onChange: PropTypes.func.isRequired,
-  section: PropTypes.object.isRequired
+  section: PropTypes.object.isRequired,
 };

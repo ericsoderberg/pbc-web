@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
@@ -7,28 +7,28 @@ import MessageContents from './MessageContents';
 
 export default class MessageItem extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {};
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { detailsForMostRecent, item: message } = this.props;
     const date = moment(message.date);
     const now = moment().startOf('day').subtract(1, 'minute');
-    if (detailsForMostRecent && ! message.series &&
+    if (detailsForMostRecent && !message.series &&
       date.isBetween(moment(now).subtract(7, 'days'), now, 'day')) {
       getItem('messages', message._id)
-      .then(message => this.setState({ message: message }))
-      .catch(error => console.log('!!! MessageItem catch', error));
+      .then(messageResponse => this.setState({ message: messageResponse }))
+      .catch(error => console.error('!!! MessageItem catch', error));
     }
   }
 
-  render () {
-    const { item: message } = this.props;
-    let classNames = ['item__container'];
-    if (this.props.className) {
-      classNames.push(this.props.className);
+  render() {
+    const { className, item: message } = this.props;
+    const classNames = ['item__container'];
+    if (className) {
+      classNames.push(className);
     }
     const date = moment(message.date);
 
@@ -36,7 +36,7 @@ export default class MessageItem extends Component {
     if (message.series) {
       linkContents = (
         <div className="message-item__series-header">
-          <label className='tertiary'>Series</label>
+          <span className="tertiary">Series</span>
           <h2>{message.name}</h2>
         </div>
       );
@@ -49,7 +49,7 @@ export default class MessageItem extends Component {
         <div key="2">
           <div className="tertiary">{date.format('MMM Do YYYY')}</div>
           <div className="secondary">{message.author}</div>
-        </div>
+        </div>,
       ];
     }
 
@@ -74,13 +74,15 @@ export default class MessageItem extends Component {
 
     return contents;
   }
-};
+}
 
 MessageItem.propTypes = {
+  className: PropTypes.string,
   detailsForMostRecent: PropTypes.bool,
-  item: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired,
 };
 
 MessageItem.defaultProps = {
-  detailsForMostRecent: false
+  className: undefined,
+  detailsForMostRecent: false,
 };

@@ -1,9 +1,9 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
-import register from './register';
+import register, { addPopulate } from './register';
+
+mongoose.Promise = global.Promise;
 
 // Messages
 
@@ -15,17 +15,19 @@ const populateMessage = (message) => {
   const nextPromise = Doc.find({
     libraryId: message.libraryId,
     date: { $gt: message.date },
-    series: { $ne: true }
+    series: { $ne: true },
   })
-  .sort('date').limit(1).select(subFields).exec();
+  .sort('date').limit(1).select(subFields)
+  .exec();
 
   // previousMessage
   const previousPromise = Doc.find({
     libraryId: message.libraryId,
     date: { $lt: message.date },
-    series: { $ne: true }
+    series: { $ne: true },
   })
-  .sort('-date').limit(1).select(subFields).exec();
+  .sort('-date').limit(1).select(subFields)
+  .exec();
 
   // seriesMessages
   const seriesMessagesPromise = Doc.find({ seriesId: message.id })
@@ -33,8 +35,8 @@ const populateMessage = (message) => {
 
   return Promise.all([Promise.resolve(message), nextPromise,
     previousPromise, seriesMessagesPromise])
-  .then(docs => {
-    let messageData = docs[0].toObject();
+  .then((docs) => {
+    const messageData = docs[0].toObject();
     messageData.nextMessage = docs[1][0];
     messageData.previousMessage = docs[2][0];
     messageData.seriesMessages = docs[3];
@@ -59,22 +61,22 @@ export default function (router) {
     get: {
       populate: [
         { path: 'seriesId', select: 'name path' },
-        { path: 'libraryId', select: 'name path' }
+        { path: 'libraryId', select: 'name path' },
       ],
       transformOut: (message, req) => {
         if (message && req.query.populate) {
           return populateMessage(message);
         }
         return message;
-      }
+      },
     },
     put: {
-      transformIn: unsetReferences
-    }
+      transformIn: unsetReferences,
+    },
   });
 
   // custom one below because register version wasn't working with $text
-  router.get(`/messages`, (req, res) => {
+  router.get('/messages', (req, res) => {
     const Message = mongoose.model('Message');
 
     let criteria = {};
@@ -93,11 +95,11 @@ export default function (router) {
 
     if (req.query.search) {
       criteria = { ...criteria, $text: { $search: req.query.search } };
-      options = { ...options, score : { $meta: "textScore" } };
-      sort = { score: { $meta: "textScore" }, date: -1 };
+      options = { ...options, score: { $meta: 'textScore' } };
+      sort = { score: { $meta: 'textScore' }, date: -1 };
     }
 
-    let query = Message.find(criteria, options);
+    const query = Message.find(criteria, options);
 
     query.sort(sort);
 

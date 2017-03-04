@@ -1,11 +1,11 @@
-"use strict";
+
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 
 const FormItem = (props) => {
   const { className, item: form, onClick } = props;
-  let classNames = ['item__container', className];
+  const classNames = ['item__container', className];
 
   let template;
   if (form.formTemplateId) {
@@ -43,7 +43,7 @@ const FormItem = (props) => {
 
 FormItem.propTypes = {
   item: PropTypes.object,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
 };
 
 export default FormItem;

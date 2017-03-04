@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
@@ -6,39 +6,39 @@ import FormState from '../../utils/FormState';
 
 export default class AdultEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onChangeEmail = this._onChangeEmail.bind(this);
     this._onToggle = this._onToggle.bind(this);
     const { adult, defaultActive, onChange } = props;
     this.state = {
-      active: defaultActive, formState: new FormState(adult, onChange)
+      active: defaultActive, formState: new FormState(adult, onChange),
     };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { adult, onChange } = nextProps;
     this.setState({ formState: new FormState(adult, onChange) });
   }
 
-  _onToggle () {
-    this.setState({ active: ! this.state.active });
+  _onToggle() {
+    this.setState({ active: !this.state.active });
   }
 
-  _loadUser (email) {
+  _loadUser(email) {
     const { formState } = this.state;
     getItems('users',
-      { filter: { email: email }, select: 'name', sort: 'name' })
-    .then(users => {
+      { filter: { email }, select: 'name', sort: 'name' })
+    .then((users) => {
       if (users.length === 1) {
         const user = users[0];
         formState.set({ name: user.name, phone: user.phone });
       }
     })
-    .catch(error => console.log('!!! Adult catch', error));
+    .catch(error => console.error('!!! Adult catch', error));
   }
 
-  _onChangeEmail (event) {
+  _onChangeEmail(event) {
     const { formState } = this.state;
     const email = event.target.value;
     formState.set('email', email);
@@ -50,7 +50,7 @@ export default class AdultEdit extends Component {
     }, 100);
   }
 
-  render () {
+  render() {
     const { onRemove } = this.props;
     const { active, formState } = this.state;
     const adult = formState.object;
@@ -62,19 +62,19 @@ export default class AdultEdit extends Component {
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={adult.name || user.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           <FormField name="email" label="Email">
             <input name="email" value={adult.email || user.email || ''}
-              onChange={this._onChangeEmail}/>
+              onChange={this._onChangeEmail} />
           </FormField>
           <FormField label="Phone">
             <input name="phone" value={adult.phone || user.phone || ''}
-              onChange={formState.change('phone')}/>
+              onChange={formState.change('phone')} />
           </FormField>
           <FormField label="Relation" help="e.g. mother, father, aunt">
             <input name="relation" value={adult.relation || ''}
-              onChange={formState.change('relation')}/>
+              onChange={formState.change('relation')} />
           </FormField>
         </fieldset>
       );
@@ -110,5 +110,10 @@ AdultEdit.propTypes = {
   adult: PropTypes.object.isRequired,
   defaultActive: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
-  onRemove: PropTypes.func
+  onRemove: PropTypes.func,
+};
+
+AdultEdit.defaultProps = {
+  defaultActive: false,
+  onRemove: undefined,
 };

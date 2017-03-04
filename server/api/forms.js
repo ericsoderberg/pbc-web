@@ -1,45 +1,47 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import moment from 'moment';
 import { authorize, authorizedForDomainOrSelf } from './auth';
 import { useOrCreateSession } from './sessions';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 
+mongoose.Promise = global.Promise;
+
 // /api/forms
 
 // const FORM_SIGN_IN_MESSAGE =
 //   '[Sign In](/sign-in) to be able to submit this form.';
 
-function formValueForFieldName (formTemplate, form, fieldName) {
+function formValueForFieldName(formTemplate, form, fieldName) {
   let result;
-  formTemplate.sections.some(section => {
-    return section.fields.some(field => {
+  formTemplate.sections.some(section => (
+    section.fields.some((field) => {
       if (field.name && field.name.toLowerCase() === fieldName.toLowerCase()) {
-        return form.fields.some(field2 => {
+        return form.fields.some((field2) => {
           if (field._id.equals(field2.templateFieldId)) {
             result = field2.value;
             return true;
           }
+          return false;
         });
       }
-    });
-  });
+      return false;
+    })
+  ));
   return result;
 }
 
-const sendEmails = (req, transporter) => {
-  return (context) => {
-    return Promise.resolve(context)
-    .then(context => {
+const sendEmails = (req, transporter) => (
+  context => (
+    Promise.resolve(context)
+    .then((emailContext) => {
       const Site = mongoose.model('Site');
       return Site.findOne({}).exec()
-      .then(site => ({ ...context, site }));
+      .then(site => ({ ...emailContext, site }));
     })
-    .then(context => {
+    .then((emailContext) => {
       // send acknowledgement, if needed
-      const { session, formTemplate, form, site } = context;
+      const { session, formTemplate, form, site } = emailContext;
       if (formTemplate.acknowledge) {
         const url = `${req.headers.origin}/forms/${form._id}/edit`;
         const instructions =
@@ -58,16 +60,18 @@ ${formTemplate.postSubmitMessage}
           from: site.email,
           to: session.email,
           subject: 'Thank you',
-          markdown: instructions
+          markdown: instructions,
         }, (err, info) => {
-          console.log('!!! sendMail', err, info);
+          if (err) {
+            console.error('!!! sendMail', err, info);
+          }
         });
       }
-      return context;
+      return emailContext;
     })
-    .then(context => {
+    .then((emailContext) => {
       // send notification, if needed
-      const { session, formTemplate, form, site } = context;
+      const { session, formTemplate, form, site } = emailContext;
       if (formTemplate.notify) {
         const url = `${req.headers.origin}/forms/${form._id}/edit`;
         const instructions =
@@ -83,43 +87,45 @@ Just letting you know.
           from: site.email,
           to: formTemplate.notify,
           subject: `${formTemplate.name} submittal`,
-          markdown: instructions
+          markdown: instructions,
         }, (err, info) => {
-          console.log('!!! sendMail', err, info);
+          if (err) {
+            console.error('!!! sendMail', err, info);
+          }
         });
       }
       return context;
-    });
-  };
-};
+    })
+  )
+);
 
 // duplicated in FormUtils
-function calculateTotal (formTemplate, form) {
+function calculateTotal(formTemplate, form) {
   let total = 0;
-  formTemplate.sections.forEach(section => {
-    section.fields.forEach(templateField => {
+  formTemplate.sections.forEach((section) => {
+    section.fields.forEach((templateField) => {
       if (templateField.monetary) {
         // see if we have it
-        form.fields.some(field => {
+        form.fields.some((field) => {
           if (field.templateFieldId.equals(templateField._id)) {
-            if ('count' === templateField.type) {
+            if (templateField.type === 'count') {
               total += (parseInt(templateField.value, 10) *
                 parseInt(field.value, 10));
-            } else if ('line' === templateField.type) {
+            } else if (templateField.type === 'line') {
               if (templateField.discount) {
                 total -= parseInt(field.value, 10);
               } else {
                 total += parseInt(field.value, 10);
               }
-            } else if ('choice' === templateField.type) {
-              templateField.options.forEach(option => {
+            } else if (templateField.type === 'choice') {
+              templateField.options.forEach((option) => {
                 if (option.value && field.optionId === option._id) {
                   total += parseInt(option.value, 10);
                 }
               });
-            } else if ('choices' === templateField.type) {
+            } else if (templateField.type === 'choices') {
               const optionIds = field.optionIds || [];
-              templateField.options.forEach(option => {
+              templateField.options.forEach((option) => {
                 if (option.value &&
                   optionIds.some(optionId => optionId.equals(option._id))) {
                   total += parseInt(option.value, 10);
@@ -128,6 +134,7 @@ function calculateTotal (formTemplate, form) {
             }
             return true;
           }
+          return false;
         });
       }
     });
@@ -135,30 +142,29 @@ function calculateTotal (formTemplate, form) {
   return Math.max(0, total);
 }
 
-function calculatePaymentsTotal (form) {
+function calculatePaymentsTotal(form) {
   let total = 0;
-  (form.paymentIds || []).forEach(payment => {
+  (form.paymentIds || []).forEach((payment) => {
     total += payment.amount;
   });
   return total;
 }
 
-const setUnpaidTotal = (form) => {
-  return Promise.resolve(form)
-  .then(form => {
+const setUnpaidTotal = form => (
+  Promise.resolve()
+  .then(() => {
     const FormTemplate = mongoose.model('FormTemplate');
     return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
-    .then(formTemplate => {
+    .then((formTemplate) => {
       form = form.toObject();
       form.unpaidTotal =
         calculateTotal(formTemplate, form) - calculatePaymentsTotal(form);
       return form;
     });
-  });
-};
+  })
+);
 
 export default function (router, transporter) {
-
   register(router, {
     category: 'forms',
     modelName: 'Form',
@@ -168,83 +174,83 @@ export default function (router, transporter) {
       populate: [
         { path: 'userId', select: 'name' },
         { path: 'formTemplateId', select: 'name domainId' },
-        { path: 'paymentIds', select: 'amount' }
-      ]
+        { path: 'paymentIds', select: 'amount' },
+      ],
     },
     get: {
       populate: [
         { path: 'userId', select: 'name' },
-        { path: 'paymentIds', select: 'amount' }
+        { path: 'paymentIds', select: 'amount' },
       ],
-      transformOut: setUnpaidTotal
+      transformOut: setUnpaidTotal,
     },
     put: {
-      transformIn: unsetDomainIfNeeded
-    }
+      transformIn: unsetDomainIfNeeded,
+    },
   });
 
-  router.post(`/forms`, (req, res) => {
+  router.post('/forms', (req, res) => {
     authorize(req, res, false) // don't require session yet
-    .then(session => {
+    .then((session) => {
       const data = req.body;
       const FormTemplate = mongoose.model('FormTemplate');
       return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
       .then(formTemplate => ({ session, formTemplate }));
     })
-    .then(context => {
+    .then((context) => {
       const { session, formTemplate } = context;
       // AUTH
-      if (! session && formTemplate.authenticate) {
+      if (!session && formTemplate.authenticate) {
         return Promise.reject({ status: 403 });
       }
       const data = req.body;
       const email = formValueForFieldName(formTemplate, data, 'email');
       const name = formValueForFieldName(formTemplate, data, 'name');
       return useOrCreateSession(session, email, name)
-      .then(session => ({ ...context, session }));
+      .then(session2 => ({ ...context, session: session2 }));
     })
-    .then(context => {
+    .then((context) => {
       const { session, formTemplate } = context;
       const Form = mongoose.model('Form');
-      let data = req.body;
+      const data = req.body;
       data.created = new Date();
       data.modified = data.created;
       const admin = (session.administrator || (formTemplate.domainId &&
         formTemplate.domainId.equals(session.administratorDomainId)));
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
-      if (! admin || ! data.userId) {
+      if (!admin || !data.userId) {
         data.userId = session.userId;
       }
       const form = new Form(data);
       return form.save()
-      .then(form => ({ ...context, form }));
+      .then(formSaved => ({ ...context, form: formSaved }));
     })
     .then(sendEmails(req, transporter))
-    .then(context => {
+    .then((context) => {
       const { session } = context;
-      if (! session.loginAt) {
+      if (!session.loginAt) {
         // we created this session here, return it
         res.status(200).json(session);
       } else {
         res.status(200).send({});
       }
     })
-    .catch(error => {
-      console.log('!!! post form catch', error);
+    .catch((error) => {
+      console.error('!!! post form catch', error);
       res.status(400).json(error);
     });
   });
 
-  router.put(`/forms/:id`, (req, res) => {
+  router.put('/forms/:id', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then((session) => {
       const id = req.params.id;
       const Form = mongoose.model('Form');
       return Form.findOne({ _id: id }).exec()
       .then(form => ({ session, form, req }));
     })
-    .then(context => {
+    .then((context) => {
       const { form } = context;
       // Get the FormTemplate so we can validate it hasn't changed and so
       // we can check the domainId for authorization.
@@ -252,27 +258,27 @@ export default function (router, transporter) {
       return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
       .then(formTemplate => ({ ...context, formTemplate }));
     })
-    .then(context => {
+    .then((context) => {
       const { session, form, formTemplate } = context;
       let data = req.body;
-      if (! formTemplate._id.equals(data.formTemplateId)) {
+      if (!formTemplate._id.equals(data.formTemplateId)) {
         return Promise.reject({ error: 'Mismatched template' });
       }
       // AUTH
       const admin = (session.administrator || (formTemplate.domainId &&
         formTemplate.domainId.equals(session.administratorDomainId)));
-      if (! admin && ! form.userID.equals(session.userId)) {
+      if (!admin && !form.userID.equals(session.userId)) {
         return Promise.reject({ status: 403 });
       }
       data.modified = new Date();
       data = unsetDomainIfNeeded(data, session);
       return form.update(data)
-      .then(form => ({ ...context, form }));
+      .then(formUpdated => ({ ...context, form: formUpdated }));
     })
     .then(sendEmails(req, transporter))
     .then(context => res.status(200).json(context.form))
-    .catch(error => {
-      console.log('!!! post form catch', error);
+    .catch((error) => {
+      console.error('!!! post form catch', error);
       res.status(error.status || 400).json(error);
     });
   });

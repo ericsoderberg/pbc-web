@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { postItem } from '../actions';
@@ -7,13 +6,13 @@ import Stored from './Stored';
 
 class ItemHeader extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onCopy = this._onCopy.bind(this);
     this.state = {};
   }
 
-  _onCopy (event) {
+  _onCopy(event) {
     event.preventDefault();
     const { category, item } = this.props;
     const copyItem = { ...item };
@@ -21,26 +20,26 @@ class ItemHeader extends Component {
     delete copyItem._id;
     delete copyItem.path;
     postItem(category, copyItem)
-    .then(newItem => {
+    .then((newItem) => {
       this.context.router.push(`/${category}/${newItem._id}/edit`);
     })
-    .catch(error => console.log('!!! ItemHeader catch', error));
+    .catch(error => console.error('!!! ItemHeader catch', error));
   }
 
-  render () {
+  render() {
     const { category, item, title, session } = this.props;
     let { actions } = this.props;
 
     if (item && session && (session.administrator ||
       (session.administratorDomainId &&
         session.administratorDomainId === item.domainId))) {
-      actions = [ ...actions,
+      actions = [...actions,
         <a key="copy" href={`/${category}/add`} onClick={this._onCopy}>
           Copy
         </a>,
         <Link key="edit" to={`/${category}/${item._id}/edit`}>
           Edit
-        </Link>
+        </Link>,
       ];
     }
 
@@ -48,7 +47,7 @@ class ItemHeader extends Component {
       <PageHeader title={title} homer={true} actions={actions} />
     );
   }
-};
+}
 
 ItemHeader.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
@@ -56,21 +55,23 @@ ItemHeader.propTypes = {
   item: PropTypes.object,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string
-  }),
-  title: PropTypes.string
+    administratorDomainId: PropTypes.string,
+  }).isRequired,
+  title: PropTypes.string,
 };
 
 ItemHeader.defaultProps = {
-  actions: []
+  actions: [],
+  item: undefined,
+  title: undefined,
 };
 
 ItemHeader.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };
 
-const select = (state, props) => ({
-  session: state.session
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(ItemHeader, select);

@@ -1,26 +1,30 @@
-"use strict";
-import React, { Component, PropTypes } from 'react';
+
+import React, { PropTypes } from 'react';
 import FormField from '../../components/FormField';
 
-export default class FileFormContents extends Component {
+const FileFormContents = (props) => {
+  const { className, formState } = props;
+  const file = formState.object;
 
-  render () {
-    const { className, formState } = this.props;
-    const file = formState.object;
-
-    return (
-      <div className={className}>
-        <fieldset className="form__fields">
-          <FormField label="Name">
-            <input ref="name" name="name" value={resource.name || ''}
-              onChange={formState.change('name')}/>
-          </FormField>
-        </fieldset>
-      </div>
-    );
-  }
+  return (
+    <div className={className}>
+      <fieldset className="form__fields">
+        <FormField label="Name">
+          <input name="name" value={file.name || ''}
+            onChange={formState.change('name')} />
+        </FormField>
+      </fieldset>
+    </div>
+  );
 };
 
 FileFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  className: PropTypes.string,
+  formState: PropTypes.object.isRequired,
 };
+
+FileFormContents.defaultProps = {
+  className: undefined,
+};
+
+export default FileFormContents;

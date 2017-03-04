@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { postSignUp } from '../../actions';
@@ -9,7 +8,7 @@ import FormState from '../../utils/FormState';
 
 export default class SignUp extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onCancel = this._onCancel.bind(this);
     this._onSignUp = this._onSignUp.bind(this);
@@ -17,33 +16,31 @@ export default class SignUp extends Component {
     const user = { name: '', email: '', password: '' };
     this.state = {
       formState: new FormState(user, this._setUser),
-      errors: {}
+      errors: {},
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Sign Up';
-    this.refs.name.focus();
+    this._nameRef.focus();
   }
 
-  _onCancel () {
+  _onCancel() {
     this.context.router.goBack();
   }
 
-  _errorToState (error) {
-    let result = {};
+  _errorToState(error) {
+    const result = {};
     if (error) {
       if (error.errmsg) {
         result.errorMessage = error.errmsg;
       } else if (error.errors) {
         result.errors = {};
-        Object.keys(error.errors).forEach(name => {
+        Object.keys(error.errors).forEach((name) => {
           const err = error.errors[name];
-          if ('encryptedPassword' === name) {
-            name = 'password';
-          }
-          if ('required' === err.kind) {
-            result.errors[name] = 'required';
+          const propName = (name === 'encryptedPassword') ? 'password' : name;
+          if (err.kind === 'required') {
+            result.errors[propName] = 'required';
           }
         });
       }
@@ -51,19 +48,19 @@ export default class SignUp extends Component {
     return result;
   }
 
-  _onSignUp (event) {
+  _onSignUp(event) {
     event.preventDefault();
     postSignUp(this.state.formState.object)
-      .then(response => this.context.router.goBack())
+      .then(() => this.context.router.goBack())
       .catch(error => this.setState(this._errorToState(error)))
-      .catch(error => console.log('!!! SignUp catch', error));
+      .catch(error => console.error('!!! SignUp catch', error));
   }
 
-  _setUser (user) {
+  _setUser(user) {
     this.setState({ formState: new FormState(user, this._setUser) });
   }
 
-  render () {
+  render() {
     const { formState, errorMessage, errors } = this.state;
     const user = formState.object;
 
@@ -71,7 +68,7 @@ export default class SignUp extends Component {
       <button key="cancel" type="button" className="button"
         onClick={this._onCancel}>
         Cancel
-      </button>
+      </button>,
     ];
 
     return (
@@ -80,21 +77,22 @@ export default class SignUp extends Component {
           onSubmit={this._onSignUp}>
           <PageHeader title="Sign Up" actions={cancelControl} />
           <FormError message={errorMessage} />
-          <div className='form__contents'>
+          <div className="form__contents">
             <fieldset className="form__fields">
               <FormField name="name" label="Name" error={errors.name}>
-                <input ref="name" name="name" value={user.name || ''}
-                  onChange={formState.change('name')}/>
+                <input ref={(ref) => { this._nameRef = ref; }} name="name"
+                  value={user.name || ''}
+                  onChange={formState.change('name')} />
               </FormField>
               <FormField name="email" label="Email" error={errors.email}>
                 <input name="email" value={user.email || ''}
-                  onChange={formState.change('email')}/>
+                  onChange={formState.change('email')} />
               </FormField>
               <FormField name="password" label="Password"
                 error={errors.password}>
                 <input name="password" type="password"
                   value={user.password || ''}
-                  onChange={formState.change('password')}/>
+                  onChange={formState.change('password')} />
               </FormField>
             </fieldset>
           </div>
@@ -112,8 +110,8 @@ export default class SignUp extends Component {
       </div>
     );
   }
-};
+}
 
 SignUp.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 import { getUnavailableDates } from '../../actions';
@@ -8,7 +8,7 @@ const NUMBER_OF_WEEKS = 52;
 
 export default class EventDates extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onToggle = this._onToggle.bind(this);
     this._get = this._get.bind(this);
@@ -16,54 +16,52 @@ export default class EventDates extends Component {
     const start = moment(today).subtract(1, 'month').startOf('week');
     const end = moment(start).add(NUMBER_OF_WEEKS, 'weeks');
     this.state = {
-      start: start,
-      end: end,
+      start,
+      end,
       selectedDates: {},
       scroll: false,
       unavailableDates: {},
-      weekDayChecked: {}
+      weekDayChecked: {},
     };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { formState: { object: event } } = nextProps;
     if (event.dates) {
-      let selectedDates = {};
-      event.dates.forEach(date => {
-        date = moment(date);
-        selectedDates[date.startOf('day').valueOf()] = true;
+      const selectedDates = {};
+      event.dates.forEach((date) => {
+        selectedDates[moment(date).startOf('day').valueOf()] = true;
       });
-      this.setState({ selectedDates: selectedDates });
-    };
+      this.setState({ selectedDates });
+    }
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     const { scroll } = this.state;
     if (scroll) {
-      const rect = this.refs.container.getBoundingClientRect();
+      const rect = this._containerRef.getBoundingClientRect();
       window.scrollBy(0, rect.top);
       this.setState({ scroll: false });
     }
   }
 
-  _get () {
+  _get() {
     const { formState } = this.props;
     const { active } = this.state;
     const event = formState.object;
     if (active) {
       if (event.resourceIds && event.resourceIds.length > 0) {
         getUnavailableDates(event)
-        .then(dates => {
-          let unavailableDates = {};
-          dates.forEach(date => {
-            date = moment(date);
-            unavailableDates[date.startOf('day').valueOf()] = true;
+        .then((dates) => {
+          const unavailableDates = {};
+          dates.forEach((date) => {
+            unavailableDates[moment(date).startOf('day').valueOf()] = true;
           });
-          this.setState({ unavailableDates: unavailableDates, scroll : true });
+          this.setState({ unavailableDates, scroll: true });
         })
-        .catch(error => console.log('!!! EventDates catch', error));
+        .catch(error => console.error('!!! EventDates catch', error));
       } else {
-        this.setState({ scroll : true });
+        this.setState({ scroll: true });
       }
     }
     if (event.dates) {
@@ -74,27 +72,27 @@ export default class EventDates extends Component {
     }
   }
 
-  _onToggle () {
-    this.setState({ active: ! this.state.active }, this._get);
+  _onToggle() {
+    this.setState({ active: !this.state.active }, this._get);
   }
 
-  _toggleWeekDay (day) {
+  _toggleWeekDay(day) {
     return () => {
       const { formState } = this.props;
       const event = formState.object;
       const { start, end } = this.state;
 
-      let weekDayChecked = { ...this.state.weekDayChecked };
-      weekDayChecked[day] = ! weekDayChecked[day];
-      this.setState({ weekDayChecked: weekDayChecked });
+      const weekDayChecked = { ...this.state.weekDayChecked };
+      weekDayChecked[day] = !weekDayChecked[day];
+      this.setState({ weekDayChecked });
 
       let dates;
       if (weekDayChecked[day]) {
         // add all dates on the same day of the week
         dates = [];
-        let date = moment(start).add(day, 'days');
+        const date = moment(start).add(day, 'days');
         while (date < end) {
-          if (! event.dates.some(date2 => moment(date2).isSame(date, 'day'))) {
+          if (!event.dates.some(date2 => moment(date2).isSame(date, 'day'))) {
             dates.push(moment(date));
           }
           date.add(1, 'week');
@@ -108,9 +106,9 @@ export default class EventDates extends Component {
     };
   }
 
-  _renderHeader () {
+  _renderHeader() {
     const { weekDayChecked } = this.state;
-    let days = [];
+    const days = [];
     let date = moment().startOf('week');
     while (days.length < 7) {
       const name = date.format('ddd');
@@ -123,7 +121,7 @@ export default class EventDates extends Component {
               checked={weekDayChecked[day] || false}
               onChange={this._toggleWeekDay(day)} />
           </div>
-        </div>
+        </div>,
       );
       date = date.add(1, 'day');
     }
@@ -134,16 +132,16 @@ export default class EventDates extends Component {
     );
   }
 
-  _renderDays () {
+  _renderDays() {
     const { formState } = this.props;
     const event = formState.object;
     const { start, end, selectedDates, unavailableDates } = this.state;
     const startValue = moment(event.start).valueOf();
 
-    let weeks = [];
+    const weeks = [];
     let days = [];
     const today = moment().startOf('day');
-    let date = moment(start);
+    const date = moment(start);
 
     while (date.isBefore(end)) {
       const name = date.format(date.date() === 1 ? 'MMM D' : 'D');
@@ -168,12 +166,12 @@ export default class EventDates extends Component {
               checked={checked} disabled={disabled}
               onChange={formState.toggleIn('dates', dateString)} />
           </div>
-        </div>
+        </div>,
       );
 
-      if (7 === days.length) {
+      if (days.length === 7) {
         weeks.push(
-          <div key={weeks.length} className="calendar__week">{days}</div>
+          <div key={weeks.length} className="calendar__week">{days}</div>,
         );
         days = [];
       }
@@ -184,7 +182,7 @@ export default class EventDates extends Component {
     return weeks;
   }
 
-  render () {
+  render() {
     const { active } = this.state;
 
     let calendar;
@@ -198,7 +196,8 @@ export default class EventDates extends Component {
     }
 
     return (
-      <fieldset ref="container" className="form__fields">
+      <fieldset ref={(ref) => { this._containerRef = ref; }}
+        className="form__fields">
         <div type="button" className="form-item">
           <Button secondary={true} label="Recurring dates"
             onClick={this._onToggle} />
@@ -207,8 +206,8 @@ export default class EventDates extends Component {
       </fieldset>
     );
   }
-};
+}
 
 EventDates.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
 };

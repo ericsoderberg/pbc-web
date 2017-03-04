@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
@@ -13,25 +13,25 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 
 class Event extends Component {
 
-  componentDidMount () {
-    if (! this.props.event) {
+  componentDidMount() {
+    if (!this.props.event) {
       getItem('events', this.props.params.id, { cache: true, populate: true })
-      .catch(error => console.log('!!! Event catch', error));
+      .catch(error => console.error('!!! Event catch', error));
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.params.id !== this.props.params.id &&
-      ! nextProps.event) {
+      !nextProps.event) {
       getItem('events', nextProps.params.id, { cache: true, populate: true })
-      .catch(error => console.log('!!! Event catch', error));
+      .catch(error => console.error('!!! Event catch', error));
     }
     if (nextProps.event) {
       document.title = nextProps.event.name;
     }
   }
 
-  render () {
+  render() {
     const { event } = this.props;
 
     let actions;
@@ -40,11 +40,11 @@ class Event extends Component {
       contents = <EventContents item={event} />;
       const calendar = event.calendarId || {};
       const path = ((calendar.path || calendar._id) ?
-        `/calendars/${calendar.path || calendar._id}` : `/calendar`) +
+        `/calendars/${calendar.path || calendar._id}` : '/calendar') +
         // TODO: pick date via shared function with EventTimes
         `?focus=${encodeURIComponent(moment(event.start).format(DATE_FORMAT))}`;
       actions = [
-        <Link key="calendar" to={path}>Calendar</Link>
+        <Link key="calendar" to={path}>Calendar</Link>,
       ];
     } else {
       contents = <Loading />;
@@ -54,18 +54,22 @@ class Event extends Component {
       <main>
         <ItemHeader category="events" item={event} actions={actions} />
         {contents}
-        <PageContext align='center'
+        <PageContext align="center"
           filter={event ? { 'sections.eventId': event._id } : undefined} />
       </main>
     );
   }
-};
+}
 
 Event.propTypes = {
   event: PropTypes.object,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }).isRequired
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
+Event.defaultProps = {
+  event: undefined,
 };
 
 const select = (state, props) => {

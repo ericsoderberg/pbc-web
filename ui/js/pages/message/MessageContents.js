@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
@@ -15,37 +15,37 @@ const RIGHT_KEY = 39;
 
 export default class MessageContents extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onKey = this._onKey.bind(this);
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('keydown', this._onKey);
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('keydown', this._onKey);
   }
 
-  _changeToMessage (message) {
+  _changeToMessage(message) {
     const path = `/messages/${message.path || message._id}`;
     this.context.router.replace(path);
   }
 
-  _onKey (event) {
-    const message = this.props.item;
+  _onKey(event) {
+    const { item: message } = this.props;
     const key = (event.keyCode ? event.keyCode : event.which);
     if (LEFT_KEY === key && message.previousMessage) {
       this._changeToMessage(message.previousMessage);
-    } else if (RIGHT_KEY ===  key && message.nextMessage) {
+    } else if (RIGHT_KEY === key && message.nextMessage) {
       this._changeToMessage(message.nextMessage);
     }
   }
 
-  _renderMessageNav (message, type) {
+  _renderMessageNav(message, type) {
     return (
-      <Button left={'previous' === type} right={'next' === type}
+      <Button left={type === 'previous'} right={type === 'next'}
         path={`/messages/${message.path || message._id}`} replaceHistory={true}>
         <div className="message__nav-name">{message.name}</div>
         <div className="message__nav-verses">{message.verses}</div>
@@ -53,11 +53,11 @@ export default class MessageContents extends Component {
     );
   }
 
-  render () {
+  render() {
     const message = this.props.item;
 
     let upcoming;
-    if (! message.series && moment(message.date).isAfter(moment())) {
+    if (!message.series && moment(message.date).isAfter(moment())) {
       upcoming = <span> - upcoming</span>;
     }
 
@@ -76,7 +76,7 @@ export default class MessageContents extends Component {
     }
 
     let image;
-    if (! message.videoUrl && message.image) {
+    if (!message.videoUrl && message.image) {
       image = (
         <Image image={message.image} full={true} />
       );
@@ -84,7 +84,7 @@ export default class MessageContents extends Component {
 
     let audio;
     let files = [];
-    (message.files || []).forEach(file => {
+    (message.files || []).forEach((file) => {
       const path = `/api/files/${file._id}`;
       if (file.type) {
         if (file.type.match(/audio/)) {
@@ -93,7 +93,7 @@ export default class MessageContents extends Component {
           files.push(
             <a key={file._id} className="item__container" href={path}>
               <div className="item">{file.label || file.name}</div>
-            </a>
+            </a>,
           );
         }
       }
@@ -110,13 +110,13 @@ export default class MessageContents extends Component {
 
     let seriesMessages;
     if (message.seriesMessages && message.seriesMessages.length > 0) {
-      const messages = message.seriesMessages.map(message => (
-        <MessageItem key={message._id} item={message} />
+      const messages = message.seriesMessages.map(seriesMessage => (
+        <MessageItem key={seriesMessage._id} item={seriesMessage} />
       ));
       seriesMessages = [
         <div key="list" className="list">
           {messages}
-        </div>
+        </div>,
       ];
     }
 
@@ -149,7 +149,6 @@ export default class MessageContents extends Component {
 
     let attributes;
     if (this.props.attributes) {
-
       let series;
       if (message.seriesId) {
         series = [
@@ -158,7 +157,7 @@ export default class MessageContents extends Component {
             <Link to={`/messages/${message.seriesId._id}`}>
               {message.seriesId.name}
             </Link>
-          </dd>
+          </dd>,
         ];
       }
 
@@ -174,7 +173,7 @@ export default class MessageContents extends Component {
     return (
       <div>
         {video || image}
-        <header className='message__header'>
+        <header className="message__header">
           <h1>{message.name}</h1>
           <div className="secondary">{message.verses}</div>
           <div className="tertiary">
@@ -185,7 +184,7 @@ export default class MessageContents extends Component {
         </header>
 
         {audio}
-        {! video ? null : image}
+        {!video ? null : image}
         {text}
         {seriesMessages}
         {files}
@@ -194,17 +193,17 @@ export default class MessageContents extends Component {
       </div>
     );
   }
-};
+}
 
-MessageContents.PropTypes = {
+MessageContents.propTypes = {
   attributes: PropTypes.bool,
-  item: PropTypes.object.isRequired
+  item: PropTypes.object.isRequired,
 };
 
 MessageContents.defaultProps = {
-  attributes: true
+  attributes: true,
 };
 
 MessageContents.contextTypes = {
-  router: PropTypes.object.isRequired
+  router: PropTypes.object.isRequired,
 };

@@ -33,20 +33,27 @@ export default class DateTimeInput extends Component {
     this.state.timeActive = false;
   }
 
-  componentDidMount () {
-    if (! hasNativeDateSelector()) {
-      this.refs.dateInput.addEventListener('focus', this._onDateActivate);
-      this.refs.timeInput.addEventListener('focus', this._onTimeActivate);
+  componentDidMount() {
+    if (!hasNativeDateSelector()) {
+      this._dateInputRef.addEventListener('focus', this._onDateActivate);
+      this._timeInputRef.addEventListener('focus', this._onTimeActivate);
     }
   }
 
-  componentWillReceiveProps (newProps) {
+  componentWillReceiveProps(newProps) {
     this.setState(this._stateFromProps(newProps));
   }
 
-  _stateFromProps (props) {
+  componentWillUnmount() {
+    if (!hasNativeDateSelector()) {
+      this._dateInputRef.removeEventListener('focus', this._onDateActivate);
+      this._timeInputRef.removeEventListener('focus', this._onTimeActivate);
+    }
+  }
+
+  _stateFromProps(props) {
     const { value } = props;
-    let result = {};
+    const result = {};
     const date = moment(value);
     if (date.isValid()) {
       result.current = date;
@@ -58,7 +65,7 @@ export default class DateTimeInput extends Component {
     return result;
   }
 
-  _onDateChange (event) {
+  _onDateChange(event) {
     const { onChange } = this.props;
     const { timeValue } = this.state;
     const dateValue = event.target.value;
@@ -76,7 +83,7 @@ export default class DateTimeInput extends Component {
     }
   }
 
-  _onTimeChange (event) {
+  _onTimeChange(event) {
     const { onChange } = this.props;
     const { dateValue } = this.state;
     const timeValue = event.target.value;
@@ -94,7 +101,7 @@ export default class DateTimeInput extends Component {
     }
   }
 
-  _onSelectDate (date) {
+  _onSelectDate(date) {
     const { timeValue } = this.state;
     this.setState({ dateActive: false });
     if (this.props.onChange) {
@@ -104,7 +111,7 @@ export default class DateTimeInput extends Component {
     }
   }
 
-  _onSelectTime (time) {
+  _onSelectTime(time) {
     const { dateValue } = this.state;
     if (this.props.onChange) {
       const dateTime = moment(`${dateValue} ${time.format(TIME_FORMAT)} `,
@@ -113,22 +120,22 @@ export default class DateTimeInput extends Component {
     }
   }
 
-  _onDateActivate (event) {
+  _onDateActivate(event) {
     event.preventDefault();
     this.setState({ dateActive: true });
     document.addEventListener('click', this._onDeactivate);
   }
 
-  _onTimeActivate (event) {
+  _onTimeActivate(event) {
     event.preventDefault();
     this.setState({ timeActive: true });
     document.addEventListener('click', this._onDeactivate);
   }
 
-  _isDescendant (parent, child) {
-    var node = child.parentNode;
+  _isDescendant(parent, child) {
+    let node = child.parentNode;
     while (node != null) {
-      if (node == parent) {
+      if (node === parent) {
         return true;
       }
       node = node.parentNode;
@@ -136,19 +143,19 @@ export default class DateTimeInput extends Component {
     return false;
   }
 
-  _onDeactivate (event) {
-    if (! this._isDescendant(this.refs.component, event.target)) {
+  _onDeactivate(event) {
+    if (!this._isDescendant(this._componentRef, event.target)) {
       this.setState({ dateActive: false, timeActive: false });
       document.removeEventListener('click', this._onDeactivate);
     }
   }
 
-  render () {
+  render() {
     const { className } = this.props;
     const {
-      current, dateActive, dateValue, timeActive, timeValue
+      current, dateActive, dateValue, timeActive, timeValue,
     } = this.state;
-    let classes = ['date-time-input'];
+    const classes = ['date-time-input'];
     if (className) {
       classes.push(className);
     }
@@ -165,11 +172,14 @@ export default class DateTimeInput extends Component {
     }
 
     return (
-      <div ref='component' className={classes.join(' ')}>
-        <input ref='dateInput' className={'date-time-input__input'} type='date'
+      <div ref={(ref) => { this._componentRef = ref; }}
+        className={classes.join(' ')}>
+        <input ref={(ref) => { this._dateInputRef = ref; }}
+          className={'date-time-input__input'} type="date"
           value={dateValue}
           onChange={this._onDateChange} onFocus={this._onOpen} />
-        <input ref='timeInput' className={'date-time-input__input'} type='time'
+        <input ref={(ref) => { this._timeInputRef = ref; }}
+          className={'date-time-input__input'} type="time"
           value={timeValue}
           onChange={this._onTimeChange} onFocus={this._onOpen} />
         {selector}
@@ -180,6 +190,11 @@ export default class DateTimeInput extends Component {
 }
 
 DateTimeInput.propTypes = {
-  onChange: PropTypes.func,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+  className: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+};
+
+DateTimeInput.defaultProps = {
+  className: undefined,
 };

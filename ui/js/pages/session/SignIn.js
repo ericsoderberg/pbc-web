@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { postSession } from '../../actions';
@@ -9,7 +8,7 @@ import FormState from '../../utils/FormState';
 
 export default class SignIn extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onCancel = this._onCancel.bind(this);
     this._onSignIn = this._onSignIn.bind(this);
@@ -18,27 +17,27 @@ export default class SignIn extends Component {
     this.state = { formState: new FormState(session, this._setSession) };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Sign In';
-    this.refs.email.focus();
+    this._emailRef.focus();
   }
 
-  _onCancel () {
+  _onCancel() {
     this.context.router.push('/');
   }
 
-  _onSignIn (event) {
+  _onSignIn(event) {
     event.preventDefault();
     postSession(this.state.formState.object)
-      .then(response => this.context.router.push('/'))
-      .catch(error => this.setState({ error: error }));
+      .then(() => this.context.router.push('/'))
+      .catch(error => this.setState({ error }));
   }
 
-  _setSession (session) {
+  _setSession(session) {
     this.setState({ formState: new FormState(session, this._setSession) });
   }
 
-  render () {
+  render() {
     const { formState, error } = this.state;
     const session = formState.object;
 
@@ -46,7 +45,7 @@ export default class SignIn extends Component {
       <button key="cancel" type="button" className="button"
         onClick={this._onCancel}>
         Cancel
-      </button>
+      </button>,
     ];
 
     return (
@@ -54,17 +53,18 @@ export default class SignIn extends Component {
         <form className="form" action="/api/sessions" onSubmit={this._onSignIn}>
           <PageHeader title="Sign In" actions={cancelControl} />
           <FormError message={error} />
-          <div className='form__contents'>
+          <div className="form__contents">
             <fieldset className="form__fields">
               <FormField name="email" label="Email">
-                <input ref="email" name="email" type='email'
+                <input ref={(ref) => { this._emailRef = ref; }}
+                  name="email" type="email"
                   value={session.email || ''}
-                  onChange={formState.change('email')}/>
+                  onChange={formState.change('email')} />
               </FormField>
               <FormField name="password" label="Password">
                 <input name="password" type="password"
                   value={session.password || ''}
-                  onChange={formState.change('password')}/>
+                  onChange={formState.change('password')} />
               </FormField>
             </fieldset>
           </div>
@@ -85,8 +85,8 @@ export default class SignIn extends Component {
       </div>
     );
   }
-};
+}
 
 SignIn.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

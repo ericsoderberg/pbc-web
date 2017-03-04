@@ -1,4 +1,3 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import { getItem, postSubscribe } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -7,42 +6,42 @@ import Loading from '../../components/Loading';
 
 export default class EmailListSubscribe extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onSubscribe = this._onSubscribe.bind(this);
     this._onCancel = this._onCancel.bind(this);
     this.state = { addresses: '' };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Subscribe';
     this._loadEmailList();
   }
 
-  _loadEmailList () {
+  _loadEmailList() {
     const { params: { id } } = this.props;
     getItem('email-lists', id)
     .then(emailList => this.setState({ emailList }))
-    .catch(error => console.log('!!! EmailListSubscribe catch', error));
+    .catch(error => console.error('!!! EmailListSubscribe catch', error));
   }
 
-  _onSubscribe (event) {
+  _onSubscribe(event) {
     event.preventDefault();
     const { addresses, emailList } = this.state;
-    postSubscribe(emailList, addresses.split("\n"))
+    postSubscribe(emailList, addresses.split('\n'))
     .then(() => this.context.router.goBack())
-    .catch(error => this.setState({ error: error }));
+    .catch(error => this.setState({ error }));
   }
 
-  _onCancel () {
+  _onCancel() {
     this.context.router.goBack();
   }
 
-  render () {
+  render() {
     const { addresses, emailList } = this.state;
 
     let result;
-    if (! emailList) {
+    if (!emailList) {
       result = <Loading />;
     } else {
       const cancel = (
@@ -77,14 +76,14 @@ export default class EmailListSubscribe extends Component {
 
     return result;
   }
-};
+}
 
 EmailListSubscribe.propTypes = {
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  })
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 EmailListSubscribe.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };

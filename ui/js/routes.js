@@ -106,9 +106,9 @@ export default {
     { path: 'forms/add', component: FormAdd },
     { path: 'forms/:id/edit', component: FormEdit },
     { path: 'forms', component: Forms },
-    { path: 'form-templates/add', component:  FormTemplateAdd },
-    { path: 'form-templates/:id', component:  FormTemplate },
-    { path: 'form-templates/:id/edit', component:  FormTemplateEdit },
+    { path: 'form-templates/add', component: FormTemplateAdd },
+    { path: 'form-templates/:id', component: FormTemplate },
+    { path: 'form-templates/:id/edit', component: FormTemplateEdit },
     { path: 'form-templates', component: FormTemplates },
     { path: 'payments/add', component: PaymentAdd },
     { path: 'payments/:id/edit', component: PaymentEdit },
@@ -131,6 +131,6 @@ export default {
     { path: 'domains', component: Domains },
     { path: 'files', component: Files },
     { path: 'search', component: Search },
-    { path: ':id', component: Page }
-  ]
+    { path: ':id', component: Page },
+  ],
 };

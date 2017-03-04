@@ -1,43 +1,42 @@
-"use strict";
 import moment from 'moment';
 import { markdown } from 'markdown';
 
-function nextDates (event) {
+function nextDates(event) {
   const start = moment(event.start);
   const yesterday = moment().subtract(1, 'day');
 
-  let dates = [];
+  const dates = [];
   if (event.dates && event.dates.length > 0) {
     // distinguish multiple days in the same week from the same day across weeks
     if (moment(event.dates[0]).day() === start.day()) {
       // find the next date
       let nextDate;
-      event.dates.forEach(date => {
+      event.dates.forEach((date) => {
         date = moment(date);
-        if (! nextDate ||
+        if (!nextDate ||
           (nextDate.isBefore(yesterday) && date.isAfter(nextDate)) ||
           (date.isAfter(yesterday) && date.isBefore(nextDate))) {
           nextDate = date;
         }
       });
       if (nextDate) {
-        dates.push(nextDate); ///.format('MMMM Do');
+        dates.push(nextDate); // .format('MMMM Do');
       }
     } else {
       dates.push(start);
-      const end = moment(event.dates[event.dates.length-1]);
+      const end = moment(event.dates[event.dates.length - 1]);
       dates.push(end);
       // result = `${start.format('MMMM Do')} - ${end.format('MMMM Do')}`;
     }
   } else {
-    dates.push(start); ///.format('MMMM Do YYYY');
+    dates.push(start); // .format('MMMM Do YYYY');
   }
 
-  let times = [];
+  const times = [];
   if (dates.length > 0) {
-    times.push(start); ///.format(' @ h:mm a');
+    times.push(start); // .format(' @ h:mm a');
     if (event.times && event.times.length > 0) {
-      event.times.forEach((time, index) => {
+      event.times.forEach((time) => {
         times.push(moment(time.start));
         // result += ` & ${moment(time.start).format('h:mm a')}`;
       });
@@ -58,7 +57,7 @@ function nextDates (event) {
 //   );
 // }
 
-function markupEvent (event, urlBase) {
+function markupEvent(event, urlBase) {
   const { nextDates: { dates, times } } = event;
   const url = `${urlBase}/events/${event.path || event._id}`;
   let image = '';
@@ -74,7 +73,7 @@ function markupEvent (event, urlBase) {
   if (event.location) {
     location = `<div style="color: #999999;">${event.location}</div>`;
   }
-  let address = '';
+  const address = '';
   if (event.address) {
     location = `<div style="color: #999999;">${event.address}</div>`;
   }
@@ -82,7 +81,7 @@ function markupEvent (event, urlBase) {
   if (event.text) {
     text = `<div>${markdown.toHTML(event.text)}</div>`;
   } else {
-    text = `<div style="padding-bottom: 24px;"></div>`;
+    text = '<div style="padding-bottom: 24px;"></div>';
   }
   return `
   <div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
@@ -96,7 +95,7 @@ function markupEvent (event, urlBase) {
   `;
 }
 
-function markupMessage (label, message, urlBase) {
+function markupMessage(label, message, urlBase) {
   const url = `${urlBase}/messages/${message.path || message._id}`;
   let verses = '';
   if (message.verses) {
@@ -116,7 +115,7 @@ function markupMessage (label, message, urlBase) {
   `;
 }
 
-export function render (newsletter, urlBase) {
+export function render(newsletter, urlBase) {
   const { events, image, nextMessage, previousMessage, text } = newsletter;
 
   let imageMarkup = '';
@@ -152,10 +151,10 @@ ${previousMessageMarkup}
 
   const eventsMarkup = events.map(event => ({
     // decorate with nextDates
-    ...event.toObject(), nextDates: nextDates(event)
+    ...event.toObject(), nextDates: nextDates(event),
   }))
   // .sort(compareEvents)
-  .map(event => markupEvent(event, urlBase)).join("\n");
+  .map(event => markupEvent(event, urlBase)).join('\n');
 
   return `
 <html>

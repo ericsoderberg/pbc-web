@@ -1,6 +1,7 @@
-"use strict";
 import mongoose, { Schema } from 'mongoose';
+
 mongoose.Promise = global.Promise;
+
 const { Types: { ObjectId } } = Schema;
 
 const DATABASE = process.env.DATABASE || 'pbc';
@@ -13,7 +14,7 @@ const image = {
   data: String,
   name: String,
   size: Number,
-  type: { type: String }
+  type: { type: String },
 };
 
 const sessionSchema = Schema({
@@ -23,7 +24,7 @@ const sessionSchema = Schema({
   loginAt: Date,
   name: String,
   token: String,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 export const Session = mongoose.model('Session', sessionSchema);
 
@@ -31,18 +32,18 @@ const userSchema = Schema({
   address: String,
   administrator: Boolean,
   administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  image: image,
+  image,
   created: Date,
-  email: {type: String, required: true, unique: true},
+  email: { type: String, required: true, unique: true },
   encryptedPassword: String,
   modified: Date,
-  name: {type: String, required: true},
+  name: { type: String, required: true },
   oldId: Number,
-  path: {type: String, unique: true, sparse: true},
+  path: { type: String, unique: true, sparse: true },
   phone: String,
   temporaryToken: String,
   text: String,
-  verified: Boolean
+  verified: Boolean,
 });
 
 mongoose.model('User', userSchema);
@@ -51,16 +52,16 @@ const familySchema = Schema({
   adults: [{
     relation: String,
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    verified: Boolean
+    verified: Boolean,
   }],
   children: [{
     birthday: Date,
     grade: String,
     name: String,
-    notes: String
+    notes: String,
   }],
   created: Date,
-  modified: Date
+  modified: Date,
 });
 
 mongoose.model('Family', familySchema);
@@ -68,7 +69,7 @@ mongoose.model('Family', familySchema);
 const domainSchema = Schema({
   created: Date,
   modified: Date,
-  name: {type: String, required: true}
+  name: { type: String, required: true },
 });
 
 mongoose.model('Domain', domainSchema);
@@ -78,38 +79,38 @@ mongoose.model('Domain', domainSchema);
 const sectionDef = {
   backgroundImage: image,
   color: String,
-  full: Boolean
+  full: Boolean,
 };
 
 const textSectionDef = { text: String };
 const imageSectionDef = { image };
 const videoSectionDef = { url: String };
 const calendarSectionDef = {
-  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' }
+  calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
 };
 const eventSectionDef = {
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
   includeMap: Boolean,
-  navigable: Boolean
+  navigable: Boolean,
 };
-const librarySectionDef ={
-  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' }
+const librarySectionDef = {
+  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
 };
 const formSectionDef = {
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' }
+  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
 };
 const peopleSectionDef = {
   people: [{
     id: { type: Schema.Types.ObjectId, ref: 'User' },
-    image: image,
-    text: String
-  }]
+    image,
+    text: String,
+  }],
 };
 const pagesSectionDef = {
   pages: [{
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
-    image: image
-  }]
+    image,
+  }],
 };
 const filesSectionDef = {
   files: [{
@@ -117,11 +118,11 @@ const filesSectionDef = {
     label: String,
     name: String,
     size: Number,
-    type: { type: String }
-  }]
+    type: { type: String },
+  }],
 };
 const mapSectionDef = {
-  address: String
+  address: String,
 };
 
 const pageSectionSchema = Schema({
@@ -136,7 +137,7 @@ const pageSectionSchema = Schema({
   ...formSectionDef,
   ...peopleSectionDef,
   ...pagesSectionDef,
-  ...filesSectionDef
+  ...filesSectionDef,
 });
 
 const pageSchema = Schema({
@@ -146,13 +147,13 @@ const pageSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: {type: String, unique: true, sparse: true},
+  path: { type: String, unique: true, sparse: true },
   public: Boolean,
   sections: [pageSectionSchema],
   // sections: [Schema(sectionDef, {
   //   discriminatorKey: 'type', _id: false, toObject: { retainKeyOrder: true }
   // })],
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 // var pageSections = pageSchema.path('sections');
@@ -176,16 +177,16 @@ pageSchema.index({ name: 'text', 'sections.text': 'text' },
   { weights: { name: 5, 'sections.text': 1 } });
 
 const Page = mongoose.model('Page', pageSchema);
-Page.on('index', (error) => console.log('Page index ready'));
+Page.on('index', () => console.log('Page index ready'));
 
 const calendarSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
-  name: {type: String, required: true},
-  path: {type: String, unique: true, sparse: true},
+  name: { type: String, required: true },
+  path: { type: String, unique: true, sparse: true },
   public: Boolean,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 mongoose.model('Calendar', calendarSchema);
@@ -199,7 +200,7 @@ const eventSectionSchema = Schema({
   ...videoSectionDef,
   ...formSectionDef,
   ...peopleSectionDef,
-  ...filesSectionDef
+  ...filesSectionDef,
 });
 
 const eventSchema = Schema({
@@ -210,12 +211,12 @@ const eventSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   end: Date,
   // formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
-  image: image,
+  image,
   location: String, // room, house owner's name, etc.
   modified: Date,
   name: String,
   oldId: Number,
-  path: {type: String, unique: true, sparse: true},
+  path: { type: String, unique: true, sparse: true },
   // set in one-off cases
   primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' },
   public: Boolean,
@@ -226,9 +227,9 @@ const eventSchema = Schema({
   text: String, // deprecated but leave for now while upgrading to sections
   times: [{
     end: Date,
-    start: Date
+    start: Date,
   }],
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 // var eventSections = eventSchema.path('sections');
@@ -248,15 +249,15 @@ eventSchema.index({ name: 'text', text: 'text' },
   { weights: { name: 5, text: 1 } });
 
 const Event = mongoose.model('Event', eventSchema);
-Event.on('index', (error) => console.log('Event index ready'));
+Event.on('index', () => console.log('Event index ready'));
 
 const resourceSchema = Schema({
   created: Date,
   modified: Date,
-  name: {type: String, required: true, unique: true},
+  name: { type: String, required: true, unique: true },
   oldId: Number,
   text: String,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 mongoose.model('Resource', resourceSchema);
@@ -266,7 +267,7 @@ const formTemplateOptionSchema = Schema({
   limit: Number,
   name: String,
   oldId: Number,
-  value: String
+  value: String,
 });
 
 const formTemplateFieldSchema = Schema({
@@ -284,9 +285,9 @@ const formTemplateFieldSchema = Schema({
   type: {
     type: String,
     enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions'],
-    required: true
+    required: true,
   },
-  value: String // for monetary + type='count'
+  value: String, // for monetary + type='count'
 });
 
 const formTemplateSectionSchema = Schema({
@@ -295,7 +296,7 @@ const formTemplateSectionSchema = Schema({
   dependsOnId: ObjectId,
   fields: [formTemplateFieldSchema],
   name: String,
-  oldId: Number
+  oldId: Number,
 });
 
 const formTemplateSchema = Schema({
@@ -305,7 +306,7 @@ const formTemplateSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   family: Boolean,
   modified: Date,
-  name: {type: String, required: true, unique: true},
+  name: { type: String, required: true, unique: true },
   notify: String,
   oldId: Number,
   payable: Boolean,
@@ -314,7 +315,7 @@ const formTemplateSchema = Schema({
   sections: [formTemplateSectionSchema],
   submitLabel: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
-  version: Number
+  version: Number,
 });
 
 mongoose.model('FormTemplate', formTemplateSchema);
@@ -331,7 +332,7 @@ const paymentSchema = Schema({
   received: Date,
   sent: Date,
   temporaryToken: String,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 mongoose.model('Payment', paymentSchema);
@@ -344,10 +345,13 @@ const formSchema = Schema({
     optionId: ObjectId, // choice, formTemplateFieldOption
     optionIds: [ObjectId], // choices, formTemplateFieldOption
     templateFieldId: { type: Schema.Types.ObjectId, required: true },
-    value: String
+    value: String,
   }],
-  formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate',
-    required: true },
+  formTemplateId: {
+    type: Schema.Types.ObjectId,
+    ref: 'FormTemplate',
+    required: true,
+  },
   modified: Date,
   name: String, // derived from appropriate field value
   oldId: Number,
@@ -355,7 +359,7 @@ const formSchema = Schema({
   // and needs a subsequent payment.
   paymentIds: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
-  version: Number
+  version: Number,
 });
 
 mongoose.model('Form', formSchema);
@@ -363,21 +367,21 @@ mongoose.model('Form', formSchema);
 const podcastSchema = Schema({
   category: String,
   description: String,
-  image: image,
+  image,
   subCategory: String,
   subtitle: String,
   summary: String,
-  title: String
+  title: String,
 });
 
 const librarySchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
-  name: {type: String, required: true},
-  path: {type: String, unique: true, sparse: true},
+  name: { type: String, required: true },
+  path: { type: String, unique: true, sparse: true },
   podcast: podcastSchema,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 librarySchema.index({ name: 'text' });
@@ -395,37 +399,37 @@ const messageSchema = Schema({
     label: String,
     name: String,
     size: Number,
-    type: { type: String }
+    type: { type: String },
   }],
-  image: image,
+  image,
   libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
   name: String,
   oldId: Number,
-  path: {type: String, unique: true, sparse: true},
+  path: { type: String, unique: true, sparse: true },
   series: Boolean,
   seriesId: { type: Schema.Types.ObjectId, ref: 'Message' },
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   videoUrl: String,
-  verses: String
+  verses: String,
 });
 
 messageSchema.index(
   { author: 'text', name: 'text', text: 'text', verses: 'text' },
-  { weights: { author: 3, name: 5, text: 1, verses: 8 } }
+  { weights: { author: 3, name: 5, text: 1, verses: 8 } },
 );
 
 const Message = mongoose.model('Message', messageSchema);
-Message.on('index', (error) => console.log('Message index ready'));
+Message.on('index', () => console.log('Message index ready'));
 
 
 const oldFileSchema = Schema({
-  oldId: {type: String, required: true, unique: true},
+  oldId: { type: String, required: true, unique: true },
   label: String,
   name: String,
   size: Number,
-  type: { type: String }
+  type: { type: String },
 });
 
 mongoose.model('OldFile', oldFileSchema);
@@ -443,7 +447,7 @@ const siteSchema = Schema({
   shortcutIcon: image,
   slogan: String,
   socialUrls: [String],
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 mongoose.model('Site', siteSchema);
@@ -455,12 +459,12 @@ const newsletterSchema = Schema({
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   eventIds: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-  image: image,
+  image,
   libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
-  name: {type: String, required: true},
+  name: { type: String, required: true },
   text: String,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 mongoose.model('Newsletter', newsletterSchema);
@@ -469,27 +473,27 @@ const emailListSchema = Schema({
   addresses: [{
     address: String,
     state: { type: String,
-      enum: ['pending', 'ok', 'disabled']
-    }
+      enum: ['pending', 'ok', 'disabled'],
+    },
   }],
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
-  name: {type: String, required: true, unique: true},
-  path: {type: String, unique: true, sparse: true},
+  name: { type: String, required: true, unique: true },
+  path: { type: String, unique: true, sparse: true },
   public: Boolean,
   text: String,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 mongoose.model('EmailList', emailListSchema);
 
 // Connection
 
-const opts = { user: USER, pass: PASSWORD,  auth: { authdb: 'admin' } };
+const opts = { user: USER, pass: PASSWORD, auth: { authdb: 'admin' } };
 mongoose.connect(`mongodb://localhost/${DATABASE}`, opts, (error) => {
   if (error) {
-    console.log('mongoose connect error', error);
+    console.error('mongoose connect error', error);
   }
 });
 const db = mongoose.connection;

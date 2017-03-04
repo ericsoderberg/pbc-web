@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 import { getItems } from '../../actions';
@@ -7,36 +7,40 @@ import UpIcon from '../../icons/Up';
 import DownIcon from '../../icons/Down';
 import MessageItem from './MessageItem';
 
-class MessagesMessageItem extends MessageItem {};
+class MessagesMessageItem extends MessageItem {}
+
 MessagesMessageItem.defaultProps = {
-  detailsForMostRecent: true
+  detailsForMostRecent: true,
 };
 
 export default class Messages extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = { filterOptions: [] };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     getItems('libraries', { select: 'name' })
     .then(response => this.setState({
       // convert to options format with label and value
       filterOptions: response.map(library => ({
         label: library.name,
-        value: library._id
-      }))
+        value: library._id,
+      })),
     }))
-    .catch(error => console.log('!!! Messages catch', error));
+    .catch(error => console.error('!!! Messages catch', error));
   }
 
-  render () {
+  render() {
     const { location } = this.props;
     const { filterOptions } = this.state;
 
-    const filter = { property: "libraryId", options: filterOptions,
-      allLabel: 'All libraries' };
+    const filter = {
+      property: 'libraryId',
+      options: filterOptions,
+      allLabel: 'All libraries',
+    };
 
     const marker = {
       property: 'date',
@@ -45,7 +49,7 @@ export default class Messages extends Component {
         <div className="marker">
           <span>future <UpIcon /></span><span>past <DownIcon /></span>
         </div>
-      )
+      ),
     };
 
     return (
@@ -55,8 +59,8 @@ export default class Messages extends Component {
         Item={MessagesMessageItem} marker={marker} />
     );
   }
-};
+}
 
 Messages.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object.isRequired,
 };

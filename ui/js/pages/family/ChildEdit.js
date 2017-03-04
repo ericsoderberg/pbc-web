@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
@@ -6,25 +6,25 @@ import FormState from '../../utils/FormState';
 
 export default class ChildEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._onToggle = this._onToggle.bind(this);
     const { child, defaultActive, onChange } = props;
     this.state = {
-      active: defaultActive, formState: new FormState(child, onChange)
+      active: defaultActive, formState: new FormState(child, onChange),
     };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { child, onChange } = nextProps;
     this.setState({ formState: new FormState(child, onChange) });
   }
 
-  _onToggle () {
-    this.setState({ active: ! this.state.active });
+  _onToggle() {
+    this.setState({ active: !this.state.active });
   }
 
-  render () {
+  render() {
     const { onRemove } = this.props;
     const { active, formState } = this.state;
     const child = formState.object;
@@ -35,7 +35,7 @@ export default class ChildEdit extends Component {
         <fieldset className="form__fields">
           <FormField label="Name">
             <input name="name" value={child.name || ''}
-              onChange={formState.change('name')}/>
+              onChange={formState.change('name')} />
           </FormField>
           <FormField label="Birthday">
             <DateInput value={child.birthday || ''}
@@ -43,11 +43,11 @@ export default class ChildEdit extends Component {
           </FormField>
           <FormField label="Grade">
             <input name="grade" value={child.grade || ''}
-              onChange={formState.change('grade')}/>
+              onChange={formState.change('grade')} />
           </FormField>
           <FormField label="Notes">
             <textarea name="notes" value={child.notes || ''} rows={4}
-              onChange={formState.change('notes')}/>
+              onChange={formState.change('notes')} />
           </FormField>
         </fieldset>
       );
@@ -72,9 +72,13 @@ export default class ChildEdit extends Component {
   }
 }
 
-ChildEdit.defaultProps = {
+ChildEdit.propTypes = {
   child: PropTypes.object.isRequired,
   defaultActive: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
-  onRemove: PropTypes.func.isRequired
+  onRemove: PropTypes.func.isRequired,
+};
+
+ChildEdit.defaultProps = {
+  defaultActive: false,
 };

@@ -16,19 +16,19 @@ const KEYS = {
   right: 39,
   down: 40,
   comma: 188,
-  shift: 16
+  shift: 16,
 };
 
-var _keyboardAccelerators = {};
-var _listeners = [];
-var _isKeyboardAcceleratorListening = false;
+const _keyboardAccelerators = {};
+const _listeners = [];
+let _isKeyboardAcceleratorListening = false;
 
-var _onKeyboardAcceleratorKeyPress = (e) => {
-  var key = (e.keyCode ? e.keyCode : e.which);
-  _listeners.slice().reverse().some(function (listener) {
+const _onKeyboardAcceleratorKeyPress = (e) => {
+  const key = (e.keyCode ? e.keyCode : e.which);
+  _listeners.slice().reverse().some((listener) => {
     if (_keyboardAccelerators[listener]) {
-      var handlers = _keyboardAccelerators[listener].handlers;
-      if (handlers.hasOwnProperty(key)) {
+      const handlers = _keyboardAccelerators[listener].handlers;
+      if (handlers[key]) {
         if (handlers[key](e)) {
           return true;
         }
@@ -42,40 +42,38 @@ var _onKeyboardAcceleratorKeyPress = (e) => {
 // Add listeners using startListeningToKeyboard().
 // Remove listeners using stopListeningToKeyboard().
 export default {
-  _initKeyboardAccelerators (element) {
-    var id = element.getAttribute('data-reactid');
+  _initKeyboardAccelerators(element) {
+    const id = element.getAttribute('data-reactid');
     _keyboardAccelerators[id] = {
-      handlers: {}
+      handlers: {},
     };
   },
 
-  _getKeyboardAcceleratorHandlers (element) {
-    var id = element.getAttribute('data-reactid');
+  _getKeyboardAcceleratorHandlers(element) {
+    const id = element.getAttribute('data-reactid');
     return _keyboardAccelerators[id].handlers;
   },
 
-  _getDowns (element) {
-    var id = element.getAttribute('data-reactid');
+  _getDowns(element) {
+    const id = element.getAttribute('data-reactid');
     return _keyboardAccelerators[id].downs;
   },
 
-  _isComponentListening (element) {
-    var id = element.getAttribute('data-reactid');
+  _isComponentListening(element) {
+    const id = element.getAttribute('data-reactid');
 
-    return _listeners.some(function (listener) {
-      return listener === id;
-    });
+    return _listeners.some(listener => listener === id);
   },
 
-  _subscribeComponent (element) {
-    var id = element.getAttribute('data-reactid');
+  _subscribeComponent(element) {
+    const id = element.getAttribute('data-reactid');
     _listeners.push(id);
   },
 
-  _unsubscribeComponent (element) {
-    var id = element.getAttribute('data-reactid');
+  _unsubscribeComponent(element) {
+    const id = element.getAttribute('data-reactid');
 
-    var removeListenerIndex = _listeners.indexOf(id);
+    const removeListenerIndex = _listeners.indexOf(id);
     _listeners.splice(removeListenerIndex, 1);
 
     delete _keyboardAccelerators[id];
@@ -84,24 +82,21 @@ export default {
   // Add handlers for specific keys.
   // This function can be called multiple times, existing handlers will
   // be replaced, new handlers will be added.
-  startListeningToKeyboard (component, handlers) {
-    var element = findDOMNode(component);
+  startListeningToKeyboard(component, handlers) {
+    const element = findDOMNode(component);
     this._initKeyboardAccelerators(element);
-    var keys = 0;
-    for (var key in handlers) {
-      if (handlers.hasOwnProperty(key)) {
-        var keyCode = key;
-        if (KEYS.hasOwnProperty(key)) {
-          keyCode = KEYS[key];
-        }
+    let keys = 0;
+    Object.keys(handlers).forEach((key) => {
+      if (handlers[key]) {
+        const keyCode = KEYS[key] || key;
         keys += 1;
         this._getKeyboardAcceleratorHandlers(element)[keyCode] = handlers[key];
       }
-    }
+    });
 
     if (keys > 0) {
       if (!_isKeyboardAcceleratorListening) {
-        window.addEventListener("keydown", _onKeyboardAcceleratorKeyPress);
+        window.addEventListener('keydown', _onKeyboardAcceleratorKeyPress);
         _isKeyboardAcceleratorListening = true;
       }
       if (!this._isComponentListening(element)) {
@@ -114,38 +109,36 @@ export default {
   // If no argument is passed in, all handlers are removed.
   // This function can be called multiple times, only the handlers
   // specified will be removed.
-  stopListeningToKeyboard (component, handlers) {
-    var element = findDOMNode(component);
+  stopListeningToKeyboard(component, handlers) {
+    const element = findDOMNode(component);
     if (!this._isComponentListening(element)) {
       return;
     }
     if (handlers) {
-      for (var key in handlers) {
-        if (handlers.hasOwnProperty(key)) {
-          var keyCode = key;
-          if (KEYS.hasOwnProperty(key)) {
-            keyCode = KEYS[key];
-          }
+      Object.keys(handlers).forEach((key) => {
+        if (handlers[key]) {
+          const keyCode = KEYS[key] || key;
           delete this._getKeyboardAcceleratorHandlers(element)[keyCode];
         }
-      }
+      });
     }
 
-    var keyCount = 0;
-    for (var keyHandler in this._getKeyboardAcceleratorHandlers(element)) {
-      if (this._getKeyboardAcceleratorHandlers(element).hasOwnProperty(keyHandler)) {
+    let keyCount = 0;
+    Object.keys(this._getKeyboardAcceleratorHandlers(element))
+    .forEach((keyHandler) => {
+      if (this._getKeyboardAcceleratorHandlers(element)[keyHandler]) {
         keyCount += 1;
       }
-    }
+    });
 
-    if (! handlers || 0 === keyCount) {
+    if (!handlers || keyCount === 0) {
       this._initKeyboardAccelerators(element);
       this._unsubscribeComponent(element);
     }
 
     if (_listeners.length === 0) {
-      window.removeEventListener("keydown", _onKeyboardAcceleratorKeyPress);
+      window.removeEventListener('keydown', _onKeyboardAcceleratorKeyPress);
       _isKeyboardAcceleratorListening = false;
     }
-  }
+  },
 };

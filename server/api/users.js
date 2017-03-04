@@ -1,40 +1,41 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
 import { authorizedAdministrator } from './auth';
 import { compressImage } from './image';
 
+mongoose.Promise = global.Promise;
+
 // /api/users
 
-const prepareUser = (data) => {
-  return Promise.resolve(data)
-  .then(data => {
-    if (! data.password) return data;
-    return bcrypt.hash(data.password, 10).then(encryptedPassword => {
+const prepareUser = data => (
+  Promise.resolve(data)
+  .then(() => {
+    if (!data.password) return data;
+    return bcrypt.hash(data.password, 10)
+    .then((encryptedPassword) => {
       data.encryptedPassword = encryptedPassword;
       delete data.password;
       return data;
     });
   })
-  .then(data => {
-    if (! data.administratorDomainId) {
+  .then((data) => {
+    if (!data.administratorDomainId) {
       delete data.administratorDomainId;
       data.$unset = { administratorDomainId: '' };
     }
     return data;
   })
-  .then(data => {
-    if (! data.image) return data;
+  .then((data) => {
+    if (!data.image) return data;
     return compressImage(data.image.data)
-    .then(compressedData => {
-      data.image.data = compressedData;
+    .then((compressedImageData) => {
+      data.image.data = compressedImageData;
       return data;
     });
-  });
-};
+  })
+);
 
 const deleteUserRelated = (doc) => {
   const Session = mongoose.model('Session');
@@ -45,47 +46,47 @@ const deleteUserRelated = (doc) => {
 
 const populateUser = (user) => {
   const Family = mongoose.model('Family');
-  return Family.findOne({ "adults.userId": user._id })
+  return Family.findOne({ 'adults.userId': user._id })
   .then(family => ({ ...user, familyId: (family || {})._id }));
 };
 
 
 export default function (router, transporter) {
   router.post('/users/sign-up', (req, res) => {
-    let data = req.body;
+    const data = req.body;
     const User = mongoose.model('User');
     // if this is the first user, make them administrator
     User.count()
-    .then(count => {
+    .then((count) => {
       if (data.password) {
         data.encryptedPassword = bcrypt.hashSync(data.password, 10);
         delete data.password;
       }
       data.created = new Date();
       data.modified = data.created;
-      data.administrator = 0 === count;
+      data.administrator = (count === 0);
       const doc = new User(data);
       return doc.save();
     })
     .then(doc => res.status(200).json(doc))
-    .catch(error => {
+    .catch((error) => {
       error = error.toJSON();
       delete error.op.encryptedPassword;
       if (error.errmsg.match(/^E11000/)) {
-        error.errmsg = "An account with that email address already exists.";
+        error.errmsg = 'An account with that email address already exists.';
       }
       return res.status(400).json(error);
     });
   });
 
   router.post('/users/verify-email', (req, res) => {
-    let data = req.body;
+    const data = req.body;
     const User = mongoose.model('User');
     const Site = mongoose.model('Site');
     // make sure we have a user with this email
     User.findOne({ email: data.email }).exec()
-    .then(user => {
-      if (! user) {
+    .then((user) => {
+      if (!user) {
         return Promise.reject({
           error: 'There is no account with that email address' });
       }
@@ -94,11 +95,11 @@ export default function (router, transporter) {
       user.modified = new Date();
       return user.save();
     })
-    .then(user => {
-      return Site.findOne({}).exec()
-      .then(site => ({ user, site }));
-    })
-    .then(context => {
+    .then(user => (
+      Site.findOne({}).exec()
+      .then(site => ({ user, site }))
+    ))
+    .then((context) => {
       const { user, site } = context;
       const url =
         `${req.headers.origin}/verify-email?token=${user.temporaryToken}`;
@@ -117,9 +118,11 @@ It will allow sign you in to the ${site.name} web site.
         from: site.email,
         to: user.email,
         subject: 'Verify Email',
-        markdown: instructions
+        markdown: instructions,
       }, (err, info) => {
-        console.log('!!! sendMail', err, info);
+        if (err) {
+          console.error('!!! sendMail', err, info);
+        }
       });
     })
     .then(() => res.status(200).send({}))
@@ -130,45 +133,45 @@ It will allow sign you in to the ${site.name} web site.
     category: 'users',
     modelName: 'User',
     delete: {
-      deleteRelated: deleteUserRelated
+      deleteRelated: deleteUserRelated,
     },
     get: {
-      transformOut: (user, req) => {
+      transformOut: (user) => {
         if (user) {
           user = user.toObject();
           delete user.encryptedPassword;
           return populateUser(user);
         }
         return user;
-      }
+      },
     },
     index: {
       authorize: authorizedAdministrator,
       searchProperties: ['name', 'email'],
-      transformOut: (users) => {
-        return users.map(doc => {
-          let user = doc.toObject();
+      transformOut: users => (
+        users.map((doc) => {
+          const user = doc.toObject();
           delete user.encryptedPassword;
           return user;
-        });
-      }
+        })
+      ),
     },
     post: {
-      transformIn: prepareUser
+      transformIn: prepareUser,
     },
     put: {
-      transformIn: prepareUser
-    }
+      transformIn: prepareUser,
+    },
   });
 }
 
-export function createUser (email, name) {
-  if (! email || ! name) {
+export function createUser(email, name) {
+  if (!email || !name) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  return User.findOne({ email: email }).exec()
-  .then(user => {
+  return User.findOne({ email }).exec()
+  .then((user) => {
     if (user) {
       return Promise.reject('Exists');
     }
@@ -176,33 +179,32 @@ export function createUser (email, name) {
     const now = new Date();
     user = new User({
       created: now,
-      email: email,
+      email,
       modified: now,
-      name: name
+      name,
     });
     return user.save();
   });
 }
 
-export function findOrCreateUser (email, name) {
-  if (! email || ! name) {
+export function findOrCreateUser(email, name) {
+  if (!email || !name) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  return User.findOne({ email: email }).exec()
-  .then(user => {
+  return User.findOne({ email }).exec()
+  .then((user) => {
     if (!user) {
       // create a new user
       const now = new Date();
       user = new User({
         created: now,
-        email: email,
+        email,
         modified: now,
-        name: name
+        name,
       });
       return user.save();
-    } else {
-      return user;
     }
+    return user;
   });
 }

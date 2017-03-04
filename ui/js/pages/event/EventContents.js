@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { PropTypes } from 'react';
 import moment from 'moment';
 import Section from '../../components/Section';
@@ -19,7 +19,7 @@ const EventContents = (props) => {
   }
 
   let upcoming;
-  let now = moment();
+  const now = moment();
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
   .filter(date => date.isAfter(now)).slice(0, 3)
   .map(date => (
@@ -29,7 +29,7 @@ const EventContents = (props) => {
   ));
   if (upcomingDates.length > 0) {
     upcoming = (
-      <Section align='center' full={false}>
+      <Section align="center" full={false}>
         <div>
           <h3>Upcoming</h3>
           <ul className="list">
@@ -42,7 +42,7 @@ const EventContents = (props) => {
 
   return (
     <div>
-      <Section full={false} align='start' backgroundImage={event.image}>
+      <Section full={false} align="start" backgroundImage={event.image}>
         <EventSection id={event} navigable={false} />
       </Section>
       <Sections sections={event.sections} />
@@ -52,8 +52,8 @@ const EventContents = (props) => {
   );
 };
 
-EventContents.PropTypes = {
-  item: PropTypes.object.isRequired
+EventContents.propTypes = {
+  item: PropTypes.object.isRequired,
 };
 
 export default EventContents;

@@ -1,9 +1,8 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 
 export default class FormField extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onClick = this._onClick.bind(this);
     this._onDragEnter = this._onDragEnter.bind(this);
@@ -13,38 +12,36 @@ export default class FormField extends Component {
     this.state = {};
   }
 
-  _onClick (event) {
+  _onClick() {
     // focus on contained input
-    const component = this.refs.component;
-    const input = component.querySelector('input, textarea');
+    const input = this._componentRef.querySelector('input, textarea');
     if (input) {
       input.focus();
     }
   }
 
-  _onDragOver (event) {
+  _onDragOver(event) {
     event.preventDefault();
   }
 
-  _onDragEnter (event) {
+  _onDragEnter(event) {
     event.preventDefault();
     this.setState({ dragging: true });
   }
 
-  _onDragLeave (event) {
+  _onDragLeave(event) {
     event.preventDefault();
     this.setState({ dragging: false });
   }
 
-  _onDrop (event) {
+  _onDrop(event) {
     event.preventDefault();
     this.props.onDrop(event);
     this.setState({ dragging: false });
   }
 
-  render () {
-    let classNames = ['form-field'];
-
+  render() {
+    const classNames = ['form-field'];
     if (this.state.dragging) {
       classNames.push('form-field--dragging');
     }
@@ -89,7 +86,10 @@ export default class FormField extends Component {
       );
     }
 
-    let onDragEnter, onDragOver, onDragLeave, onDrop;
+    let onDragEnter;
+    let onDragOver;
+    let onDragLeave;
+    let onDrop;
     if (this.props.onDrop) {
       onDragEnter = this._onDragEnter;
       onDragOver = this.onDragOver;
@@ -98,7 +98,8 @@ export default class FormField extends Component {
     }
 
     return (
-      <div ref="component" className={classNames.join(' ')}
+      <div ref={(ref) => { this._componentRef = ref; }}
+        className={classNames.join(' ')}
         onClick={this._onClick}
         onDragEnter={onDragEnter} onDragOver={onDragOver}
         onDragLeave={onDragLeave} onDrop={onDrop} >
@@ -108,13 +109,23 @@ export default class FormField extends Component {
       </div>
     );
   }
-};
+}
 
 FormField.propTypes = {
+  children: PropTypes.any.isRequired,
   closeControl: PropTypes.node,
   error: PropTypes.string,
   help: PropTypes.node,
   label: PropTypes.string,
   name: PropTypes.string,
-  onDrop: PropTypes.func
+  onDrop: PropTypes.func,
+};
+
+FormField.defaultProps = {
+  closeControl: undefined,
+  error: undefined,
+  help: undefined,
+  label: undefined,
+  name: undefined,
+  onDrop: undefined,
 };

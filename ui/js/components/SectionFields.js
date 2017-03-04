@@ -1,16 +1,15 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import FormField from './FormField';
 import ImageField from './ImageField';
 
 export default class SectionFields extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = {};
   }
 
-  render () {
+  render() {
     const { formState } = this.props;
     const { active } = this.state;
     const section = formState.object;
@@ -22,12 +21,12 @@ export default class SectionFields extends Component {
           <FormField>
             <input name="full" type="checkbox"
               checked={section.full || false}
-              onChange={formState.toggle('full')}/>
+              onChange={formState.toggle('full')} />
             <label htmlFor="full">Edge to edge</label>
           </FormField>
           <FormField label="Background color">
-            <input ref="color" name="color" value={section.color || ''}
-              onChange={formState.change('color')}/>
+            <input name="color" value={section.color || ''}
+              onChange={formState.change('color')} />
           </FormField>
           <ImageField label="Background image" name="backgroundImage"
             formState={formState} property="backgroundImage" />
@@ -35,8 +34,8 @@ export default class SectionFields extends Component {
       );
     } else {
       result = (
-        <a className="form-fields__more-control"
-          onClick={() => this.setState({ active: true })}>style</a>
+        <button className="form-fields__more-control button-plain"
+          onClick={() => this.setState({ active: true })}>style</button>
       );
     }
 
@@ -45,5 +44,5 @@ export default class SectionFields extends Component {
 }
 
 SectionFields.propTypes = {
-  formState: PropTypes.object.isRequired
+  formState: PropTypes.object.isRequired,
 };

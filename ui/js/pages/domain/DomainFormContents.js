@@ -1,26 +1,30 @@
-"use strict";
-import React, { Component, PropTypes } from 'react';
+
+import React, { PropTypes } from 'react';
 import FormField from '../../components/FormField';
 
-export default class DomainFormContents extends Component {
+const DomainFormContents = (props) => {
+  const { className, formState } = props;
+  const domain = formState.object;
 
-  render () {
-    const { className, formState } = this.props;
-    const domain = formState.object;
-
-    return (
-      <div className={className}>
-        <fieldset className="form__fields">
-          <FormField label="Name">
-            <input name="name" value={domain.name || ''}
-              onChange={formState.change('name')}/>
-          </FormField>
-        </fieldset>
-      </div>
-    );
-  }
+  return (
+    <div className={className}>
+      <fieldset className="form__fields">
+        <FormField label="Name">
+          <input name="name" value={domain.name || ''}
+            onChange={formState.change('name')} />
+        </FormField>
+      </fieldset>
+    </div>
+  );
 };
 
 DomainFormContents.propTypes = {
-  formState: PropTypes.object.isRequired
+  className: PropTypes.string,
+  formState: PropTypes.object.isRequired,
 };
+
+DomainFormContents.defaultProps = {
+  className: undefined,
+};
+
+export default DomainFormContents;

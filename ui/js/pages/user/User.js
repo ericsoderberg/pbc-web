@@ -1,5 +1,4 @@
-"use strict";
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Show from '../../components/Show';
 import Section from '../../components/Section';
 import Text from '../../components/Text';
@@ -40,9 +39,14 @@ const UserContents = (props) => {
   );
 };
 
-export default class User extends Show {};
+
+UserContents.propTypes = {
+  item: PropTypes.object.isRequired,
+};
+
+export default class User extends Show {}
 
 User.defaultProps = {
   category: 'users',
-  Contents: UserContents
+  Contents: UserContents,
 };

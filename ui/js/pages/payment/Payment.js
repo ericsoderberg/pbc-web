@@ -1,16 +1,14 @@
-"use strict";
+
 import React from 'react';
 import Show from '../../components/Show';
 
-const PaymentContents = (props) => {
-  return (
-    <div>TBD</div>
-  );
-};
+const PaymentContents = () => (
+  <div>TBD</div>
+);
 
-export default class Payment extends Show {};
+export default class Payment extends Show {}
 
 Payment.defaultProps = {
   category: 'payments',
-  Contents: PaymentContents
+  Contents: PaymentContents,
 };

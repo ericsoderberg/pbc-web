@@ -1,36 +1,51 @@
-"use strict";
-import React, { Component } from 'react';
+
+import React, { Component, PropTypes } from 'react';
 import { deleteFile } from '../../actions';
 import List from '../../components/List';
 import ConfirmRemove from '../../components/ConfirmRemove';
 
 class Item extends Component {
 
-  _onRemove (id) {
-    deleteFile(id);
+  constructor() {
+    super();
+    this._onRemove = this._onRemove.bind(this);
   }
 
-  render () {
+  _onRemove() {
+    const { item: file } = this.props;
+    deleteFile(file._id);
+  }
+
+  render() {
     const { className, item: file } = this.props;
-    let classNames = ['item__container', className];
-    console.log('!!! Files', file);
+    const classNames = ['item__container', className];
+    // console.log('!!! Files', file);
     return (
       <div className={classNames.join(' ')}>
         <div className="item">
           <span className="item__name">{file.name || file._id}</span>
-          <ConfirmRemove onConfirm={this._onRemove.bind(this, file._id)} />
+          <ConfirmRemove onConfirm={this._onRemove} />
         </div>
       </div>
     );
   }
+}
+
+Item.propTypes = {
+  className: PropTypes.string,
+  item: PropTypes.object.isRequired,
 };
 
-export default class Files extends List {};
+Item.defaultProps = {
+  className: undefined,
+};
+
+export default class Files extends List {}
 
 Files.defaultProps = {
   ...List.defaultProps,
   category: 'files',
-  Item: Item,
+  Item,
   path: '/files',
-  title: 'Files'
+  title: 'Files',
 };

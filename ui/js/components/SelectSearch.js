@@ -15,38 +15,37 @@ export default class SelectSearch extends Component {
 
     this._onDeactivate = this._onDeactivate.bind(this);
     this._onToggle = this._onToggle.bind(this);
-    this._onSelect = this._onSelect.bind(this);
     this._onSearch = this._onSearch.bind(this);
 
     this.state = { active: props.active, searchText: '' };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.active) {
       this._activation(true);
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     // Set up keyboard listeners appropriate to the current state.
     if (prevState.active !== this.state.active) {
       this._activation(this.state.active);
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this._activation(false);
   }
 
-  _onToggle (event) {
+  _onToggle(event) {
     event.preventDefault();
-    this.setState({ active: ! this.state.active });
+    this.setState({ active: !this.state.active });
   }
 
-  _isDescendant (parent, child) {
-    var node = child.parentNode;
+  _isDescendant(parent, child) {
+    let node = child.parentNode;
     while (node != null) {
-      if (node == parent) {
+      if (node === parent) {
         return true;
       }
       node = node.parentNode;
@@ -54,51 +53,58 @@ export default class SelectSearch extends Component {
     return false;
   }
 
-  _onDeactivate (event) {
-    if (! this._isDescendant(this.refs.component, event.target)) {
+  _onDeactivate(event) {
+    if (!this._isDescendant(this._componentRef, event.target)) {
       this.setState({ active: false });
     }
   }
 
-  _onSelect (suggestion) {
-    this.setState({ active: false });
-    this.props.onChange(suggestion);
+  _select(suggestion) {
+    return () => {
+      this.setState({ active: false });
+      this.props.onChange(suggestion);
+    };
   }
 
-  _onSearch (event) {
+  _onClear() {
+    this.setState({ active: false });
+    this.props.onChange(undefined);
+  }
+
+  _onSearch(event) {
     const searchText = event.target.value;
-    this.setState({ searchText: searchText });
+    this.setState({ searchText });
     const { category, exclude, options } = this.props;
     getItems(category,
       { select: 'name', sort: 'name', ...(options || {}), search: searchText })
-    .then(response => {
+    .then((response) => {
       const suggestions = response
-      .filter(item => ! (exclude || []).some(item2 => item._id === item2._id));
-      this.setState({ suggestions: suggestions });
+      .filter(item => !(exclude || []).some(item2 => item._id === item2._id));
+      this.setState({ suggestions });
     })
-    .catch(error => console.log('!!! SelectSearch catch', error));
+    .catch(error => console.error('!!! SelectSearch catch', error));
   }
 
-  _activation (active) {
+  _activation(active) {
     const listeners = {
       esc: this._onDeactivate,
-      tab: this._onDeactivate
+      tab: this._onDeactivate,
     };
 
     if (active) {
       document.addEventListener('click', this._onDeactivate);
       KeyboardAccelerators.startListeningToKeyboard(this, listeners);
-      this.refs.input.focus();
+      this._inputRef.focus();
     } else {
       document.removeEventListener('click', this._onDeactivate);
       KeyboardAccelerators.stopListeningToKeyboard(this, listeners);
     }
   }
 
-  render () {
+  render() {
     const { className, clearable, placeholder, Suggestion } = this.props;
     const { active, searchText, suggestions } = this.state;
-    let classes = ['select-search'];
+    const classes = ['select-search'];
     if (active) {
       classes.push('select-search--active');
     }
@@ -114,7 +120,7 @@ export default class SelectSearch extends Component {
     if (clearable && value) {
       clearControl = (
         <Button className="select-search__clear" icon={<CloseIcon />}
-          onClick={this._onSelect.bind(this, undefined)} />
+          onClick={this._onClear} />
       );
     }
 
@@ -122,15 +128,16 @@ export default class SelectSearch extends Component {
     let Icon = DownIcon;
     if (active) {
       Icon = UpIcon;
-      let suggests = (suggestions || []).map((suggestion, index) => (
-        <div key={index} className="select-search__suggestion"
-          onClick={this._onSelect.bind(this, suggestion)}>
+      const suggests = (suggestions || []).map(suggestion => (
+        <div key={suggestion._id} className="select-search__suggestion"
+          onClick={this._select(suggestion)}>
           {Suggestion ? <Suggestion item={suggestion} /> : suggestion.name}
         </div>
       ));
       details = (
         <div className={'select-search__drop'}>
-          <input ref="input" className="select-search__input"
+          <input ref={(ref) => { this._inputRef = ref; }}
+            className="select-search__input"
             placeholder="Search"
             value={searchText} onChange={this._onSearch} />
           {suggests}
@@ -139,7 +146,8 @@ export default class SelectSearch extends Component {
     }
 
     return (
-      <div ref="component" className={classes.join(' ')}>
+      <div ref={(ref) => { this._componentRef = ref; }}
+        className={classes.join(' ')}>
         <div className="select-search__header" onClick={this._onToggle}>
           <input className="select-search__value" disabled={true}
             placeholder={placeholder} value={value} />
@@ -155,19 +163,30 @@ export default class SelectSearch extends Component {
 
 SelectSearch.propTypes = {
   active: PropTypes.bool,
-  category: PropTypes.string,
+  category: PropTypes.string.isRequired,
+  className: PropTypes.string,
   clearable: PropTypes.bool,
   exclude: PropTypes.arrayOf(PropTypes.shape({
-    _id: PropTypes.string
+    _id: PropTypes.string,
   })),
-  onChange: PropTypes.func,
-  options: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+  options: PropTypes.object.isRequired,
   placeholder: PropTypes.string,
   Suggestion: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.shape({
-      name: PropTypes.node.isRequired
-    })
-  ])
+      name: PropTypes.node.isRequired,
+    }),
+  ]),
+};
+
+SelectSearch.defaultProps = {
+  active: false,
+  className: undefined,
+  clearable: false,
+  exclude: [],
+  placeholder: undefined,
+  Suggestion: undefined,
+  value: '',
 };

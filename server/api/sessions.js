@@ -1,15 +1,15 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import moment from 'moment';
 import { authorize } from './auth';
 import { createUser } from './users';
 
+mongoose.Promise = global.Promise;
+
 // /api/sessions
 
-function createSession (user) {
+function createSession(user) {
   const Session = mongoose.model('Session');
   const data = {
     administrator: user.administrator,
@@ -18,7 +18,7 @@ function createSession (user) {
     loginAt: new Date(),
     name: user.name,
     token: hat(), // better to encrypt this before storing it, someday
-    userId: user._id
+    userId: user._id,
   };
   const session = new Session(data);
   return session.save();
@@ -28,18 +28,17 @@ export default function (router) {
   router.post('/sessions', (req, res) => {
     const User = mongoose.model('User');
     const { email, password } = req.body;
-    User.findOne({ email: email })
+    User.findOne({ email })
     .exec()
-    .then(user => {
+    .then((user) => {
       if (user && user.encryptedPassword &&
         bcrypt.compareSync(password, user.encryptedPassword)) {
         return createSession(user);
-      } else {
-        return Promise.reject();
       }
+      return Promise.reject();
     })
     .then(session => res.status(200).json(session))
-    .catch(error => res.status(401).json({error: "Invalid email or password"}));
+    .catch(() => res.status(401).json({ error: 'Invalid email or password' }));
   });
 
   // This is used when resetting a password
@@ -49,48 +48,46 @@ export default function (router) {
     const date = moment().subtract(2, 'hours');
     User.findOne({
       temporaryToken: token,
-      modified: { $gt: date.toString() }
+      modified: { $gt: date.toString() },
     }).exec()
-    .then(user => {
+    .then((user) => {
       user.temporaryToken = undefined;
       user.verified = true;
       return user.save();
     })
     .then(user => createSession(user))
     .then(session => res.status(200).json(session))
-    .catch(error => res.status(400).json({}));
+    .catch(() => res.status(400).json({}));
   });
 
   router.delete('/sessions/:id', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then((session) => {
       const id = req.params.id;
       if (session._id.equals(id)) {
         return session.remove();
-      } else {
-        Promise.reject();
       }
+      return Promise.reject();
     })
     .then(() => res.status(200).send())
-    .catch(error => res.status(401).json({ error: 'Not authorized' }));
+    .catch(() => res.status(401).json({ error: 'Not authorized' }));
   });
-};
+}
 
-export function useOrCreateSession (session, email, name) {
-  if (! session) {
+export function useOrCreateSession(session, email, name) {
+  if (!session) {
     return createUser(email, name)
-    .then(user => {
+    .then((user) => {
       // create a new session
       const Session = mongoose.model('Session');
-      const session = new Session({
+      const newSession = new Session({
         email: user.email,
         name: user.name,
         token: hat(), // better to encrypt this before storing it, someday
-        userId: user._id
+        userId: user._id,
       });
-      return session.save();
+      return newSession.save();
     });
-  } else {
-    return session;
   }
+  return session;
 }

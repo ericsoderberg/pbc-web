@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
@@ -9,33 +9,34 @@ import MessageContents from './MessageContents';
 
 class Message extends Component {
 
-  componentDidMount () {
-    if (! this.props.message) {
+  componentDidMount() {
+    if (!this.props.message) {
       getItem('messages', this.props.params.id, { cache: true, populate: true })
-      .catch(error => console.log('!!! Message catch', error));
+      .catch(error => console.error('!!! Message catch', error));
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.params.id !== this.props.params.id &&
-      ! nextProps.message) {
+      !nextProps.message) {
       getItem('messages', nextProps.params.id, { cache: true, populate: true })
-      .catch(error => console.log('!!! Message catch', error));
+      .catch(error => console.error('!!! Message catch', error));
     }
     if (nextProps.message) {
       document.title = nextProps.message.name;
     }
   }
 
-  render () {
+  render() {
     const { message } = this.props;
-    let contents, actions;
+    let contents;
+    let actions;
     if (message) {
       contents = <MessageContents item={message} />;
       const library = message.libraryId || {};
       const path = `/libraries/${library.path || library._id}`;
       actions = [
-        <Link key="library" to={path}>Library</Link>
+        <Link key="library" to={path}>Library</Link>,
       ];
     } else {
       contents = <Loading />;
@@ -48,13 +49,13 @@ class Message extends Component {
       </main>
     );
   }
-};
+}
 
 Message.propTypes = {
-  message: PropTypes.object,
+  message: PropTypes.object.isRequired,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
-  }).isRequired
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 const select = (state, props) => {
@@ -63,7 +64,7 @@ const select = (state, props) => {
     message = state.messages[props.params.id];
   }
   return {
-    message: message
+    message,
   };
 };
 

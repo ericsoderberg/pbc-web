@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import Markdown from 'markdown-to-jsx';
@@ -10,29 +10,36 @@ import SelectSearch from '../../components/SelectSearch';
 import Stored from '../../components/Stored';
 import FormTotal from './FormTotal';
 
-const UserSuggestion = (props) => (
+const UserSuggestion = props => (
   <div className="box--between">
     <span>{props.item.name}</span>
     <span className="secondary">{props.item.email}</span>
   </div>
 );
 
+UserSuggestion.propTypes = {
+  item: PropTypes.shape({
+    email: PropTypes.string,
+    name: PropTypes.string,
+  }).isRequired,
+};
+
 class FormContents extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this._renderTemplateSection = this._renderTemplateSection.bind(this);
     this._renderTemplateField = this._renderTemplateField.bind(this);
     this.state = this._stateFromProps(props);
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState(this._stateFromProps(nextProps));
   }
 
-  _stateFromProps (props) {
-    let fieldsSet = {};
-    props.form.fields.forEach(field => {
+  _stateFromProps(props) {
+    const fieldsSet = {};
+    props.form.fields.forEach((field) => {
       if (field.value || field.optionId ||
         (field.optionIds && field.optionIds.length > 0)) {
         fieldsSet[field.templateFieldId] = true;
@@ -42,10 +49,10 @@ class FormContents extends Component {
       (props.session.administrator || (
         (props.formTemplate && props.formTemplate.domainId &&
         props.session.administratorDomainId === props.formTemplate.domainId))));
-    return { administrator: administrator, fieldsSet: fieldsSet };
+    return { administrator, fieldsSet };
   }
 
-  _fieldIndex (id) {
+  _fieldIndex(id) {
     const { form: { fields } } = this.props;
     let result = -1;
     fields.some((field, index) => {
@@ -53,16 +60,17 @@ class FormContents extends Component {
         result = index;
         return true;
       }
+      return false;
     });
     return result;
   }
 
-  _change (templateFieldId) {
+  _change(templateFieldId) {
     return (event) => {
       const value = event.target.value;
-      const nextField = { templateFieldId: templateFieldId, value: value };
-      let form = { ...this.props.form };
-      let fields = form.fields.slice(0);
+      const nextField = { templateFieldId, value };
+      const form = { ...this.props.form };
+      const fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
       if (index === -1) {
         fields.push(nextField);
@@ -74,13 +82,11 @@ class FormContents extends Component {
     };
   }
 
-  _setOption (templateFieldId, optionId) {
-    return (event) => {
-      const nextField = {
-        templateFieldId: templateFieldId, optionId: optionId
-      };
-      let form = { ...this.props.form };
-      let fields = form.fields.slice(0);
+  _setOption(templateFieldId, optionId) {
+    return () => {
+      const nextField = { templateFieldId, optionId };
+      const form = { ...this.props.form };
+      const fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
       if (index === -1) {
         fields.push(nextField);
@@ -92,46 +98,42 @@ class FormContents extends Component {
     };
   }
 
-  _toggleOption (templateFieldId, optionId) {
-    return (event) => {
-      let form = { ...this.props.form };
-      let fields = form.fields.slice(0);
+  _toggleOption(templateFieldId, optionId) {
+    return () => {
+      const form = { ...this.props.form };
+      const fields = form.fields.slice(0);
       const index = this._fieldIndex(templateFieldId);
       if (index === -1) {
-        fields.push({
-          templateFieldId: templateFieldId, optionIds: [optionId]
-        });
+        fields.push({ templateFieldId, optionIds: [optionId] });
       } else {
-        let optionIds = fields[index].optionIds.slice(0);
-        let optionIndex = optionIds.indexOf(optionId);
+        const optionIds = fields[index].optionIds.slice(0);
+        const optionIndex = optionIds.indexOf(optionId);
         if (optionIndex === -1) {
           optionIds.push(optionId);
         } else {
           optionIds.splice(optionIndex, 1);
         }
-        fields[index] = {
-          templateFieldId: templateFieldId, optionIds: optionIds
-        };
+        fields[index] = { templateFieldId, optionIds };
       }
       form.fields = fields;
       this.props.onChange(form);
     };
   }
 
-  _renderOptionLabel (templateField, option, selected) {
+  _renderOptionLabel(templateField, option, selected) {
     let label;
     if (templateField.monetary && option.value) {
-      let classes = ['form__field-option-amount'];
+      const classes = ['form__field-option-amount'];
       if (selected) {
         classes.push('primary');
       } else {
         classes.push('tertiary');
       }
       label = [
-        <span key='name'>{option.name}</span>,
-        <span key='amount' className={classes.join(' ')}>
+        <span key="name">{option.name}</span>,
+        <span key="amount" className={classes.join(' ')}>
           $ {option.value}
-        </span>
+        </span>,
       ];
     } else {
       label = <span>{option.name}</span>;
@@ -139,14 +141,14 @@ class FormContents extends Component {
     return label;
   }
 
-  _renderFormField (templateField, index) {
+  _renderFormField(templateField, index) {
     const { form: { fields } } = this.props;
     const error = this.props.error || {};
     const fieldIndex = this._fieldIndex(templateField._id);
     const field = fields[fieldIndex] || {};
 
     let contents;
-    if ('line' === templateField.type) {
+    if (templateField.type === 'line') {
       contents = (
         <input name={templateField.name} type="text"
           value={field.value || ''}
@@ -169,39 +171,39 @@ class FormContents extends Component {
           </div>
         );
       }
-    } else if ('lines' === templateField.type) {
+    } else if (templateField.type === 'lines') {
       contents = (
         <textarea name={templateField.name} value={field.value || ''}
           onChange={this._change(templateField._id)} />
       );
-    } else if ('choice' === templateField.type) {
+    } else if (templateField.type === 'choice') {
       contents = (templateField.options || []).map((option, index) => {
         const checked = (field.optionId === option._id);
         const label = this._renderOptionLabel(templateField, option, checked);
         return (
-          <div key={index} className="form__field-option">
+          <div key={option._id} className="form__field-option">
             <input name={templateField.name} type="radio"
               checked={checked}
-              onChange={this._setOption(templateField._id, option._id)}/>
+              onChange={this._setOption(templateField._id, option._id)} />
             <label htmlFor={templateField.name}>{label}</label>
           </div>
         );
       });
-    } else if ('choices' === templateField.type) {
+    } else if (templateField.type === 'choices') {
       const optionIds = field.optionIds || [];
       contents = (templateField.options || []).map((option, index) => {
         const checked = (optionIds.indexOf(option._id) !== -1);
         const label = this._renderOptionLabel(templateField, option, checked);
         return (
-          <div key={index} className="form__field-option">
+          <div key={option._id} className="form__field-option">
             <input name={templateField.name} type="checkbox"
               checked={checked}
-              onChange={this._toggleOption(templateField._id, option._id)}/>
+              onChange={this._toggleOption(templateField._id, option._id)} />
             <label htmlFor={templateField.name}>{label}</label>
           </div>
         );
       });
-    } else if ('count' === templateField.type) {
+    } else if (templateField.type === 'count') {
       contents = (
         <input name={templateField.name} type="number"
           min={templateField.min || 0} max={templateField.max}
@@ -214,7 +216,7 @@ class FormContents extends Component {
         const amount =
           `${templateField.monetary ? '$ ' : ''}` +
           `${(field.value || 0) * templateField.value}`;
-        let amountClasses = ["form__field-option-amount"];
+        const amountClasses = ['form__field-option-amount'];
         if (field.value > 0) {
           amountClasses.push('primary');
         } else {
@@ -239,9 +241,9 @@ class FormContents extends Component {
     );
   }
 
-  _renderTemplateField (templateField, index) {
+  _renderTemplateField(templateField, index) {
     let result;
-    if ('instructions' === templateField.type) {
+    if (templateField.type === 'instructions') {
       result = (
         <div key={index} className="form__text">
           <Markdown>{templateField.help}</Markdown>
@@ -253,7 +255,7 @@ class FormContents extends Component {
     return result;
   }
 
-  _renderTemplateSection (templateSection, index) {
+  _renderTemplateSection(templateSection, index) {
     const { fieldsSet } = this.state;
     let name;
     if (templateSection.name) {
@@ -265,7 +267,7 @@ class FormContents extends Component {
     }
     const fields = (templateSection.fields || [])
     .filter(templateField => (
-      ! templateField.dependsOnId || fieldsSet[templateField.dependsOnId]
+      !templateField.dependsOnId || fieldsSet[templateField.dependsOnId]
     ))
     .map(this._renderTemplateField);
     return (
@@ -276,7 +278,7 @@ class FormContents extends Component {
     );
   }
 
-  render () {
+  render() {
     const { form, formTemplate, full, error, session } = this.props;
     const { administrator, fieldsSet } = this.state;
 
@@ -287,14 +289,13 @@ class FormContents extends Component {
 
     const sections = (formTemplate.sections || [])
     .filter(section => (
-      (! section.dependsOnId || fieldsSet[section.dependsOnId]) &&
-      (! section.administrative || (full && administrator))
+      (!section.dependsOnId || fieldsSet[section.dependsOnId]) &&
+      (!section.administrative || (full && administrator))
     ))
     .map(this._renderTemplateSection);
 
     let admin;
     if (full && administrator) {
-
       let added;
       if (form.created) {
         added = (
@@ -326,7 +327,7 @@ class FormContents extends Component {
           </div>
           <FormField label="Person" help="the person to submit this form for">
             <SelectSearch category="users"
-              options={{select: 'name email', sort: 'name'}}
+              options={{ select: 'name email', sort: 'name' }}
               Suggestion={UserSuggestion}
               value={(form.userId || session).name || ''}
               onChange={(suggestion) => {
@@ -334,7 +335,7 @@ class FormContents extends Component {
                 this.props.onChange(form);
               }} />
           </FormField>
-          <div className='form__footer'>
+          <div className="form__footer">
             {payments}
             <Link to={formTemplatePath}>template</Link>
           </div>
@@ -348,7 +349,7 @@ class FormContents extends Component {
     }
 
     return (
-      <div className='form__contents'>
+      <div className="form__contents">
         {formError}
         {sections}
         {total}
@@ -356,27 +357,31 @@ class FormContents extends Component {
       </div>
     );
   }
-};
+}
 
 FormContents.propTypes = {
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   form: PropTypes.shape({
-    fields: PropTypes.arrayOf(PropTypes.object).isRequired
+    fields: PropTypes.arrayOf(PropTypes.object).isRequired,
   }).isRequired,
   formTemplate: PropTypes.shape({
-    sections: PropTypes.arrayOf(PropTypes.object)
+    sections: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
   full: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-    name: PropTypes.string
-  })
+    name: PropTypes.string,
+  }).isRequired,
 };
 
-const select = (state, props) => ({
-  session: state.session
+FormContents.defaultProps = {
+  error: undefined,
+};
+
+const select = state => ({
+  session: state.session,
 });
 
 export default Stored(FormContents, select);

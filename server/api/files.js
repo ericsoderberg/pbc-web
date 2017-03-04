@@ -1,11 +1,11 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import fs from 'fs';
 import rmdir from 'rimraf';
 import { authorize } from './auth';
 
-export var FILES_PATH = `${__dirname}/../../public/files`;
+mongoose.Promise = global.Promise;
+
+export const FILES_PATH = `${__dirname}/../../public/files`;
 
 // /api/files
 
@@ -28,7 +28,7 @@ export default function (router) {
 
   router.delete('/files/:id', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then(() => {
       const id = req.params.id;
       rmdir(`${FILES_PATH}/${id}`, (error) => {
         if (error) {
@@ -42,7 +42,7 @@ export default function (router) {
 
   router.get('/files', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then(() => {
       fs.readdir(`${FILES_PATH}`, (error, files) => {
         if (error) {
           res.status(400).json(error);
@@ -61,16 +61,16 @@ export default function (router) {
 
   router.post('/files', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then(() => {
       const id = new mongoose.Types.ObjectId();
       let fstream;
       req.busboy.on('file',
-        function (fieldname, file, filename, encoding, mimetype) {
+        (fieldname, file, filename, encoding, mimetype) => {
           const dir = `${FILES_PATH}/${id}`;
           fs.mkdir(dir, () => {
             fstream = fs.createWriteStream(`${dir}/${filename}`);
             file.pipe(fstream);
-            fstream.on('close', function () {
+            fstream.on('close', () => {
               res.json({ _id: id, name: filename, type: mimetype });
             });
           });

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
@@ -7,19 +7,19 @@ import SectionEdit from '../../components/SectionEdit';
 
 export default class FormSectionEdit extends Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const { section, onChange } = props;
     this.state = { formState: new FormState(section, onChange) };
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
-      formState: new FormState(nextProps.section, nextProps.onChange)
+      formState: new FormState(nextProps.section, nextProps.onChange),
     });
   }
 
-  render () {
+  render() {
     const { formState } = this.state;
     const section = formState.object;
 
@@ -28,16 +28,16 @@ export default class FormSectionEdit extends Component {
         <FormField name="formTemplateId" label="Form template">
           <SelectSearch category="form-templates"
             value={(section.formTemplateId || {}).name || ''}
-            onChange={(suggestion) =>
+            onChange={suggestion =>
               formState.change('formTemplateId')({
                 _id: suggestion._id, name: suggestion.name })} />
         </FormField>
       </SectionEdit>
     );
   }
-};
+}
 
-FormSectionEdit.defaultProps = {
+FormSectionEdit.propTypes = {
   onChange: PropTypes.func.isRequired,
-  section: PropTypes.object.isRequired
+  section: PropTypes.object.isRequired,
 };

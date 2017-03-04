@@ -1,6 +1,5 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
-import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import { getSite, getItem, deleteSession } from '../../actions';
 import Sections from '../../components/Sections';
@@ -19,7 +18,7 @@ import { isDarkBackground } from '../../utils/Color';
 
 class Home extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onResize = this._onResize.bind(this);
     this._layout = this._layout.bind(this);
@@ -31,87 +30,85 @@ class Home extends Component {
     this.state = { menuHeight: 0, showMenu: false };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { site } = this.props;
-    if (! site) {
+    if (!site) {
       getSite()
       .then(this._siteReady)
-      .catch(error => console.log('!!! Home catch', error));
+      .catch(error => console.error('!!! Home catch', error));
     } else {
       this._siteReady(site)
-      .catch(error => console.log('!!! Home re-catch', error));
+      .catch(error => console.error('!!! Home re-catch', error));
     }
     window.addEventListener('resize', this._onResize);
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.page && ! this.props.page) {
-      this.setState({ layoutNeeded: true });
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.page && !this.props.page) {
+      this._layoutNeeded = true;
     }
   }
 
-  componentDidUpdate () {
-    const { layoutNeeded } = this.state;
-    if (layoutNeeded) {
-      this.setState({ layoutNeeded: false });
+  componentDidUpdate() {
+    if (this._layoutNeeded) {
+      this._layoutNeeded = false;
       this._layout();
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
     clearTimeout(this._resizeTimer);
   }
 
-  _siteReady (site) {
+  _siteReady(site) {
     const { page } = this.props;
     document.title = site.name;
     this._layout();
     if (page) {
       return Promise.resolve();
-    } else if (! page && site.homePageId) {
+    } else if (!page && site.homePageId) {
       return getItem('pages', site.homePageId._id,
         { cache: true, populate: true });
-    } else {
-      return Promise.reject('No home page');
     }
+    return Promise.reject('No home page');
   }
 
-  _signOut () {
+  _signOut() {
     deleteSession()
     .then(() => this.context.router.go('/'))
-    .catch(error => console.log('!!! Home _signOut catch', error));
+    .catch(error => console.error('!!! Home _signOut catch', error));
   }
 
-  _onResize () {
+  _onResize() {
     clearTimeout(this._resizeTimer);
     this._resizeTimer = setTimeout(this._layout, 20); // debounce
   }
 
-  _layout () {
-    if (window.innerWidth < 700 && this.refs.menuRef) {
-      const rect = findDOMNode(this.refs.menuRef).getBoundingClientRect();
+  _layout() {
+    if (window.innerWidth < 700 && this._menuRef) {
+      const rect = this._menuRef.getBoundingClientRect();
       this.setState({ menuHeight: rect.height, showMenu: false });
     } else {
       this.setState({ menuHeight: 0, showMenu: false });
     }
   }
 
-  _showMenu (event) {
+  _showMenu() {
     this.setState({ showMenu: true });
   }
 
-  _hideMenu (event) {
+  _hideMenu() {
     this.setState({ showMenu: false });
   }
 
-  _onSearch (event) {
+  _onSearch(event) {
     const { searchText } = this.state;
     event.preventDefault();
     this.context.router.push(`/search?q=${searchText}`);
   }
 
-  _renderSession () {
+  _renderSession() {
     const { session } = this.props;
     let contents;
     if (session && session.token) {
@@ -121,7 +118,7 @@ class Home extends Component {
         </Link>,
         <a key="control" className="home__sign-out" onClick={this._signOut}>
           <span className="link__text">Sign Out</span>
-        </a>
+        </a>,
       ];
     } else {
       contents = <Button path="/sign-in">Sign In</Button>;
@@ -129,45 +126,44 @@ class Home extends Component {
     return <div className="home__session">{contents}</div>;
   }
 
-  _renderMenuLinks () {
+  _renderMenuLinks() {
     const { page } = this.props;
-    let links = [
-      <Link key='/search' to='/search'>Search</Link>
+    const links = [
+      <Link key="search" to="/search">Search</Link>,
     ];
     if (page) {
-
-      page.sections.filter(section => 'pages' === section.type)
-      .forEach(section => {
-        section.pages.forEach(page => {
-          page = page.id; // how the backend returns it
-          let path = page.path ? `/${page.path}` : `/pages/${page._id}`;
+      page.sections.filter(section => section.type === 'pages')
+      .forEach((section) => {
+        section.pages.forEach((sectionPage) => {
+          const actualPage = sectionPage.id; // how the backend returns it
+          const path = actualPage.path ? `/${actualPage.path}` :
+            `/pages/${actualPage._id}`;
           links.push(<Link key={path} to={path}>{page.name}</Link>);
         });
       });
 
       const calendarSections =
-        page.sections.filter(section => 'calendar' === section.type);
-      calendarSections.forEach(section => {
+        page.sections.filter(section => section.type === 'calendar');
+      calendarSections.forEach((section) => {
         const calendar = section.calendarId;
-        let path = `/calendars/${calendar.path || calendar._id}`;
+        const path = `/calendars/${calendar.path || calendar._id}`;
         links.push(<Link key={path} to={path}>{calendar.name}</Link>);
       });
       if (calendarSections.length === 0) {
-        links.push(<Link key='/calendar' to='/calendar'>Calendar</Link>);
+        links.push(<Link key="calendar" to="/calendar">Calendar</Link>);
       }
 
-      page.sections.filter(section => 'library' === section.type)
-      .forEach(section => {
+      page.sections.filter(section => section.type === 'library')
+      .forEach((section) => {
         const library = section.libraryId;
-        let path = `/libraries/${library.path || library._id}`;
+        const path = `/libraries/${library.path || library._id}`;
         links.push(<Link key={path} to={path}>Library</Link>);
       });
-
     }
     return links;
   }
 
-  _renderSplash () {
+  _renderSplash() {
     const { site } = this.props;
     return (
       <Section key="splash" className="home__splash">
@@ -180,12 +176,12 @@ class Home extends Component {
     );
   }
 
-  _renderFooter () {
+  _renderFooter() {
     const { page, session, site } = this.props;
 
     let socialLinks;
     if (site.socialUrls && site.socialUrls.length > 0) {
-      socialLinks = site.socialUrls.map(url => {
+      socialLinks = site.socialUrls.map((url) => {
         let contents;
         if (url.match(/facebook/)) {
           contents = <FacebookIcon />;
@@ -206,7 +202,7 @@ class Home extends Component {
 
     let logo;
     if (site && site.logo) {
-      logo = <img className="home__logo logo" src={site.logo.data} />;
+      logo = <img className="home__logo logo" alt="logo" src={site.logo.data} />;
     }
 
     const sessionControl = this._renderSession();
@@ -241,11 +237,11 @@ class Home extends Component {
     );
   }
 
-  _renderContents () {
+  _renderContents() {
     const { page, site } = this.props;
     const { searchText, showMenu } = this.state;
 
-    let splash = this._renderSplash();
+    const splash = this._renderSplash();
 
     let sections;
     if (page) {
@@ -257,41 +253,41 @@ class Home extends Component {
       sections = <Loading key="page" />;
     }
 
-    let menuControlClasses = ["home__menu-control"];
-    let menuClasses = ["home__menu"];
-    let menuStyle = { backgroundColor: '#fff' };
+    const menuControlClasses = ['home__menu-control'];
+    const menuClasses = ['home__menu'];
+    const menuStyle = { backgroundColor: '#fff' };
     if (showMenu) {
-      menuClasses.push("home__menu--active");
+      menuClasses.push('home__menu--active');
     }
     if (site && site.color) {
       menuStyle.backgroundColor = site.color;
       if (isDarkBackground(site.color)) {
-        menuStyle.push("dark-background");
+        menuStyle.push('dark-background');
         if (showMenu) {
-          menuControlClasses.push("dark-background");
+          menuControlClasses.push('dark-background');
         }
       }
     }
     const links = this._renderMenuLinks();
     const menu = (
-      <div key="menu" ref='menuRef' className={menuClasses.join(' ')}
-        style={menuStyle}>
+      <div key="menu" ref={(ref) => { this._menuRef = ref; }}
+        className={menuClasses.join(' ')} style={menuStyle}>
         {links}
       </div>
     );
 
-    let search = (
+    const search = (
       <form key="search" className="home__search" onSubmit={this._onSearch}>
         <input type="text" placeholder="Search" value={searchText || ''}
           onChange={e => this.setState({ searchText: e.target.value })} />
-        <button className="button-icon" type='submit'
+        <button className="button-icon" type="submit"
           onClick={this._onSearch}>
           <SearchIcon />
         </button>
       </form>
     );
 
-    let footer = this._renderFooter();
+    const footer = this._renderFooter();
 
     return [
       menu,
@@ -304,18 +300,19 @@ class Home extends Component {
       splash,
       sections,
       search,
-      footer
+      footer,
     ];
   }
 
-  render () {
+  render() {
     const { site } = this.props;
     const { menuHeight, showMenu } = this.state;
 
-    let contents, style;
+    let contents;
+    let style;
     if (site) {
       contents = this._renderContents();
-      if (! showMenu) {
+      if (!showMenu) {
         style = { transform: `translateY(-${menuHeight}px)` };
       }
     } else {
@@ -329,29 +326,34 @@ class Home extends Component {
       </main>
     );
   }
-};
+}
 
 Home.propTypes = {
   page: PropTypes.object,
   session: PropTypes.shape({
-    token: PropTypes.any
-  }),
-  site: PropTypes.object
+    token: PropTypes.any,
+  }).isRequired,
+  site: PropTypes.object,
+};
+
+Home.defaultProps = {
+  page: undefined,
+  site: undefined,
 };
 
 Home.contextTypes = {
-  router: PropTypes.any
+  router: PropTypes.any,
 };
 
-const select = (state, props) => {
+const select = (state) => {
   let page;
   if (state.site && state.pages) {
     page = state.pages[state.site.homePageId._id];
   }
   return {
-    page: page,
+    page,
     session: state.session,
-    site: state.site
+    site: state.site,
   };
 };
 

@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
@@ -10,20 +10,20 @@ import Sections from '../../components/Sections';
 
 class Page extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this.state = {};
   }
 
-  componentDidMount () {
-    if (! this.props.page) {
+  componentDidMount() {
+    if (!this.props.page) {
       this._load(this.props);
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.params.id !== this.props.params.id &&
-      ! nextProps.page) {
+      !nextProps.page) {
       this._load(nextProps);
     }
     if (nextProps.page) {
@@ -31,15 +31,15 @@ class Page extends Component {
     }
   }
 
-  _load (props) {
+  _load(props) {
     getItem('pages', props.params.id, { cache: true, populate: true })
-    .catch(error => {
-      console.log('!!! Page catch', error);
-      this.setState({ error: error });
+    .catch((error) => {
+      console.error('!!! Page catch', error);
+      this.setState({ error });
     });
   }
 
-  render () {
+  render() {
     const { page, session } = this.props;
     const { error } = this.state;
 
@@ -50,7 +50,7 @@ class Page extends Component {
       if (session && (session.administrator ||
         session.administratorDomainId === page.domainId)) {
         actions = [
-          <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>
+          <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>,
         ];
       }
     } else if (error) {
@@ -66,17 +66,21 @@ class Page extends Component {
       </main>
     );
   }
-};
+}
 
 Page.propTypes = {
   page: PropTypes.object,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired,
   }).isRequired,
   session: PropTypes.shape({
     administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string
-  })
+    administratorDomainId: PropTypes.string,
+  }).isRequired,
+};
+
+Page.defaultProps = {
+  page: undefined,
 };
 
 const select = (state, props) => {

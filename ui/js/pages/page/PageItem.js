@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
@@ -21,7 +21,13 @@ const PageItem = (props) => {
 
 PageItem.propTypes = {
   align: PropTypes.oneOf(['start', 'center', 'end']),
-  item: PropTypes.object
+  className: PropTypes.string,
+  item: PropTypes.object.isRequired,
+};
+
+PageItem.defaultProps = {
+  align: undefined,
+  className: undefined,
 };
 
 export default PageItem;

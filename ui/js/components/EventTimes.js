@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { PropTypes } from 'react';
 import moment from 'moment';
 
@@ -7,7 +7,7 @@ const EventTimes = (props) => {
   const start = moment(event.start);
   const yesterday = moment().subtract(1, 'day');
 
-  let classes = ["event-times"];
+  const classes = ['event-times'];
   if (size) {
     classes.push(`event-times--${size}`);
   }
@@ -18,9 +18,8 @@ const EventTimes = (props) => {
     if (moment(event.dates[0]).day() === start.day()) {
       // find the next date
       let nextDate;
-      event.dates.forEach(date => {
-        date = moment(date);
-        if (! nextDate ||
+      event.dates.map(date => moment(date)).forEach((date) => {
+        if (!nextDate ||
           (nextDate.isBefore(yesterday) && date.isAfter(nextDate)) ||
           (date.isAfter(yesterday) && date.isBefore(nextDate))) {
           nextDate = date;
@@ -40,8 +39,8 @@ const EventTimes = (props) => {
         </span>,
         <span key="sep" className="event-times__separator">-</span>,
         <span key="2" className="event-times__date">
-          {moment(event.dates[event.dates.length-1]).format('MMMM Do')}
-        </span>
+          {moment(event.dates[event.dates.length - 1]).format('MMMM Do')}
+        </span>,
       ];
     }
   } else {
@@ -58,17 +57,17 @@ const EventTimes = (props) => {
     times = [
       <span key="first" className="event-times__time">
         {start.format('h:mm a')}
-      </span>
+      </span>,
     ];
     if (event.times && event.times.length > 0) {
-      event.times.forEach((time, index) => {
+      event.times.forEach((time) => {
         times.push(
-          <span key={index} className="event-times__separator">&</span>
+          <span key={time.start} className="event-times__separator">&</span>,
         );
         times.push(
           <span key={time.start} className="event-times__time">
             {moment(time.start).format('h:mm a')}
-          </span>
+          </span>,
         );
       });
     }
@@ -82,21 +81,25 @@ const EventTimes = (props) => {
         <span className="event-times__times">{times}</span>
       </div>
     );
-  } else {
-    return (
-      <div className={classes.join(' ')}>
-        <span className="event-times__times">{times}</span>
-        <span className="event-times__separator" />
-        <span className="event-times__dates">{dates}</span>
-      </div>
-    );
   }
+  return (
+    <div className={classes.join(' ')}>
+      <span className="event-times__times">{times}</span>
+      <span className="event-times__separator" />
+      <span className="event-times__dates">{dates}</span>
+    </div>
+  );
 };
 
 EventTimes.propTypes = {
   event: PropTypes.any.isRequired,
   reverse: PropTypes.bool,
-  size: PropTypes.oneOf(['medium', 'large'])
+  size: PropTypes.oneOf(['medium', 'large']),
+};
+
+EventTimes.defaultProps = {
+  reverse: false,
+  size: undefined,
 };
 
 export default EventTimes;

@@ -1,27 +1,26 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import fs from 'fs';
 import { authorize } from './auth';
 
-export var ICON_DIR = `${__dirname}/../../`;
+mongoose.Promise = global.Promise;
+
+export const ICON_DIR = `${__dirname}/../../`;
 
 if (process.env.PAYPAL_CLIENT_ID) {
   console.log('PayPal available');
 } else {
-  console.log('PayPal unavailable, set PAYPAL_CLIENT_ID environment variable');
+  console.warn('PayPal unavailable, set PAYPAL_CLIENT_ID environment variable');
 }
 
 // /api/site
 
 export default function (router) {
-
   router.get('/site', (req, res) => {
     const Doc = mongoose.model('Site');
     Doc.findOne({})
     .populate({ path: 'homePageId', select: 'name' })
     .exec()
-    .then(site => {
+    .then((site) => {
       site = site.toObject();
       site.paypalClientId = process.env.PAYPAL_CLIENT_ID;
       return site;
@@ -32,16 +31,16 @@ export default function (router) {
 
   router.post('/site', (req, res) => {
     authorize(req, res)
-    .then(session => {
+    .then((session) => {
       const Doc = mongoose.model('Site');
-      let data = req.body;
+      const data = req.body;
       data.modified = new Date();
       data.userId = session.userId;
       const doc = new Doc(data);
       return Doc.remove({}).exec()
       .then(() => doc.save());
     })
-    .then(site => {
+    .then((site) => {
       // copy shortcut and mobile icons
       if (site.shortcutIcon) {
         // strip metadata
@@ -49,8 +48,8 @@ export default function (router) {
         // const metadata = matches[1];
         const base64Data = matches[2];
         fs.writeFile(`${ICON_DIR}/shortcut-icon.png`, base64Data, 'base64',
-          function(err) {
-            console.log(err);
+          (err) => {
+            console.error(err);
           });
       }
       if (site.mobileIcon) {
@@ -59,8 +58,8 @@ export default function (router) {
         // const metadata = matches[1];
         const base64Data = matches[2];
         fs.writeFile(`${ICON_DIR}/mobile-app-icon.png`, base64Data, 'base64',
-          function(err) {
-            console.log(err);
+          (err) => {
+            console.error(err);
           });
       }
       return site;

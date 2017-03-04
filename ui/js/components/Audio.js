@@ -1,4 +1,4 @@
-"use strict";
+
 import React, { Component, PropTypes } from 'react';
 import Section from './Section';
 import Button from './Button';
@@ -7,12 +7,12 @@ import PauseIcon from '../icons/Pause';
 import VolumeIcon from '../icons/Volume';
 
 function pad(num, size) {
-  let s = num + "";
-  while (s.length < size) s = "0" + s;
+  let s = `${num}`;
+  while (s.length < size) s = `0${s}`;
   return s;
 }
 
-function friendlyDuration (duration) {
+function friendlyDuration(duration) {
   let remaining = duration;
   let result = '';
   if (remaining > 3600) {
@@ -31,7 +31,7 @@ function friendlyDuration (duration) {
 
 export default class Audio extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onTimeUpdate = this._onTimeUpdate.bind(this);
     this._onEnded = this._onEnded.bind(this);
@@ -43,12 +43,12 @@ export default class Audio extends Component {
     this._onToggleVolume = this._onToggleVolume.bind(this);
     this._onVolume = this._onVolume.bind(this);
     this.state = {
-      playing: false, volume: 0.7, start: 0, end: 0, at: 0, showVolume: false
+      playing: false, volume: 0.7, start: 0, end: 0, at: 0, showVolume: false,
     };
   }
 
-  componentDidMount () {
-    const audio = this.refs.audio;
+  componentDidMount() {
+    const audio = this._audioRef;
     audio.volume = this.state.volume;
     audio.addEventListener('timeupdate', this._onTimeUpdate);
     audio.addEventListener('ended', this._onEnded);
@@ -56,27 +56,27 @@ export default class Audio extends Component {
     this._layout();
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     const { autoPlay } = this.props;
     const { playing } = this.state;
-    if (autoPlay && ! playing) {
+    if (autoPlay && !playing) {
       this._onPlay();
     }
   }
 
-  componentWillUnmount () {
-    const audio = this.refs.audio;
+  componentWillUnmount() {
+    const audio = this._audioRef;
     audio.removeEventListener('timeupdate', this._onTimeUpdate);
     audio.removeEventListener('ended', this._onEnded);
     window.removeEventListener('resize', this._onResize);
   }
 
-  _onTimeUpdate (event) {
-    const audio = this.refs.audio;
+  _onTimeUpdate() {
+    const audio = this._audioRef;
     this.setState({ at: audio.currentTime });
   }
 
-  _onEnded (event) {
+  _onEnded() {
     const { onEnd } = this.props;
     this.setState({ playing: false, at: 0 });
     if (onEnd) {
@@ -84,56 +84,59 @@ export default class Audio extends Component {
     }
   }
 
-  _onResize (event) {
+  _onResize() {
     clearTimeout(this._resizeTimer);
     this._resizeTimer = setTimeout(this._layout, 10);
   }
 
-  _layout () {
+  _layout() {
     // Remove?
   }
 
-  _onPlay () {
+  _onPlay() {
     const { onStart } = this.props;
-    const audio = this.refs.audio;
+    const audio = this._audioRef;
     audio.play();
-    this.setState({ playing: true,
-      start: audio.seekable.start(0), end: audio.seekable.end(0) });
+    this.setState({
+      playing: true,
+      start: audio.seekable.start(0),
+      end: audio.seekable.end(0),
+    });
     if (onStart) {
       onStart();
     }
   }
 
-  _onPause () {
-    const audio = this.refs.audio;
+  _onPause() {
+    const audio = this._audioRef;
     audio.pause();
     this.setState({ playing: false });
   }
 
-  _onSeek (event) {
-    const audio = this.refs.audio;
+  _onSeek(event) {
+    const audio = this._audioRef;
     const value = event.target.value;
     audio.currentTime = value;
     this.setState({ at: value });
   }
 
-  _onToggleVolume (event) {
-    this.setState({ showVolume: ! this.state.showVolume });
+  _onToggleVolume() {
+    this.setState({ showVolume: !this.state.showVolume });
   }
 
-  _onVolume (event) {
-    const audio = this.refs.audio;
+  _onVolume(event) {
+    const audio = this._audioRef;
     const value = event.target.value;
     audio.volume = value;
     this.setState({ volume: value });
   }
 
-  render () {
+  render() {
     const { file, className, color, full, plain } = this.props;
     const { playing, volume, start, end, at, showVolume } = this.state;
     const path = `/api/files/${file._id}/${file.name}`;
 
-    let classes = ['audio'];
+    const classes = ['audio'];
     if (plain) {
       classes.push('audio--plain');
     }
@@ -174,7 +177,7 @@ export default class Audio extends Component {
     return (
       <Section color={color} full={full} plain={plain}>
         <div className={classes.join(' ')}>
-          <audio ref="audio" preload="metadata">
+          <audio ref={(ref) => { this._audioRef = ref; }} preload="metadata">
             <source src={path} type={'audio/mpeg' || file.type} />
             No audio with this browser
           </audio>
@@ -194,7 +197,7 @@ export default class Audio extends Component {
       </Section>
     );
   }
-};
+}
 
 Audio.propTypes = {
   autoPlay: PropTypes.bool,
@@ -203,9 +206,16 @@ Audio.propTypes = {
     _id: PropTypes.string.isRequired,
     label: PropTypes.string,
     name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired
-  }),
+    type: PropTypes.string.isRequired,
+  }).isRequired,
   onEnd: PropTypes.func,
   onStart: PropTypes.func,
-  ...Section.propTypes
+  ...Section.propTypes,
+};
+
+Audio.defaultProps = {
+  autoPlay: false,
+  full: false,
+  onEnd: undefined,
+  onStart: undefined,
 };

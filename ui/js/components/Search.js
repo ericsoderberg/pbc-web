@@ -1,45 +1,44 @@
-"use strict";
 import React, { Component, PropTypes } from 'react';
 import SearchIcon from '../icons/Search';
 
 export default class Search extends Component {
 
-  constructor () {
+  constructor() {
     super();
     this._onActivate = this._onActivate.bind(this);
     this._onBlur = this._onBlur.bind(this);
     this.state = { active: false };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { focusOnMount } = this.props;
     if (focusOnMount) {
-      this.refs.input.focus();
+      this._inputRef.focus();
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this._unmounted = true;
   }
 
-  _onActivate (event) {
+  _onActivate() {
     this.setState({ active: true }, () => {
-      this.refs.input.focus();
+      this._inputRef.focus();
     });
   }
 
-  _onBlur (event) {
+  _onBlur() {
     setTimeout(() => {
-      if (! this._unmounted) {
+      if (!this._unmounted) {
         this.setState({ active: false });
       }
     }, 10);
   }
 
-  render () {
+  render() {
     const { onChange, responsive, value } = this.props;
     const { active } = this.state;
-    let classNames = ['search'];
+    const classNames = ['search'];
     if (responsive) {
       classNames.push('search--responsive');
     }
@@ -49,20 +48,27 @@ export default class Search extends Component {
 
     return (
       <div className={classNames.join(' ')}>
-        <input ref="input" className="search__input" placeholder="Search"
+        <input ref={(ref) => { this._inputRef = ref; }}
+          className="search__input" placeholder="Search"
           value={value || ''} onChange={onChange} onBlur={this._onBlur} />
         <button className="search__control button-icon"
-          onClick={! active ? this._onActivate : undefined}>
+          onClick={!active ? this._onActivate : undefined}>
           <SearchIcon />
         </button>
       </div>
     );
   }
-};
+}
 
 Search.propTypes = {
   focusOnMount: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   responsive: PropTypes.bool,
-  value: PropTypes.string
+  value: PropTypes.string,
+};
+
+Search.defaultProps = {
+  focusOnMount: false,
+  responsive: false,
+  value: '',
 };
