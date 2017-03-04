@@ -207,14 +207,14 @@ export default function (router) {
       transformOut: (doc) => {
         // convert deprecated text property to a section
         doc = doc.toObject();
-        if (doc.text) {
-          if (doc.sections.length === 0) {
+        if (doc.text !== undefined) {
+          if (doc.text && doc.sections.length === 0) {
             doc.sections.push({ type: 'text', text: doc.text });
           }
           delete doc.text;
         }
-        if (doc.address) {
-          if (doc.sections.length === 0) {
+        if (doc.address !== undefined) {
+          if (doc.address && doc.sections.length === 0) {
             doc.sections.push({ type: 'map', address: doc.address });
           }
           delete doc.address;
