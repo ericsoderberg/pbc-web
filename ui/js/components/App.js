@@ -93,7 +93,7 @@ App.propTypes = {
 };
 
 const select = state => ({
-  session: state.session,
+  session: state.session || {},
 });
 
 export default Stored(App, select);

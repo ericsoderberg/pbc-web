@@ -10,7 +10,8 @@ function pad(num, size) {
 export default class TimeSelector extends Component {
 
   _hour(hour) {
-    return () => {
+    return (event) => {
+      event.preventDefault();
       const { value } = this.props;
       const ampmOffset = value.hour() > 12 ? 12 : 0;
       const time = moment(value).hour(hour + ampmOffset);
@@ -19,7 +20,8 @@ export default class TimeSelector extends Component {
   }
 
   _minute(minute) {
-    return () => {
+    return (event) => {
+      event.preventDefault();
       const { value } = this.props;
       const time = moment(value).minute(minute);
       this.props.onChange(time);
@@ -27,7 +29,8 @@ export default class TimeSelector extends Component {
   }
 
   _amPm(ampm) {
-    return () => {
+    return (event) => {
+      event.preventDefault();
       const { value } = this.props;
       const time = moment(value);
       if (time.hour() <= 12 && ampm === 'pm') {
