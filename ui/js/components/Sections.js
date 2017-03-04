@@ -48,7 +48,7 @@ export default class Sections extends Component {
       } else if (section.type === 'pages') {
         contents = <PagesSection pages={section.pages} />;
       } else if (section.type === 'video') {
-        contents = <Video url={section.url} />;
+        contents = <Video url={section.url} autoplay={false} />;
       } else if (section.type === 'form') {
         contents = <FormSection formTemplateId={section.formTemplateId} />;
       } else if (section.type === 'files') {
