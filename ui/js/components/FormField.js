@@ -13,10 +13,10 @@ export default class FormField extends Component {
   }
 
   _onClick() {
-    // focus on contained input
-    const input = this._componentRef.querySelector('input, textarea');
-    if (input) {
-      input.focus();
+    // focus on contained input, of only one
+    const inputs = this._componentRef.querySelectorAll('input, textarea');
+    if (inputs.length === 1) {
+      inputs[0].focus();
     }
   }
 
