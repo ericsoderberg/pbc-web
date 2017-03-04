@@ -76,7 +76,7 @@ class MainNav extends Component {
       sessionControls = [
         <Link key="name" className="main-nav__link"
           to={`/users/${session.userId}/edit`}>{session.name}</Link>,
-        <button key="out" className="main-nav__link button"
+        <button key="out" className="main-nav__link button-plain"
           onClick={this._signOut}>
           Sign Out
         </button>,

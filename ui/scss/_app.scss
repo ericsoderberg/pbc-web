@@ -79,9 +79,16 @@
 
 .main-nav__link {
   display: block;
-  padding: $half-unit $unit;
-  text-decoration: none;
   color: $active-color;
+
+  &:not(.button-plain) {
+    padding: $half-unit $unit;
+    text-decoration: none;
+  }
+
+  &.button-plain {
+    width: 100%;
+  }
 
   &:hover {
     background-color: $control-hover-background;
