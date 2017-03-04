@@ -170,7 +170,7 @@ SelectSearch.propTypes = {
     _id: PropTypes.string,
   })),
   onChange: PropTypes.func.isRequired,
-  options: PropTypes.object.isRequired,
+  options: PropTypes.object,
   placeholder: PropTypes.string,
   Suggestion: PropTypes.func,
   value: PropTypes.oneOfType([
@@ -186,6 +186,7 @@ SelectSearch.defaultProps = {
   className: undefined,
   clearable: false,
   exclude: [],
+  options: undefined,
   placeholder: undefined,
   Suggestion: undefined,
   value: '',

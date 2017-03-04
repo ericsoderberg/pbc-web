@@ -5,7 +5,7 @@ import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
 import FormState from '../../utils/FormState';
 
-class FilesItemEdit extends Component {
+export default class FilesItemEdit extends Component {
 
   constructor(props) {
     super(props);

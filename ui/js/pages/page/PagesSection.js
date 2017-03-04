@@ -44,15 +44,20 @@ export default class PagesSection extends Component {
       classes.push(className);
     }
 
-    const links = (pages || []).map((pageRef, index) => {
+    const links = (pages || []).map((pageRef) => {
       let page;
       if (typeof pageRef.id === 'object') {
        // populated on server
         page = pageRef.id;
       } else {
         // populated via _load
-        page = this.state.pages[pageRef.id] || {};
+        page = this.state.pages[pageRef.id];
       }
+      return { pageRef, page };
+    })
+    .filter(context => context.page)
+    .map((context, index) => {
+      const { page, pageRef } = context;
       const path = page.path ? `/${page.path}` : `/pages/${page._id}`;
       const style = { transitionDelay: `${100 + (100 * index)}ms` };
       let link;

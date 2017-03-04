@@ -5,7 +5,7 @@ import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
 
-class PageItemEdit extends Component {
+export default class PageItemEdit extends Component {
 
   constructor(props) {
     super(props);
