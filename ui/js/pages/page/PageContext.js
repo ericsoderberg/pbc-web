@@ -26,7 +26,7 @@ export default class PageContext extends Component {
     const { filter } = props;
     if (filter) {
       getItems('pages', {
-        filter,
+        filter: { public: true, ...filter },
         select: 'name path',
       })
       .then((pages) => {
