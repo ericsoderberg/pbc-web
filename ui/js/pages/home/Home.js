@@ -138,7 +138,7 @@ class Home extends Component {
           const actualPage = sectionPage.id; // how the backend returns it
           const path = actualPage.path ? `/${actualPage.path}` :
             `/pages/${actualPage._id}`;
-          links.push(<Link key={path} to={path}>{page.name}</Link>);
+          links.push(<Link key={path} to={path}>{actualPage.name}</Link>);
         });
       });
 
