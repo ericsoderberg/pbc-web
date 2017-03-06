@@ -9,9 +9,10 @@ const PageItem = (props) => {
   if (align) {
     itemClassNames.push(`item--${align}`);
   }
+  const path = page.path ? `/${page.path}` : `/pages/${page._id}`;
   return (
     <Link className={classNames.join(' ')}
-      to={page.path || `/pages/${page._id}`}>
+      to={path}>
       <div className={itemClassNames.join(' ')}>
         <span className="item__name">{page.name}</span>
       </div>
