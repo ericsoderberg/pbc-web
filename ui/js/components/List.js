@@ -75,7 +75,8 @@ class List extends Component {
     const { filterNames } = this.state;
     const searchParams = [];
 
-    const searchText = options.searchText || this.state.searchText || undefined;
+    const searchText = options.searchText !== undefined ? options.searchText :
+      (this.state.searchText || undefined);
     if (searchText) {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
