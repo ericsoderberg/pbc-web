@@ -1,5 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
+import FormField from '../../components/FormField';
+import DateInput from '../../components/DateInput';
 import AddIcon from '../../icons/Add';
 import AdultEdit from './AdultEdit';
 import ChildEdit from './ChildEdit';
@@ -58,6 +60,46 @@ export default class FamilyFormContents extends Component {
             <AddIcon />
           </button>
         </div>
+
+        <div className="form__text">
+          <h2>Acknowledgements</h2>
+        </div>
+        <fieldset className="form__fields">
+          <FormField label="Media">
+            <input id="media" name="media" type="checkbox"
+              checked={family.mediaConsent || false}
+              onChange={formState.toggle('mediaConsent')} />
+            <label htmlFor="media">
+              I give my permission to publish photos of my children.
+            </label>
+          </FormField>
+          <FormField label="Dismissal">
+            <input id="dismissal" name="dismissal" type="checkbox"
+              checked={family.dismissalConsent || false}
+              onChange={formState.toggle('dismissalConsent')} />
+            <label htmlFor="dismissal">
+              I give my permission to release my children from classes
+              without me being present.
+            </label>
+          </FormField>
+          <FormField label="Liability">
+            <input id="liability" name="liability" type="checkbox"
+              checked={family.liabilityRelease || false}
+              onChange={formState.toggle('liabilityRelease')} />
+            <label htmlFor="dismissal">
+              I release liability for my children.
+            </label>
+          </FormField>
+          <FormField label="Signature"
+            help="Typing your name here is treated as your signature">
+            <input name="signature" value={family.signature || ''}
+              onChange={formState.change('signature')} />
+          </FormField>
+          <FormField label="Date">
+            <DateInput value={family.signed || ''}
+              onChange={formState.change('signed')} />
+          </FormField>
+        </fieldset>
       </div>
     );
   }

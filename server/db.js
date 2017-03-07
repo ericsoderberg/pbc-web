@@ -60,6 +60,11 @@ const familySchema = Schema({
     name: String,
     notes: String,
   }],
+  mediaConsent: Boolean,
+  dismissalConsent: Boolean,
+  liabilityRelease: Boolean,
+  signature: String,
+  signed: Date,
   created: Date,
   modified: Date,
 });

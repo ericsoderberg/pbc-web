@@ -45,7 +45,7 @@ export default class ChildEdit extends Component {
             <input name="grade" value={child.grade || ''}
               onChange={formState.change('grade')} />
           </FormField>
-          <FormField label="Notes">
+          <FormField label="Notes" help="For example: allergies, guidance.">
             <textarea name="notes" value={child.notes || ''} rows={4}
               onChange={formState.change('notes')} />
           </FormField>
