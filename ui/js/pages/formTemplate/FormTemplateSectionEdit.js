@@ -53,45 +53,64 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render() {
-    const { includeName, dependableFields } = this.props;
-    const { formState, expandedFields } = this.state;
+    const { family, includeName, dependableFields } = this.props;
+    const { detailsActive, formState, expandedFields } = this.state;
     const section = formState.object;
 
     let sectionFields;
     if (includeName) {
-      const dependsOnOptions = dependableFields
-      .filter(dependableField => (
-        dependableField.sectionId !== (section._id || section.id)
-      ))
-      .map(dependableField => (
-        <option key={dependableField.id} label={dependableField.name}
-          value={dependableField.id} />
-      ));
-      dependsOnOptions.unshift(<option key={0} />);
+      let details;
+
+      if (detailsActive) {
+        const dependsOnOptions = dependableFields
+        .filter(dependableField => (
+          dependableField.sectionId !== (section._id || section.id)
+        ))
+        .map(dependableField => (
+          <option key={dependableField.id} label={dependableField.name}
+            value={dependableField.id} />
+        ));
+        dependsOnOptions.unshift(<option key={0} />);
+
+        details = [
+          <FormField label="Depends on">
+            <select name="dependsOnId" value={section.dependsOnId || ''}
+              onChange={formState.change('dependsOnId')}>
+              {dependsOnOptions}
+            </select>
+          </FormField>,
+          <FormField>
+            <input name="administrative" type="checkbox"
+              checked={section.administrative || false}
+              onChange={formState.toggle('administrative')} />
+            <label htmlFor="administrative">administrative</label>
+          </FormField>,
+        ];
+
+        if (family) {
+          details.push(
+            <FormField>
+              <input name="child" type="checkbox"
+                checked={section.child || false}
+                onChange={formState.toggle('child')} />
+              <label htmlFor="child">per child</label>
+            </FormField>,
+          );
+        }
+      } else {
+        details = (
+          <button className="form-fields__more-control button button-plain"
+            onClick={() => this.setState({ detailsActive: true })}>details</button>
+        );
+      }
+
       sectionFields = (
         <fieldset className="form__fields">
           <FormField label="Section name">
             <input name="name" value={section.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField label="Depends on">
-            <select name="dependsOnId" value={section.dependsOnId || ''}
-              onChange={formState.change('dependsOnId')}>
-              {dependsOnOptions}
-            </select>
-          </FormField>
-          <FormField>
-            <input name="child" type="checkbox"
-              checked={section.child || false}
-              onChange={formState.toggle('child')} />
-            <label htmlFor="child">per child</label>
-          </FormField>
-          <FormField>
-            <input name="administrative" type="checkbox"
-              checked={section.administrative || false}
-              onChange={formState.toggle('administrative')} />
-            <label htmlFor="administrative">administrative</label>
-          </FormField>
+          {details}
         </fieldset>
       );
     }
@@ -121,8 +140,8 @@ export default class FormTemplateSectionEdit extends Component {
 
       return (
         <div key={field.id}>
-          <div className="form-item">
-            <button type="button" className="button-plain"
+          <div className="form-item form-item__controls">
+            <button type="button" className="button-plain form-item__control"
               onClick={this._toggleField(field._id || field.id)}>
               <h4>{field.name || field.type}</h4>
             </button>
@@ -159,6 +178,7 @@ export default class FormTemplateSectionEdit extends Component {
 
 FormTemplateSectionEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object).isRequired,
+  family: PropTypes.bool.isRequired,
   includeName: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
