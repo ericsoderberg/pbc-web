@@ -139,7 +139,7 @@ export default class FormTemplateSectionEdit extends Component {
       }
 
       return (
-        <div key={field.id}>
+        <div key={field._id || field.id}>
           <div className="form-item form-item__controls">
             <button type="button" className="button-plain form-item__control"
               onClick={this._toggleField(field._id || field.id)}>

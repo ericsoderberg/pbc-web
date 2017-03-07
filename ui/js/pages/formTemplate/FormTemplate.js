@@ -10,8 +10,10 @@ import DateInput from '../../components/DateInput';
 import Loading from '../../components/Loading';
 import PageContext from '../page/PageContext';
 
-const FIXED_FIELDS = ['created', 'modified'];
-const FiXED_LABELS = { created: 'Submitted', modified: 'Updated' };
+const FIXED_FIELDS = [
+  { name: 'created', label: 'Submitted' },
+  { name: 'modified', label: 'Updated' },
+];
 
 export default class FormTemplate extends Component {
 
@@ -22,7 +24,7 @@ export default class FormTemplate extends Component {
   }
 
   componentDidMount() {
-    this._loadFormTemplate();
+    this._load();
   }
 
   componentDidUpdate() {
@@ -39,90 +41,74 @@ export default class FormTemplate extends Component {
     }
   }
 
-  _loadFormTemplate() {
+  _load() {
     const { params: { id } } = this.props;
     getItem('form-templates', id)
     .then((formTemplate) => {
       document.title = formTemplate.name;
-      this.setState({ formTemplate: this._annotateFormTemplate(formTemplate) },
-        this._loadForm);
-    })
-    .catch(error => console.error('!!! FormTemplate template catch', error));
-  }
 
-  _loadForm() {
-    const { params: { id } } = this.props;
-    const { formTemplate } = this.state;
-    getItems('forms', {
-      filter: { formTemplateId: id }, populate: true,
-    })
-    .then((forms) => {
-      const annotatedForms = this._annotateForms(forms, formTemplate);
-      this.setState({ forms: annotatedForms, formTemplate });
-    })
-    .catch(error => console.error('!!! FormTemplate forms catch', error));
-  }
-
-  _annotateFormTemplate(formTemplate) {
-    const fieldMap = {};
-    const optionMap = {};
-    const columnFields = [];
-    formTemplate.sections.forEach((section) => {
-      section.fields.forEach((field) => {
-        fieldMap[field._id] = field;
-        field.options.forEach((option) => { optionMap[option._id] = option; });
-        if (field.type !== 'instructions') {
-          const columnField = { ...field };
-          columnField.index = columnFields.length;
-          if (field.type === 'count' || field.monetary) {
-            columnField.total = 0;
-          }
-          columnFields.push(columnField);
-        }
-      });
-    });
-    const result = { ...formTemplate };
-    result.fieldMap = fieldMap;
-    result.optionMap = optionMap;
-    result.columnFields = columnFields;
-    result.fixedFields = FIXED_FIELDS.map((name, index) => ({
-      name,
-      index: columnFields.length + index,
-    }));
-    return result;
-  }
-
-  _annotateForms(forms, formTemplate) {
-    return forms.map((form) => {
+      const columns = [];
       const fieldMap = {};
-      form.fields.forEach((field) => {
-        // hash fields for sorting
-        fieldMap[field.templateFieldId] = field;
-        // calculate totals
-        const templateField = formTemplate.fieldMap[field.templateFieldId];
-        if (templateField.total >= 0) {
-          const value = parseFloat(this._fieldValue(field, formTemplate), 10);
-          if (value) {
-            templateField.total += value;
+      const optionMap = {};
+      const totalMap = {};
+      formTemplate.sections.forEach((section) => {
+        section.fields.forEach((field) => {
+          fieldMap[field._id] = field;
+          field.options.forEach((option) => { optionMap[option._id] = option; });
+          if (field.type !== 'instructions') {
+            columns.push(field._id);
           }
-        }
+          if (field.type === 'count' || field.monetary) {
+            totalMap[field._id] = 0;
+          }
+        });
       });
 
-      return { ...form, fieldMap };
-    });
+      FIXED_FIELDS.forEach((field) => {
+        fieldMap[field.name] = field;
+        columns.push(field.name);
+      });
+
+      this.setState({ columns, formTemplate, fieldMap, optionMap });
+      return { totalMap };
+    })
+    .then((context) => {
+      const { totalMap } = context;
+      return getItems('forms', {
+        filter: { formTemplateId: id }, populate: true,
+      })
+      .then((forms) => {
+        // calculate totals
+        forms.forEach((form) => {
+          form.fields.forEach((field) => {
+            const total = totalMap[field.templateFieldId];
+            if (total >= 0) {
+              const value = parseFloat(this._fieldValue(field), 10);
+              if (value) {
+                totalMap[field.templateFieldId] += value;
+              }
+            }
+          });
+        });
+
+        this.setState({ forms, totalMap });
+      });
+    })
+    .catch(error => console.error('!!! FormTemplate catch', error));
   }
 
-  _fieldValue(field, formTemplate) {
-    const templateField = formTemplate.fieldMap[field.templateFieldId];
+  _fieldValue(field) {
+    const { fieldMap, optionMap } = this.state;
+    const templateField = fieldMap[field.templateFieldId];
     let value;
     if (templateField.type === 'count') {
       value = templateField.value * field.value;
     } else if (templateField.type === 'choice' && field.optionId) {
-      const option = formTemplate.optionMap[field.optionId];
+      const option = optionMap[field.optionId];
       value = option.value;
     } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
       value = field.optionIds.map((optionId) => {
-        const option = formTemplate.optionMap[optionId];
+        const option = optionMap[optionId];
         return option.value;
       });
       value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
@@ -132,8 +118,9 @@ export default class FormTemplate extends Component {
     return value;
   }
 
-  _fieldContents(field, formTemplate) {
-    const templateField = formTemplate.fieldMap[field.templateFieldId];
+  _fieldContents(field) {
+    const { fieldMap, optionMap } = this.state;
+    const templateField = fieldMap[field.templateFieldId];
     let contents = field.value;
     if (templateField.type === 'count') {
       let prefix;
@@ -147,53 +134,42 @@ export default class FormTemplate extends Component {
         </span>
       );
     } else if (templateField.type === 'choice' && field.optionId) {
-      const option = formTemplate.optionMap[field.optionId];
-      contents = option.name;
+      contents = optionMap[field.optionId].name;
     } else if (templateField.type === 'choices' && field.optionIds) {
-      contents = field.optionIds.map((optionId) => {
-        const option = formTemplate.optionMap[optionId];
-        return option.name;
-      }).join(', ');
+      contents = field.optionIds.map(optionId => optionMap[optionId].name)
+      .join(', ');
     } else if (templateField.monetary) {
       contents = <span><span className="secondary">$ </span>{contents}</span>;
     }
     return contents;
   }
 
+  _fieldValueFor(form, templateFieldId) {
+    let result = form[templateFieldId];
+    if (!result) {
+      form.fields.some((field) => {
+        if (field.templateFieldId === templateFieldId) {
+          result = this._fieldValue(field);
+          if (typeof form === 'string') {
+            result = result.toLowerCase();
+          }
+          return true;
+        }
+        return false;
+      });
+    }
+    return result;
+  }
+
   _sortForms(templateFieldId) {
     return () => {
-      const { forms, formTemplate, sortFieldId, sortReverse } = this.state;
+      const { forms, sortFieldId, sortReverse } = this.state;
       const nextSortReverse = (templateFieldId === sortFieldId ?
         !sortReverse : false);
-      const fixed = FIXED_FIELDS.indexOf(templateFieldId) !== -1;
 
       const nextForms = forms.sort((form1, form2) => {
-        let value1;
-        if (fixed) {
-          value1 = form1[templateFieldId];
-        } else {
-          const field1 = form1.fieldMap[templateFieldId];
-          if (field1) {
-            value1 = this._fieldValue(field1, formTemplate);
-            if (typeof value1 === 'string') {
-              value1 = value1.toLowerCase();
-            }
-          }
-        }
-
-        let value2;
-        if (fixed) {
-          value2 = form2[templateFieldId];
-        } else {
-          const field2 = form2.fieldMap[templateFieldId];
-          if (field2) {
-            value2 = this._fieldValue(field2, formTemplate);
-            if (typeof value2 === 'string') {
-              value2 = value2.toLowerCase();
-            }
-          }
-        }
-
+        const value1 = this._fieldValueFor(form1, templateFieldId);
+        const value2 = this._fieldValueFor(form2, templateFieldId);
         if (value1 && (!value2 || value1 < value2)) {
           return nextSortReverse ? 1 : -1;
         }
@@ -212,29 +188,26 @@ export default class FormTemplate extends Component {
   }
 
   _totalForms() {
-    const { filteredForms, forms, formTemplate } = this.state;
+    const { filteredForms, forms, totalMap } = this.state;
+    const nextTotalMap = { ...totalMap };
     // zero out totals
-    formTemplate.sections.forEach((section) => {
-      section.fields.forEach((templateField) => {
-        if (templateField.total >= 0) {
-          templateField.total = 0;
-        }
-      });
+    Object.keys(nextTotalMap).forEach((fieldId) => {
+      nextTotalMap[fieldId] = 0;
     });
 
     (filteredForms || forms).forEach((form) => {
       form.fields.forEach((field) => {
         // calculate totals
-        const templateField = formTemplate.fieldMap[field.templateFieldId];
-        if (templateField.total >= 0) {
-          const value = parseFloat(this._fieldValue(field, formTemplate), 10);
+        const total = nextTotalMap[field.templateFieldId];
+        if (total >= 0) {
+          const value = parseFloat(this._fieldValue(field), 10);
           if (value) {
-            templateField.total += value;
+            nextTotalMap[field.templateFieldId] += value;
           }
         }
       });
     });
-    this.setState({ formTemplate });
+    this.setState({ totalMap: nextTotalMap });
   }
 
   _filterForms() {
@@ -253,36 +226,24 @@ export default class FormTemplate extends Component {
   }
 
   _renderHeaderCells() {
-    const { formTemplate, sortFieldId, sortReverse } = this.state;
-    const cells = formTemplate.columnFields.map((field) => {
+    const { columns, fieldMap, sortFieldId, sortReverse, totalMap } = this.state;
+    const cells = columns.map((fieldId) => {
+      const field = fieldMap[fieldId];
       const classes = [];
-      if (sortFieldId === field._id) {
+      if (sortFieldId === fieldId) {
         classes.push('sort');
         if (sortReverse) {
           classes.push('sort--reverse');
         }
       }
-      if (field.total >= 0) {
+      if (totalMap[fieldId] >= 0) {
         classes.push('numeric');
       }
       return (
-        <th key={field._id} className={classes.join(' ')}
-          onClick={this._sortForms(field._id)}>
+        <th key={fieldId} className={classes.join(' ')}
+          onClick={this._sortForms(fieldId)}>
           {field.name}
         </th>
-      );
-    });
-
-    formTemplate.fixedFields.forEach((field) => {
-      let className;
-      if (sortFieldId === field.name) {
-        className = (sortReverse ? 'sort sort--reverse' : 'sort');
-      }
-      cells.push(
-        <th key={field.name} className={className}
-          onClick={this._sortForms(field.name)}>
-          {FiXED_LABELS[field.name]}
-        </th>,
       );
     });
 
@@ -290,65 +251,67 @@ export default class FormTemplate extends Component {
   }
 
   _renderFooterCells() {
-    const { formTemplate, sortFieldId } = this.state;
-    return formTemplate.columnFields.map((field) => {
-      let classes = (field.total >= 0 ? 'total' : '');
-      if (field._id === sortFieldId) {
+    const { columns, fieldMap, sortFieldId, totalMap } = this.state;
+    return columns.map((fieldId) => {
+      const field = fieldMap[fieldId];
+      const total = totalMap[fieldId];
+      let classes = (total >= 0 ? 'total' : '');
+      if (fieldId === sortFieldId) {
         classes += ' sort';
       }
-      let contents = field.total >= 0 ? field.total : '';
+      let contents = total >= 0 ? total : '';
       if (field.monetary) {
         contents = `$ ${contents}`;
       }
-      return <td key={field.index} className={classes}>{contents}</td>;
+      return <td key={fieldId} className={classes}>{contents}</td>;
     });
   }
 
   _renderCells(form) {
-    const { formTemplate, sortFieldId } = this.state;
-    const templateFieldMap = formTemplate.fieldMap;
+    const { columns, sortFieldId, totalMap } = this.state;
 
-    let cells = [];
+    const childMap = {};
+    if (form.familyId) {
+      form.familyId.children.forEach((child) => { childMap[child._id] = child; });
+    }
+
+    const cellMap = {};
     form.fields.forEach((field) => {
-      const templateField = templateFieldMap[field.templateFieldId];
+      const templateFieldId = field.templateFieldId;
 
-      let classes = (field.templateFieldId === sortFieldId ? 'sort' : '');
-      if (templateField.total >= 0) {
-        classes += ' numeric';
+      let contents = this._fieldContents(field);
+      if (field.childId) {
+        // prefix with child's name
+        const child = childMap[field.childId];
+        contents = (
+          <div key={field.childId}>
+            <span className="secondary">{child.name}</span> {contents}
+          </div>
+        );
+        if (!cellMap[templateFieldId]) {
+          cellMap[templateFieldId] = [];
+        }
+        cellMap[templateFieldId].push(contents);
+      } else {
+        cellMap[templateFieldId] = contents;
       }
-
-      const contents = this._fieldContents(field, formTemplate);
-      cells[templateField.index] = (
-        <td key={field._id} className={classes}>{contents}</td>
-      );
     });
 
-    cells = formTemplate.columnFields.map((templateField, index) => (
-      cells[index] || <td key={index}>&nbsp;</td>));
-
-    let classes = 'secondary';
-    if (sortFieldId === 'created') {
-      classes += ' sort';
-    }
     const created = moment(form.created);
-    cells.push(
-      <td key="created" className={classes}>
-        {created.format('MMM Do YYYY')}
-      </td>,
-    );
-
-    classes = 'secondary';
-    if (sortFieldId === 'modified') {
-      classes += ' sort';
-    }
+    cellMap.created = created.format('MMM Do YYYY');
     const modified = moment(form.modified);
-    let contents;
     if (!modified.isSame(created, 'day')) {
-      contents = modified.format('MMM Do YYYY');
+      cellMap.modified = modified.format('MMM Do YYYY');
     }
-    cells.push(
-      <td key="modified" className={classes}>{contents}</td>,
-    );
+
+    const cells = columns.map((templateFieldId) => {
+      let classes = (templateFieldId === sortFieldId ? 'sort' : '');
+      if (totalMap[templateFieldId] >= 0) {
+        classes += ' numeric';
+      }
+      const contents = cellMap[templateFieldId] || <span>&nbsp;</span>;
+      return <td key={templateFieldId} className={classes}>{contents}</td>;
+    });
 
     return cells;
   }

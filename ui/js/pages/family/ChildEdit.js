@@ -61,7 +61,8 @@ export default class ChildEdit extends Component {
             <h3>{child.name}</h3>
           </button>
           <div className="box--row box--static">
-            <button type="button" className="button-plain" onClick={onRemove}>
+            <button type="button" className="button-plain form-item__control"
+              onClick={onRemove}>
               remove
             </button>
           </div>

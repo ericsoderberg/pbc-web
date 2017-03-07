@@ -122,7 +122,7 @@ export default class FormTemplateFormContents extends Component {
       }
 
       return (
-        <div key={section._id} className={sectionClassName}>
+        <div key={section._id || section.id} className={sectionClassName}>
           {header}
           {edit}
         </div>

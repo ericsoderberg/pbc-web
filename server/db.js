@@ -345,7 +345,9 @@ mongoose.model('Payment', paymentSchema);
 const formSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  familyId: { type: Schema.Types.ObjectId, ref: 'Family' },
   fields: [{
+    childId: { type: Schema.Types.ObjectId }, // for family based forms
     oldId: Number,
     optionId: ObjectId, // choice, formTemplateFieldOption
     optionIds: [ObjectId], // choices, formTemplateFieldOption

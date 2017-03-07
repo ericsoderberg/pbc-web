@@ -1,6 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItem, postItem, haveSession, setSession } from '../../actions';
+import { getItem, getItems, postItem, haveSession, setSession,
+  } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
@@ -32,33 +33,56 @@ class FormAdd extends Component {
   }
 
   _load(props) {
+    const { session } = props;
     const formTemplateId =
       props.formTemplateId || props.location.query.formTemplateId;
-    const session = props.session;
     getItem('form-templates', formTemplateId)
     .then((formTemplate) => {
-      const fields = [];
+      if (formTemplate.family) {
+        // need a Family context first
+        return getItems('families', { 'adults.userId': session.userId })
+        .then((families) => {
+          if (families.length > 0) {
+            return { formTemplate, family: families[0] };
+          }
+          return { formTemplate };
+        });
+      }
+      return { formTemplate };
+    })
+    .then((context) => {
+      const { family, formTemplate } = context;
+      const form = { fields: [], formTemplateId: formTemplate._id };
+      if (family) {
+        form.familyId = family._id;
+      }
       formTemplate.sections.forEach((section) => {
         section.fields.forEach((field) => {
           if (session) {
             // pre-fill out name and email from session, if possible
             if (field.name === 'Name') {
-              fields.push({ templateFieldId: field._id, value: session.name });
+              form.fields.push({ templateFieldId: field._id, value: session.name });
             } else if (field.name === 'Email') {
-              fields.push({ templateFieldId: field._id, value: session.email });
+              form.fields.push({ templateFieldId: field._id, value: session.email });
             }
           }
           // pre-fill out fields with a minimum value
           if (field.min) {
-            fields.push({ templateFieldId: field._id, value: field.min });
+            if (section.child) {
+              family.children.forEach((child) => {
+                form.fields.push({
+                  childId: child._id,
+                  templateFieldId: field._id,
+                  value: field.min });
+              });
+            } else {
+              form.fields.push({ templateFieldId: field._id, value: field.min });
+            }
           }
         });
       });
 
-      this.setState({
-        form: { fields, formTemplateId: formTemplate._id },
-        formTemplate,
-      });
+      this.setState({ family, form, formTemplate });
     })
     .catch(error => console.error('!!! FormAdd catch', error));
   }
@@ -101,7 +125,7 @@ class FormAdd extends Component {
 
   render() {
     const { className, onCancel, full, inline } = this.props;
-    const { form, formTemplate, error } = this.state;
+    const { family, form, formTemplate, error } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -137,6 +161,7 @@ class FormAdd extends Component {
           onSubmit={this._onAdd}>
           {header}
           <FormContents form={form} formTemplate={formTemplate}
+            family={family}
             full={full} onChange={this._onChange} error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">
@@ -155,7 +180,7 @@ class FormAdd extends Component {
 
 FormAdd.propTypes = {
   className: PropTypes.string,
-  formTemplateId: PropTypes.string.isRequired,
+  formTemplateId: PropTypes.string,
   full: PropTypes.bool,
   inline: PropTypes.bool,
   location: PropTypes.shape({
@@ -164,15 +189,19 @@ FormAdd.propTypes = {
     }),
   }),
   onCancel: PropTypes.func,
-  onDone: PropTypes.func.isRequired,
+  onDone: PropTypes.func,
+  session: PropTypes.object,
 };
 
 FormAdd.defaultProps = {
   className: undefined,
+  formTemplateId: undefined,
   full: true,
   inline: false,
   location: undefined,
   onCancel: undefined,
+  onDone: undefined,
+  session: undefined,
 };
 
 FormAdd.contextTypes = {

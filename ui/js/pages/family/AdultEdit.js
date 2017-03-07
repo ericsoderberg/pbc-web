@@ -84,7 +84,8 @@ export default class AdultEdit extends Component {
     if (onRemove) {
       removeControl = (
         <div className="box--row box--static">
-          <button type="button" className="button-plain" onClick={onRemove}>
+          <button type="button" className="button-plain form-item__control"
+            onClick={onRemove}>
             remove
           </button>
         </div>

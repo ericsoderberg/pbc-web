@@ -4,10 +4,11 @@ import { getItem, putItem, deleteItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
+import Stored from '../../components/Stored';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
-export default class FormEdit extends Component {
+class FormEdit extends Component {
 
   constructor(props) {
     super(props);
@@ -25,11 +26,27 @@ export default class FormEdit extends Component {
   }
 
   componentDidMount() {
-    getItem('forms', this.props.id || this.props.params.id)
+    this._load(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.id !== this.props.id) {
+      this._load(nextProps);
+    }
+  }
+
+  _load(props) {
+    getItem('forms', props.id || props.params.id)
     .then((form) => {
       this.setState({ form });
-      return getItem('form-templates', form.formTemplateId);
+      if (form.familyId) {
+        return getItem('families', form.familyId._id)
+        .then(family => this.setState({ family }))
+        .then(() => form);
+      }
+      return form;
     })
+    .then(form => getItem('form-templates', form.formTemplateId))
     .then((formTemplate) => {
       this.setState({ formTemplate });
       document.title = formTemplate.name;
@@ -79,7 +96,7 @@ export default class FormEdit extends Component {
 
   render() {
     const { className, full, inline } = this.props;
-    const { form, formTemplate } = this.state;
+    const { family, form, formTemplate } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -110,7 +127,7 @@ export default class FormEdit extends Component {
           onSubmit={this._onUpdate}>
           {header}
           <FormContents form={form} formTemplate={formTemplate}
-            full={full} onChange={this._onChange} />
+            family={family} full={full} onChange={this._onChange} />
           <footer className="form__footer">
             <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />
@@ -137,13 +154,14 @@ FormEdit.propTypes = {
   formTemplate: PropTypes.object,
   formTemplateId: PropTypes.string,
   full: PropTypes.bool,
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
   inline: PropTypes.bool,
-  onCancel: PropTypes.func.isRequired,
-  onDone: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
+  onDone: PropTypes.func,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  // session: PropTypes.object,
 };
 
 FormEdit.defaultProps = {
@@ -151,9 +169,19 @@ FormEdit.defaultProps = {
   formTemplate: undefined,
   formTemplateId: undefined,
   full: true,
+  id: undefined,
   inline: false,
+  onCancel: undefined,
+  onDone: undefined,
+  // session: undefined,
 };
 
 FormEdit.contextTypes = {
   router: PropTypes.any,
 };
+
+const select = state => ({
+  session: state.session,
+});
+
+export default Stored(FormEdit, select);

@@ -89,5 +89,5 @@ export function useOrCreateSession(session, email, name) {
       return newSession.save();
     });
   }
-  return session;
+  return Promise.resolve(session);
 }

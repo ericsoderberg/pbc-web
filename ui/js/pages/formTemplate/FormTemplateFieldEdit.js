@@ -15,12 +15,23 @@ export default class FormTemplateFieldEdit extends Component {
   constructor(props) {
     super(props);
     const { field, onChange } = props;
-    this.state = { formState: new FormState(field, onChange) };
+    this.state = {
+      formState: new FormState(field, onChange),
+      newOptionId: 1,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       formState: new FormState(nextProps.field, nextProps.onChange),
+    });
+  }
+
+  _addOption() {
+    return this.state.formState.addTo('options', () => {
+      const id = this.state.newOptionId;
+      this.setState({ newOptionId: this.state.newOptionId + 1 });
+      return { id };
     });
   }
 
@@ -141,10 +152,10 @@ export default class FormTemplateFieldEdit extends Component {
           onClick={formState.swapWith('options', index, index + 1)}>
           <DownIcon />
         </button>
-        ));
+      ));
 
       return (
-        <div key={option._id}>
+        <div key={option._id || option.id}>
           <div className="form-item">
             <legend>{`Option ${index + 1}`}</legend>
             <div className="box--row">
@@ -168,7 +179,7 @@ export default class FormTemplateFieldEdit extends Component {
         <fieldset className="form__fields">
           <FormFieldAdd>
             <Button label="Add option" secondary={true}
-              onClick={formState.addTo('options')} />
+              onClick={this._addOption()} />
           </FormFieldAdd>
         </fieldset>
       );
@@ -179,7 +190,8 @@ export default class FormTemplateFieldEdit extends Component {
       dependableField.id !== (field._id || field.id)
     ))
     .map(dependableField => (
-      <option key={dependableField.id} label={dependableField.name}
+      <option key={dependableField._id || dependableField.id}
+        label={dependableField.name}
         value={dependableField.id} />
     ));
     dependsOnOptions.unshift(<option key={0} />);

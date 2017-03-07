@@ -52,11 +52,12 @@ class FormContents extends Component {
     return { administrator, fieldsSet };
   }
 
-  _fieldIndex(id) {
+  _fieldIndex(templateFieldId, childId) {
     const { form: { fields } } = this.props;
     let result = -1;
     fields.some((field, index) => {
-      if (field.templateFieldId === id) {
+      if (field.templateFieldId === templateFieldId &&
+        (!field.childId || field.childId === childId)) {
         result = index;
         return true;
       }
@@ -65,13 +66,16 @@ class FormContents extends Component {
     return result;
   }
 
-  _change(templateFieldId) {
+  _change(templateFieldId, childId) {
     return (event) => {
       const value = event.target.value;
       const nextField = { templateFieldId, value };
+      if (childId) {
+        nextField.childId = childId;
+      }
       const form = { ...this.props.form };
       const fields = form.fields.slice(0);
-      const index = this._fieldIndex(templateFieldId);
+      const index = this._fieldIndex(templateFieldId, childId);
       if (index === -1) {
         fields.push(nextField);
       } else {
@@ -82,12 +86,15 @@ class FormContents extends Component {
     };
   }
 
-  _setOption(templateFieldId, optionId) {
+  _setOption(templateFieldId, childId, optionId) {
     return () => {
       const nextField = { templateFieldId, optionId };
+      if (childId) {
+        nextField.childId = childId;
+      }
       const form = { ...this.props.form };
       const fields = form.fields.slice(0);
-      const index = this._fieldIndex(templateFieldId);
+      const index = this._fieldIndex(templateFieldId, childId);
       if (index === -1) {
         fields.push(nextField);
       } else {
@@ -98,13 +105,17 @@ class FormContents extends Component {
     };
   }
 
-  _toggleOption(templateFieldId, optionId) {
+  _toggleOption(templateFieldId, childId, optionId) {
     return () => {
       const form = { ...this.props.form };
       const fields = form.fields.slice(0);
-      const index = this._fieldIndex(templateFieldId);
+      const index = this._fieldIndex(templateFieldId, childId);
       if (index === -1) {
-        fields.push({ templateFieldId, optionIds: [optionId] });
+        const nextField = { templateFieldId, optionIds: [optionId] };
+        if (childId) {
+          nextField.childId = childId;
+        }
+        fields.push(nextField);
       } else {
         const optionIds = fields[index].optionIds.slice(0);
         const optionIndex = optionIds.indexOf(optionId);
@@ -113,7 +124,11 @@ class FormContents extends Component {
         } else {
           optionIds.splice(optionIndex, 1);
         }
-        fields[index] = { templateFieldId, optionIds };
+        const field = { templateFieldId, optionIds };
+        if (childId) {
+          field.childId = childId;
+        }
+        fields[index] = field;
       }
       form.fields = fields;
       this.props.onChange(form);
@@ -141,18 +156,18 @@ class FormContents extends Component {
     return label;
   }
 
-  _renderFormField(templateField, index) {
+  _renderFormField(templateField, childId) {
     const { form: { fields } } = this.props;
     const error = this.props.error || {};
-    const fieldIndex = this._fieldIndex(templateField._id);
+    const fieldIndex = this._fieldIndex(templateField._id, childId);
     const field = fields[fieldIndex] || {};
+    const name = `${templateField.name}${childId ? `-${childId}` : ''}`;
 
     let contents;
     if (templateField.type === 'line') {
       contents = (
-        <input name={templateField.name} type="text"
-          value={field.value || ''}
-          onChange={this._change(templateField._id)} />
+        <input name={name} type="text" value={field.value || ''}
+          onChange={this._change(templateField._id, childId)} />
       );
       if (templateField.monetary) {
         let amount;
@@ -173,42 +188,40 @@ class FormContents extends Component {
       }
     } else if (templateField.type === 'lines') {
       contents = (
-        <textarea name={templateField.name} value={field.value || ''}
-          onChange={this._change(templateField._id)} />
+        <textarea name={name} value={field.value || ''}
+          onChange={this._change(templateField._id, childId)} />
       );
     } else if (templateField.type === 'choice') {
-      contents = (templateField.options || []).map((option, index) => {
+      contents = (templateField.options || []).map((option) => {
         const checked = (field.optionId === option._id);
         const label = this._renderOptionLabel(templateField, option, checked);
         return (
-          <div key={option._id} className="form__field-option">
-            <input name={templateField.name} type="radio"
-              checked={checked}
-              onChange={this._setOption(templateField._id, option._id)} />
+          <div key={option._id || option.id} className="form__field-option">
+            <input name={name} type="radio" checked={checked}
+              onChange={this._setOption(templateField._id, childId, option._id)} />
             <label htmlFor={templateField.name}>{label}</label>
           </div>
         );
       });
     } else if (templateField.type === 'choices') {
       const optionIds = field.optionIds || [];
-      contents = (templateField.options || []).map((option, index) => {
+      contents = (templateField.options || []).map((option) => {
         const checked = (optionIds.indexOf(option._id) !== -1);
         const label = this._renderOptionLabel(templateField, option, checked);
         return (
-          <div key={option._id} className="form__field-option">
-            <input name={templateField.name} type="checkbox"
-              checked={checked}
-              onChange={this._toggleOption(templateField._id, option._id)} />
+          <div key={option._id || option.id} className="form__field-option">
+            <input name={name} type="checkbox" checked={checked}
+              onChange={this._toggleOption(templateField._id, childId, option._id)} />
             <label htmlFor={templateField.name}>{label}</label>
           </div>
         );
       });
     } else if (templateField.type === 'count') {
       contents = (
-        <input name={templateField.name} type="number"
+        <input name={name} type="number"
           min={templateField.min || 0} max={templateField.max}
           value={field.value || templateField.min || 0}
-          onChange={this._change(templateField._id)} />
+          onChange={this._change(templateField._id, childId)} />
       );
       if (templateField.value) {
         const prefix =
@@ -234,29 +247,51 @@ class FormContents extends Component {
     }
 
     return (
-      <FormField key={index} label={templateField.name}
+      <FormField key={name} label={templateField.name}
         help={templateField.help} error={error[templateField._id]}>
         {contents}
       </FormField>
     );
   }
 
-  _renderTemplateField(templateField, index) {
+  _renderTemplateField(templateField, childId) {
     let result;
     if (templateField.type === 'instructions') {
       result = (
-        <div key={index} className="form__text">
+        <div key={templateField._id} className="form__text">
           <Markdown>{templateField.help}</Markdown>
         </div>
       );
     } else {
-      result = this._renderFormField(templateField, index);
+      result = this._renderFormField(templateField, childId);
     }
     return result;
   }
 
-  _renderTemplateSection(templateSection, index) {
+  _renderTemplateSection(templateSection) {
+    const { family } = this.props;
     const { fieldsSet } = this.state;
+
+    const sectionFields = (templateSection.fields || [])
+    .filter(templateField => (
+      !templateField.dependsOnId || fieldsSet[templateField.dependsOnId]
+    ));
+
+    if (family && templateSection.child) {
+      return family.children.map((child) => {
+        const fields = sectionFields.map(sectionField =>
+          this._renderTemplateField(sectionField, child._id));
+        return (
+          <fieldset key={child.name} className="form__fields">
+            <div className="form__text">
+              <h2>{child.name}</h2>
+            </div>
+            {fields}
+          </fieldset>
+        );
+      });
+    }
+
     let name;
     if (templateSection.name) {
       name = (
@@ -265,13 +300,13 @@ class FormContents extends Component {
         </div>
       );
     }
-    const fields = (templateSection.fields || [])
-    .filter(templateField => (
-      !templateField.dependsOnId || fieldsSet[templateField.dependsOnId]
-    ))
-    .map(this._renderTemplateField);
+
+    const fields = sectionFields.map(sectionField =>
+      this._renderTemplateField(sectionField));
+
     return (
-      <fieldset key={index} className="form__fields">
+      <fieldset key={templateSection._id || templateSection.id}
+        className="form__fields">
         {name}
         {fields}
       </fieldset>
@@ -361,6 +396,7 @@ class FormContents extends Component {
 
 FormContents.propTypes = {
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  family: PropTypes.object,
   form: PropTypes.shape({
     fields: PropTypes.arrayOf(PropTypes.object).isRequired,
   }).isRequired,
@@ -378,6 +414,7 @@ FormContents.propTypes = {
 
 FormContents.defaultProps = {
   error: undefined,
+  family: undefined,
 };
 
 const select = state => ({
