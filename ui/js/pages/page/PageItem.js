@@ -9,7 +9,12 @@ const PageItem = (props) => {
   if (align) {
     itemClassNames.push(`item--${align}`);
   }
-  const path = page.path ? `/${page.path}` : `/pages/${page._id}`;
+  let path;
+  if (page.path && page.path[0] !== '/') {
+    path = `/${page.path}`;
+  } else {
+    path = `/pages/${page._id}`;
+  }
   return (
     <Link className={classNames.join(' ')}
       to={path}>
