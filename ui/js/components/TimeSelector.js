@@ -33,9 +33,9 @@ export default class TimeSelector extends Component {
       event.preventDefault();
       const { value } = this.props;
       const time = moment(value);
-      if (time.hour() <= 12 && ampm === 'pm') {
+      if (time.hour() < 12 && ampm === 'pm') {
         time.hour(time.hour() + 12);
-      } else if (time.hour() > 12 && ampm === 'am') {
+      } else if (time.hour() >= 12 && ampm === 'am') {
         time.hour(time.hour() - 12);
       }
       this.props.onChange(time);
@@ -75,7 +75,7 @@ export default class TimeSelector extends Component {
       );
     }
 
-    const selectedAmPm = (value.hour() > 12 ? 'pm' : 'am');
+    const selectedAmPm = (value.hour() >= 12 ? 'pm' : 'am');
     const ampms = ['am', 'pm'].map((ampm) => {
       const classes = ['time-selector__ampm'];
       if (selectedAmPm === ampm) {

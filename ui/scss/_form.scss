@@ -508,6 +508,7 @@
   height: $unit * 1.5;
   width: $unit * 1.5;
   border-radius: $unit * 0.75;
+  border: 2px solid $background-color;
   cursor: pointer;
   padding: $unit * 0.375;
   transition: background-color 0.3s;
