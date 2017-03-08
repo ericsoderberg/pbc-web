@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize } from './auth';
+import { authorize, authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetCalendarIfNeeded } from './calendars';
 import register from './register';
@@ -196,6 +196,9 @@ export default function (router) {
   register(router, {
     category: 'events',
     modelName: 'Event',
+    index: {
+      authorize: authorizedForDomain,
+    },
     get: {
       populate: [
         { path: 'primaryEventId', select: 'name path' },
