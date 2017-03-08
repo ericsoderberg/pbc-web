@@ -36,6 +36,7 @@ class Event extends Component {
 
     let actions;
     let contents;
+    let context;
     if (event) {
       contents = <EventContents item={event} />;
       const calendar = event.calendarId || {};
@@ -46,6 +47,21 @@ class Event extends Component {
       actions = [
         <Link key="calendar" to={path}>Calendar</Link>,
       ];
+
+      let filter;
+      if (calendar._id) {
+        filter = { $or: [
+          { 'sections.eventId': event._id },
+          { 'sections.calendarId': event.calendarId._id },
+        ] };
+      } else {
+        filter = { 'sections.eventId': event._id };
+      }
+
+      context = (
+        <PageContext align="center"
+          filter={filter} />
+      );
     } else {
       contents = <Loading />;
     }
@@ -54,8 +70,7 @@ class Event extends Component {
       <main>
         <ItemHeader category="events" item={event} actions={actions} />
         {contents}
-        <PageContext align="center"
-          filter={event ? { 'sections.eventId': event._id } : undefined} />
+        {context}
       </main>
     );
   }

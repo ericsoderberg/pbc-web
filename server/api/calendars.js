@@ -80,9 +80,9 @@ export default function (router) {
         !(session.administrator || session.administratorDomainId)) {
         query.find({ public: true });
       } else if (!session.administrator) {
-        query.find({ $or: [{
-          public: true, domainId: session.administratorDomainId,
-        }] });
+        query.find({ $or: [
+          { public: true }, { domainId: session.administratorDomainId },
+        ] });
       }
 
       return query.sort('start').exec()
