@@ -1,6 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 
+// e.g. https://vimeo.com/205930454
 const VIMEO_REGEXP = /vimeo\.com\/(\d+)/;
+// e.g. https://vimeo.com/album/4142534
+const VIMEO_ALBUM_REGEXP = /vimeo\.com\/album\/(\d+)/;
 const YOUTUBE_REGEXP = /youtube\.com\/(\w+)|youtu\.be\/(\w+)/;
 
 export default class Video extends Component {
@@ -10,8 +13,18 @@ export default class Video extends Component {
 
     let contents = <span>Unknown type</span>;
     if (url) {
-      // TOOD: Handle YouTube vs. Vimeo
-      let match = url.match(VIMEO_REGEXP);
+      let match = url.match(VIMEO_ALBUM_REGEXP);
+      if (match) {
+        const src = `${window.location.protocol}//player.vimeo.com/hubnut/album/` +
+          `${match[1]}?title=0&byline=0&portrait=0`;
+        contents = (
+          <iframe src={src}
+            width="960" height="540" frameBorder="0"
+            webkitAllowFullScreen={true}
+            mozallowfullscreen={true} allowFullScreen={true} />
+        );
+      }
+      match = url.match(VIMEO_REGEXP);
       if (match) {
         let src = `${window.location.protocol}//player.vimeo.com/video/` +
           `${match[1]}?title=0&byline=0&portrait=0`;
