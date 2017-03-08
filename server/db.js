@@ -179,6 +179,7 @@ const pageSchema = Schema({
 // pageSections.discriminator('pages', Schema(pagesSectionDef, { _id: false }));
 // pageSections.discriminator('files', Schema(filesSectionDef, { _id: false }));
 
+pageSchema.index({ name: 1 });
 pageSchema.index({ name: 'text', 'sections.text': 'text' },
   { weights: { name: 5, 'sections.text': 1 } });
 
