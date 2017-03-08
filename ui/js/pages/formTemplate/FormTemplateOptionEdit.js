@@ -32,6 +32,10 @@ export default class FormTemplateOptionEdit extends Component {
             <input name="value" value={option.value || ''}
               onChange={formState.change('value')} />
           </FormField>
+          <FormField label="Help">
+            <textarea name="help" value={option.help || ''} rows={1}
+              onChange={formState.change('help')} />
+          </FormField>
         </fieldset>
       </div>
     );

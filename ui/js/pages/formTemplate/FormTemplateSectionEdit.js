@@ -9,8 +9,10 @@ import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateFieldEdit from './FormTemplateFieldEdit';
 
-const FIELD_TYPES = ['line', 'lines', 'choice', 'choices', 'count',
-  'instructions'];
+const FIELD_TYPES = [
+  'line', 'lines', 'choice', 'choices', 'number',
+  'date', 'instructions',
+];
 
 export default class FormTemplateSectionEdit extends Component {
 
@@ -53,7 +55,7 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render() {
-    const { family, includeName, dependableFields } = this.props;
+    const { family, includeName, dependableFields, dependsOnFormTemplate } = this.props;
     const { detailsActive, formState, expandedFields } = this.state;
     const section = formState.object;
 
@@ -134,6 +136,7 @@ export default class FormTemplateSectionEdit extends Component {
         edit = (
           <FormTemplateFieldEdit field={field} index={index}
             dependableFields={dependableFields}
+            dependsOnFormTemplate={dependsOnFormTemplate}
             onChange={formState.changeAt('fields', index)} />
         );
       }
@@ -178,8 +181,14 @@ export default class FormTemplateSectionEdit extends Component {
 
 FormTemplateSectionEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object).isRequired,
-  family: PropTypes.bool.isRequired,
+  dependsOnFormTemplate: PropTypes.object,
+  family: PropTypes.bool,
   includeName: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
+};
+
+FormTemplateSectionEdit.defaultProps = {
+  dependsOnFormTemplate: undefined,
+  family: undefined,
 };

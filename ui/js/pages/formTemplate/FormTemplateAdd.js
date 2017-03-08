@@ -9,11 +9,13 @@ FormTemplateAdd.defaultProps = {
   ...Add.defaultProps,
   category: 'form-templates',
   default: { sections: [
-    { fields: [
-      { id: 1, type: 'instructions', help: '# Title' },
-      { id: 2, type: 'line', name: 'Name' },
-      { id: 3, type: 'line', name: 'Email' },
-    ] },
+    { id: 1000,
+      fields: [
+        { id: 1000, type: 'instructions', help: '# Title' },
+        { id: 1001, type: 'line', name: 'Name' },
+        { id: 1002, type: 'line', name: 'Email' },
+      ],
+    },
   ] },
   FormContents: FormTemplateFormContents,
   Preview: FormPreview,

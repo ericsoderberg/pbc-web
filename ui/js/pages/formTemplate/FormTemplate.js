@@ -58,7 +58,8 @@ export default class FormTemplate extends Component {
           if (field.type !== 'instructions') {
             columns.push(field._id);
           }
-          if (field.type === 'count' || field.monetary) {
+          if (field.type === 'count' || field.type === 'number' ||
+          field.monetary) {
             totalMap[field._id] = 0;
           }
         });
@@ -101,7 +102,7 @@ export default class FormTemplate extends Component {
     const { fieldMap, optionMap } = this.state;
     const templateField = fieldMap[field.templateFieldId];
     let value;
-    if (templateField.type === 'count') {
+    if (templateField.type === 'count' || templateField.type === 'number') {
       value = templateField.value * field.value;
     } else if (templateField.type === 'choice' && field.optionId) {
       const option = optionMap[field.optionId];
@@ -122,7 +123,7 @@ export default class FormTemplate extends Component {
     const { fieldMap, optionMap } = this.state;
     const templateField = fieldMap[field.templateFieldId];
     let contents = field.value;
-    if (templateField.type === 'count') {
+    if (templateField.type === 'count' || templateField.type === 'number') {
       let prefix;
       if (templateField.monetary) {
         prefix = '$ ';

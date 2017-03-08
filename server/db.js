@@ -271,6 +271,7 @@ mongoose.model('Resource', resourceSchema);
 
 const formTemplateOptionSchema = Schema({
   disabled: Boolean,
+  help: String,
   limit: Number,
   name: String,
   oldId: Number,
@@ -282,6 +283,7 @@ const formTemplateFieldSchema = Schema({
   discount: Boolean, // negates form field value
   help: String,
   limit: Number,
+  linkedToId: ObjectId, // for depends
   max: Number, // for count
   min: Number, // for count
   monetary: Boolean,
@@ -291,7 +293,10 @@ const formTemplateFieldSchema = Schema({
   required: Boolean,
   type: {
     type: String,
-    enum: ['line', 'lines', 'choice', 'choices', 'count', 'instructions'],
+    enum: [
+      'line', 'lines', 'choice', 'choices', 'count', 'instructions',
+      'date', 'number',
+    ],
     required: true,
   },
   value: String, // for monetary + type='count'
@@ -310,8 +315,9 @@ const formTemplateSchema = Schema({
   acknowledge: Boolean,
   authenticate: Boolean,
   created: Date,
+  dependsOnId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  family: Boolean,
+  family: Boolean, // REMOVE
   modified: Date,
   name: { type: String, required: true, unique: true },
   notify: String,
@@ -349,7 +355,7 @@ const formSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   familyId: { type: Schema.Types.ObjectId, ref: 'Family' },
   fields: [{
-    childId: { type: Schema.Types.ObjectId }, // for family based forms
+    childId: { type: Schema.Types.ObjectId }, // for family based forms, REMOVE
     oldId: Number,
     optionId: ObjectId, // choice, formTemplateFieldOption
     optionIds: [ObjectId], // choices, formTemplateFieldOption

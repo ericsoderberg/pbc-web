@@ -16,6 +16,7 @@ export default class SelectSearch extends Component {
     this._onDeactivate = this._onDeactivate.bind(this);
     this._onToggle = this._onToggle.bind(this);
     this._onSearch = this._onSearch.bind(this);
+    this._onClear = this._onClear.bind(this);
 
     this.state = { active: props.active, searchText: '' };
   }

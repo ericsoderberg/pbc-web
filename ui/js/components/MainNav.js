@@ -21,7 +21,7 @@ const DOMAIN_ADMIN_ROUTES = [
 
 const ADMIN_ROUTES = [
   { label: 'People', path: '/users' },
-  { label: 'Families', path: '/families' },
+  // { label: 'Families', path: '/families' },
   { label: 'Resources', path: '/resources' },
   { label: 'Domains', path: '/domains' },
   { label: 'Calendars', path: '/calendars' },

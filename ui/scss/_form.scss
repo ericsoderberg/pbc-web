@@ -194,6 +194,10 @@
       max-width: 400px;
       margin: $half-unit;
       vertical-align: top;
+
+      &.form-option-label {
+        display: flex;
+      }
     }
   }
 
@@ -242,6 +246,11 @@
 
 .form-field__label {
   margin-right: $half-unit;
+}
+
+.form-field__help {
+  position: relative;
+  text-align: right;
 }
 
 .form-field__error {
@@ -304,6 +313,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
 
     span {
       flex: 1 1;
@@ -978,7 +988,8 @@
   }
 }
 
-.text-help {
+.text-help,
+.form-field__help {
   position: relative;
 
   button {
@@ -992,11 +1003,13 @@
   }
 }
 
-.text-help__drop {
+.text-help__drop,
+.form-field__help-drop {
   display: none;
   position: absolute;
   bottom: $unit;
   right: -$half-unit;
+  max-width: $form-width;
   margin: 0;
   text-align: left;
   padding: $half-unit;
@@ -1013,5 +1026,13 @@
 .text-help--active {
   .text-help__drop {
     display: block;
+  }
+}
+
+.form-field__help--active {
+  .form-field__help-drop {
+    display: block;
+    width: $form-width;
+    text-align: left;
   }
 }

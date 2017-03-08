@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Markdown from 'markdown-to-jsx';
 
 export default class FormField extends Component {
 
@@ -41,8 +42,9 @@ export default class FormField extends Component {
   }
 
   render() {
+    const { dragging, helpActive } = this.state;
     const classNames = ['form-field'];
-    if (this.state.dragging) {
+    if (dragging) {
       classNames.push('form-field--dragging');
     }
 
@@ -57,7 +59,25 @@ export default class FormField extends Component {
 
     let help;
     if (this.props.help) {
-      help = <span className="form-field__help">{this.props.help}</span>;
+      if (this.props.help.length > 30) {
+        const helpClassNames = ['form-field__help'];
+        if (helpActive) {
+          helpClassNames.push('form-field__help--active');
+        }
+        help = (
+          <span className={helpClassNames.join(' ')}>
+            <button className="button-plain" type="button"
+              onClick={() => this.setState({ helpActive: !helpActive })}>
+              what?
+            </button>
+            <div className="form-field__help-drop">
+              <Markdown>{this.props.help}</Markdown>
+            </div>
+          </span>
+        );
+      } else {
+        help = <span className="form-field__help">{this.props.help}</span>;
+      }
     }
 
     let error;

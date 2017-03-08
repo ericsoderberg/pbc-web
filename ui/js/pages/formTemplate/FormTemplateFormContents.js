@@ -1,8 +1,9 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { getItems, getItem } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
+import SelectSearch from '../../components/SelectSearch';
 import Button from '../../components/Button';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
@@ -13,6 +14,7 @@ export default class FormTemplateFormContents extends Component {
 
   constructor() {
     super();
+    this._changeDependsOnId = this._changeDependsOnId.bind(this);
     this.state = {
       domains: [],
       expandedSections: {}, // _id or id
@@ -28,6 +30,28 @@ export default class FormTemplateFormContents extends Component {
       .catch(error => console.error('FormTemplateFormContents catch', error));
     } else if (session.administratorDomainId) {
       formState.change('domainId')(session.administratorDomainId);
+    }
+    this._loadDependency(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { formState: { object: { dependsOnId } } } = this.props;
+    const { formState: { object: { dependsOnId: nextDependsOnId } } } = nextProps;
+    if (nextDependsOnId !== dependsOnId) {
+      this._loadDependency(nextProps);
+    }
+  }
+
+  _loadDependency(props) {
+    const { formState: { object: formTemplate } } = props;
+    if (formTemplate.dependsOnId) {
+      // load dependent form to get fields we might link to
+      getItem('form-templates', formTemplate.dependsOnId._id)
+      .then(dependsOnFormTemplate => this.setState({ dependsOnFormTemplate }))
+      .catch(error => console.error(
+        'FormTemplateFormContents dependsOnFormTemplate catch', error));
+    } else {
+      this.setState({ dependsOnFormTemplate: undefined });
     }
   }
 
@@ -52,9 +76,16 @@ export default class FormTemplateFormContents extends Component {
     };
   }
 
+  _changeDependsOnId(suggestion) {
+    const { formState } = this.props;
+    const value = suggestion ?
+      { _id: suggestion._id, name: suggestion.name } : undefined;
+    formState.set('dependsOnId', value);
+  }
+
   render() {
-    const { className, formState, session } = this.props;
-    const { expandedSections, detailsActive } = this.state;
+    const { className, errors, formState, session } = this.props;
+    const { expandedSections, detailsActive, dependsOnFormTemplate } = this.state;
     const formTemplate = formState.object;
 
     // build field id/name list for dependencies
@@ -116,6 +147,7 @@ export default class FormTemplateFormContents extends Component {
           <FormTemplateSectionEdit section={section}
             family={formTemplate.family}
             dependableFields={dependableFields}
+            dependsOnFormTemplate={dependsOnFormTemplate}
             includeName={formTemplate.sections.length > 1}
             onChange={formState.changeAt('sections', index)} />
         );
@@ -132,35 +164,31 @@ export default class FormTemplateFormContents extends Component {
     let details;
     if (detailsActive) {
       details = [
-        <FormField key="submit" label="Submit button label">
+        <FormField key="submit" label="Submit button label"
+          error={errors.submitLabel}>
           <input name="submitLabel"
             value={formTemplate.submitLabel || 'Submit'}
             onChange={formState.change('submitLabel')} />
         </FormField>,
-        <FormField key="message" label="Post submit message">
+        <FormField key="message" label="Post submit message"
+          error={errors.postSubmitMessage}>
           <textarea name="postSubmitMessage" rows={2}
             value={formTemplate.postSubmitMessage || ''}
             onChange={formState.change('postSubmitMessage')} />
         </FormField>,
-        <FormField key="ack">
+        <FormField key="ack" error={errors.acknowledge}>
           <input name="acknowledge" type="checkbox"
             checked={formTemplate.acknowledge || false}
             onChange={formState.toggle('acknowledge')} />
           <label htmlFor="acknowledge">acknowledge via email</label>
         </FormField>,
-        <FormField key="auth">
+        <FormField key="auth" error={errors.authenticate}>
           <input name="authenticate" type="checkbox"
             checked={formTemplate.authenticate || false}
             onChange={formState.toggle('authenticate')} />
           <label htmlFor="authenticate">authenticate</label>
         </FormField>,
-        <FormField key="family">
-          <input name="family" type="checkbox"
-            checked={formTemplate.family || false}
-            onChange={formState.toggle('family')} />
-          <label htmlFor="family">family</label>
-        </FormField>,
-        <FormField key="pay">
+        <FormField key="pay" error={errors.payable}>
           <input name="payable" type="checkbox"
             checked={formTemplate.payable || false}
             onChange={formState.toggle('payable')} />
@@ -171,7 +199,8 @@ export default class FormTemplateFormContents extends Component {
       if (formTemplate.payable) {
         details.push(
           <FormField key="check" label="Check instructions"
-            help="Leave blank to not allow checks">
+            help="Leave blank to not allow checks"
+            error={errors.payByCheckInstructions}>
             <textarea name="payByCheckInstructions"
               value={formTemplate.payByCheckInstructions || ''}
               onChange={formState.change('payByCheckInstructions')} />
@@ -180,7 +209,14 @@ export default class FormTemplateFormContents extends Component {
       }
 
       details.push(
-        <FormField key="notify" label="Notify email addresses">
+        <FormField key="depends" label="Depends on" error={errors.dependsOnId}>
+          <SelectSearch category="form-templates" clearable={true}
+            value={(formTemplate.dependsOnId || {}).name || ''}
+            onChange={this._changeDependsOnId} />
+        </FormField>,
+        <FormField key="notify" label="Notify email addresses"
+          help="Whom to notify when people submit filled out forms."
+          error={errors.notify}>
           <input name="notify"
             value={formTemplate.notify || ''}
             onChange={formState.change('notify')} />
@@ -193,7 +229,7 @@ export default class FormTemplateFormContents extends Component {
         ));
         domains.unshift(<option key={0} />);
         details.push(
-          <FormField key="admin" label="Administered by">
+          <FormField key="admin" label="Administered by" error={errors.domainId}>
             <select name="domainId" value={formTemplate.domainId || ''}
               onChange={formState.change('domainId')}>
               {domains}
@@ -211,7 +247,7 @@ export default class FormTemplateFormContents extends Component {
     return (
       <div className={className}>
         <fieldset className="form__fields">
-          <FormField label="Form name">
+          <FormField label="Form name" error={errors.name}>
             <input name="name" value={formTemplate.name || ''}
               onChange={formState.change('name')} />
           </FormField>
@@ -231,10 +267,12 @@ export default class FormTemplateFormContents extends Component {
 
 FormTemplateFormContents.propTypes = {
   className: PropTypes.string,
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 FormTemplateFormContents.defaultProps = {
   className: undefined,
+  errors: undefined,
 };

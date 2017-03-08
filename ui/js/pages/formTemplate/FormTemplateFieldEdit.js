@@ -36,7 +36,7 @@ export default class FormTemplateFieldEdit extends Component {
   }
 
   render() {
-    const { dependableFields } = this.props;
+    const { dependableFields, dependsOnFormTemplate } = this.props;
     const { formState } = this.state;
     const field = formState.object;
 
@@ -51,7 +51,8 @@ export default class FormTemplateFieldEdit extends Component {
     let min;
 
     if (field.type === 'line' || field.type === 'choice' ||
-      field.type === 'choices' || field.type === 'count') {
+      field.type === 'choices' || field.type === 'count' ||
+      field.type === 'number') {
       monetary = (
         <FormField>
           <input name="monetary" type="checkbox"
@@ -62,7 +63,7 @@ export default class FormTemplateFieldEdit extends Component {
       );
     }
 
-    if (field.type === 'count') {
+    if (field.type === 'count' || field.type === 'number') {
       let prefix;
       if (field.monetary) {
         prefix = <span className="prefix">$</span>;
@@ -97,7 +98,7 @@ export default class FormTemplateFieldEdit extends Component {
       );
     }
 
-    if (field.type === 'line' && field.monetary) {
+    if ((field.type === 'line' || field.type === 'number') && field.monetary) {
       discount = (
         <FormField>
           <input name="discount" type="checkbox"
@@ -125,7 +126,7 @@ export default class FormTemplateFieldEdit extends Component {
 
       help = (
         <FormField label="Help">
-          <input name="help" value={field.help || ''}
+          <textarea name="help" value={field.help || ''} rows={1}
             onChange={formState.change('help')} />
         </FormField>
       );
@@ -204,6 +205,30 @@ export default class FormTemplateFieldEdit extends Component {
       </FormField>
     );
 
+    let linkedTo;
+    if (dependsOnFormTemplate) {
+      const linkedToOptions = [];
+      dependsOnFormTemplate.sections.forEach(section2 =>
+        section2.fields.forEach((field2) => {
+          if (field2.type === field.type) {
+            linkedToOptions.push(
+              <option key={field2._id}
+                label={`${section2.name} ${field2.name}`} value={field2._id} />,
+            );
+          }
+        }),
+      );
+      linkedToOptions.unshift(<option key={0} />);
+      linkedTo = (
+        <FormField label="Linked to">
+          <select name="linkedToId" value={field.linkedToId || ''}
+            onChange={formState.change('linkedToId')}>
+            {linkedToOptions}
+          </select>
+        </FormField>
+      );
+    }
+
     return (
       <div>
         <fieldset className="form__fields">
@@ -217,6 +242,7 @@ export default class FormTemplateFieldEdit extends Component {
           {monetary}
           {discount}
           {dependsOn}
+          {linkedTo}
         </fieldset>
         {options}
         {addOptionControl}
@@ -227,10 +253,12 @@ export default class FormTemplateFieldEdit extends Component {
 
 FormTemplateFieldEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object),
+  dependsOnFormTemplate: PropTypes.object,
   field: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
 FormTemplateFieldEdit.defaultProps = {
   dependableFields: [],
+  dependsOnFormTemplate: undefined,
 };

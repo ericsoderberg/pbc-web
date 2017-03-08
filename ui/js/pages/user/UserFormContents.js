@@ -163,12 +163,12 @@ export default class UserFormContents extends Component {
       `userId=${encodeURIComponent(user._id)}` +
       `&userId-name=${encodeURIComponent(user.name)}`;
 
-    let family;
-    if (user.familyId) {
-      family = <Link to={`/families/${user.familyId}/edit`}>Family</Link>;
-    } else {
-      family = <Link to={'/families/add'}>Add Family</Link>;
-    }
+    // let family;
+    // if (user.familyId) {
+    //   family = <Link to={`/families/${user.familyId}/edit`}>Family</Link>;
+    // } else {
+    //   family = <Link to={'/families/add'}>Add Family</Link>;
+    // }
 
     return (
       <div className={className}>
@@ -202,11 +202,13 @@ export default class UserFormContents extends Component {
 
         {adminFields}
 
+        {/* }
         <div className="form-section">
           <div className="form-item">
             <h3>{family}</h3>
           </div>
         </div>
+        {*/}
 
         <div className="form-section">
           <div className="form-item">

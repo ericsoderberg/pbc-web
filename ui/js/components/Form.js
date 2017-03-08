@@ -93,9 +93,14 @@ class Form extends Component {
     if (loading) {
       contents = <Loading />;
     } else {
+      const errors = {};
+      Object.keys(error.errors || {}).forEach((key) => {
+        const err = error.errors[key];
+        errors[key] = err.kind === 'required' ? 'required' : err.message;
+      });
       contents = (
         <FormContents className="form__contents" {...contentsProps}
-          formState={formState} session={session} />
+          formState={formState} session={session} errors={errors} />
       );
     }
 
@@ -104,7 +109,7 @@ class Form extends Component {
         <form className="form" action={action}
           onSubmit={this._onSubmit}>
           {header}
-          <FormError message={error} />
+          <FormError error={error} />
           {contents}
           <div className="form__footer-container">
             <footer className="form__footer">
@@ -127,7 +132,9 @@ Form.propTypes = {
   action: PropTypes.string,
   actions: PropTypes.arrayOf(PropTypes.element),
   contentsProps: PropTypes.object,
-  error: PropTypes.object,
+  error: PropTypes.shape({
+    errors: PropTypes.object,
+  }),
   footerActions: PropTypes.node,
   FormContents: PropTypes.func.isRequired,
   item: PropTypes.object,
@@ -151,7 +158,7 @@ Form.defaultProps = {
   action: undefined,
   actions: [],
   contentsProps: undefined,
-  error: undefined,
+  error: {},
   footerActions: undefined,
   item: undefined,
   inline: false,
