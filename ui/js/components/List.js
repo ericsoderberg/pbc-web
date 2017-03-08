@@ -27,6 +27,10 @@ class List extends Component {
     this._setStateFromLocation(nextProps);
   }
 
+  componentDidUpdate() {
+    this._onScroll();
+  }
+
   componentWillUnmount() {
     window.removeEventListener('scroll', this._onScroll);
   }
