@@ -11,6 +11,7 @@ const PASSWORD = process.env.DATABASE_PASSWORD || 'pbc';
 // Schemas
 
 const image = {
+  dark: Boolean,
   data: String,
   name: String,
   size: Number,

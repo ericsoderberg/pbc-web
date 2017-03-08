@@ -69,6 +69,8 @@ export default class Section extends Component {
         if (isDarkBackground(color)) {
           classNames.push('dark-background');
         }
+      } else if (backgroundImage && backgroundImage.dark) {
+        classNames.push('dark-background');
       }
       if (align) {
         classNames.push(`section__container--${align}`);

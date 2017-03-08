@@ -768,6 +768,12 @@
   max-width: 100%;
 }
 
+.image-field__controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .form-total {
   max-width: $form-width;
   margin: $unit auto;
