@@ -1,7 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
-import ImageField from '../../components/ImageField';
+// import ImageField from '../../components/ImageField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
 
@@ -19,7 +19,7 @@ export default class PageItemEdit extends Component {
   }
 
   render() {
-    const { index } = this.props;
+    // const { index } = this.props;
     const { formState } = this.state;
     const pageSummary = formState.object;
 
@@ -32,8 +32,10 @@ export default class PageItemEdit extends Component {
               formState.change('id')({
                 _id: suggestion._id, name: suggestion.name })} />
         </FormField>
+        {/* }
         <ImageField key="image" label="Image" name={`image-${index}`}
           formState={formState} property="image" />
+        { */}
       </div>
     );
   }
@@ -41,7 +43,7 @@ export default class PageItemEdit extends Component {
 }
 
 PageItemEdit.propTypes = {
-  index: PropTypes.number.isRequired,
+  // index: PropTypes.number.isRequired,
   item: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
 };

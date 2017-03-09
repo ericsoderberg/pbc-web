@@ -10,12 +10,20 @@ export default class SectionFields extends Component {
   }
 
   render() {
-    const { formState } = this.props;
+    const { allowBackgroundImage, formState } = this.props;
     const { active } = this.state;
     const section = formState.object;
 
     let result;
     if (active) {
+      let backgroundImage;
+      if (allowBackgroundImage) {
+        backgroundImage = (
+          <ImageField label="Background image" name="backgroundImage"
+            formState={formState} property="backgroundImage" />
+        );
+      }
+
       result = (
         <div>
           <FormField>
@@ -28,8 +36,7 @@ export default class SectionFields extends Component {
             <input name="color" value={section.color || ''}
               onChange={formState.change('color')} />
           </FormField>
-          <ImageField label="Background image" name="backgroundImage"
-            formState={formState} property="backgroundImage" />
+          {backgroundImage}
         </div>
       );
     } else {
@@ -44,5 +51,10 @@ export default class SectionFields extends Component {
 }
 
 SectionFields.propTypes = {
+  allowBackgroundImage: PropTypes.bool,
   formState: PropTypes.object.isRequired,
+};
+
+SectionFields.defaultProps = {
+  allowBackgroundImage: true,
 };

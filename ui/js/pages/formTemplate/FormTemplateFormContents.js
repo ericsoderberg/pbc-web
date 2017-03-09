@@ -5,6 +5,7 @@ import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import SelectSearch from '../../components/SelectSearch';
 import Button from '../../components/Button';
+import TextHelp from '../../components/TextHelp';
 import DownIcon from '../../icons/Down';
 import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
@@ -171,7 +172,7 @@ export default class FormTemplateFormContents extends Component {
             onChange={formState.change('submitLabel')} />
         </FormField>,
         <FormField key="message" label="Post submit message"
-          error={errors.postSubmitMessage}>
+          help={<TextHelp />} error={errors.postSubmitMessage}>
           <textarea name="postSubmitMessage" rows={2}
             value={formTemplate.postSubmitMessage || ''}
             onChange={formState.change('postSubmitMessage')} />
@@ -209,7 +210,9 @@ export default class FormTemplateFormContents extends Component {
       }
 
       details.push(
-        <FormField key="depends" label="Depends on" error={errors.dependsOnId}>
+        <FormField key="depends" label="Depends on"
+          help="Another form that must be filled out first"
+          error={errors.dependsOnId}>
           <SelectSearch category="form-templates" clearable={true}
             value={(formTemplate.dependsOnId || {}).name || ''}
             onChange={this._changeDependsOnId} />

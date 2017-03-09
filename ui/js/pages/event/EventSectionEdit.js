@@ -40,7 +40,7 @@ export default class EventSectionEdit extends Component {
     const section = formState.object;
 
     return (
-      <SectionEdit formState={formState}>
+      <SectionEdit formState={formState} allowBackgroundImage={false}>
         <FormField label="Event">
           <SelectSearch category="events"
             options={{ select: 'name start', sort: '-start' }}
