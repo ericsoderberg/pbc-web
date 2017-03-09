@@ -34,55 +34,53 @@ class FormAdd extends Component {
 
   _load(props) {
     const { session } = props;
+    const form = { ...this.state.form };
     const formTemplateId =
       props.formTemplateId || props.location.query.formTemplateId;
     getItem('form-templates', formTemplateId)
     .then((formTemplate) => {
-      if (formTemplate.family) {
-        // need a Family context first
-        return getItems('families', { 'adults.userId': session.userId })
-        .then((families) => {
-          if (families.length > 0) {
-            return { formTemplate, family: families[0] };
-          }
-          return { formTemplate };
-        });
+      if (formTemplate.dependsOnId) {
+        // get forms already filled out
+        return getItems('forms', {
+          formTemplateId: formTemplate.dependsOnId._id,
+          userId: (form || session || {}).userId,
+        })
+        .then(dependedOnForms => ({ formTemplate, dependedOnForms }));
       }
       return { formTemplate };
     })
     .then((context) => {
-      const { family, formTemplate } = context;
-      const form = { fields: [], formTemplateId: formTemplate._id };
-      if (family) {
-        form.familyId = family._id;
-      }
+      const { formTemplate } = context;
+      form.formTemplateId = formTemplate._id;
       formTemplate.sections.forEach((section) => {
         section.fields.forEach((field) => {
-          if (session) {
-            // pre-fill out name and email from session, if possible
-            if (field.name === 'Name') {
-              form.fields.push({ templateFieldId: field._id, value: session.name });
-            } else if (field.name === 'Email') {
-              form.fields.push({ templateFieldId: field._id, value: session.email });
-            }
-          }
+          // TOOD: annotate fields for which should come from session
+          // if (session) {
+          //   // pre-fill out name and email from session, if possible
+          //   if (field.name === 'Name') {
+          //     form.fields.push({ templateFieldId: field._id, value: session.name });
+          //   } else if (field.name === 'Email') {
+          //     form.fields.push({ templateFieldId: field._id, value: session.email });
+          //   }
+          // }
+
           // pre-fill out fields with a minimum value
           if (field.min) {
-            if (section.child) {
-              family.children.forEach((child) => {
-                form.fields.push({
-                  childId: child._id,
-                  templateFieldId: field._id,
-                  value: field.min });
-              });
-            } else {
-              form.fields.push({ templateFieldId: field._id, value: field.min });
-            }
+            // if (section.child) {
+            //   family.children.forEach((child) => {
+            //     form.fields.push({
+            //       childId: child._id,
+            //       templateFieldId: field._id,
+            //       value: field.min });
+            //   });
+            // } else {
+            form.fields.push({ templateFieldId: field._id, value: field.min });
+            // }
           }
         });
       });
 
-      this.setState({ family, form, formTemplate });
+      this.setState({ form, formTemplate });
     })
     .catch(error => console.error('!!! FormAdd catch', error));
   }
