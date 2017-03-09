@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { findDOMNode } from 'react-dom';
+// import { findDOMNode } from 'react-dom';
 import Button from './Button';
 import MainNav from './MainNav';
 import Stored from './Stored';
@@ -34,17 +34,19 @@ class App extends Component {
   }
 
   _hideNavControl() {
-    clearTimeout(this._navTimer);
-    this._navTimer = setTimeout(() => {
-      const { navActive, navigable } = this.state;
-      if (navigable && !navActive &&
-        window.scrollY === 0 && window.innerWidth < 700) {
-        const navControl = this._navControlRef;
-        if (navControl) {
-          window.scrollTo(0, findDOMNode(navControl).offsetHeight);
-        }
-      }
-    }, 40);
+    // clearTimeout(this._navTimer);
+    // this._navTimer = setTimeout(() => {
+    //   const { navActive, navigable } = this.state;
+    //   console.log('!!! _hideNavControl', navigable, navActive, window.scrollY);
+    //   if (navigable && !navActive &&
+    //     window.innerWidth < 700) {
+    //     const navControl = this._navControlRef;
+    //     if (navControl) {
+    //       console.log('!!! scrollTo', findDOMNode(navControl).offsetHeight);
+    //       window.scrollTo(0, findDOMNode(navControl).offsetHeight);
+    //     }
+    //   }
+    // }, 40);
   }
 
   _onToggle() {

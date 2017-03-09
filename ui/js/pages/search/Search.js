@@ -61,6 +61,7 @@ export default class Search extends Component {
   _onSearch(event) {
     const searchText = event.target.value;
     this.setState({ searchText, loading: true });
+    // debounce typing
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
     // Put the search term in the browser location
