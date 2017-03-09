@@ -14,7 +14,7 @@ import FormContentsField from './FormContentsField';
 // };
 
 const FormContentsSection = (props) => {
-  const { fields, formTemplateSection, onChange } = props;
+  const { error, fields, formTemplateSection, onChange } = props;
 
   const formTemplateFields = (formTemplateSection.fields || [])
   .filter(formTemplateField => (
@@ -30,12 +30,13 @@ const FormContentsSection = (props) => {
     );
   }
 
-  const contents = formTemplateFields.map(formTemplateField => (
-    <FormContentsField key={formTemplateField._id || formTemplateField.id}
-      formTemplateField={formTemplateField}
-      field={fields[formTemplateField._id || formTemplateField.id]}
-      onChange={onChange} />
-  ));
+  const contents = formTemplateFields.map((formTemplateField) => {
+    const id = formTemplateField._id || formTemplateField.id;
+    return (
+      <FormContentsField key={id} formTemplateField={formTemplateField}
+        field={fields[id]} error={error[id]} onChange={onChange} />
+    );
+  });
 
   return (
     <fieldset className="form__fields">
@@ -46,11 +47,16 @@ const FormContentsSection = (props) => {
 };
 
 FormContentsSection.propTypes = {
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   fields: PropTypes.object.isRequired,
   formTemplateSection: PropTypes.shape({
     fields: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
   onChange: PropTypes.func.isRequired,
+};
+
+FormContentsSection.defaultProps = {
+  error: {},
 };
 
 export default FormContentsSection;

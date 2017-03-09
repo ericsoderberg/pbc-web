@@ -1,4 +1,8 @@
 
+export function isFieldSet(field) {
+  return (field.value || field.optionId ||
+    (field.optionIds && field.optionIds.length > 0));
+}
 
 export function setFormError(formTemplate, form) {
   let error;
@@ -8,7 +12,7 @@ export function setFormError(formTemplate, form) {
       if (templateField.required) {
         // see if we have it
         if (!form.fields.some(field => (
-          field.templateFieldId === templateField._id && field.value))) {
+          field.templateFieldId === templateField._id))) {
           if (!error) {
             error = {};
           }
@@ -27,7 +31,7 @@ export function clearFormError(formTemplate, form, error) {
       if (templateField.required) {
         // see if we have it
         if (form.fields.some(field => (
-          field.templateFieldId === templateField._id && field.value))) {
+          field.templateFieldId === templateField._id && isFieldSet(field)))) {
           delete result[templateField._id];
         }
       }

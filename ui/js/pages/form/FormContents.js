@@ -8,6 +8,7 @@ import SelectSearch from '../../components/SelectSearch';
 import Stored from '../../components/Stored';
 import FormTotal from './FormTotal';
 import FormContentsSection from './FormContentsSection';
+import { isFieldSet } from './FormUtils';
 
 const UserSuggestion = props => (
   <div className="box--between">
@@ -38,8 +39,7 @@ class FormContents extends Component {
   _stateFromProps(props) {
     const fields = {};
     props.form.fields.forEach((field) => {
-      if (field.value || field.optionId ||
-        (field.optionIds && field.optionIds.length > 0)) {
+      if (isFieldSet(field)) {
         fields[field.templateFieldId] = field;
       }
     });
@@ -62,7 +62,12 @@ class FormContents extends Component {
       return index !== -1;
     });
 
-    if (index === -1) {
+    if (!isFieldSet(field)) {
+      // field has no value, remove it
+      if (index !== -1) {
+        fields.splice(index, 1);
+      }
+    } else if (index === -1) {
       fields.push(field);
     } else {
       fields[index] = field;
@@ -88,7 +93,7 @@ class FormContents extends Component {
     ))
     .map(section => (
       <FormContentsSection key={section._id || section.id}
-        formTemplateSection={section} fields={fields}
+        formTemplateSection={section} fields={fields} error={error}
         onChange={this._onChangeField} />
     ));
 

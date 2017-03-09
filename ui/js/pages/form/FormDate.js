@@ -9,8 +9,10 @@ const FormDate = (props) => {
     <FormField label={formTemplateField.name}
       help={formTemplateField.help} error={error}>
       <DateInput name={formTemplateField.name} value={field.value || ''}
-        onChange={event =>
-          onChange(formTemplateField._id, event.target.value)} />
+        onChange={date => onChange({
+          templateFieldId: formTemplateField._id,
+          value: date,
+        })} />
     </FormField>
   );
 };
