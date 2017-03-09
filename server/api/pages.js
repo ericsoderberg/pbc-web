@@ -34,6 +34,7 @@ const PAGE_MESSAGE_FIELDS =
 
 const populatePage = (page) => {
   const Message = mongoose.model('Message');
+  const Event = mongoose.model('Event');
   const date = moment().subtract(1, 'day');
 
   const promises = [Promise.resolve(page)];
@@ -60,12 +61,49 @@ const populatePage = (page) => {
     );
   });
 
+  // Calendar
+  page.sections.filter(section => section.type === 'calendar')
+  .forEach((section) => {
+    const start = moment(date);
+    const end = moment(start).add(2, 'month');
+    promises.push(
+      Event.find({
+        calendarId: section.calendarId,
+        $or: [
+          { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+          { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+        ],
+      })
+      .then((events) => {
+        // sort by which comes next
+        const nextDate = event => (
+          [...event.dates, event.start]
+            .map(d => moment(d))
+            .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0]
+        );
+        events.sort((e1, e2) => {
+          const d1 = nextDate(e1);
+          const d2 = nextDate(e2);
+          return d1.isBefore(d2) ? -1 : d2.isBefore(d1) ? 1 : 0;
+        });
+        return events;
+      }),
+    );
+  });
+
   return Promise.all(promises)
   .then((docs) => {
-    const pageData = docs[0].toObject();
+    let docsIndex = 0;
+    const pageData = docs[docsIndex].toObject();
     pageData.sections.filter(section => section.type === 'library')
-    .forEach((section, index) => {
-      section.message = docs[1 + index];
+    .forEach((section) => {
+      docsIndex += 1;
+      section.message = docs[docsIndex];
+    });
+    pageData.sections.filter(section => section.type === 'calendar')
+    .forEach((section) => {
+      docsIndex += 1;
+      section.events = docs[docsIndex];
     });
     return pageData;
   });
@@ -207,6 +245,7 @@ export default function (router) {
           model: 'Event',
         },
         { path: 'sections.libraryId', select: 'name path', model: 'Library' },
+        { path: 'sections.calendarId', select: 'name path', model: 'Calendar' },
         { path: 'sections.formTemplateId',
           select: 'name',
           model: 'FormTemplate' },
