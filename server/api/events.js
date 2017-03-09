@@ -216,6 +216,7 @@ export default function (router) {
           }
           delete doc.text;
         }
+        // convert deprecated address property to a map
         if (doc.address !== undefined) {
           if (doc.address && doc.sections.length === 0) {
             doc.sections.push({ type: 'map', address: doc.address });

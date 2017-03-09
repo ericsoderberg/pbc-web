@@ -1,17 +1,17 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import moment from 'moment';
 import '../db';
 import { imageData, loadCategoryArray, copyFile } from './utils';
 import results from './results';
 
+mongoose.Promise = global.Promise;
+
 // Page
 
-function normalizePage (item, arg) {
+function normalizePage(item, arg) {
   const {
     styles, contacts, userIds, photos, pageFiles, events, eventDocs,
-    forms, formTemplateIds
+    forms, formTemplateIds,
   } = arg;
   item.oldId = item.id;
   item.created = item.created_at || undefined;
@@ -26,7 +26,7 @@ function normalizePage (item, arg) {
           style.banner_content_type),
         name: style.banner_file_name,
         size: style.banner_file_size || undefined,
-        type: style.banner_content_type
+        type: style.banner_content_type,
       };
       item.sections.push({ image, type: 'image' });
     }
@@ -36,9 +36,9 @@ function normalizePage (item, arg) {
     item.sections.push({ text: item.text, type: 'text' });
   }
 
-  if ((! item.aspect_order || item.aspect_order.indexOf('c') !== -1) &&
+  if ((!item.aspect_order || item.aspect_order.indexOf('c') !== -1) &&
     contacts[item.id]) {
-    const people = contacts[item.id].map(item2 => {
+    const people = contacts[item.id].map((item2) => {
       let image;
       if (item2.portrait_file_name) {
         image = {
@@ -46,39 +46,38 @@ function normalizePage (item, arg) {
             item2.portrait_content_type),
           name: item2.portrait_file_name,
           size: item2.portrait_file_size || undefined,
-          type: item2.portrait_content_type
+          type: item2.portrait_content_type,
         };
       }
       return {
         id: userIds[item2.user_id],
-        image: image,
-        text: `${item2.role ? '### ' + item2.role : ''} ${item2.bio}`
+        image,
+        text: `${item2.role ? `### ${item2.role}` : ''} ${item2.bio}`,
       };
     });
     item.sections.push({ people, type: 'people' });
   }
 
-  if ((! item.aspect_order || item.aspect_order.indexOf('e') !== -1) &&
+  if ((!item.aspect_order || item.aspect_order.indexOf('e') !== -1) &&
     events[item.id]) {
     const lastWeek = moment().subtract(1, 'week');
     events[item.id]
-    .filter(item2 => {
+    .filter((item2) => {
       const event = eventDocs[item2.id];
-      if (item2.name === 'YAF') console.log('!!! YAF', event, lastWeek);
       return (events[item.id].length <= 2 ||
         moment(event.start).isAfter(lastWeek));
     })
-    .forEach(item2 => {
+    .forEach((item2) => {
       if (eventDocs[item2.id]._id) {
         item.sections.push({ eventId: eventDocs[item2.id]._id, type: 'event' });
       }
     });
   }
 
-  if ((! item.aspect_order || item.aspect_order.indexOf('p') !== -1) &&
+  if ((!item.aspect_order || item.aspect_order.indexOf('p') !== -1) &&
     photos[item.id]) {
     let totalSize = 0;
-    photos[item.id].forEach(item2 => {
+    photos[item.id].forEach((item2) => {
       // stop if we've got too many
       totalSize += item2.photo_file_size;
       if (item2.photo_file_name && totalSize < 12000000) {
@@ -87,7 +86,7 @@ function normalizePage (item, arg) {
             item2.photo_content_type),
           name: item2.photo_file_name,
           size: item2.photo_file_size || undefined,
-          type: item2.photo_content_type
+          type: item2.photo_content_type,
         };
         item.sections.push({ image, type: 'image' });
       }
@@ -100,16 +99,16 @@ function normalizePage (item, arg) {
       label: item2.label,
       name: item2.name,
       size: item2.size,
-      type: item2.type
+      type: item2.type,
     }));
     item.sections.push({ files, type: 'files' });
   }
 
-  if ((! item.aspect_order || item.aspect_order.indexOf('f') !== -1) &&
+  if ((!item.aspect_order || item.aspect_order.indexOf('f') !== -1) &&
     forms[item.id]) {
-    forms[item.id].filter(item2 => item2.published).forEach(item2 => {
+    forms[item.id].filter(item2 => item2.published).forEach((item2) => {
       item.sections.push({
-        formTemplateId: formTemplateIds[item2.id], type: 'form'
+        formTemplateId: formTemplateIds[item2.id], type: 'form',
       });
     });
   }
@@ -117,7 +116,7 @@ function normalizePage (item, arg) {
   return item;
 }
 
-function normalizeOldFile (item, oldId) {
+function normalizeOldFile(item, oldId) {
   item._id = new mongoose.Types.ObjectId();
   item.oldId = oldId;
   item.label = item.name;
@@ -127,26 +126,25 @@ function normalizeOldFile (item, oldId) {
   return item;
 }
 
-function fileToOldFile (item, results) {
+function fileToOldFile(item, results) {
   const OldFile = mongoose.model('OldFile');
   const oldId = `pf-${item.id}`;
-  return OldFile.findOne({ oldId: oldId }).exec()
-  .then(oldFile => {
+  return OldFile.findOne({ oldId }).exec()
+  .then((oldFile) => {
     if (oldFile) {
       return results.skipped('OldFile', oldFile);
-    } else {
-      item = normalizeOldFile(item, oldId);
-      // copy before saving
-      return copyFile(item, `files/${item.id}/original/${item.file_file_name}`)
-      .then(() => {
-        results.copied('OldFile', oldFile);
-        oldFile = new OldFile(item);
-        return oldFile.save()
-        .then(oldFile => results.saved('OldFile', oldFile))
-        .catch(error => results.errored('OldFile', oldFile, error));
-      })
-      .catch(error => results.errored('OldFile', item, error));
     }
+    item = normalizeOldFile(item, oldId);
+    // copy before saving
+    return copyFile(item, `files/${item.id}/original/${item.file_file_name}`)
+    .then(() => {
+      results.copied('OldFile', oldFile);
+      oldFile = new OldFile(item);
+      return oldFile.save()
+      .then(oldFileSaved => results.saved('OldFile', oldFileSaved))
+      .catch(error => results.errored('OldFile', oldFile, error));
+    })
+    .catch(error => results.errored('OldFile', item, error));
   });
 }
 
@@ -155,23 +153,23 @@ export default function () {
   const User = mongoose.model('User');
   const Event = mongoose.model('Event');
   const FormTemplate = mongoose.model('FormTemplate');
-  let pages = {}; // oldId => doc
-  let childOldIds = {}; // oldId => [oldId, ...]
-  let contacts = {}; // oldId => [item, ...]
-  let photos = {}; // oldId => [item, ...]
-  let styles = {}; // oldId => item
-  let userIds = {}; // oldId => _id
-  let events = {}; // oldId => [item, ...]
-  let eventDocs = {}; // oldId => doc
-  let forms = {}; // oldId => [item, ...]
-  let formTemplateIds = {}; // oldId => _id
-  let pageFiles = {};  // oldId => [doc, ...]
+  const pages = {}; // oldId => doc
+  const childOldIds = {}; // oldId => [oldId, ...]
+  const contacts = {}; // oldId => [item, ...]
+  const photos = {}; // oldId => [item, ...]
+  const styles = {}; // oldId => item
+  const userIds = {}; // oldId => _id
+  const events = {}; // oldId => [item, ...]
+  const eventDocs = {}; // oldId => doc
+  const forms = {}; // oldId => [item, ...]
+  const formTemplateIds = {}; // oldId => _id
+  const pageFiles = {};  // oldId => [doc, ...]
   const pagesData = loadCategoryArray('pages');
 
   return Promise.resolve()
   .then(() => {
-    loadCategoryArray('contacts').forEach(item => {
-      if (! contacts[item.page_id]) {
+    loadCategoryArray('contacts').forEach((item) => {
+      if (!contacts[item.page_id]) {
         contacts[item.page_id] = [];
       }
       contacts[item.page_id].push(item);
@@ -182,18 +180,18 @@ export default function () {
     // load Users so we can map ids
     return User.find({}).select('oldId').exec()
     .then(users => users.filter(user => user.oldId)
-      .forEach(user => userIds[user.oldId] = user._id)
+      .forEach((user) => { userIds[user.oldId] = user._id; }),
     );
   })
   .then(() => {
-    loadCategoryArray('styles').forEach(item => styles[item.id] = item);
+    loadCategoryArray('styles').forEach((item) => { styles[item.id] = item; });
   })
   .then(() => {
     loadCategoryArray('events')
     // only master events
-    .filter(item => (! item.master_id || item.master_id === item.id))
-    .forEach(item => {
-      if (! events[item.page_id]) {
+    .filter(item => (!item.master_id || item.master_id === item.id))
+    .forEach((item) => {
+      if (!events[item.page_id]) {
         events[item.page_id] = [];
       }
       events[item.page_id].push(item);
@@ -203,14 +201,14 @@ export default function () {
     console.log('!!! find Events');
     // load Events so we can map ids and check start date
     return Event.find({}).select('oldId start').exec()
-    .then(events => events.filter(event => event.oldId)
-      .forEach(event => eventDocs[event.oldId] = event)
+    .then(eventsFound => eventsFound.filter(event => event.oldId)
+      .forEach((event) => { eventDocs[event.oldId] = event; }),
     );
   })
   .then(() => {
     loadCategoryArray('forms')
-    .forEach(item => {
-      if (! forms[item.page_id]) {
+    .forEach((item) => {
+      if (!forms[item.page_id]) {
         forms[item.page_id] = [];
       }
       forms[item.page_id].push(item);
@@ -223,12 +221,12 @@ export default function () {
     .then(formTemplates => (
       formTemplates.filter(formTemlate => formTemlate.oldId))
       .forEach(formTemlate => (
-        formTemplateIds[formTemlate.oldId] = formTemlate._id))
+        formTemplateIds[formTemlate.oldId] = formTemlate._id)),
     );
   })
   .then(() => {
-    loadCategoryArray('photos').forEach(item => {
-      if (! photos[item.page_id]) {
+    loadCategoryArray('photos').forEach((item) => {
+      if (!photos[item.page_id]) {
         photos[item.page_id] = [];
       }
       photos[item.page_id].push(item);
@@ -239,13 +237,13 @@ export default function () {
     let sequentialFilePromise = Promise.resolve();
     console.log('!!! load files');
     loadCategoryArray('documents').forEach((item, index) => {
-      if (! pageFiles[item.page_id]) {
+      if (!pageFiles[item.page_id]) {
         pageFiles[item.page_id] = [];
       }
       // run file copies sequentially to avoid running out of file descriptors
       sequentialFilePromise = sequentialFilePromise
       .then(() => {
-        if (99 === (index % 100)) console.log(index + 1);
+        if ((index % 100) === 99) console.log(index + 1);
         return fileToOldFile(item, results)
         .then(oldFile => pageFiles[item.page_id].push(oldFile))
         .catch(error => results.errored('OldFile', item, error));
@@ -254,11 +252,10 @@ export default function () {
     return sequentialFilePromise;
   })
   .then(() => {
-    let pagePromises = [];
-    pagesData.forEach(item => {
-
-      if (item.parent_id && ! item.private && ! item.obscure) {
-        if (! childOldIds[item.parent_id]) {
+    const pagePromises = [];
+    pagesData.forEach((item) => {
+      if (item.parent_id && !item.private && !item.obscure) {
+        if (!childOldIds[item.parent_id]) {
           childOldIds[item.parent_id] = [];
         }
         if (childOldIds[item.parent_id].indexOf(item.id) === -1) {
@@ -267,48 +264,47 @@ export default function () {
       }
 
       const promise = Page.findOne({ oldId: item.id }).exec()
-      .then(page => {
+      .then((page) => {
         if (page) {
           return results.skipped('Page', page);
-        } else {
-          item = normalizePage(item, {
-            styles, contacts, userIds, photos, pageFiles, events, eventDocs,
-            forms, formTemplateIds
-          });
-          page = new Page(item);
-          return page.save()
-          .then(page => results.saved('Page', page))
-          .catch(error => results.errored('Page', page, error));
         }
+        item = normalizePage(item, {
+          styles, contacts, userIds, photos, pageFiles, events, eventDocs,
+          forms, formTemplateIds,
+        });
+        page = new Page(item);
+        return page.save()
+        .then(pageSaved => results.saved('Page', pageSaved))
+        .catch(error => results.errored('Page', page, error));
       })
-      .then(page => pages[item.id] = page);
+      .then((page) => { pages[item.id] = page; });
 
       pagePromises.push(promise);
     });
 
     return Promise.all(pagePromises);
   })
-  // Once we've got all of the pages set up,
-  // link pages together by parent id
-  .then(() => {
-    console.log('!!! link pages');
-    let linkPromises = [];
-    pagesData.forEach(item => {
-      if (childOldIds[item.id]) {
-        let page = pages[item.id];
-        // check to see if we've already done this
-        if (! page.sections.some(s => 'pages' === s.type)) {
-          page.sections.push({
-            pages: childOldIds[item.id].map(oldId => ({
-              id: pages[oldId]._id })),
-            type: 'pages'
-          });
-          linkPromises.push(page.save());
-        }
-      }
-    });
-    return Promise.all(linkPromises);
-  })
+  // // Once we've got all of the pages set up,
+  // // link pages together by parent id
+  // .then(() => {
+  //   console.log('!!! link pages');
+  //   const linkPromises = [];
+  //   pagesData.forEach((item) => {
+  //     if (childOldIds[item.id]) {
+  //       const page = pages[item.id];
+  //       // check to see if we've already done this
+  //       if (!page.sections.some(s => s.type === 'pages')) {
+  //         page.sections.push({
+  //           pages: childOldIds[item.id].map(oldId => ({
+  //             id: pages[oldId]._id })),
+  //           type: 'pages',
+  //         });
+  //         linkPromises.push(page.save());
+  //       }
+  //     }
+  //   });
+  //   return Promise.all(linkPromises);
+  // })
   .then(() => console.log('!!! pages done'))
   .catch(error => console.log('!!! pages catch', error, error.stack));
 }
