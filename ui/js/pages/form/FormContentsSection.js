@@ -33,7 +33,8 @@ const FormContentsSection = (props) => {
   const contents = formTemplateFields.map(formTemplateField => (
     <FormContentsField key={formTemplateField._id || formTemplateField.id}
       formTemplateField={formTemplateField}
-      field={fields[formTemplateField.id]} onChange={onChange} />
+      field={fields[formTemplateField._id || formTemplateField.id]}
+      onChange={onChange} />
   ));
 
   return (

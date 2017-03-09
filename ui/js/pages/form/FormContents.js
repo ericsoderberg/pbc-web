@@ -27,6 +27,7 @@ class FormContents extends Component {
 
   constructor(props) {
     super(props);
+    this._onChangeField = this._onChangeField.bind(this);
     this.state = this._stateFromProps(props);
   }
 
