@@ -154,7 +154,8 @@ class FormSection extends Component {
             }
           });
         }
-        this.setState({ forms, paymentFormId });
+        this.setState({ forms, paymentFormId },
+          () => this._resetState(this.props));
       })
       .catch(error => console.error('!!! FormSummary forms catch', error));
     }
