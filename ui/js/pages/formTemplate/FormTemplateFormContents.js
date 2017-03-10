@@ -79,9 +79,19 @@ export default class FormTemplateFormContents extends Component {
 
   _changeDependsOnId(suggestion) {
     const { formState } = this.props;
-    const value = suggestion ?
+    const dependsOnId = suggestion ?
       { _id: suggestion._id, name: suggestion.name } : undefined;
-    formState.set('dependsOnId', value);
+    if (!dependsOnId) {
+      // clear any linkedTo fields too
+      const sections = formState.object.sections.slice(0);
+      sections.forEach((section) => {
+        section.fields.forEach((field) => {
+          field.linkedToId = undefined;
+        });
+      });
+      formState.set('sections', sections);
+    }
+    formState.set('dependsOnId', dependsOnId);
   }
 
   render() {
