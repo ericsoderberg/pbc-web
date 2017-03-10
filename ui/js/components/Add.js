@@ -74,7 +74,7 @@ Add.propTypes = {
 
 Add.defaultProps = {
   createSession: false,
-  default: undefined,
+  default: {},
   onChange: undefined,
   Preview: undefined,
   showable: false,

@@ -57,6 +57,11 @@ class Form extends Component {
       classes.push('form__container--inline');
     }
 
+    // convert duplicate key message to something more graceful
+    if (error && error.code === 11000) {
+      error.message = 'Already exists';
+    }
+
     let header;
     let footerCancelControl;
     if (inline) {
