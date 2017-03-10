@@ -30,20 +30,29 @@ const PAYING = 'paying';
 const SUMMARY = 'summary';
 
 const FormItem = (props) => {
-  const { className, distinguish, item: form, onClick, verb } = props;
+  const {
+    className, distinguish, intermediate, item: form, onClick, verb,
+  } = props;
   const classNames = ['item__container', className];
-  const timestamp = moment(form.modified).format('MMM Do YYYY');
+  const buttonClassNames = ['button'];
   let message;
-  if (distinguish) {
-    message = `${verb} for ${form.name} ${timestamp}`;
+  if (intermediate) {
+    buttonClassNames.push('button--secondary');
+    message = `${form.name}`;
   } else {
-    message = `${verb} ${timestamp}`;
+    buttonClassNames.push('button-plain');
+    const timestamp = moment(form.modified).format('MMM Do YYYY');
+    if (distinguish) {
+      message = `${verb} for ${form.name} ${timestamp}`;
+    } else {
+      message = `${verb} ${timestamp}`;
+    }
   }
 
   return (
     <div className={classNames.join(' ')}>
       <div className="item item--full">
-        <button className="button button-plain" onClick={onClick}>
+        <button className={buttonClassNames.join(' ')} onClick={onClick}>
           {message}
         </button>
       </div>
@@ -54,14 +63,31 @@ const FormItem = (props) => {
 FormItem.propTypes = {
   className: PropTypes.string,
   distinguish: PropTypes.bool,
+  intermediate: PropTypes.bool,
   item: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
-  verb: PropTypes.string.isRequired,
+  verb: PropTypes.string,
 };
 
 FormItem.defaultProps = {
   className: undefined,
   distinguish: false,
+  intermediate: false,
+  verb: undefined,
+};
+
+const _bestForm = (form, forms) => {
+  let result = form;
+  Object.keys(forms).some(key =>
+    forms[key].some((form2) => {
+      if (form2.linkedFormId === form._id) {
+        result = _bestForm(form2, forms);
+        return true;
+      }
+      return false;
+    }),
+  );
+  return result;
 };
 
 class FormSection extends Component {
@@ -114,7 +140,9 @@ class FormSection extends Component {
   _load(props) {
     const { formTemplate, formTemplateId } = props;
     const finalFormTemplateId = formTemplateId._id || formTemplate._id;
-    this.setState({ finalFormTemplateId });
+    this.setState({
+      finalFormTemplateId, rootFormTemplateId: finalFormTemplateId,
+    });
     // We might already have the form template if we're on a page that
     // populated it.
     if (formTemplateId && !formTemplate) {
@@ -133,6 +161,7 @@ class FormSection extends Component {
       this.setState({ state: AUTHENTICATION_NEEDED });
     } else {
       if (formTemplate.dependsOnId) {
+        this.setState({ rootFormTemplateId: formTemplate.dependsOnId._id });
         this._loadFormTemplate(formTemplate.dependsOnId._id);
       }
       this._loadForms(formTemplate._id);
@@ -190,6 +219,21 @@ class FormSection extends Component {
   //       () => this.setState({ height: undefined }), 600);
   //   }
   // }
+
+  _add(linkedForm) {
+    return () => {
+      const { finalFormTemplateId, formTemplates } = this.state;
+      let formTemplate = formTemplates[finalFormTemplateId];
+      while (formTemplate.dependsOnId &&
+        (!linkedForm ||
+          linkedForm.formTemplateId._id !== formTemplate.dependsOnId._id)) {
+        formTemplate = formTemplates[formTemplate.dependsOnId._id];
+      }
+      this.setState({
+        state: ADDING, activeFormTemplateId: formTemplate._id, linkedForm,
+      });
+    };
+  }
 
   _edit(id) {
     return () => {
@@ -264,11 +308,15 @@ class FormSection extends Component {
   render() {
     const { className, session } = this.props;
     const {
-      activeFormTemplateId,
-      formTemplates, forms, editId, height, linkedForm, paymentFormId, state,
+      activeFormTemplateId, finalFormTemplateId, formTemplates, forms, editId, height,
+      linkedForm, paymentFormId, rootFormTemplateId, state,
     } = this.state;
+    const finalFormTemplate = formTemplates[finalFormTemplateId];
     const formTemplate = formTemplates[activeFormTemplateId];
-    const activeForms = forms[activeFormTemplateId];
+
+    // determine which set of forms to show
+    const bestForms = (forms[rootFormTemplateId] || []).map(form =>
+      _bestForm(form, forms));
 
     const classes = ['form-summary__container'];
     if (className) {
@@ -276,11 +324,11 @@ class FormSection extends Component {
     }
 
     let formTemplateLink;
-    if (session && session.userId.administrator && formTemplate) {
-      const formTemplatePath = `/form-templates/${formTemplate._id}`;
+    if (session && session.userId.administrator && finalFormTemplate) {
+      const formTemplatePath = `/form-templates/${finalFormTemplateId}`;
       formTemplateLink = (
         <Link className="form-summary__template" to={formTemplatePath}>
-          {formTemplate.name}
+          {finalFormTemplate.name}
         </Link>
       );
     }
@@ -314,7 +362,7 @@ class FormSection extends Component {
       }
 
       case ADDING: {
-        const onCancel = activeForms.length > 0 ? this._nextState(SUMMARY) : undefined;
+        const onCancel = bestForms.length > 0 ? this._nextState(SUMMARY) : undefined;
         contents = (
           <FormAdd full={false} inline={true}
             formTemplateId={activeFormTemplateId} linkedForm={linkedForm}
@@ -341,18 +389,27 @@ class FormSection extends Component {
       }
 
       case SUMMARY: {
-        const items = activeForms.map(form => (
-          <li key={form._id}>
-            <FormItem item={form} onClick={this._edit(form._id)}
-              verb={LABEL[formTemplate.submitLabel] || LABEL.Submit}
-              distinguish={forms.length > 1} />
-          </li>
-        ));
+        const items = bestForms.map((form) => {
+          let itemContents;
+          if (form.formTemplateId._id === finalFormTemplateId) {
+            itemContents = (
+              <FormItem item={form} onClick={this._edit(form._id)}
+                verb={LABEL[formTemplate.submitLabel] || LABEL.Submit}
+                distinguish={bestForms.length > 1} />
+            );
+          } else {
+            itemContents = (
+              <FormItem item={form} onClick={this._add(form)}
+                intermediate={true} />
+            );
+          }
+          return <li key={form._id}>{itemContents}</li>;
+        });
 
         contents = (
           <div className="form-summary">
             <Button className="form-summary__add" plain={true}
-              icon={<AddIcon />} onClick={this._nextState(ADDING)} />
+              icon={<AddIcon />} onClick={this._add()} />
             <div className="form-summary__message">
               <Markdown>
                 {formTemplate.postSubmitMessage || `## ${formTemplate.name}`}

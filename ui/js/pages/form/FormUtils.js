@@ -40,18 +40,28 @@ export function clearFormError(formTemplate, form, error) {
   return result;
 }
 
-export function finalizeForm(formTemplate, form) {
+export function finalizeForm(formTemplate, form, linkedForm) {
   // find first 'name' field and set form.name to that value
   formTemplate.sections.some(section => (
     section.fields.some((templateField) => {
       if (templateField.name && templateField.name.match(/name/i)) {
-        form.fields.some((field) => {
-          if (field.templateFieldId === templateField._id) {
-            form.name = field.value;
-            return true;
-          }
-          return false;
-        });
+        if (templateField.linkedFieldId && linkedForm) {
+          linkedForm.fields.some((field) => {
+            if (field.templateFieldId === templateField.linkedFieldId) {
+              form.name = field.value;
+              return true;
+            }
+            return false;
+          });
+        } else {
+          form.fields.some((field) => {
+            if (field.templateFieldId === templateField._id) {
+              form.name = field.value;
+              return true;
+            }
+            return false;
+          });
+        }
         return true;
       }
       return false;

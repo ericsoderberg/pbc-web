@@ -79,14 +79,14 @@ class FormAdd extends Component {
 
   _onAdd(event) {
     event.preventDefault();
-    const { onDone } = this.props;
+    const { linkedForm, onDone } = this.props;
     const { formTemplate, form } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
       this.setState({ error });
     } else {
-      finalizeForm(formTemplate, form);
+      finalizeForm(formTemplate, form, linkedForm);
       postItem('forms', form)
       .then((response) => {
         // if we didn't have a session and we created one as part of adding,

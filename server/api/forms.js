@@ -206,6 +206,7 @@ export default function (router, transporter) {
         return Promise.reject({ status: 403 });
       }
       const data = req.body;
+      // TODO: use sessionName and sessionEmail properties!
       const email = formValueForFieldName(formTemplate, data, 'email');
       const name = formValueForFieldName(formTemplate, data, 'name');
       return useOrCreateSession(session, email, name)

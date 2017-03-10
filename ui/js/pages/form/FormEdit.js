@@ -57,13 +57,13 @@ class FormEdit extends Component {
   _onUpdate(event) {
     event.preventDefault();
     const { onDone } = this.props;
-    const { formTemplate, form } = this.state;
+    const { formTemplate, form, linkedForm } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
       this.setState({ error });
     } else {
-      finalizeForm(formTemplate, form);
+      finalizeForm(formTemplate, form, linkedForm);
       putItem('forms', this.state.form)
       .then(() => (onDone ? onDone() : this.context.router.goBack()))
       .catch(error2 => this.setState({ error2 }));
@@ -160,7 +160,7 @@ FormEdit.propTypes = {
   onDone: PropTypes.func,
   params: PropTypes.shape({
     id: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   // session: PropTypes.object,
 };
 
@@ -173,6 +173,7 @@ FormEdit.defaultProps = {
   inline: false,
   onCancel: undefined,
   onDone: undefined,
+  params: undefined,
   // session: undefined,
 };
 
