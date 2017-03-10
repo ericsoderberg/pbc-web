@@ -9,7 +9,7 @@ export function setFormError(formTemplate, form) {
   // check for required fields
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
-      if (templateField.required) {
+      if (templateField.required && !templateField.linkedFieldId) {
         // see if we have it
         if (!form.fields.some(field => (
           field.templateFieldId === templateField._id))) {

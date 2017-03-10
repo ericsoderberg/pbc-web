@@ -14,7 +14,7 @@ import FormContentsField from './FormContentsField';
 // };
 
 const FormContentsSection = (props) => {
-  const { error, fields, formTemplateSection, onChange } = props;
+  const { error, fields, formTemplateSection, linkedForm, onChange } = props;
 
   const formTemplateFields = (formTemplateSection.fields || [])
   .filter(formTemplateField => (
@@ -34,7 +34,8 @@ const FormContentsSection = (props) => {
     const id = formTemplateField._id || formTemplateField.id;
     return (
       <FormContentsField key={id} formTemplateField={formTemplateField}
-        field={fields[id]} error={error[id]} onChange={onChange} />
+        field={fields[id]} linkedForm={linkedForm} error={error[id]}
+        onChange={onChange} />
     );
   });
 
@@ -52,11 +53,13 @@ FormContentsSection.propTypes = {
   formTemplateSection: PropTypes.shape({
     fields: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
+  linkedForm: PropTypes.object,
   onChange: PropTypes.func.isRequired,
 };
 
 FormContentsSection.defaultProps = {
   error: {},
+  linkedForm: undefined,
 };
 
 export default FormContentsSection;

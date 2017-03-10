@@ -15,9 +15,11 @@ class FormAdd extends Component {
     super(props);
     this._onAdd = this._onAdd.bind(this);
     this._onChange = this._onChange.bind(this);
+    const { linkedForm } = props;
     this.state = {
       form: {
         fields: [],
+        linkedFormId: (linkedForm ? linkedForm._id : undefined),
       },
     };
   }
@@ -54,28 +56,18 @@ class FormAdd extends Component {
       form.formTemplateId = formTemplate._id;
       formTemplate.sections.forEach((section) => {
         section.fields.forEach((field) => {
-          // TOOD: annotate fields for which should come from session
-          // if (session) {
-          //   // pre-fill out name and email from session, if possible
-          //   if (field.name === 'Name') {
-          //     form.fields.push({ templateFieldId: field._id, value: session.userId.name });
-          //   } else if (field.name === 'Email') {
-          //     form.fields.push({ templateFieldId: field._id, value: session.userId.email });
-          //   }
-          // }
+          if (session) {
+            // pre-fill out name and email from session
+            if (field.sessionName) {
+              form.fields.push({ templateFieldId: field._id, value: session.userId.name });
+            } else if (field.sessionEmail) {
+              form.fields.push({ templateFieldId: field._id, value: session.userId.email });
+            }
+          }
 
           // pre-fill out fields with a minimum value
           if (field.min) {
-            // if (section.child) {
-            //   family.children.forEach((child) => {
-            //     form.fields.push({
-            //       childId: child._id,
-            //       templateFieldId: field._id,
-            //       value: field.min });
-            //   });
-            // } else {
             form.fields.push({ templateFieldId: field._id, value: field.min });
-            // }
           }
         });
       });
@@ -122,8 +114,8 @@ class FormAdd extends Component {
   }
 
   render() {
-    const { className, onCancel, full, inline } = this.props;
-    const { family, form, formTemplate, error } = this.state;
+    const { className, onCancel, full, inline, linkedForm } = this.props;
+    const { form, formTemplate, error } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -159,7 +151,7 @@ class FormAdd extends Component {
           onSubmit={this._onAdd}>
           {header}
           <FormContents form={form} formTemplate={formTemplate}
-            family={family}
+            linkedForm={linkedForm}
             full={full} onChange={this._onChange} error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">
@@ -181,6 +173,7 @@ FormAdd.propTypes = {
   formTemplateId: PropTypes.string,
   full: PropTypes.bool,
   inline: PropTypes.bool,
+  linkedForm: PropTypes.object,
   location: PropTypes.shape({
     query: PropTypes.shape({
       formTemplateId: PropTypes.string,
@@ -196,6 +189,7 @@ FormAdd.defaultProps = {
   formTemplateId: undefined,
   full: true,
   inline: false,
+  linkedForm: undefined,
   location: undefined,
   onCancel: undefined,
   onDone: undefined,

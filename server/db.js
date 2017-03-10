@@ -279,7 +279,7 @@ const formTemplateFieldSchema = Schema({
   discount: Boolean, // negates form field value
   help: String,
   limit: Number,
-  linkedToId: ObjectId, // for depends
+  linkedFieldId: ObjectId, // for depends
   max: Number, // for count
   min: Number, // for count
   monetary: Boolean,
@@ -287,6 +287,8 @@ const formTemplateFieldSchema = Schema({
   oldId: Number,
   options: [formTemplateOptionSchema],
   required: Boolean,
+  sessionEmail: Boolean,
+  sessionName: Boolean,
   type: {
     type: String,
     enum: [
@@ -363,6 +365,7 @@ const formSchema = Schema({
     ref: 'FormTemplate',
     required: true,
   },
+  linkedFormId: { type: Schema.Types.ObjectId, ref: 'Form' }, // for depends
   modified: Date,
   name: String, // derived from appropriate field value
   oldId: Number,

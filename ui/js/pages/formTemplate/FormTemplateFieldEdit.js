@@ -10,6 +10,9 @@ import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateOptionEdit from './FormTemplateOptionEdit';
 
+const NAME_REGEXP = /name/i;
+const EMAIL_REGEXP = /email/i;
+
 export default class FormTemplateFieldEdit extends Component {
 
   constructor(props) {
@@ -49,6 +52,8 @@ export default class FormTemplateFieldEdit extends Component {
     let limit;
     let max;
     let min;
+    let sessionEmail;
+    let sessionName;
 
     if (field.type === 'line' || field.type === 'choice' ||
       field.type === 'choices' || field.type === 'count' ||
@@ -107,6 +112,28 @@ export default class FormTemplateFieldEdit extends Component {
           <label htmlFor="discount">Discount</label>
         </FormField>
       );
+    }
+
+    if (field.type === 'line') {
+      if (field.name.match(NAME_REGEXP)) {
+        sessionName = (
+          <FormField>
+            <input name="sessionName" type="checkbox"
+              checked={field.sessionName || false}
+              onChange={formState.toggle('sessionName')} />
+            <label htmlFor="sessionName">Session name</label>
+          </FormField>
+        );
+      } else if (field.name.match(EMAIL_REGEXP)) {
+        sessionEmail = (
+          <FormField>
+            <input name="sessionEmail" type="checkbox"
+              checked={field.sessionEmail || false}
+              onChange={formState.toggle('sessionEmail')} />
+            <label htmlFor="sessionEmail">Session email</label>
+          </FormField>
+        );
+      }
     }
 
     if (field.type === 'instructions') {
@@ -205,25 +232,27 @@ export default class FormTemplateFieldEdit extends Component {
       </FormField>
     );
 
-    let linkedTo;
+    let linkedField;
     if (dependsOnFormTemplate) {
-      const linkedToOptions = [];
+      const linkedFieldOptions = [];
       dependsOnFormTemplate.sections.forEach(section2 =>
         section2.fields.forEach((field2) => {
           if (field2.type === field.type) {
-            linkedToOptions.push(
+            linkedFieldOptions.push(
               <option key={field2._id}
                 label={`${section2.name} ${field2.name}`} value={field2._id} />,
             );
           }
         }),
       );
-      linkedToOptions.unshift(<option key={0} />);
-      linkedTo = (
-        <FormField label="Linked to">
-          <select name="linkedToId" value={field.linkedToId || ''}
-            onChange={formState.change('linkedToId')}>
-            {linkedToOptions}
+      linkedFieldOptions.unshift(<option key={0} />);
+      linkedField = (
+        <FormField label="Linked to"
+          help={`Link the value of this field to a field in the depended
+            on form`}>
+          <select name="linkedFieldId" value={field.linkedFieldId || ''}
+            onChange={formState.change('linkedFieldId')}>
+            {linkedFieldOptions}
           </select>
         </FormField>
       );
@@ -241,8 +270,10 @@ export default class FormTemplateFieldEdit extends Component {
           {required}
           {monetary}
           {discount}
+          {sessionName}
+          {sessionEmail}
           {dependsOn}
-          {linkedTo}
+          {linkedField}
         </fieldset>
         {options}
         {addOptionControl}

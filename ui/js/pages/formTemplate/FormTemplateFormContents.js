@@ -82,11 +82,11 @@ export default class FormTemplateFormContents extends Component {
     const dependsOnId = suggestion ?
       { _id: suggestion._id, name: suggestion.name } : undefined;
     if (!dependsOnId) {
-      // clear any linkedTo fields too
+      // clear any linkedField fields too
       const sections = formState.object.sections.slice(0);
       sections.forEach((section) => {
         section.fields.forEach((field) => {
-          field.linkedToId = undefined;
+          field.linkedFieldId = undefined;
         });
       });
       formState.set('sections', sections);

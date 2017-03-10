@@ -19,11 +19,21 @@ const TYPE_COMPONENT = {
 };
 
 const FormContentsField = (props) => {
-  const { error, field, formTemplateField, onChange } = props;
+  const { error, field, formTemplateField, linkedForm, onChange } = props;
   const Component = TYPE_COMPONENT[formTemplateField.type];
+  let linkedField;
+  if (formTemplateField && formTemplateField.linkedFieldId && linkedForm) {
+    linkedForm.fields.some((field2) => {
+      if (field2.templateFieldId === formTemplateField.linkedFieldId) {
+        linkedField = field2;
+      }
+      return linkedField;
+    });
+  }
   return (
     <Component key={formTemplateField._id || formTemplateField.id}
       formTemplateField={formTemplateField} field={field}
+      linkedField={linkedField}
       onChange={onChange} error={error} />
   );
 };
@@ -32,12 +42,14 @@ FormContentsField.propTypes = {
   error: PropTypes.string,
   field: PropTypes.object,
   formTemplateField: PropTypes.object.isRequired,
+  linkedForm: PropTypes.object,
   onChange: PropTypes.func.isRequired,
 };
 
 FormContentsField.defaultProps = {
   error: undefined,
   field: undefined,
+  linkedForm: undefined,
 };
 
 export default FormContentsField;

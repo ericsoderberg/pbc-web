@@ -78,7 +78,7 @@ class FormContents extends Component {
   }
 
   render() {
-    const { form, formTemplate, full, error, session } = this.props;
+    const { form, formTemplate, full, error, linkedForm, session } = this.props;
     const { administrator, fields } = this.state;
 
     let formError;
@@ -93,8 +93,8 @@ class FormContents extends Component {
     ))
     .map(section => (
       <FormContentsSection key={section._id || section.id}
-        formTemplateSection={section} fields={fields} error={error}
-        onChange={this._onChangeField} />
+        formTemplateSection={section} fields={fields} linkedForm={linkedForm}
+        error={error} onChange={this._onChangeField} />
     ));
 
     let admin;
@@ -164,7 +164,6 @@ class FormContents extends Component {
 
 FormContents.propTypes = {
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  // family: PropTypes.object,
   form: PropTypes.shape({
     fields: PropTypes.arrayOf(PropTypes.object).isRequired,
   }).isRequired,
@@ -172,6 +171,7 @@ FormContents.propTypes = {
     sections: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
   full: PropTypes.bool.isRequired,
+  linkedForm: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({
@@ -184,7 +184,7 @@ FormContents.propTypes = {
 
 FormContents.defaultProps = {
   error: undefined,
-  family: undefined,
+  linkedForm: undefined,
 };
 
 const select = state => ({

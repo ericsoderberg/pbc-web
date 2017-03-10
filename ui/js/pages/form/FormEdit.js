@@ -39,9 +39,9 @@ class FormEdit extends Component {
     getItem('forms', props.id || props.params.id)
     .then((form) => {
       this.setState({ form });
-      if (form.familyId) {
-        return getItem('families', form.familyId._id)
-        .then(family => this.setState({ family }))
+      if (form.linkedFormId) {
+        return getItem('forms', form.linkedFormId)
+        .then(linkedForm => this.setState({ linkedForm }))
         .then(() => form);
       }
       return form;
@@ -96,7 +96,7 @@ class FormEdit extends Component {
 
   render() {
     const { className, full, inline } = this.props;
-    const { family, form, formTemplate } = this.state;
+    const { form, formTemplate, linkedForm } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -127,7 +127,7 @@ class FormEdit extends Component {
           onSubmit={this._onUpdate}>
           {header}
           <FormContents form={form} formTemplate={formTemplate}
-            family={family} full={full} onChange={this._onChange} />
+            linkedForm={linkedForm} full={full} onChange={this._onChange} />
           <footer className="form__footer">
             <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />

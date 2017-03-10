@@ -61,7 +61,10 @@ export function authorizedForDomainOrSelf(session) {
   if (session && session.userId.administrator) {
     return {};
   } else if (session && session.userId.administratorDomainId) {
-    return { domainId: session.userId.administratorDomainId };
+    return { $or: [
+      { domainId: session.userId.administratorDomainId },
+      { userId: session.userId },
+    ] };
   } else if (session) {
     return { userId: session.userId };
   }
