@@ -40,6 +40,14 @@ export function authorizedAdministrator(session) {
   return { name: false };
 }
 
+export function authorizedDomainAdministrator(session) {
+  if (session &&
+    (session.userId.administrator || session.userId.administratorDomainId)) {
+    return {};
+  }
+  return { name: false };
+}
+
 export function authorizedForDomain(session) {
   if (session && session.userId.administrator) {
     return {};

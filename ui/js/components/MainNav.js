@@ -17,11 +17,10 @@ const DOMAIN_ADMIN_ROUTES = [
   { label: 'Form Templates', path: '/form-templates' },
   { label: 'Payments', path: '/payments' },
   { label: 'Email Lists', path: '/email-lists' },
+  { label: 'People', path: '/users' },
 ];
 
 const ADMIN_ROUTES = [
-  { label: 'People', path: '/users' },
-  // { label: 'Families', path: '/families' },
   { label: 'Resources', path: '/resources' },
   { label: 'Domains', path: '/domains' },
   { label: 'Calendars', path: '/calendars' },

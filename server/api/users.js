@@ -2,16 +2,16 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
-import { authorizedAdministrator } from './auth';
+import { authorizedAdministrator, authorizedDomainAdministrator } from './auth';
 import { compressImage } from './image';
 
 mongoose.Promise = global.Promise;
 
 // /api/users
 
-const prepareUser = data => (
-  Promise.resolve(data)
-  .then(() => {
+const prepareUser = userData => (
+  Promise.resolve(userData)
+  .then((data) => {
     if (!data.password) return data;
     return bcrypt.hash(data.password, 10)
     .then((encryptedPassword) => {
@@ -153,7 +153,7 @@ It will allow sign you in to the ${site.name} web site.
       },
     },
     index: {
-      authorize: authorizedAdministrator,
+      authorize: authorizedDomainAdministrator,
       searchProperties: ['name', 'email'],
       transformOut: users => (
         users.map((doc) => {
