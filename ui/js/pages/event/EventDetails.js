@@ -42,15 +42,15 @@ export default class EventDetails extends Component {
     if (params.calendarId) {
       formState.change('calendarId')(params.calendarId);
     }
-    if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+    if (session.userId.administratorDomainId) {
+      formState.change('domainId')(session.userId.administratorDomainId);
     }
   }
 
   _get() {
     const { session } = this.props;
 
-    if (session.administrator) {
+    if (session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(domains => this.setState({ domains }))
       .catch(error => console.error('EventDetails catch', error));
@@ -132,7 +132,7 @@ export default class EventDetails extends Component {
       }
 
       let administeredBy;
-      if (session.administrator) {
+      if (session.userId.administrator) {
         const domainOptions = domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));

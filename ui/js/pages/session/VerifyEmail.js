@@ -48,7 +48,7 @@ const Verified = (props) => {
       <div className="form__contents">
         <fieldset className="form__fields">
           <div className="form__text">
-            Thanks for verifying your email {session.name}.
+            Thanks for verifying your email {session.userId.name}.
             You can set a password for your account or just proceed to where
             you left off.
           </div>

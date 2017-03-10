@@ -113,8 +113,8 @@ class Home extends Component {
     let contents;
     if (session && session.token) {
       contents = [
-        <Link key="name" to={`/users/${session.userId}/edit`}>
-          {session.name}
+        <Link key="name" to={`/users/${session.userId._id}/edit`}>
+          {session.userId.name}
         </Link>,
         <a key="control" className="home__sign-out" onClick={this._signOut}>
           <span className="link__text">Sign Out</span>
@@ -208,7 +208,7 @@ class Home extends Component {
     const sessionControl = this._renderSession();
 
     let editControl;
-    if (page && session && session.administrator) {
+    if (page && session && session.userId.administrator) {
       editControl = <Link to={`/pages/${page._id}/edit`}>Edit</Link>;
     }
 

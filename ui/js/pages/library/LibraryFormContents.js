@@ -14,12 +14,12 @@ export default class LibraryFormContents extends Component {
   componentDidMount() {
     const { formState, session } = this.props;
 
-    if (session.administrator) {
+    if (session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.error('LibraryFormContents domains catch', error));
-    } else if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+    } else if (session.userId.administratorDomainId) {
+      formState.change('domainId')(session.userId.administratorDomainId);
     }
   }
 
@@ -28,7 +28,7 @@ export default class LibraryFormContents extends Component {
     const library = formState.object;
 
     let administeredBy;
-    if (session.administrator) {
+    if (session.userId.administrator) {
       const domains = this.state.domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));

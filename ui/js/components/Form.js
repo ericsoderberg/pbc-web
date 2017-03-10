@@ -151,9 +151,11 @@ Form.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   Preview: PropTypes.func,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
-    name: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+      name: PropTypes.string,
+    }),
   }).isRequired,
   submitLabel: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,

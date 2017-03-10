@@ -52,8 +52,8 @@ class Library extends Component {
           {page.name}
         </Link>
       ));
-      if (session && (session.administrator ||
-        session.administratorDomainId === library.domainId)) {
+      if (session && (session.userId.administrator ||
+        session.userId.administratorDomainId === library.domainId)) {
         controls.push(
           <Link key="edit" to={`/libraries/${library._id}/edit`}>
             Edit
@@ -80,8 +80,10 @@ Library.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+    }),
   }),
 };
 

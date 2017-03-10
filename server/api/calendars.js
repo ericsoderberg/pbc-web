@@ -77,11 +77,11 @@ export default function (router) {
         });
       }
       if (!session ||
-        !(session.administrator || session.administratorDomainId)) {
+        !(session.userId.administrator || session.userId.administratorDomainId)) {
         query.find({ public: true });
-      } else if (!session.administrator) {
+      } else if (!session.userId.administrator) {
         query.find({ $or: [
-          { public: true }, { domainId: session.administratorDomainId },
+          { public: true }, { domainId: session.userId.administratorDomainId },
         ] });
       }
 

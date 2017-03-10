@@ -48,8 +48,8 @@ class Page extends Component {
     let contents;
     if (page) {
       contents = <Sections align={page.align} sections={page.sections} />;
-      if (session && (session.administrator ||
-        session.administratorDomainId === page.domainId)) {
+      if (session && (session.userId.administrator ||
+        session.userId.administratorDomainId === page.domainId)) {
         actions = [
           <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>,
         ];
@@ -77,8 +77,10 @@ Page.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+    }),
   }),
 };
 

@@ -7,7 +7,7 @@ import Stored from '../../components/Stored';
 const FamilyAdd = (props) => {
   const { session } = props;
   const family = {
-    adults: [{ email: session.email, name: session.name }],
+    adults: [{ email: session.userId.email, name: session.userId.name }],
     children: [],
   };
   return (

@@ -58,7 +58,7 @@ ${formTemplate.postSubmitMessage}
 `;
         transporter.sendMail({
           from: site.email,
-          to: session.email,
+          to: session.userId.email,
           subject: 'Thank you',
           markdown: instructions,
         }, (err, info) => {
@@ -79,7 +79,7 @@ ${formTemplate.postSubmitMessage}
 # [${formTemplate.name}](${url})
 
 
-### Submitted by ${session.name} (${session.email}) on ${moment(form.modified).format('MMMM Do YYYY')}
+### Submitted by ${session.userId.name} (${session.userId.email}) on ${moment(form.modified).format('MMMM Do YYYY')}
 
 Just letting you know.
 `;
@@ -217,8 +217,8 @@ export default function (router, transporter) {
       const data = req.body;
       data.created = new Date();
       data.modified = data.created;
-      const admin = (session.administrator || (formTemplate.domainId &&
-        formTemplate.domainId.equals(session.administratorDomainId)));
+      const admin = (session.userId.administrator || (formTemplate.domainId &&
+        formTemplate.domainId.equals(session.userId.administratorDomainId)));
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
       if (!admin || !data.userId) {
@@ -267,8 +267,8 @@ export default function (router, transporter) {
         return Promise.reject({ error: 'Mismatched template' });
       }
       // AUTH
-      const admin = (session.administrator || (formTemplate.domainId &&
-        formTemplate.domainId.equals(session.administratorDomainId)));
+      const admin = (session.userId.administrator || (formTemplate.domainId &&
+        formTemplate.domainId.equals(session.userId.administratorDomainId)));
       if (!admin && !form.userID.equals(session.userId)) {
         return Promise.reject({ status: 403 });
       }

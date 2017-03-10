@@ -133,7 +133,7 @@ class FormSection extends Component {
     const { session } = this.props;
     if (session) {
       getItems('forms', {
-        filter: { formTemplateId: formTemplate._id, userId: session.userId },
+        filter: { formTemplateId: formTemplate._id, userId: session.userId._id },
         populate: true,
       })
       .then((forms) => {
@@ -231,7 +231,7 @@ class FormSection extends Component {
     }
 
     let formTemplateLink;
-    if (session && session.administrator && formTemplate) {
+    if (session && session.userId.administrator && formTemplate) {
       const formTemplatePath = `/form-templates/${formTemplate._id}`;
       formTemplateLink = (
         <Link className="form-summary__template" to={formTemplatePath}>
@@ -341,9 +341,11 @@ FormSection.propTypes = {
   formTemplateId: PropTypes.oneOfType([
     PropTypes.string, PropTypes.object]),
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
-    userId: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+      _id: PropTypes.string,
+    }),
   }),
 };
 

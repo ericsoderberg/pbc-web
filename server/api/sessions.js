@@ -12,16 +12,16 @@ mongoose.Promise = global.Promise;
 function createSession(user) {
   const Session = mongoose.model('Session');
   const data = {
-    administrator: user.administrator,
-    administratorDomainId: user.administratorDomainId,
-    email: user.email,
     loginAt: new Date(),
-    name: user.name,
     token: hat(), // better to encrypt this before storing it, someday
     userId: user._id,
   };
   const session = new Session(data);
-  return session.save();
+  return session.save()
+  .then(sessionSaved => Session.findOne({ token: sessionSaved.token })
+    .populate('userId', 'email name administrator administratorDomainId')
+    .exec(),
+  );
 }
 
 export default function (router) {
@@ -81,8 +81,6 @@ export function useOrCreateSession(session, email, name) {
       // create a new session
       const Session = mongoose.model('Session');
       const newSession = new Session({
-        email: user.email,
-        name: user.name,
         token: hat(), // better to encrypt this before storing it, someday
         userId: user._id,
       });

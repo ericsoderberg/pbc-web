@@ -14,14 +14,14 @@ export default class PageDetailsFormContents extends Component {
 
   componentDidMount() {
     const { formState, session } = this.props;
-    if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+    if (session.userId.administratorDomainId) {
+      formState.change('domainId')(session.userId.administratorDomainId);
     }
   }
 
   _get() {
     const { session } = this.props;
-    if (session.administrator) {
+    if (session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.error('PageDetailsFormContents catch', error));
@@ -60,7 +60,7 @@ export default class PageDetailsFormContents extends Component {
       ];
 
       let administeredBy;
-      if (session.administrator) {
+      if (session.userId.administrator) {
         const domains = this.state.domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));

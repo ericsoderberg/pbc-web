@@ -6,8 +6,6 @@ import UserIcon from '../../icons/User';
 const Item = (props) => {
   const { className, item: user } = props;
   const classNames = ['item__container', className];
-  const admin =
-    (user.administrator || user.administratorDomainId) ? ' *' : undefined;
   let avatar;
   if (user.image) {
     avatar = <img className="avatar" alt="avatar" src={user.image.data} />;
@@ -20,7 +18,6 @@ const Item = (props) => {
         <span className="box--row">
           {avatar}
           <span className="item__name">{user.name}</span>
-          <span>{admin}</span>
         </span>
         <span>{user.email}</span>
       </div>

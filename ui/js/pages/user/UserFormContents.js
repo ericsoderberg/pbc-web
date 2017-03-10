@@ -22,7 +22,7 @@ export default class UserFormContents extends Component {
   componentDidMount() {
     const { formState, session } = this.props;
 
-    if (session.administrator) {
+    if (session.userId.administrator || session.userId.administratorDomainId) {
       this._getDomains();
     }
 
@@ -94,14 +94,15 @@ export default class UserFormContents extends Component {
 
   render() {
     const { className, formState, session } = this.props;
+    const { domains } = this.state;
     const user = formState.object;
 
     let adminFields;
-    if (session.administrator) {
-      const domains = this.state.domains.map(domain => (
+    if (session.userId.administrator) {
+      const domainOptions = domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
-      domains.unshift(<option key={0} />);
+      domainOptions.unshift(<option key={0} />);
 
       adminFields = (
         <fieldset className="form__fields">
@@ -115,8 +116,19 @@ export default class UserFormContents extends Component {
             <select name="administratorDomainId"
               value={user.administratorDomainId || ''}
               onChange={formState.change('administratorDomainId')}>
-              {domains}
+              {domainOptions}
             </select>
+          </FormField>
+        </fieldset>
+      );
+    } else if (session.userId.administratorDomainId && domains.length > 0 &&
+      user.administratorDomainId) {
+      const domain = domains.filter(d => d._id === user.administratorDomainId);
+      adminFields = (
+        <fieldset className="form__fields">
+          <FormField label="Administrator for">
+            <input name="administratorDomainId" disabled={true}
+              value={domain.name} />
           </FormField>
         </fieldset>
       );
@@ -236,7 +248,13 @@ export default class UserFormContents extends Component {
 UserFormContents.propTypes = {
   className: PropTypes.string,
   formState: PropTypes.object.isRequired,
-  session: PropTypes.object.isRequired,
+  session: PropTypes.shape({
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+      name: PropTypes.string,
+    }).isRequired,
+  }).isRequired,
 };
 
 UserFormContents.defaultProps = {

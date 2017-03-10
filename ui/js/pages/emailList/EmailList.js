@@ -91,8 +91,8 @@ class EmailList extends Component {
       result = <Loading />;
     } else {
       const actions = [];
-      if (session && (session.administrator ||
-        session.administratorDomainId === emailList.domainId)) {
+      if (session && (session.userId.administrator ||
+        session.userId.administratorDomainId === emailList.domainId)) {
         actions.push(
           <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
             Edit
@@ -170,8 +170,10 @@ EmailList.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+    }),
   }).isRequired,
 };
 

@@ -58,9 +58,9 @@ class FormAdd extends Component {
           // if (session) {
           //   // pre-fill out name and email from session, if possible
           //   if (field.name === 'Name') {
-          //     form.fields.push({ templateFieldId: field._id, value: session.name });
+          //     form.fields.push({ templateFieldId: field._id, value: session.userId.name });
           //   } else if (field.name === 'Email') {
-          //     form.fields.push({ templateFieldId: field._id, value: session.email });
+          //     form.fields.push({ templateFieldId: field._id, value: session.userId.email });
           //   }
           // }
 

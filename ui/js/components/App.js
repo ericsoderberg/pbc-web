@@ -29,7 +29,7 @@ class App extends Component {
     const { session } = props;
     return {
       navigable: (session &&
-        (session.administrator || session.administratorDomainId)),
+        (session.userId.administrator || session.userId.administratorDomainId)),
     };
   }
 
@@ -89,13 +89,19 @@ class App extends Component {
 App.propTypes = {
   children: PropTypes.any.isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
-  }).isRequired,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+    }),
+  }),
+};
+
+App.defaultProps = {
+  session: undefined,
 };
 
 const select = state => ({
-  session: state.session || {},
+  session: state.session,
 });
 
 export default Stored(App, select);

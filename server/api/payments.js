@@ -42,8 +42,8 @@ export default function (router) {
       // the current session user
       if (!data.userId ||
         // TODO: get formTemplate so we have the domainId
-        !(session.administrator || (formTemplate.domainId &&
-          formTemplate.domainId.equals(session.administratorDomainId)))) {
+        !(session.userId.administrator || (formTemplate.domainId &&
+          formTemplate.domainId.equals(session.userId.administratorDomainId)))) {
         data.userId = session.userId;
       }
       const payment = new Payment(data);
@@ -67,8 +67,8 @@ export default function (router) {
         // Allow an administrator to set the userId. Otherwise, set it to
         // the current session user
         if (!data.userId ||
-          !(session.administrator || (payment.domainId &&
-            payment.domainId.equals(session.administratorDomainId)))) {
+          !(session.userId.administrator || (payment.domainId &&
+            payment.domainId.equals(session.userId.administratorDomainId)))) {
           data.userId = session.userId;
         }
         data.modified = new Date();

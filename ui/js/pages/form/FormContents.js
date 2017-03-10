@@ -44,9 +44,9 @@ class FormContents extends Component {
       }
     });
     const administrator = (props.session &&
-      (props.session.administrator || (
+      (props.session.userId.administrator || (
         (props.formTemplate && props.formTemplate.domainId &&
-        props.session.administratorDomainId === props.formTemplate.domainId))));
+        props.session.userId.administratorDomainId === props.formTemplate.domainId))));
     return { administrator, fields };
   }
 
@@ -174,9 +174,11 @@ FormContents.propTypes = {
   full: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
-    name: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+      name: PropTypes.string,
+    }),
   }).isRequired,
 };
 

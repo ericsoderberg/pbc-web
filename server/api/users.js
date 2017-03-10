@@ -142,6 +142,7 @@ It will allow sign you in to the ${site.name} web site.
       deleteRelated: deleteUserRelated,
     },
     get: {
+      populate: { path: 'administratorDomainId', select: 'name' },
       transformOut: (user) => {
         if (user) {
           user = user.toObject();

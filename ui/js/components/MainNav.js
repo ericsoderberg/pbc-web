@@ -75,16 +75,16 @@ class MainNav extends Component {
     if (session) {
       sessionControls = [
         <Link key="name" className="main-nav__link"
-          to={`/users/${session.userId}/edit`}>{session.name}</Link>,
+          to={`/users/${session.userId._id}/edit`}>{session.userId.name}</Link>,
         <button key="out" className="main-nav__link button-plain"
           onClick={this._signOut}>
           Sign Out
         </button>,
       ];
-      if (session.administrator || session.administratorDomainId) {
+      if (session.userId.administrator || session.userId.administratorDomainId) {
         domainAdminLinks = this._renderLinks(DOMAIN_ADMIN_ROUTES);
       }
-      if (session.administrator) {
+      if (session.userId.administrator) {
         adminLinks = this._renderLinks(ADMIN_ROUTES);
       }
     } else {
@@ -111,10 +111,11 @@ MainNav.propTypes = {
   className: PropTypes.string,
   onClick: PropTypes.func.isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
-    name: PropTypes.string,
-    userId: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+      name: PropTypes.string,
+    }),
   }).isRequired,
 };
 

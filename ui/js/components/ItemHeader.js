@@ -30,9 +30,9 @@ class ItemHeader extends Component {
     const { category, item, title, session } = this.props;
     let { actions } = this.props;
 
-    if (item && session && (session.administrator ||
-      (session.administratorDomainId &&
-        session.administratorDomainId === item.domainId))) {
+    if (item && session && (session.userId.administrator ||
+      (session.userId.administratorDomainId &&
+        session.userId.administratorDomainId === item.domainId))) {
       actions = [...actions,
         <a key="copy" href={`/${category}/add`} onClick={this._onCopy}>
           Copy
@@ -54,8 +54,10 @@ ItemHeader.propTypes = {
   category: PropTypes.string.isRequired,
   item: PropTypes.object,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+    }),
   }),
   title: PropTypes.string,
 };

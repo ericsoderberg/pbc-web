@@ -25,12 +25,12 @@ export default class FormTemplateFormContents extends Component {
 
   componentDidMount() {
     const { formState, session } = this.props;
-    if (session.administrator) {
+    if (session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(response => this.setState({ domains: response }))
       .catch(error => console.error('FormTemplateFormContents catch', error));
-    } else if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+    } else if (session.userId.administratorDomainId) {
+      formState.change('domainId')(session.userId.administratorDomainId);
     }
     this._loadDependency(this.props);
   }
@@ -226,7 +226,7 @@ export default class FormTemplateFormContents extends Component {
         </FormField>,
       );
 
-      if (session.administrator) {
+      if (session.userId.administrator) {
         const domains = this.state.domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));

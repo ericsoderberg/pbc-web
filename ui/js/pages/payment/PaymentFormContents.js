@@ -46,7 +46,7 @@ class PaymentFormContents extends Component {
         '!!! PaymentFormContents form catch', error));
     }
 
-    if (full && session.administrator) {
+    if (full && session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(domains => this.setState({ domains }))
       .catch(error => console.error('PaymentFormContents domains catch', error));
@@ -56,8 +56,8 @@ class PaymentFormContents extends Component {
         .then(forms => this.setState({ forms }))
         .catch(error => console.error('PaymentFormContents forms catch', error));
       }
-    } else if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+    } else if (session.userId.administratorDomainId) {
+      formState.change('domainId')(session.userId.administratorDomainId);
     }
 
     this._loadForms(this.props);
@@ -73,7 +73,7 @@ class PaymentFormContents extends Component {
     const { formState, full, session } = props;
     const payment = formState.object;
 
-    if (full && session.administrator && payment && payment._id) {
+    if (full && session.userId.administrator && payment && payment._id) {
       getItems('forms', { filter: { paymentIds: payment._id } })
       .then(forms => this.setState({ forms }))
       .catch(error => console.error('PaymentFormContents forms catch', error));
@@ -101,8 +101,8 @@ class PaymentFormContents extends Component {
     }
 
     const administrator = (session &&
-      (session.administrator || (payment.domainId &&
-        session.administratorDomainId === payment.domainId)));
+      (session.userId.administrator || (payment.domainId &&
+        session.userId.administratorDomainId === payment.domainId)));
 
     let admin;
     if (full && administrator) {
@@ -121,7 +121,7 @@ class PaymentFormContents extends Component {
       }
 
       let administeredBy;
-      if (session.administrator) {
+      if (session.userId.administrator) {
         const domains = this.state.domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));
@@ -215,9 +215,11 @@ PaymentFormContents.propTypes = {
   full: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   session: PropTypes.shape({
-    administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
-    name: PropTypes.string,
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+      name: PropTypes.string,
+    }),
   }).isRequired,
 };
 

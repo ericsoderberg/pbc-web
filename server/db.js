@@ -19,13 +19,9 @@ const image = {
 };
 
 const sessionSchema = Schema({
-  administrator: Boolean,
-  administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  email: String,
   loginAt: Date,
-  name: String,
-  token: String,
-  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  token: { type: String, required: true, unique: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 });
 export const Session = mongoose.model('Session', sessionSchema);
 

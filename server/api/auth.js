@@ -15,6 +15,7 @@ export function authorize(req, res, required = true) {
     const token = authorization.split('=')[1];
     const Session = mongoose.model('Session');
     return Session.findOne({ token })
+    .populate('userId', 'email name administrator administratorDomainId')
     .exec()
     .then((session) => {
       if (session || !required) {
@@ -33,26 +34,26 @@ export function authorize(req, res, required = true) {
 }
 
 export function authorizedAdministrator(session) {
-  if (session && session.administrator) {
+  if (session && session.userId.administrator) {
     return {};
   }
   return { name: false };
 }
 
 export function authorizedForDomain(session) {
-  if (session && session.administrator) {
+  if (session && session.userId.administrator) {
     return {};
-  } else if (session && session.administratorDomainId) {
-    return { domainId: session.administratorDomainId };
+  } else if (session && session.userId.administratorDomainId) {
+    return { domainId: session.userId.administratorDomainId };
   }
   return { name: false };
 }
 
 export function authorizedForDomainOrSelf(session) {
-  if (session && session.administrator) {
+  if (session && session.userId.administrator) {
     return {};
-  } else if (session && session.administratorDomainId) {
-    return { domainId: session.administratorDomainId };
+  } else if (session && session.userId.administratorDomainId) {
+    return { domainId: session.userId.administratorDomainId };
   } else if (session) {
     return { userId: session.userId };
   }

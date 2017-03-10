@@ -31,13 +31,13 @@ export default class NewsletterFormContents extends Component {
     .catch(error => console.error('NewsletterFormContents calendars catch',
       error));
 
-    if (session.administrator) {
+    if (session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(domains => this.setState({ domains }))
       .catch(error => console.error('NewsletterFormContents domains catch',
         error));
-    } else if (session.administratorDomainId) {
-      formState.change('domainId')(session.administratorDomainId);
+    } else if (session.userId.administratorDomainId) {
+      formState.change('domainId')(session.userId.administratorDomainId);
     }
   }
 
@@ -82,7 +82,7 @@ export default class NewsletterFormContents extends Component {
     calendarOptions.unshift(<option key={0} />);
 
     let administeredBy;
-    if (session.administrator) {
+    if (session.userId.administrator) {
       const domainOptions = domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
