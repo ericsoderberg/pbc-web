@@ -79,11 +79,12 @@ Page.propTypes = {
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-  }).isRequired,
+  }),
 };
 
 Page.defaultProps = {
   page: undefined,
+  session: undefined,
 };
 
 const select = (state, props) => {

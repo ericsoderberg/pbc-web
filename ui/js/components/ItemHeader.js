@@ -56,13 +56,14 @@ ItemHeader.propTypes = {
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-  }).isRequired,
+  }),
   title: PropTypes.string,
 };
 
 ItemHeader.defaultProps = {
   actions: [],
   item: undefined,
+  session: undefined,
   title: undefined,
 };
 

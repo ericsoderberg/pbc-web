@@ -57,11 +57,11 @@ import ResourceEdit from './pages/resource/ResourceEdit';
 import Search from './pages/search/Search';
 import SignIn from './pages/session/SignIn';
 import SignUp from './pages/user/SignUp';
+import VerifyEmail from './pages/session/VerifyEmail';
 import Users from './pages/user/Users';
 import UserAdd from './pages/user/UserAdd';
 import User from './pages/user/User';
 import UserEdit from './pages/user/UserEdit';
-import UserVerifyEmail from './pages/user/VerifyEmail';
 import SiteEdit from './pages/site/SiteEdit';
 
 const requireSession = (nextState, replace) => {
@@ -85,7 +85,7 @@ export default {
     { path: 'calendar', component: Calendar },
     { path: 'sign-up', component: SignUp },
     { path: 'sign-in', component: SignIn },
-    { path: 'verify-email', component: UserVerifyEmail },
+    { path: 'verify-email', component: VerifyEmail },
     { path: 'users/add', component: UserAdd },
     { path: 'users/:id', component: User },
     { path: 'users/:id/edit', component: UserEdit },

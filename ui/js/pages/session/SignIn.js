@@ -4,7 +4,10 @@ import { postSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
+import Button from '../../components/Button';
 import FormState from '../../utils/FormState';
+
+const TITLE = 'Sign In';
 
 export default class SignIn extends Component {
 
@@ -18,7 +21,10 @@ export default class SignIn extends Component {
   }
 
   componentDidMount() {
-    document.title = 'Sign In';
+    const { inline } = this.props;
+    if (!inline) {
+      document.title = TITLE;
+    }
     this._emailRef.focus();
   }
 
@@ -27,9 +33,14 @@ export default class SignIn extends Component {
   }
 
   _onSignIn(event) {
+    const { inline } = this.props;
     event.preventDefault();
     postSession(this.state.formState.object)
-      .then(() => this.context.router.push('/'))
+      .then(() => {
+        if (!inline) {
+          this.context.router.push('/');
+        }
+      })
       .catch(error => this.setState({ error }));
   }
 
@@ -38,20 +49,41 @@ export default class SignIn extends Component {
   }
 
   render() {
+    const { inline, onCancel, onSignUp, onVerifyEmail } = this.props;
     const { formState, error } = this.state;
     const session = formState.object;
+    const classNames = ['form__container'];
+    if (inline) {
+      classNames.push('form__container--inline');
+    }
 
-    const cancelControl = [
-      <button key="cancel" type="button" className="button"
-        onClick={this._onCancel}>
-        Cancel
-      </button>,
-    ];
+    let header;
+    let footerCancelControl;
+    let verifyEmailControl;
+    let signUpControl;
+    if (inline) {
+      header = <div className="form__text"><h2>{TITLE}</h2></div>;
+      footerCancelControl = (
+        <Button secondary={true} label="Cancel" onClick={onCancel} />
+      );
+      verifyEmailControl = <a onClick={onVerifyEmail}>Sign in via email</a>;
+      signUpControl = <a onClick={onSignUp}>Sign up</a>;
+    } else {
+      const actions = [
+        <button key="cancel" type="button" className="button"
+          onClick={this._onCancel}>
+          Cancel
+        </button>,
+      ];
+      header = <PageHeader title={TITLE} actions={actions} />;
+      verifyEmailControl = <Link to="/verify-email">Sign in via email</Link>;
+      signUpControl = <Link to="/sign-up">Sign up</Link>;
+    }
 
     return (
-      <div className="form__container">
+      <div className={classNames.join(' ')}>
         <form className="form" action="/api/sessions" onSubmit={this._onSignIn}>
-          <PageHeader title="Sign In" actions={cancelControl} />
+          {header}
           <FormError message={error} />
           <div className="form__contents">
             <fieldset className="form__fields">
@@ -73,12 +105,13 @@ export default class SignIn extends Component {
               <button type="submit" className="button" onClick={this._onSignIn}>
                 Sign In
               </button>
+              {footerCancelControl}
             </footer>
             <footer className="form__footer">
-              <Link to="/verify-email">Sign in via email</Link>
+              {verifyEmailControl}
             </footer>
             <footer className="form__footer">
-              <Link to="/sign-up">Sign up</Link>
+              {signUpControl}
             </footer>
           </div>
         </form>
@@ -86,6 +119,20 @@ export default class SignIn extends Component {
     );
   }
 }
+
+SignIn.propTypes = {
+  inline: PropTypes.bool,
+  onCancel: PropTypes.func,
+  onSignUp: PropTypes.func,
+  onVerifyEmail: PropTypes.func,
+};
+
+SignIn.defaultProps = {
+  inline: false,
+  onCancel: undefined,
+  onSignUp: undefined,
+  onVerifyEmail: undefined,
+};
 
 SignIn.contextTypes = {
   router: PropTypes.any,
