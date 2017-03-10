@@ -20,7 +20,7 @@ export default class SessionSection extends Component {
   }
 
   render() {
-    const { className, onCancel } = this.props;
+    const { className, onCancel, returnPath } = this.props;
     const { state } = this.state;
 
     const classes = ['session-section__container'];
@@ -51,7 +51,7 @@ export default class SessionSection extends Component {
         contents = (
           <VerifyEmail inline={true} onCancel={onCancel}
             onSignIn={this._nextState(SIGN_IN)}
-            onSignUp={this._nextState(SIGN_UP)} />
+            onSignUp={this._nextState(SIGN_UP)} returnPath={returnPath} />
         );
         break;
       }
@@ -68,6 +68,7 @@ export default class SessionSection extends Component {
 SessionSection.propTypes = {
   className: PropTypes.string,
   onCancel: PropTypes.func,
+  returnPath: PropTypes.string.isRequired,
 };
 
 SessionSection.defaultProps = {

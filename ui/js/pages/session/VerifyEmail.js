@@ -16,10 +16,16 @@ const Wrapper = (props) => {
   if (inline) {
     classNames.push('form__container--inline');
   }
+  let header;
+  if (inline) {
+    header = <div className="form__text"><h2>{TITLE}</h2></div>;
+  } else {
+    header = <PageHeader title={TITLE} />;
+  }
   return (
     <div className={classNames.join(' ')}>
       <div className="form">
-        <PageHeader title={TITLE} />
+        {header}
         {children}
       </div>
     </div>
@@ -32,10 +38,10 @@ Wrapper.propTypes = {
 };
 
 const Verified = (props) => {
-  const { inline, session } = props;
+  const { inline, returnPath, session } = props;
   let homeControl;
   if (!inline) {
-    homeControl = <Button path="/" secondary={true}>Home</Button>;
+    homeControl = <Button path={returnPath} secondary={true}>Proceed</Button>;
   }
   return (
     <Wrapper inline={inline}>
@@ -43,7 +49,8 @@ const Verified = (props) => {
         <fieldset className="form__fields">
           <div className="form__text">
             Thanks for verifying your email {session.name}.
-            You can set a password for your account or just use the site.
+            You can set a password for your account or just proceed to where
+            you left off.
           </div>
         </fieldset>
       </div>
@@ -61,10 +68,15 @@ const Verified = (props) => {
 
 Verified.propTypes = {
   inline: PropTypes.bool.isRequired,
+  returnPath: PropTypes.string,
   session: PropTypes.shape({
     name: PropTypes.string,
     userId: PropTypes.string,
   }).isRequired,
+};
+
+Verified.defaultProps = {
+  returnPath: '/',
 };
 
 const Pending = (props) => {
@@ -115,10 +127,10 @@ class VerifyEmail extends Component {
     const { inline } = this.props;
     if (!inline) {
       document.title = TITLE;
-      const temporaryToken = this.props.location.query.token;
-      if (temporaryToken) {
-        postSessionViaToken({ token: this.props.location.query.token })
-        .then(() => this.setState({ state: 'done' }))
+      const { location: { query: { token, returnPath } } } = this.props;
+      if (token) {
+        postSessionViaToken({ token })
+        .then(() => this.setState({ state: 'done', returnPath }))
         .catch((error) => {
           console.error('!!! Reset catch', error);
           this.setState({ state: 'prompt', errorMessage: error });
@@ -130,17 +142,20 @@ class VerifyEmail extends Component {
   }
 
   _onCancel() {
-    this.context.router.push('/');
+    const { returnPath } = this.props;
+    this.context.router.push(returnPath);
   }
 
   _onSendLink(event) {
+    const { returnPath } = this.props;
+    const { email } = this.state;
     event.preventDefault();
-    if (!this.state.email) {
+    if (!email) {
       this.setState({ errors: { email: 'required' } });
-    } else if (!EMAIL_REGEXP.test(this.state.email)) {
+    } else if (!EMAIL_REGEXP.test(email)) {
       this.setState({ errors: { email: 'not an email address' } });
     } else {
-      postVerifyEmail(this.state.email)
+      postVerifyEmail(email, returnPath)
       .then(() => this.setState({ state: 'pending' }))
       .catch((error) => {
         console.error('!!! VerifyEmail error', error);
@@ -221,7 +236,7 @@ class VerifyEmail extends Component {
 
   render() {
     const { inline, session } = this.props;
-    const { email, state } = this.state;
+    const { email, returnPath, state } = this.state;
 
     let contents;
     switch (state) {
@@ -233,7 +248,9 @@ class VerifyEmail extends Component {
         contents = <Pending inline={inline} email={email} session={session} />;
         break;
       case 'done':
-        contents = <Verified inline={inline} session={session} />;
+        contents = (
+          <Verified inline={inline} session={session} returnPath={returnPath} />
+        );
         break;
     }
     return contents;
@@ -244,12 +261,14 @@ VerifyEmail.propTypes = {
   inline: PropTypes.bool,
   location: PropTypes.shape({
     query: PropTypes.shape({
+      returnPath: PropTypes.string,
       token: PropTypes.string,
     }),
   }),
   onCancel: PropTypes.func,
   onSignIn: PropTypes.func,
   onSignUp: PropTypes.func,
+  returnPath: PropTypes.string,
   session: PropTypes.shape({
     name: PropTypes.string,
   }),
@@ -261,6 +280,7 @@ VerifyEmail.defaultProps = {
   onCancel: undefined,
   onSignIn: undefined,
   onSignUp: undefined,
+  returnPath: '/',
   session: undefined,
 };
 

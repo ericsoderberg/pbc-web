@@ -262,7 +262,8 @@ class FormSection extends Component {
 
       case SESSION: {
         contents = (
-          <SessionSection onCancel={this._nextState(AUTHENTICATION_NEEDED)} />
+          <SessionSection onCancel={this._nextState(AUTHENTICATION_NEEDED)}
+            returnPath={window.location.pathname} />
         );
         break;
       }

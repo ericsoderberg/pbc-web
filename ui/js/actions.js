@@ -209,9 +209,12 @@ export function postSignUp(user) {
   .then(response => response.json());
 }
 
-export function postVerifyEmail(email) {
+export function postVerifyEmail(email, returnPath) {
   return fetch('/api/users/verify-email', {
-    method: 'POST', headers: _headers, body: JSON.stringify({ email }) })
+    method: 'POST',
+    headers: _headers,
+    body: JSON.stringify({ email, returnPath }),
+  })
   .then(processStatus)
   .then(response => response.json());
 }

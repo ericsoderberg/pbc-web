@@ -101,8 +101,14 @@ export default function (router, transporter) {
     ))
     .then((context) => {
       const { user, site } = context;
+      const params = [
+        `token=${user.temporaryToken}`,
+      ];
+      if (data.returnPath) {
+        params.push(`returnPath=${encodeURIComponent(data.returnPath)}`);
+      }
       const url =
-        `${req.headers.origin}/verify-email?token=${user.temporaryToken}`;
+        `${req.headers.origin}/verify-email?${params.join('&')}`;
       const instructions =
 `## Email verification for ${site.name}
 
