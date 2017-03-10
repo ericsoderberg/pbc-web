@@ -1,18 +1,24 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import List from '../../components/List';
+import UserIcon from '../../icons/User';
 
 const Item = (props) => {
   const { className, item: user } = props;
   const classNames = ['item__container', className];
   const admin =
     (user.administrator || user.administratorDomainId) ? ' *' : undefined;
+  let avatar;
+  if (user.image) {
+    avatar = <img className="avatar" alt="avatar" src={user.image.data} />;
+  } else {
+    avatar = <UserIcon className="avatar" />;
+  }
   return (
     <Link className={classNames.join(' ')} to={`/users/${user._id}`}>
       <div className="item">
         <span className="box--row">
-          <img className="avatar" alt="avatar"
-            src={user.image ? user.image.data : ''} />
+          {avatar}
           <span className="item__name">{user.name}</span>
           <span>{admin}</span>
         </span>
