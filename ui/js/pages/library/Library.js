@@ -82,7 +82,11 @@ Library.propTypes = {
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-  }).isRequired,
+  }),
+};
+
+Library.defaultProps = {
+  session: undefined,
 };
 
 const select = state => ({

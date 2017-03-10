@@ -332,12 +332,13 @@ Home.propTypes = {
   page: PropTypes.object,
   session: PropTypes.shape({
     token: PropTypes.any,
-  }).isRequired,
+  }),
   site: PropTypes.object,
 };
 
 Home.defaultProps = {
   page: undefined,
+  session: undefined,
   site: undefined,
 };
 

@@ -330,7 +330,7 @@ List.propTypes = {
   session: PropTypes.shape({
     administrator: PropTypes.bool,
     administratorDomainId: PropTypes.string,
-  }).isRequired,
+  }),
   sort: PropTypes.string,
   title: PropTypes.string.isRequired,
 };
@@ -345,6 +345,7 @@ List.defaultProps = {
   populate: undefined,
   search: true,
   select: undefined,
+  session: undefined,
   sort: 'name',
 };
 
