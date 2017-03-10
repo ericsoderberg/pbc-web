@@ -77,7 +77,7 @@ export default class SelectSearch extends Component {
     this.setState({ searchText });
     const { category, exclude, options } = this.props;
     getItems(category,
-      { select: 'name', sort: 'name', ...(options || {}), search: searchText })
+      { select: 'name', sort: 'name', ...options, search: searchText })
     .then((response) => {
       const suggestions = response
       .filter(item => !(exclude || []).some(item2 => item._id === item2._id));
@@ -187,7 +187,7 @@ SelectSearch.defaultProps = {
   className: undefined,
   clearable: false,
   exclude: [],
-  options: undefined,
+  options: {},
   placeholder: undefined,
   Suggestion: undefined,
   value: '',

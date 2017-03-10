@@ -219,14 +219,21 @@ export default class FormTemplateFormContents extends Component {
         );
       }
 
+      if (formTemplate.authenticate) {
+        details.push(
+          <FormField key="depends" label="Depends on"
+            help={`Another form that must be filled out first.
+              This only works for authenticated forms.`}
+            error={errors.dependsOnId}>
+            <SelectSearch category="form-templates" clearable={true}
+              options={{ filter: { authenticate: true } }}
+              value={(formTemplate.dependsOnId || {}).name || ''}
+              onChange={this._changeDependsOnId} />
+          </FormField>,
+        );
+      }
+
       details.push(
-        <FormField key="depends" label="Depends on"
-          help="Another form that must be filled out first"
-          error={errors.dependsOnId}>
-          <SelectSearch category="form-templates" clearable={true}
-            value={(formTemplate.dependsOnId || {}).name || ''}
-            onChange={this._changeDependsOnId} />
-        </FormField>,
         <FormField key="notify" label="Notify email addresses"
           help="Whom to notify when people submit filled out forms."
           error={errors.notify}>
