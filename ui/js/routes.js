@@ -18,10 +18,6 @@ import Events from './pages/event/Events';
 import EventAdd from './pages/event/EventAdd';
 import Event from './pages/event/Event';
 import EventEdit from './pages/event/EventEdit';
-import Families from './pages/family/Families';
-import FamilyAdd from './pages/family/FamilyAdd';
-import Family from './pages/family/Family';
-import FamilyEdit from './pages/family/FamilyEdit';
 import Files from './pages/file/Files';
 import FormAdd from './pages/form/FormAdd';
 import FormEdit from './pages/form/FormEdit';
@@ -90,10 +86,6 @@ export default {
     { path: 'users/:id', component: User },
     { path: 'users/:id/edit', component: UserEdit },
     { path: 'users', component: Users },
-    { path: 'families/add', component: FamilyAdd, onEnter: requireSession },
-    { path: 'families/:id', component: Family, onEnter: requireSession },
-    { path: 'families/:id/edit', component: FamilyEdit, onEnter: requireSession },
-    { path: 'families', component: Families, onEnter: requireSession },
     { path: 'pages/add', component: PageAdd, onEnter: requireSession },
     { path: 'pages/:id', component: Page },
     { path: 'pages/:id/edit', component: PageEdit, onEnter: requireSession },

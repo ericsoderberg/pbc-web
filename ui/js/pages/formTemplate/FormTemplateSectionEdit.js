@@ -55,7 +55,7 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render() {
-    const { family, includeName, dependableFields, dependsOnFormTemplate } = this.props;
+    const { includeName, dependableFields, dependsOnFormTemplate } = this.props;
     const { detailsActive, formState, expandedFields } = this.state;
     const section = formState.object;
 
@@ -88,17 +88,6 @@ export default class FormTemplateSectionEdit extends Component {
             <label htmlFor="administrative">administrative</label>
           </FormField>,
         ];
-
-        if (family) {
-          details.push(
-            <FormField>
-              <input name="child" type="checkbox"
-                checked={section.child || false}
-                onChange={formState.toggle('child')} />
-              <label htmlFor="child">per child</label>
-            </FormField>,
-          );
-        }
       } else {
         details = (
           <button className="form-fields__more-control button button-plain"
@@ -182,7 +171,6 @@ export default class FormTemplateSectionEdit extends Component {
 FormTemplateSectionEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object).isRequired,
   dependsOnFormTemplate: PropTypes.object,
-  family: PropTypes.bool,
   includeName: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
@@ -190,5 +178,4 @@ FormTemplateSectionEdit.propTypes = {
 
 FormTemplateSectionEdit.defaultProps = {
   dependsOnFormTemplate: undefined,
-  family: undefined,
 };

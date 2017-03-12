@@ -10,8 +10,11 @@ import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateOptionEdit from './FormTemplateOptionEdit';
 
-const NAME_REGEXP = /name/i;
-const EMAIL_REGEXP = /email/i;
+const LINK_TO_USER_FIELDS = {
+  name: /name/i,
+  email: /email/i,
+  phone: /phone/i,
+};
 
 export default class FormTemplateFieldEdit extends Component {
 
@@ -52,8 +55,7 @@ export default class FormTemplateFieldEdit extends Component {
     let limit;
     let max;
     let min;
-    let sessionEmail;
-    let sessionName;
+    let sessionField;
 
     if (field.type === 'line' || field.type === 'choice' ||
       field.type === 'choices' || field.type === 'count' ||
@@ -115,25 +117,26 @@ export default class FormTemplateFieldEdit extends Component {
     }
 
     if (field.type === 'line') {
-      if (field.name.match(NAME_REGEXP)) {
-        sessionName = (
-          <FormField>
-            <input name="sessionName" type="checkbox"
-              checked={field.sessionName || false}
-              onChange={formState.toggle('sessionName')} />
-            <label htmlFor="sessionName">Session name</label>
-          </FormField>
-        );
-      } else if (field.name.match(EMAIL_REGEXP)) {
-        sessionEmail = (
-          <FormField>
-            <input name="sessionEmail" type="checkbox"
-              checked={field.sessionEmail || false}
-              onChange={formState.toggle('sessionEmail')} />
-            <label htmlFor="sessionEmail">Session email</label>
-          </FormField>
-        );
-      }
+      Object.keys(LINK_TO_USER_FIELDS).some((fieldName) => {
+        const regexp = LINK_TO_USER_FIELDS[fieldName];
+        if (field.name.match(regexp)) {
+          sessionField = (
+            <FormField>
+              <input name="sessionField" type="checkbox"
+                checked={field.linkToUserProperty === fieldName}
+                onChange={() => formState.set('linkToUserProperty',
+                  (field.linkToUserProperty === fieldName) ?
+                  undefined : fieldName)
+                } />
+              <label htmlFor="sessionField">
+                Tie to session user {fieldName}
+              </label>
+            </FormField>
+          );
+          return true;
+        }
+        return false;
+      });
     }
 
     if (field.type === 'instructions') {
@@ -270,8 +273,7 @@ export default class FormTemplateFieldEdit extends Component {
           {required}
           {monetary}
           {discount}
-          {sessionName}
-          {sessionEmail}
+          {sessionField}
           {dependsOn}
           {linkedField}
         </fieldset>

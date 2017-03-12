@@ -45,29 +45,6 @@ const userSchema = Schema({
 
 mongoose.model('User', userSchema);
 
-const familySchema = Schema({
-  adults: [{
-    relation: String,
-    userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    verified: Boolean,
-  }],
-  children: [{
-    birthday: Date,
-    grade: String,
-    name: String,
-    notes: String,
-  }],
-  mediaConsent: Boolean,
-  dismissalConsent: Boolean,
-  liabilityRelease: Boolean,
-  signature: String,
-  signed: Date,
-  created: Date,
-  modified: Date,
-});
-
-mongoose.model('Family', familySchema);
-
 const domainSchema = Schema({
   created: Date,
   modified: Date,
@@ -287,8 +264,7 @@ const formTemplateFieldSchema = Schema({
   oldId: Number,
   options: [formTemplateOptionSchema],
   required: Boolean,
-  sessionEmail: Boolean,
-  sessionName: Boolean,
+  linkToUserProperty: String,
   type: {
     type: String,
     enum: [
@@ -315,7 +291,6 @@ const formTemplateSchema = Schema({
   created: Date,
   dependsOnId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  family: Boolean, // REMOVE
   modified: Date,
   name: { type: String, required: true, unique: true },
   notify: String,
@@ -351,9 +326,7 @@ mongoose.model('Payment', paymentSchema);
 const formSchema = Schema({
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  familyId: { type: Schema.Types.ObjectId, ref: 'Family' },
   fields: [{
-    childId: { type: Schema.Types.ObjectId }, // for family based forms, REMOVE
     oldId: Number,
     optionId: ObjectId, // choice, formTemplateFieldOption
     optionIds: [ObjectId], // choices, formTemplateFieldOption

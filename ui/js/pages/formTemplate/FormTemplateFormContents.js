@@ -156,7 +156,6 @@ export default class FormTemplateFormContents extends Component {
         expandedSections[section.id]) {
         edit = (
           <FormTemplateSectionEdit section={section}
-            family={formTemplate.family}
             dependableFields={dependableFields}
             dependsOnFormTemplate={dependsOnFormTemplate}
             includeName={formTemplate.sections.length > 1}

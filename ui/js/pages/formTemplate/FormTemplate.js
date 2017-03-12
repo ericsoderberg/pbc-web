@@ -271,31 +271,10 @@ export default class FormTemplate extends Component {
   _renderCells(form) {
     const { columns, sortFieldId, totalMap } = this.state;
 
-    const childMap = {};
-    if (form.familyId) {
-      form.familyId.children.forEach((child) => { childMap[child._id] = child; });
-    }
-
     const cellMap = {};
     form.fields.forEach((field) => {
       const templateFieldId = field.templateFieldId;
-
-      let contents = this._fieldContents(field);
-      if (field.childId) {
-        // prefix with child's name
-        const child = childMap[field.childId];
-        contents = (
-          <div key={field.childId}>
-            <span className="secondary">{child.name}</span> {contents}
-          </div>
-        );
-        if (!cellMap[templateFieldId]) {
-          cellMap[templateFieldId] = [];
-        }
-        cellMap[templateFieldId].push(contents);
-      } else {
-        cellMap[templateFieldId] = contents;
-      }
+      cellMap[templateFieldId] = this._fieldContents(field);
     });
 
     const created = moment(form.created);

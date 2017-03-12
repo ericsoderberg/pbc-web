@@ -12,20 +12,25 @@ mongoose.Promise = global.Promise;
 // const FORM_SIGN_IN_MESSAGE =
 //   '[Sign In](/sign-in) to be able to submit this form.';
 
-function formValueForFieldName(formTemplate, form, fieldName) {
-  let result;
-  formTemplate.sections.some(section => (
-    section.fields.some((field) => {
-      if (field.name && field.name.toLowerCase() === fieldName.toLowerCase()) {
-        return form.fields.some((field2) => {
-          if (field._id.equals(field2.templateFieldId)) {
-            result = field2.value;
-            return true;
+function pullUserData(formTemplate, form) {
+  const result = {};
+  formTemplate.sections.forEach(section => (
+    section.fields.filter(field => field.session).forEach((field) => {
+      form.fields.some((field2) => {
+        if (field._id.equals(field2.templateFieldId)) {
+          if (field.session.name) {
+            result.name = field2.value;
+          } else if (field.session.email) {
+            result.email = field2.email;
+          } else if (field.session.phone) {
+            result.email = field2.phone;
+          } else if (field.session.address) {
+            result.email = field2.address;
           }
-          return false;
-        });
-      }
-      return false;
+          return true;
+        }
+        return false;
+      });
     })
   ));
   return result;
@@ -175,14 +180,12 @@ export default function (router, transporter) {
         { path: 'userId', select: 'name' },
         { path: 'formTemplateId', select: 'name domainId' },
         { path: 'paymentIds', select: 'amount' },
-        { path: 'familyId', select: 'children' },
       ],
     },
     get: {
       populate: [
         { path: 'userId', select: 'name' },
         { path: 'paymentIds', select: 'amount' },
-        { path: 'familyId', select: 'children' },
       ],
       transformOut: setUnpaidTotal,
     },
@@ -206,10 +209,8 @@ export default function (router, transporter) {
         return Promise.reject({ status: 403 });
       }
       const data = req.body;
-      // TODO: use sessionName and sessionEmail properties!
-      const email = formValueForFieldName(formTemplate, data, 'email');
-      const name = formValueForFieldName(formTemplate, data, 'name');
-      return useOrCreateSession(session, email, name)
+      const userData = pullUserData(formTemplate, data);
+      return useOrCreateSession(session, userData)
       .then(session2 => ({ ...context, session: session2 }));
     })
     .then((context) => {

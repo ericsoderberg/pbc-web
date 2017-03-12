@@ -19,7 +19,7 @@ function createSession(user) {
   const session = new Session(data);
   return session.save()
   .then(sessionSaved => Session.findOne({ token: sessionSaved.token })
-    .populate('userId', 'email name administrator administratorDomainId')
+    .populate('userId', 'email name administrator administratorDomainId phone')
     .exec(),
   );
 }
@@ -74,9 +74,9 @@ export default function (router) {
   });
 }
 
-export function useOrCreateSession(session, email, name) {
+export function useOrCreateSession(session, userData) {
   if (!session) {
-    return createUser(email, name)
+    return createUser(userData)
     .then((user) => {
       // create a new session
       const Session = mongoose.model('Session');

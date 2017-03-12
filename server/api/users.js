@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
-import { authorizedAdministrator, authorizedDomainAdministrator } from './auth';
+import { authorizedDomainAdministrator } from './auth';
 import { compressImage } from './image';
 
 mongoose.Promise = global.Promise;
@@ -43,13 +43,6 @@ const deleteUserRelated = (doc) => {
   // TODO: unsubscribe from EmailLists
   .then(() => doc);
 };
-
-const populateUser = (user) => {
-  const Family = mongoose.model('Family');
-  return Family.findOne({ 'adults.userId': user._id })
-  .then(family => ({ ...user, familyId: (family || {})._id }));
-};
-
 
 export default function (router, transporter) {
   router.post('/users/sign-up', (req, res) => {
@@ -147,7 +140,7 @@ It will allow sign you in to the ${site.name} web site.
         if (user) {
           user = user.toObject();
           delete user.encryptedPassword;
-          return populateUser(user);
+          return user;
         }
         return user;
       },
@@ -172,24 +165,19 @@ It will allow sign you in to the ${site.name} web site.
   });
 }
 
-export function createUser(email, name) {
-  if (!email || !name) {
+export function createUser(data) {
+  if (!data.email || !data.name) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  return User.findOne({ email }).exec()
+  return User.findOne({ email: data.email }).exec()
   .then((user) => {
     if (user) {
       return Promise.reject('Exists');
     }
     // create a new user
     const now = new Date();
-    user = new User({
-      created: now,
-      email,
-      modified: now,
-      name,
-    });
+    user = new User({ ...data, created: now, modified: now });
     return user.save();
   });
 }

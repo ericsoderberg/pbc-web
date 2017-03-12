@@ -56,13 +56,12 @@ class FormAdd extends Component {
       form.formTemplateId = formTemplate._id;
       formTemplate.sections.forEach((section) => {
         section.fields.forEach((field) => {
-          if (session) {
-            // pre-fill out name and email from session
-            if (field.sessionName) {
-              form.fields.push({ templateFieldId: field._id, value: session.userId.name });
-            } else if (field.sessionEmail) {
-              form.fields.push({ templateFieldId: field._id, value: session.userId.email });
-            }
+          if (session && field.linkToUserProperty) {
+            // pre-fill out fields from session user
+            form.fields.push({
+              templateFieldId: field._id,
+              value: session.userId[field.linkToUserProperty],
+            });
           }
 
           // pre-fill out fields with a minimum value
