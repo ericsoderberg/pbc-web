@@ -97,7 +97,7 @@ class FormEdit extends Component {
   }
 
   render() {
-    const { className, full, inline } = this.props;
+    const { className, full, inline, onLinkedForm } = this.props;
     const { form, formTemplate, linkedForm } = this.state;
     const classNames = ['form'];
     if (className) {
@@ -132,6 +132,14 @@ class FormEdit extends Component {
               from <Link to={`/forms/${linkedForm._id}/edit`}>
                 {linkedForm.formTemplateId.name}
               </Link>
+            </span>
+          );
+        } else {
+          linkedFormControl = (
+            <span className="form__link">
+              from <a onClick={() => onLinkedForm(linkedForm._id)}>
+                {linkedForm.formTemplateId.name}
+              </a>
             </span>
           );
         }
@@ -174,10 +182,10 @@ FormEdit.propTypes = {
   inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
+  onLinkedForm: PropTypes.func,
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
   }),
-  // session: PropTypes.object,
 };
 
 FormEdit.defaultProps = {
@@ -189,8 +197,8 @@ FormEdit.defaultProps = {
   inline: false,
   onCancel: undefined,
   onDone: undefined,
+  onLinkedForm: undefined,
   params: {},
-  // session: undefined,
 };
 
 FormEdit.contextTypes = {

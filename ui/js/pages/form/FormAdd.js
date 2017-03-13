@@ -1,7 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItem, getItems, postItem, haveSession, setSession,
-  } from '../../actions';
+import { getItem, postItem, haveSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
@@ -15,13 +14,7 @@ class FormAdd extends Component {
     super(props);
     this._onAdd = this._onAdd.bind(this);
     this._onChange = this._onChange.bind(this);
-    const { linkedForm } = props;
-    this.state = {
-      form: {
-        fields: [],
-        linkedFormId: (linkedForm ? linkedForm._id : undefined),
-      },
-    };
+    this.state = {};
   }
 
   componentDidMount() {
@@ -29,31 +22,23 @@ class FormAdd extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.formTemplateId !== this.props.formTemplateId) {
+    const { formTemplateId } = nextProps;
+    if (formTemplateId !== this.props.formTemplateId) {
       this._load(nextProps);
     }
   }
 
   _load(props) {
-    const { session } = props;
-    const form = { ...this.state.form };
+    const { session, linkedForm } = props;
     const formTemplateId =
       props.formTemplateId || props.location.query.formTemplateId;
     getItem('form-templates', formTemplateId)
     .then((formTemplate) => {
-      if (formTemplate.linkedFormTemplateId) {
-        // get forms already filled out
-        return getItems('forms', {
-          formTemplateId: formTemplate.linkedFormTemplateId._id,
-          userId: (form || session || {}).userId,
-        })
-        .then(linkedToForms => ({ formTemplate, linkedToForms }));
-      }
-      return { formTemplate };
-    })
-    .then((context) => {
-      const { formTemplate } = context;
-      form.formTemplateId = formTemplate._id;
+      const form = {
+        fields: [],
+        formTemplateId: formTemplate._id,
+        linkedFormId: (linkedForm ? linkedForm._id : undefined),
+      };
       formTemplate.sections.forEach((section) => {
         section.fields.forEach((field) => {
           if (session && field.linkToUserProperty) {
@@ -121,7 +106,7 @@ class FormAdd extends Component {
     }
 
     let result;
-    if (formTemplate) {
+    if (formTemplate && form) {
       let cancelControl;
       let headerCancelControl;
       if (onCancel || (this.props.location &&

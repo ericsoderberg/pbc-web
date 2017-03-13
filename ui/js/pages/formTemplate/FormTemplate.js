@@ -48,13 +48,13 @@ export default class FormTemplate extends Component {
       document.title = formTemplate.name;
 
       const columns = [];
-      const fieldMap = {};
+      const templateFieldMap = {};
       const linkedFieldMap = {};
       const optionMap = {};
       const totalMap = {};
       formTemplate.sections.forEach((section) => {
         section.fields.forEach((field) => {
-          fieldMap[field._id] = field;
+          templateFieldMap[field._id] = field;
           field.options.forEach((option) => { optionMap[option._id] = option; });
           if (field.type !== 'instructions') {
             columns.push(field._id);
@@ -70,12 +70,12 @@ export default class FormTemplate extends Component {
       });
 
       FIXED_FIELDS.forEach((field) => {
-        fieldMap[field.name] = field;
+        templateFieldMap[field.name] = field;
         columns.push(field.name);
       });
 
       this.setState({
-        columns, formTemplate, fieldMap, linkedFieldMap, optionMap,
+        columns, formTemplate, templateFieldMap, linkedFieldMap, optionMap,
       });
       return { formTemplate, totalMap };
     })
@@ -122,8 +122,8 @@ export default class FormTemplate extends Component {
   }
 
   _fieldValue(field) {
-    const { fieldMap, optionMap } = this.state;
-    const templateField = fieldMap[field.templateFieldId];
+    const { templateFieldMap, optionMap } = this.state;
+    const templateField = templateFieldMap[field.templateFieldId];
     let value;
     if (templateField.type === 'count' || templateField.type === 'number') {
       value = templateField.value * field.value;
@@ -251,9 +251,9 @@ export default class FormTemplate extends Component {
   }
 
   _renderHeaderCells() {
-    const { columns, fieldMap, sortFieldId, sortReverse, totalMap } = this.state;
+    const { columns, templateFieldMap, sortFieldId, sortReverse, totalMap } = this.state;
     const cells = columns.map((fieldId) => {
-      const field = fieldMap[fieldId];
+      const field = templateFieldMap[fieldId];
       const classes = [];
       if (sortFieldId === fieldId) {
         classes.push('sort');
@@ -276,9 +276,9 @@ export default class FormTemplate extends Component {
   }
 
   _renderFooterCells() {
-    const { columns, fieldMap, sortFieldId, totalMap } = this.state;
+    const { columns, templateFieldMap, sortFieldId, totalMap } = this.state;
     return columns.map((fieldId) => {
-      const field = fieldMap[fieldId];
+      const field = templateFieldMap[fieldId];
       const total = totalMap[fieldId];
       let classes = (total >= 0 ? 'total' : '');
       if (fieldId === sortFieldId) {
@@ -294,27 +294,29 @@ export default class FormTemplate extends Component {
 
   _renderCells(form, linkedForm) {
     const {
-      columns, fieldMap, linkedFieldMap, sortFieldId, totalMap,
+      columns, templateFieldMap, linkedFieldMap, sortFieldId, totalMap,
     } = this.state;
 
     const cellMap = {};
     form.fields.forEach((field) => {
       const templateFieldId = field.templateFieldId;
-      const templateField = fieldMap[templateFieldId];
+      const templateField = templateFieldMap[templateFieldId] || {};
       cellMap[templateFieldId] = this._fieldContents(field, templateField);
     });
 
-    // look for linked fields
-    Object.keys(linkedFieldMap).forEach((templateFieldId) => {
-      linkedForm.fields.some((field) => {
-        if (field.templateFieldId === linkedFieldMap[templateFieldId]) {
-          const templateField = fieldMap[templateFieldId];
-          cellMap[templateFieldId] = this._fieldContents(field, templateField);
-          return true;
-        }
-        return false;
+    if (linkedForm) {
+      // look for linked fields
+      Object.keys(linkedFieldMap).forEach((templateFieldId) => {
+        linkedForm.fields.some((field) => {
+          if (field.templateFieldId === linkedFieldMap[templateFieldId]) {
+            const templateField = templateFieldMap[templateFieldId] || {};
+            cellMap[templateFieldId] = this._fieldContents(field, templateField);
+            return true;
+          }
+          return false;
+        });
       });
-    });
+    }
 
     const created = moment(form.created);
     cellMap.created = created.format('MMM Do YYYY');

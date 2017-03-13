@@ -17,8 +17,7 @@ import SessionSection from '../session/SessionSection';
 const LABEL = {
   Register: 'Registered',
   'Sign Up': 'Signed up',
-  Submit: 'Submitted',
-  Subscribe: 'Subscribed',
+  Submit: 'Submitted',  Subscribe: 'Subscribed',
 };
 
 const LOADING = 'loading';
@@ -113,12 +112,10 @@ class FormSection extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.formTemplateId !== this.props.formTemplateId) {
-      this._load(nextProps);
-    }
-    if ((nextProps.session && !this.props.session) ||
+    if (nextProps.formTemplateId !== this.props.formTemplateId ||
+      (nextProps.session && !this.props.session) ||
       (!nextProps.session && this.props.session)) {
-      this._resetState(nextProps);
+      this._load(nextProps);
     }
   }
 
@@ -141,18 +138,20 @@ class FormSection extends Component {
 
   _load(props) {
     const { formTemplate, formTemplateId } = props;
-    const finalFormTemplateId = formTemplateId._id || formTemplate._id;
-    this.setState({
-      activeFormTemplateId: finalFormTemplateId,
-      finalFormTemplateId,
-      rootFormTemplateId: finalFormTemplateId,
-    });
-    // We might already have the form template if we're on a page that
-    // populated it.
-    if (formTemplateId && !formTemplate) {
-      this._loadFormTemplate(finalFormTemplateId);
-    } else if (formTemplate) {
-      this._formTemplateReady(formTemplate);
+    if (formTemplateId || formTemplate) {
+      const finalFormTemplateId = formTemplateId._id || formTemplate._id;
+      this.setState({
+        activeFormTemplateId: finalFormTemplateId,
+        finalFormTemplateId,
+        rootFormTemplateId: finalFormTemplateId,
+      });
+      // We might already have the form template if we're on a page that
+      // populated it.
+      if (formTemplateId && !formTemplate) {
+        this._loadFormTemplate(finalFormTemplateId);
+      } else if (formTemplate) {
+        this._formTemplateReady(formTemplate);
+      }
     }
   }
 
@@ -378,7 +377,8 @@ class FormSection extends Component {
       case EDITING: {
         contents = (
           <FormEdit id={editId} full={false} inline={true}
-            onDone={this._onDone} onCancel={this._nextState(SUMMARY)} />
+            onDone={this._onDone} onCancel={this._nextState(SUMMARY)}
+            onLinkedForm={id => this.setState({ editId: id })} />
         );
         break;
       }
