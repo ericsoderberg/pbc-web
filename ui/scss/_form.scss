@@ -36,6 +36,12 @@
 
   .section__container & {
     background-color: inherit;
+
+    .form__footer-separator {
+      span {
+        background-color: $background-color;
+      }
+    }
   }
 
   @media all and (min-width: 700px) {
@@ -381,10 +387,6 @@
 
   & + .form__footer {
     margin-top: $unit;
-
-    a {
-      margin: $unit 0;
-    }
   }
 }
 
@@ -1047,5 +1049,20 @@
 
   a {
     color: $tertiary-color;
+  }
+}
+
+.form__footer-separator {
+  position: relative;
+  max-width: $form-width;
+  margin: $double-unit auto $unit;
+  text-align: center;
+  border-top: 1px solid $border-color;
+
+  > span {
+    position: relative;
+    top: - $half-unit;
+    padding: $unit;
+    background-color: $secondary-background-color; //$background-color;
   }
 }

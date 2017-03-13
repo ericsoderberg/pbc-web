@@ -66,8 +66,10 @@ export default class SignIn extends Component {
       footerCancelControl = (
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
-      verifyEmailControl = <a onClick={onVerifyEmail}>Sign in via email</a>;
-      signUpControl = <a onClick={onSignUp}>Sign up</a>;
+      verifyEmailControl = <a onClick={onVerifyEmail}>Forgot password?</a>;
+      signUpControl = (
+        <Button secondary={true} label="Sign up" onClick={onSignUp} />
+      );
     } else {
       const actions = [
         <button key="cancel" type="button" className="button"
@@ -76,8 +78,10 @@ export default class SignIn extends Component {
         </button>,
       ];
       header = <PageHeader title={TITLE} actions={actions} />;
-      verifyEmailControl = <Link to="/verify-email">Sign in via email</Link>;
-      signUpControl = <Link to="/sign-up">Sign up</Link>;
+      verifyEmailControl = <Link to="/verify-email">Forgot password?</Link>;
+      signUpControl = (
+        <Button secondary={true} label="Sign up" path="/sign-up" />
+      );
     }
 
     return (
@@ -110,6 +114,9 @@ export default class SignIn extends Component {
             <footer className="form__footer">
               {verifyEmailControl}
             </footer>
+            <div className="form__footer-separator">
+              <span>or</span>
+            </div>
             <footer className="form__footer">
               {signUpControl}
             </footer>

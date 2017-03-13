@@ -82,15 +82,15 @@ export default class SignUp extends Component {
 
     let header;
     let footerCancelControl;
-    let verifyEmailControl;
     let signInControl;
     if (inline) {
       header = <div className="form__text"><h2>{TITLE}</h2></div>;
       footerCancelControl = (
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
-      signInControl = <a onClick={onSignIn}>Sign in with a password</a>;
-      verifyEmailControl = <a onClick={onVerifyEmail}>Sign in via email</a>;
+      signInControl = (
+        <Button secondary={true} label="Sign in" onClick={onSignIn} />
+      );
     } else {
       const actions = [
         <button key="cancel" type="button" className="button"
@@ -99,8 +99,9 @@ export default class SignUp extends Component {
         </button>,
       ];
       header = <PageHeader title={TITLE} actions={actions} />;
-      signInControl = <Link to="/sign-in">Sign in with a password</Link>;
-      verifyEmailControl = <Link to="/verify-email">Sign in via email</Link>;
+      signInControl = (
+        <Button secondary={true} label="Sign in" path="/sign-in" />
+      );
     }
 
     return (
@@ -135,11 +136,11 @@ export default class SignUp extends Component {
               </button>
               {footerCancelControl}
             </footer>
+            <div className="form__footer-separator">
+              <span>or</span>
+            </div>
             <footer className="form__footer">
               {signInControl}
-            </footer>
-            <footer className="form__footer">
-              {verifyEmailControl}
             </footer>
           </div>
         </form>

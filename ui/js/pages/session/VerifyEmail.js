@@ -181,8 +181,10 @@ class VerifyEmail extends Component {
       footerCancelControl = (
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
-      signInControl = <a onClick={onSignIn}>Sign in with a password</a>;
-      signUpControl = <a onClick={onSignUp}>Sign up</a>;
+      signInControl = <a onClick={onSignIn}>Sign in</a>;
+      signUpControl = (
+        <Button secondary={true} label="Sign up" onClick={onSignUp} />
+      );
     } else {
       const actions = [
         <button key="cancel" type="button" className="button"
@@ -191,7 +193,7 @@ class VerifyEmail extends Component {
         </button>,
       ];
       header = <PageHeader title={TITLE} actions={actions} />;
-      signInControl = <Link to="/sign-in">Sign in with a password</Link>;
+      signInControl = <Link to="/sign-in">Sign in</Link>;
       signUpControl = <Link to="/sign-up">Sign up</Link>;
     }
 
@@ -203,8 +205,8 @@ class VerifyEmail extends Component {
           <div className="form__contents">
             <fieldset className="form__fields">
               <div className="form__text">
-                <p>You can sign in via a link {"we'll"} send to your email
-                address.</p>
+                <p>{"We'll"} send a link to your email
+                address that you can use to sign in.</p>
               </div>
               <FormField name="email" label="Email" error={errors.email}>
                 <input ref={(ref) => { this._emailRef = ref; }}
@@ -225,6 +227,9 @@ class VerifyEmail extends Component {
             <footer className="form__footer">
               {signInControl}
             </footer>
+            <div className="form__footer-separator">
+              <span>or</span>
+            </div>
             <footer className="form__footer">
               {signUpControl}
             </footer>
