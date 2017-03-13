@@ -144,7 +144,7 @@
   // background-color: $header-background-color;
 
   @media all and (min-width: 700px) {
-    height: $triple-unit;
+    min-height: $triple-unit;
 
     .button-icon {
       height: $triple-unit;
