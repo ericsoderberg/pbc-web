@@ -90,13 +90,14 @@ export default class FormTemplate extends Component {
         .then((forms) => {
           const linkedForms = {};
           forms.forEach((form) => { linkedForms[form._id] = form; });
-          return { ...context, linkedForms };
+          this.setState({ linkedForms });
+          return context;
         });
       }
       return context;
     })
     .then((context) => {
-      const { linkedForms, totalMap } = context;
+      const { totalMap } = context;
       return getItems('forms', {
         filter: { formTemplateId: id }, populate: true,
       })
@@ -114,7 +115,7 @@ export default class FormTemplate extends Component {
           });
         });
 
-        this.setState({ forms, linkedForms, totalMap });
+        this.setState({ forms, totalMap });
       });
     })
     .catch(error => console.error('!!! FormTemplate catch', error));
@@ -160,6 +161,8 @@ export default class FormTemplate extends Component {
     } else if (templateField.type === 'choices' && field.optionIds) {
       contents = field.optionIds.map(optionId => optionMap[optionId].name)
       .join(', ');
+    } else if (templateField.type === 'date') {
+      contents = moment(contents).format('YYYY-MM-DD');
     } else if (templateField.monetary) {
       contents = <span><span className="secondary">$ </span>{contents}</span>;
     }
