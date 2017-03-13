@@ -180,8 +180,7 @@ export default function () {
     // load Users so we can map ids
     return User.find({}).select('oldId').exec()
     .then(users => users.filter(user => user.oldId)
-      .forEach((user) => { userIds[user.oldId] = user._id; }),
-    );
+      .forEach((user) => { userIds[user.oldId] = user._id; }));
   })
   .then(() => {
     loadCategoryArray('styles').forEach((item) => { styles[item.id] = item; });
@@ -202,8 +201,7 @@ export default function () {
     // load Events so we can map ids and check start date
     return Event.find({}).select('oldId start').exec()
     .then(eventsFound => eventsFound.filter(event => event.oldId)
-      .forEach((event) => { eventDocs[event.oldId] = event; }),
-    );
+      .forEach((event) => { eventDocs[event.oldId] = event; }));
   })
   .then(() => {
     loadCategoryArray('forms')
@@ -221,8 +219,7 @@ export default function () {
     .then(formTemplates => (
       formTemplates.filter(formTemlate => formTemlate.oldId))
       .forEach(formTemlate => (
-        formTemplateIds[formTemlate.oldId] = formTemlate._id)),
-    );
+        formTemplateIds[formTemlate.oldId] = formTemlate._id)));
   })
   .then(() => {
     loadCategoryArray('photos').forEach((item) => {

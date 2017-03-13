@@ -10,7 +10,7 @@ const LIBRARIES = [
   { name: 'Forum', path: 'forum', oldPageIds: [], parentPageId: 510 },
   { name: 'High School', path: 'high-school', oldPageIds: [214] },
   { name: 'Step Closer', path: 'step-closer', oldPageIds: [430] },
-  { name: 'Women', path: 'women', oldPageIds: [495, 558] },
+  { name: 'Women', path: 'women', oldPageIds: [495, 558, 803, 844, 896] },
   { name: 'Young Adult', path: 'young-adult', oldPageIds: [431] },
 ];
 
