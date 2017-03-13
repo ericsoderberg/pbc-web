@@ -114,7 +114,7 @@ export default class UserFormContents extends Component {
           </FormField>
           <FormField label="Administrator for">
             <select name="administratorDomainId"
-              value={user.administratorDomainId || ''}
+              value={(user.administratorDomainId || {})._id || ''}
               onChange={formState.change('administratorDomainId')}>
               {domainOptions}
             </select>
@@ -123,7 +123,7 @@ export default class UserFormContents extends Component {
       );
     } else if (session.userId.administratorDomainId && domains.length > 0 &&
       user.administratorDomainId) {
-      const domain = domains.filter(d => d._id === user.administratorDomainId);
+      const domain = domains.filter(d => d._id === user.administratorDomainId._id);
       adminFields = (
         <fieldset className="form__fields">
           <FormField label="Administrator for">
