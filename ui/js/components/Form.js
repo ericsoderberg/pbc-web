@@ -111,8 +111,7 @@ class Form extends Component {
 
     return (
       <div className={classes.join(' ')}>
-        <form className="form" action={action}
-          onSubmit={this._onSubmit}>
+        <form className="form" action={action} onSubmit={this._onSubmit}>
           {header}
           <FormError error={error} />
           {contents}

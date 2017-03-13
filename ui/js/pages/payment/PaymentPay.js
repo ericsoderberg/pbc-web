@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { getItem, postItem, putItem } from '../../actions';
-import Loading from '../../components/Loading';
+import { postItem } from '../../actions';
 import Stored from '../../components/Stored';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
@@ -16,15 +15,16 @@ class PaymentPay extends Component {
     this._setItem = this._setItem.bind(this);
     this._paypalPayment = this._paypalPayment.bind(this);
     this._onAuthorize = this._onAuthorize.bind(this);
+    this._onSubmit = this._onSubmit.bind(this);
     this._onAdd = this._onAdd.bind(this);
     this._onCancel = this._onCancel.bind(this);
-    const payment = { method: 'paypal' };
+
+    const { amount, formIds, payByCheckInstructions } = props;
+    const payment = { amount, formIds, payByCheckInstructions, method: 'check' };
     this.state = { formState: new FormState(payment, this._setItem) };
   }
 
   componentDidMount() {
-    this._load(this.props);
-
     // add paypal
     if (!paypalLoaded) {
       paypalLoaded = true;
@@ -63,26 +63,14 @@ class PaymentPay extends Component {
     }
   }
 
-  _load(props) {
-    const { formId } = props;
-    getItem('forms', formId)
-    .then((form) => {
-      const { formState } = this.state;
-      const payment = formState.object;
-      payment.amount = form.unpaidTotal;
-      this.setState({ form, formState: new FormState(payment, this._setItem) });
-    })
-    .catch(error => console.error('!!! PaymentPay catch', error));
-  }
-
   _setItem(item) {
     this.setState({ formState: new FormState(item, this._setItem) });
   }
 
   _onSubmit(event) {
+    event.preventDefault();
     const { formState } = this.state;
     const payment = formState.object;
-    event.preventDefault();
     if (payment.method !== 'paypal') {
       this._onAdd(payment);
     }
@@ -90,17 +78,12 @@ class PaymentPay extends Component {
 
   _onAdd(payment) {
     const { onDone } = this.props;
-    const { form, error } = this.state;
+    const { error } = this.state;
 
     if (error) {
       this.setState({ error });
     } else {
       postItem('payments', payment)
-      .then((paymentResponse) => {
-        // link payment to form
-        form.paymentIds.push(paymentResponse._id);
-        return putItem('forms', form);
-      })
       .then(() => onDone())
       .catch(error2 => this.setState({ error: error2 }));
     }
@@ -134,47 +117,47 @@ class PaymentPay extends Component {
   }
 
   render() {
-    const { formId, formTemplateId, session } = this.props;
-    const { form, formState, error } = this.state;
+    const { amount, formIds, payByCheckInstructions, session } = this.props;
+    const { formState, error } = this.state;
     const payment = formState.object;
 
-    let result;
-    if (form && session) {
-      let submitButton;
-      if (payment.method !== 'paypal') {
-        submitButton = (
-          <Button type="submit" label="Submit" onClick={this._onSubmit} />
-        );
-      }
-      result = (
-        <form className="form" action="/api/payments" onSubmit={this._onSubmit}>
-          <div className="form__text"><h2>Payment</h2></div>
-          <FormError message={error} />
-          <PaymentFormContents inline={true} full={false}
-            formTemplateId={formTemplateId} formId={formId}
-            formState={formState} session={session} />
-          <footer className="form__footer">
-            <div id="paypalButton" style={{
-              display: (payment.method === 'paypal' ? 'block' : 'none') }} />
-            {submitButton}
-            <Button secondary={true} label="Cancel" onClick={this._onCancel} />
-          </footer>
-        </form>
+    let submitButton;
+    if (payment.method !== 'paypal') {
+      submitButton = (
+        <Button type="submit" label="Submit" onClick={this._onSubmit} />
       );
-    } else {
-      result = <Loading />;
     }
-    return result;
+
+    return (
+      <form className="form" action="/api/payments" onSubmit={this._onSubmit}>
+        <div className="form__text"><h2>Payment</h2></div>
+        <FormError message={error} />
+        <PaymentFormContents inline={true} full={false} amount={amount}
+          payByCheckInstructions={payByCheckInstructions} formIds={formIds}
+          formState={formState} session={session} />
+        <footer className="form__footer">
+          <div id="paypalButton" style={{
+            display: (payment.method === 'paypal' ? 'block' : 'none') }} />
+          {submitButton}
+          <Button secondary={true} label="Cancel" onClick={this._onCancel} />
+        </footer>
+      </form>
+    );
   }
 }
 
 PaymentPay.propTypes = {
-  formId: PropTypes.string.isRequired,
-  formTemplateId: PropTypes.string.isRequired,
+  amount: PropTypes.number.isRequired,
+  formIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCancel: PropTypes.func.isRequired,
   onDone: PropTypes.func.isRequired,
+  payByCheckInstructions: PropTypes.string,
   session: PropTypes.object.isRequired,
   site: PropTypes.object.isRequired,
+};
+
+PaymentPay.defaultProps = {
+  payByCheckInstructions: undefined,
 };
 
 const select = state => ({

@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import Markdown from 'markdown-to-jsx';
 
 const FormError = (props) => {
   const { message, error } = props;
@@ -18,7 +17,7 @@ const FormError = (props) => {
   return (
     <div className={classes.join(' ')}>
       <div className="form-error__message">
-        <Markdown>{text || ''}</Markdown>
+        {text}
       </div>
     </div>
   );

@@ -73,11 +73,10 @@
   height: 0;
   max-width: $form-width;
   margin: 0 auto;
+  text-align: left;
 }
 
 .form-error--active {
-  background-color: #ffe8e8;
-  padding: 1px $unit;
   height: auto;
   margin-bottom: $unit;
 }

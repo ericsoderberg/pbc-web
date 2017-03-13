@@ -84,8 +84,8 @@ class FormContents extends Component {
     const { administrator, fields } = this.state;
 
     let formError;
-    if (error && (typeof error === 'string' || error.error)) {
-      formError = <FormError message={error} />;
+    if (error) {
+      formError = <FormError error={error} />;
     }
 
     const sections = (formTemplate.sections || [])
@@ -183,13 +183,14 @@ FormContents.propTypes = {
       administratorDomainId: PropTypes.string,
       name: PropTypes.string,
     }),
-  }).isRequired,
+  }),
 };
 
 FormContents.defaultProps = {
   error: undefined,
   linkedForm: undefined,
   linkedFormControl: undefined,
+  session: undefined,
 };
 
 const select = state => ({

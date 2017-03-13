@@ -15,18 +15,11 @@ mongoose.Promise = global.Promise;
 function pullUserData(formTemplate, form) {
   const result = {};
   formTemplate.sections.forEach(section => (
-    section.fields.filter(field => field.session).forEach((field) => {
-      form.fields.some((field2) => {
-        if (field._id.equals(field2.templateFieldId)) {
-          if (field.session.name) {
-            result.name = field2.value;
-          } else if (field.session.email) {
-            result.email = field2.email;
-          } else if (field.session.phone) {
-            result.email = field2.phone;
-          } else if (field.session.address) {
-            result.email = field2.address;
-          }
+    section.fields.filter(templateField => templateField.linkToUserProperty)
+    .forEach((templateField) => {
+      form.fields.some((field) => {
+        if (templateField._id.equals(field.templateFieldId)) {
+          result[templateField.linkToUserProperty] = field.value;
           return true;
         }
         return false;
@@ -266,13 +259,13 @@ export default function (router, transporter) {
     .then((context) => {
       const { session, form, formTemplate } = context;
       let data = req.body;
-      if (!formTemplate._id.equals(data.formTemplateId)) {
+      if (!formTemplate._id.equals(data.formTemplateId._id)) {
         return Promise.reject({ error: 'Mismatched template' });
       }
       // AUTH
       const admin = (session.userId.administrator || (formTemplate.domainId &&
         formTemplate.domainId.equals(session.userId.administratorDomainId)));
-      if (!admin && !form.userID.equals(session.userId)) {
+      if (!admin && !form.userId.equals(session.userId._id)) {
         return Promise.reject({ status: 403 });
       }
       data.modified = new Date();

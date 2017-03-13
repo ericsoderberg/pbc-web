@@ -83,8 +83,8 @@ class FormAdd extends Component {
       })
       .then(() => (onDone ? onDone() : this.context.router.goBack()))
       .catch((error2) => {
-        console.error('!!! FormAdd post error', error);
-        this.setState({ error: error2 });
+        console.error('!!! FormAdd post error', error2);
+        this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
       })
       .catch(error2 => console.error('!!! FormAdd post 2', error2));
     }
@@ -98,8 +98,10 @@ class FormAdd extends Component {
   }
 
   render() {
-    const { className, onCancel, full, inline, linkedForm } = this.props;
-    const { form, formTemplate, error } = this.state;
+    const {
+      className, onCancel, full, inline, linkedForm, signInControl,
+    } = this.props;
+    const { form, formTemplate, error, showSignIn } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -130,6 +132,11 @@ class FormAdd extends Component {
         );
       }
 
+      let signIn;
+      if (showSignIn && signInControl) {
+        signIn = signInControl;
+      }
+
       result = (
         <form className={classNames.join(' ')} action={'/forms'}
           onSubmit={this._onAdd}>
@@ -142,6 +149,7 @@ class FormAdd extends Component {
               {formTemplate.submitLabel || 'Submit'}
             </button>
             {cancelControl}
+            {signIn}
           </footer>
         </form>
       );
@@ -166,6 +174,7 @@ FormAdd.propTypes = {
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   session: PropTypes.object,
+  signInControl: PropTypes.element,
 };
 
 FormAdd.defaultProps = {
@@ -178,6 +187,7 @@ FormAdd.defaultProps = {
   onCancel: undefined,
   onDone: undefined,
   session: undefined,
+  signInControl: undefined,
 };
 
 FormAdd.contextTypes = {

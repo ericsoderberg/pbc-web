@@ -173,7 +173,10 @@ export function createUser(data) {
   return User.findOne({ email: data.email }).exec()
   .then((user) => {
     if (user) {
-      return Promise.reject('Exists');
+      return Promise.reject({
+        code: 'userExists',
+        message: `An account with the email ${data.email} already exists.`,
+      });
     }
     // create a new user
     const now = new Date();

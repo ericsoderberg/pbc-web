@@ -12,7 +12,7 @@ import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
 import PaymentPay from '../payment/PaymentPay';
 import SessionSection from '../session/SessionSection';
-// import { calculateTotal } from './FormUtils';
+import { calculateTotal } from './FormUtils';
 
 const LABEL = {
   Register: 'Registered',
@@ -175,40 +175,48 @@ class FormSection extends Component {
   _loadFormTemplate(id) {
     getItem('form-templates', id)
     .then(formTemplate => this._formTemplateReady(formTemplate))
-    .catch(error => console.error('!!! FormSummary formTemplate catch', error));
+    .catch(error => console.error('!!! FormSection formTemplate catch', error));
   }
 
   _loadForms(formTemplateId) {
     const { session } = this.props;
+    const { finalFormTemplateId, formTemplates } = this.state;
     if (session) {
       getItems('forms', {
         filter: { formTemplateId, userId: session.userId._id },
         populate: true,
       })
       .then((forms) => {
-        let paymentFormId;
-        // if (formTemplate.payable) {
-        //   // see if any require payment
-        //   forms.forEach((form) => {
-        //     const formTotal = calculateTotal(formTemplate, form);
-        //     let paymentTotal = 0;
-        //     (form.paymentIds || []).forEach((payment) => {
-        //       paymentTotal += payment.amount;
-        //     });
-        //     if (formTotal > paymentTotal) {
-        //       form.needsPayment = true;
-        //       if (!paymentFormId) {
-        //         paymentFormId = form._id;
-        //       }
-        //     }
-        //   });
-        // }
+        const formTemplate = formTemplates[formTemplateId];
+        let paymentNeeded;
+        if (finalFormTemplateId === formTemplateId && formTemplate.payable) {
+          // See if there's any balance still to be paid
+          let amount = 0;
+          const formIds = [];
+          forms.forEach((form) => {
+            const formTotal = calculateTotal(formTemplate, form);
+            let paidTotal = 0;
+            (form.paymentIds || []).forEach((payment) => {
+              paidTotal += payment.amount;
+            });
+            if (formTotal > paidTotal) {
+              formIds.push(form._id);
+              amount += formTotal - paidTotal;
+            }
+          });
+          if (amount > 0) {
+            paymentNeeded = { amount, formIds };
+          }
+        }
         const nextForms = { ...this.state.forms };
         nextForms[formTemplateId] = forms;
-        this.setState({ forms: nextForms, paymentFormId },
-          () => this._resetState(this.props));
+        this._resetState({ editId: undefined, forms: nextForms, paymentNeeded });
       })
-      .catch(error => console.error('!!! FormSummary forms catch', error));
+      .catch(error => console.error('!!! FormSection forms catch', error));
+    } else {
+      const nextForms = { ...this.state.forms };
+      nextForms[formTemplateId] = [];
+      this._resetState({ editId: undefined, forms: nextForms });
     }
   }
 
@@ -254,31 +262,31 @@ class FormSection extends Component {
     });
   }
 
-  _resetState(props) {
-    const { session } = props;
+  _resetState(state) {
+    const { session } = this.props;
     const {
-      finalFormTemplateId, formTemplates, forms, editId, paymentFormId,
-    } = this.state;
+      finalFormTemplateId, formTemplates, forms, editId, paymentNeeded,
+    } = { ...this.state, ...state };
 
     const finalFormTemplate = formTemplates[finalFormTemplateId];
     const finalForms = forms[finalFormTemplateId];
 
-    let state;
+    let nextState;
     let activeFormTemplateId = finalFormTemplateId;
     let linkedForm;
     if (!finalFormTemplate || !finalForms) {
-      state = LOADING;
+      nextState = LOADING;
     } else if (!session && finalFormTemplate.authenticate) {
-      state = AUTHENTICATION_NEEDED;
+      nextState = AUTHENTICATION_NEEDED;
     } else if (finalFormTemplate.linkedFormTemplateId) {
       const linkedFormTemplateId = finalFormTemplate.linkedFormTemplateId._id;
       const linkedToFormTemplate = formTemplates[linkedFormTemplateId];
       const linkedToForms = forms[linkedFormTemplateId];
       if (!linkedToFormTemplate || !linkedToForms) {
-        state = LOADING;
+        nextState = LOADING;
       } else if (linkedToForms.length === 0) {
         activeFormTemplateId = linkedFormTemplateId;
-        state = ADDING;
+        nextState = ADDING;
       } else if (finalForms.length !== linkedToForms.length) {
         if (finalForms.length === 0) {
           linkedForm = linkedToForms[0];
@@ -290,21 +298,21 @@ class FormSection extends Component {
             }
           });
         }
-        state = ADDING;
+        nextState = ADDING;
       } else {
-        state = SUMMARY;
+        nextState = SUMMARY;
       }
     } else if (finalForms.length === 0) {
-      state = ADDING;
+      nextState = ADDING;
     } else if (editId) {
-      state = EDITING;
-    } else if (paymentFormId) {
-      state = PAYING;
+      nextState = EDITING;
+    } else if (paymentNeeded) {
+      nextState = PAYING;
     } else {
-      state = SUMMARY;
+      nextState = SUMMARY;
     }
 
-    this.setState({ activeFormTemplateId, linkedForm, state });
+    this.setState({ ...state, activeFormTemplateId, linkedForm, state: nextState });
   }
 
   _nextState(state) {
@@ -321,7 +329,7 @@ class FormSection extends Component {
     const { className, session } = this.props;
     const {
       activeFormTemplateId, finalFormTemplateId, formTemplates, forms, editId, height,
-      linkedForm, paymentFormId, rootFormTemplateId, state,
+      linkedForm, paymentNeeded, rootFormTemplateId, state,
     } = this.state;
     const finalFormTemplate = formTemplates[finalFormTemplateId];
     const formTemplate = formTemplates[activeFormTemplateId];
@@ -378,7 +386,9 @@ class FormSection extends Component {
         contents = (
           <FormAdd full={false} inline={true}
             formTemplateId={activeFormTemplateId} linkedForm={linkedForm}
-            onDone={this._onDone} onCancel={onCancel} />
+            onDone={this._onDone} onCancel={onCancel}
+            signInControl={<Button label="Sign In" secondary={true}
+              onClick={this._nextState(SESSION)} />} />
         );
         break;
       }
@@ -394,8 +404,9 @@ class FormSection extends Component {
 
       case PAYING: {
         contents = (
-          <PaymentPay formId={paymentFormId}
-            formTemplateId={activeFormTemplateId}
+          <PaymentPay amount={paymentNeeded.amount}
+            formIds={paymentNeeded.formIds}
+            payByCheckInstructions={formTemplate.payByCheckInstructions}
             onDone={this._onDone} onCancel={this._nextState(SUMMARY)} />
         );
         break;

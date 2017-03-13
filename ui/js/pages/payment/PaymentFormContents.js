@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import Markdown from 'markdown-to-jsx';
-import { getItem, getItems } from '../../actions';
+import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
@@ -29,33 +29,12 @@ class PaymentFormContents extends Component {
   }
 
   componentDidMount() {
-    const { formId, formTemplateId, formState, full, session } = this.props;
-    const payment = formState.object;
-
-    if (formTemplateId) {
-      getItem('form-templates', formTemplateId)
-      .then(formTemplate => this.setState({ formTemplate }))
-      .catch(error => console.error(
-        '!!! PaymentFormContents formTemplate catch', error));
-    }
-
-    if (formId) {
-      getItem('forms', formId)
-      .then(form => this.setState({ form }))
-      .catch(error => console.error(
-        '!!! PaymentFormContents form catch', error));
-    }
+    const { formState, full, session } = this.props;
 
     if (full && session.userId.administrator) {
       getItems('domains', { sort: 'name' })
       .then(domains => this.setState({ domains }))
       .catch(error => console.error('PaymentFormContents domains catch', error));
-
-      if (payment._id) {
-        getItems('forms', { filter: { paymentIds: payment._id } })
-        .then(forms => this.setState({ forms }))
-        .catch(error => console.error('PaymentFormContents forms catch', error));
-      }
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
@@ -81,8 +60,8 @@ class PaymentFormContents extends Component {
   }
 
   render() {
-    const { className, formState, full, session } = this.props;
-    const { form, forms, formTemplate } = this.state;
+    const { className, formState, full, payByCheckInstructions, session } = this.props;
+    const { forms } = this.state;
     const payment = formState.object;
 
     // const formFilter = { 'paymentId': payment._id };
@@ -92,10 +71,10 @@ class PaymentFormContents extends Component {
     //   `&filter-name=${encodeURIComponent(formFilterLabel)}`;
 
     let checkInstructions;
-    if (payment.method === 'check' && formTemplate) {
+    if (payment.method === 'check' && payByCheckInstructions) {
       checkInstructions = (
         <div className="form-field__text">
-          <Markdown>{formTemplate.payByCheckInstructions || ''}</Markdown>
+          <Markdown>{payByCheckInstructions || ''}</Markdown>
         </div>
       );
     }
@@ -159,10 +138,7 @@ class PaymentFormContents extends Component {
               options={{ select: 'name email', sort: 'name' }}
               Suggestion={UserSuggestion}
               value={(payment.userId || session).name || ''}
-              onChange={(suggestion) => {
-                payment.userId = suggestion;
-                this.props.onChange(payment);
-              }} />
+              onChange={suggestion => formState.set('userId', suggestion)} />
           </FormField>
           {administeredBy}
           {formLinks}
@@ -177,18 +153,18 @@ class PaymentFormContents extends Component {
             <div className="box--row">
               <span className="prefix">$</span>
               <input name="amount" type="text" disabled={!administrator}
-                value={payment.amount || (form || {}).unpaidTotal || ''}
+                value={payment.amount || ''}
                 onChange={formState.change('amount')} />
             </div>
           </FormField>
           <FormField label="Method">
-            <div>
+            <div className="box--row">
               <input id="methodPaypal" name="method" type="radio" value="paypal"
                 checked={payment.method === 'paypal'}
                 onChange={formState.change('method')} />
               <label htmlFor="methodPaypal">paypal</label>
             </div>
-            <div>
+            <div className="box--row">
               <input id="methodCheck" name="method" type="radio" value="check"
                 checked={payment.method === 'check'}
                 onChange={formState.change('method')} />
@@ -210,10 +186,8 @@ class PaymentFormContents extends Component {
 PaymentFormContents.propTypes = {
   className: PropTypes.string,
   formState: PropTypes.object.isRequired,
-  formId: PropTypes.string.isRequired,
-  formTemplateId: PropTypes.string.isRequired,
+  payByCheckInstructions: PropTypes.string,
   full: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
@@ -226,6 +200,7 @@ PaymentFormContents.propTypes = {
 PaymentFormContents.defaultProps = {
   className: undefined,
   full: true,
+  payByCheckInstructions: undefined,
 };
 
 const select = state => ({

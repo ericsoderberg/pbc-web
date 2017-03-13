@@ -78,7 +78,7 @@ export function calculateTotal(formTemplate, form) {
         // see if we have it
         form.fields.some((field) => {
           if (field.templateFieldId === templateField._id) {
-            if (templateField.type === 'count') {
+            if (templateField.type === 'number' || templateField.type === 'count') {
               total += (parseInt(templateField.value, 10) *
                 parseInt(field.value, 10));
             } else if (templateField.type === 'line') {
