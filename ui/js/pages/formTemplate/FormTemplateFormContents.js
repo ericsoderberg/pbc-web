@@ -15,7 +15,7 @@ export default class FormTemplateFormContents extends Component {
 
   constructor() {
     super();
-    this._changeDependsOnId = this._changeDependsOnId.bind(this);
+    this._changeLinkedFormTemplateId = this._changeLinkedFormTemplateId.bind(this);
     this.state = {
       domains: [],
       expandedSections: {}, // _id or id
@@ -36,23 +36,23 @@ export default class FormTemplateFormContents extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { formState: { object: { dependsOnId } } } = this.props;
-    const { formState: { object: { dependsOnId: nextDependsOnId } } } = nextProps;
-    if (nextDependsOnId !== dependsOnId) {
+    const { formState: { object: { linkedFormTemplateId } } } = this.props;
+    const { formState: { object: { linkedFormTemplateId: nextLinkedFormTemplateId } } } = nextProps;
+    if (nextLinkedFormTemplateId !== linkedFormTemplateId) {
       this._loadDependency(nextProps);
     }
   }
 
   _loadDependency(props) {
     const { formState: { object: formTemplate } } = props;
-    if (formTemplate.dependsOnId) {
-      // load dependent form to get fields we might link to
-      getItem('form-templates', formTemplate.dependsOnId._id)
-      .then(dependsOnFormTemplate => this.setState({ dependsOnFormTemplate }))
+    if (formTemplate.linkedFormTemplateId) {
+      // load linked form to get fields we might link to
+      getItem('form-templates', formTemplate.linkedFormTemplateId._id)
+      .then(linkedToFormTemplate => this.setState({ linkedToFormTemplate }))
       .catch(error => console.error(
-        'FormTemplateFormContents dependsOnFormTemplate catch', error));
+        'FormTemplateFormContents linkedToFormTemplate catch', error));
     } else {
-      this.setState({ dependsOnFormTemplate: undefined });
+      this.setState({ linkedToFormTemplate: undefined });
     }
   }
 
@@ -77,11 +77,11 @@ export default class FormTemplateFormContents extends Component {
     };
   }
 
-  _changeDependsOnId(suggestion) {
+  _changeLinkedFormTemplateId(suggestion) {
     const { formState } = this.props;
-    const dependsOnId = suggestion ?
+    const linkedFormTemplateId = suggestion ?
       { _id: suggestion._id, name: suggestion.name } : undefined;
-    if (!dependsOnId) {
+    if (!linkedFormTemplateId) {
       // clear any linkedField fields too
       const sections = formState.object.sections.slice(0);
       sections.forEach((section) => {
@@ -91,12 +91,12 @@ export default class FormTemplateFormContents extends Component {
       });
       formState.set('sections', sections);
     }
-    formState.set('dependsOnId', dependsOnId);
+    formState.set('linkedFormTemplateId', linkedFormTemplateId);
   }
 
   render() {
     const { className, errors, formState, session } = this.props;
-    const { expandedSections, detailsActive, dependsOnFormTemplate } = this.state;
+    const { expandedSections, detailsActive, linkedToFormTemplate } = this.state;
     const formTemplate = formState.object;
 
     // build field id/name list for dependencies
@@ -157,7 +157,7 @@ export default class FormTemplateFormContents extends Component {
         edit = (
           <FormTemplateSectionEdit section={section}
             dependableFields={dependableFields}
-            dependsOnFormTemplate={dependsOnFormTemplate}
+            linkedToFormTemplate={linkedToFormTemplate}
             includeName={formTemplate.sections.length > 1}
             onChange={formState.changeAt('sections', index)} />
         );
@@ -220,14 +220,14 @@ export default class FormTemplateFormContents extends Component {
 
       if (formTemplate.authenticate) {
         details.push(
-          <FormField key="depends" label="Depends on"
+          <FormField key="linkedTo" label="Linked to"
             help={`Another form that must be filled out first.
               This only works for authenticated forms.`}
-            error={errors.dependsOnId}>
+            error={errors.linkedFormTemplateId}>
             <SelectSearch category="form-templates" clearable={true}
               options={{ filter: { authenticate: true } }}
-              value={(formTemplate.dependsOnId || {}).name || ''}
-              onChange={this._changeDependsOnId} />
+              value={(formTemplate.linkedFormTemplateId || {}).name || ''}
+              onChange={this._changeLinkedFormTemplateId} />
           </FormField>,
         );
       }

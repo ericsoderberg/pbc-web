@@ -20,7 +20,7 @@ export default class FormTemplate extends Component {
   constructor() {
     super();
     this._layout = this._layout.bind(this);
-    this.state = { sortReverse: false };
+    this.state = { linkedForms: {}, sortReverse: false };
   }
 
   componentDidMount() {
@@ -49,6 +49,7 @@ export default class FormTemplate extends Component {
 
       const columns = [];
       const fieldMap = {};
+      const linkedFieldMap = {};
       const optionMap = {};
       const totalMap = {};
       formTemplate.sections.forEach((section) => {
@@ -62,6 +63,9 @@ export default class FormTemplate extends Component {
           field.monetary) {
             totalMap[field._id] = 0;
           }
+          if (field.linkedFieldId) {
+            linkedFieldMap[field._id] = field.linkedFieldId;
+          }
         });
       });
 
@@ -70,11 +74,29 @@ export default class FormTemplate extends Component {
         columns.push(field.name);
       });
 
-      this.setState({ columns, formTemplate, fieldMap, optionMap });
-      return { totalMap };
+      this.setState({
+        columns, formTemplate, fieldMap, linkedFieldMap, optionMap,
+      });
+      return { formTemplate, totalMap };
     })
     .then((context) => {
-      const { totalMap } = context;
+      const { formTemplate } = context;
+      if (formTemplate.linkedFormTemplateId) {
+        // get linked forms
+        return getItems('forms', {
+          filter: { formTemplateId: formTemplate.linkedFormTemplateId._id },
+          populate: true,
+        })
+        .then((forms) => {
+          const linkedForms = {};
+          forms.forEach((form) => { linkedForms[form._id] = form; });
+          return { ...context, linkedForms };
+        });
+      }
+      return context;
+    })
+    .then((context) => {
+      const { linkedForms, totalMap } = context;
       return getItems('forms', {
         filter: { formTemplateId: id }, populate: true,
       })
@@ -92,7 +114,7 @@ export default class FormTemplate extends Component {
           });
         });
 
-        this.setState({ forms, totalMap });
+        this.setState({ forms, linkedForms, totalMap });
       });
     })
     .catch(error => console.error('!!! FormTemplate catch', error));
@@ -119,9 +141,8 @@ export default class FormTemplate extends Component {
     return value;
   }
 
-  _fieldContents(field) {
-    const { fieldMap, optionMap } = this.state;
-    const templateField = fieldMap[field.templateFieldId];
+  _fieldContents(field, templateField) {
+    const { optionMap } = this.state;
     let contents = field.value;
     if (templateField.type === 'count' || templateField.type === 'number') {
       let prefix;
@@ -268,13 +289,28 @@ export default class FormTemplate extends Component {
     });
   }
 
-  _renderCells(form) {
-    const { columns, sortFieldId, totalMap } = this.state;
+  _renderCells(form, linkedForm) {
+    const {
+      columns, fieldMap, linkedFieldMap, sortFieldId, totalMap,
+    } = this.state;
 
     const cellMap = {};
     form.fields.forEach((field) => {
       const templateFieldId = field.templateFieldId;
-      cellMap[templateFieldId] = this._fieldContents(field);
+      const templateField = fieldMap[templateFieldId];
+      cellMap[templateFieldId] = this._fieldContents(field, templateField);
+    });
+
+    // look for linked fields
+    Object.keys(linkedFieldMap).forEach((templateFieldId) => {
+      linkedForm.fields.some((field) => {
+        if (field.templateFieldId === linkedFieldMap[templateFieldId]) {
+          const templateField = fieldMap[templateFieldId];
+          cellMap[templateFieldId] = this._fieldContents(field, templateField);
+          return true;
+        }
+        return false;
+      });
     });
 
     const created = moment(form.created);
@@ -297,11 +333,12 @@ export default class FormTemplate extends Component {
   }
 
   _renderRows() {
-    const { filteredForms, forms } = this.state;
+    const { filteredForms, forms, linkedForms } = this.state;
     const fixedRows = [];
     const flexedRows = [];
     (filteredForms || forms).forEach((form) => {
-      const cells = this._renderCells(form);
+      const linkedForm = linkedForms[form.linkedFormId];
+      const cells = this._renderCells(form, linkedForm);
       fixedRows.push(
         <tr key={form._id} onClick={this._editForm(form._id)}>
           {cells.slice(0, 1)}

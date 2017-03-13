@@ -42,7 +42,7 @@ export default class FormTemplateFieldEdit extends Component {
   }
 
   render() {
-    const { dependableFields, dependsOnFormTemplate } = this.props;
+    const { dependableFields, linkedToFormTemplate } = this.props;
     const { formState } = this.state;
     const field = formState.object;
 
@@ -236,9 +236,9 @@ export default class FormTemplateFieldEdit extends Component {
     );
 
     let linkedField;
-    if (dependsOnFormTemplate) {
+    if (linkedToFormTemplate) {
       const linkedFieldOptions = [];
-      dependsOnFormTemplate.sections.forEach(section2 =>
+      linkedToFormTemplate.sections.forEach(section2 =>
         section2.fields.forEach((field2) => {
           if (field2.type === field.type) {
             linkedFieldOptions.push(
@@ -286,12 +286,12 @@ export default class FormTemplateFieldEdit extends Component {
 
 FormTemplateFieldEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object),
-  dependsOnFormTemplate: PropTypes.object,
+  linkedToFormTemplate: PropTypes.object,
   field: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
 FormTemplateFieldEdit.defaultProps = {
   dependableFields: [],
-  dependsOnFormTemplate: undefined,
+  linkedToFormTemplate: undefined,
 };

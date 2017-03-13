@@ -289,7 +289,7 @@ const formTemplateSchema = Schema({
   acknowledge: Boolean,
   authenticate: Boolean,
   created: Date,
-  dependsOnId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
+  linkedFormTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: { type: String, required: true, unique: true },

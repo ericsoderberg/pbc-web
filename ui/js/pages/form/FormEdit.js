@@ -1,5 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { getItem, putItem, deleteItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
@@ -30,7 +31,8 @@ class FormEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.id !== this.props.id) {
+    if (nextProps.params.id !== this.props.params.id ||
+      nextProps.id !== this.props.id) {
       this._load(nextProps);
     }
   }
@@ -38,7 +40,7 @@ class FormEdit extends Component {
   _load(props) {
     getItem('forms', props.id || props.params.id)
     .then((form) => {
-      this.setState({ form });
+      this.setState({ form, formTemplate: undefined, linkedForm: undefined });
       if (form.linkedFormId) {
         return getItem('forms', form.linkedFormId)
         .then(linkedForm => this.setState({ linkedForm }))
@@ -46,7 +48,7 @@ class FormEdit extends Component {
       }
       return form;
     })
-    .then(form => getItem('form-templates', form.formTemplateId))
+    .then(form => getItem('form-templates', form.formTemplateId._id))
     .then((formTemplate) => {
       this.setState({ formTemplate });
       document.title = formTemplate.name;
@@ -122,12 +124,26 @@ class FormEdit extends Component {
         );
       }
 
+      let linkedFormControl;
+      if (linkedForm) {
+        if (!inline) {
+          linkedFormControl = (
+            <span className="form__link">
+              from <Link to={`/forms/${linkedForm._id}/edit`}>
+                {linkedForm.formTemplateId.name}
+              </Link>
+            </span>
+          );
+        }
+      }
+
       result = (
-        <form className={classNames.join(' ')} action={`/forms${form._id}`}
+        <form className={classNames.join(' ')} action={`/forms/${form._id}`}
           onSubmit={this._onUpdate}>
           {header}
           <FormContents form={form} formTemplate={formTemplate}
-            linkedForm={linkedForm} full={full} onChange={this._onChange} />
+            linkedForm={linkedForm} linkedFormControl={linkedFormControl}
+            full={full} onChange={this._onChange} />
           <footer className="form__footer">
             <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />
@@ -173,7 +189,7 @@ FormEdit.defaultProps = {
   inline: false,
   onCancel: undefined,
   onDone: undefined,
-  params: undefined,
+  params: {},
   // session: undefined,
 };
 

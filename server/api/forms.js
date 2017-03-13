@@ -177,15 +177,16 @@ export default function (router, transporter) {
     index: {
       authorize: authorizedForDomainOrSelf,
       populate: [
-        { path: 'userId', select: 'name' },
         { path: 'formTemplateId', select: 'name domainId' },
         { path: 'paymentIds', select: 'amount' },
+        { path: 'userId', select: 'name' },
       ],
     },
     get: {
       populate: [
-        { path: 'userId', select: 'name' },
+        { path: 'formTemplateId', select: 'name domainId' },
         { path: 'paymentIds', select: 'amount' },
+        { path: 'userId', select: 'name' },
       ],
       transformOut: setUnpaidTotal,
     },

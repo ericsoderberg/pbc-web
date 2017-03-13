@@ -40,7 +40,7 @@ const FormItem = (props) => {
     buttonClassNames.push('button--secondary');
     message = `${form.name}`;
   } else {
-    buttonClassNames.push('button-plain');
+    buttonClassNames.push('button-plain ');
     const timestamp = moment(form.modified).format('MMM Do YYYY');
     if (distinguish) {
       message = `${verb} for ${form.name} ${timestamp}`;
@@ -52,9 +52,11 @@ const FormItem = (props) => {
   return (
     <div className={classNames.join(' ')}>
       <div className="item item--full">
-        <button className={buttonClassNames.join(' ')} onClick={onClick}>
-          {message}
-        </button>
+        <div>
+          <button className={buttonClassNames.join(' ')} onClick={onClick}>
+            {message}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -100,7 +102,7 @@ class FormSection extends Component {
     // this._onResize = this._onResize.bind(this);
     // this._layout = this._layout.bind(this);
 
-    // formTemplates and forms are a hash to handle inter-form dependencies,
+    // formTemplates and forms are a hash to handle inter-form linkages,
     // both are keyed by a form template id
     this.state = { formTemplates: {}, forms: {}, state: LOADING };
   }
@@ -141,7 +143,9 @@ class FormSection extends Component {
     const { formTemplate, formTemplateId } = props;
     const finalFormTemplateId = formTemplateId._id || formTemplate._id;
     this.setState({
-      finalFormTemplateId, rootFormTemplateId: finalFormTemplateId,
+      activeFormTemplateId: finalFormTemplateId,
+      finalFormTemplateId,
+      rootFormTemplateId: finalFormTemplateId,
     });
     // We might already have the form template if we're on a page that
     // populated it.
@@ -160,9 +164,9 @@ class FormSection extends Component {
     if (!session && formTemplate.authenticate) {
       this.setState({ state: AUTHENTICATION_NEEDED });
     } else {
-      if (formTemplate.dependsOnId) {
-        this.setState({ rootFormTemplateId: formTemplate.dependsOnId._id });
-        this._loadFormTemplate(formTemplate.dependsOnId._id);
+      if (formTemplate.linkedFormTemplateId) {
+        this.setState({ rootFormTemplateId: formTemplate.linkedFormTemplateId._id });
+        this._loadFormTemplate(formTemplate.linkedFormTemplateId._id);
       }
       this._loadForms(formTemplate._id);
     }
@@ -224,10 +228,10 @@ class FormSection extends Component {
     return () => {
       const { finalFormTemplateId, formTemplates } = this.state;
       let formTemplate = formTemplates[finalFormTemplateId];
-      while (formTemplate.dependsOnId &&
+      while (formTemplate.linkedFormTemplateId &&
         (!linkedForm ||
-          linkedForm.formTemplateId._id !== formTemplate.dependsOnId._id)) {
-        formTemplate = formTemplates[formTemplate.dependsOnId._id];
+          linkedForm.formTemplateId._id !== formTemplate.linkedFormTemplateId._id)) {
+        formTemplate = formTemplates[formTemplate.linkedFormTemplateId._id];
       }
       this.setState({
         state: ADDING, activeFormTemplateId: formTemplate._id, linkedForm,
@@ -266,17 +270,17 @@ class FormSection extends Component {
       state = LOADING;
     } else if (!session && finalFormTemplate.authenticate) {
       state = AUTHENTICATION_NEEDED;
-    } else if (finalFormTemplate.dependsOnId) {
-      const dependsOnId = finalFormTemplate.dependsOnId._id;
-      const dependsOn = formTemplates[dependsOnId];
-      const dependsOnForms = forms[dependsOnId];
-      if (!dependsOn || !dependsOnForms) {
+    } else if (finalFormTemplate.linkedFormTemplateId) {
+      const linkedFormTemplateId = finalFormTemplate.linkedFormTemplateId._id;
+      const linkedToFormTemplate = formTemplates[linkedFormTemplateId];
+      const linkedToForms = forms[linkedFormTemplateId];
+      if (!linkedToFormTemplate || !linkedToForms) {
         state = LOADING;
-      } else if (dependsOnForms.length === 0) {
-        activeFormTemplateId = dependsOnId;
+      } else if (linkedToForms.length === 0) {
+        activeFormTemplateId = linkedFormTemplateId;
         state = ADDING;
-      } else if (finalForms.length === 0 && dependsOnForms.length === 1) {
-        linkedForm = dependsOnForms[0];
+      } else if (finalForms.length === 0 && linkedToForms.length === 1) {
+        linkedForm = linkedToForms[0];
         state = ADDING;
       } else {
         state = SUMMARY;

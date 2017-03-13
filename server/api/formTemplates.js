@@ -9,12 +9,12 @@ mongoose.Promise = global.Promise;
 
 const unsetReferences = (data) => {
   data = unsetDomainIfNeeded(data);
-  if (!data.dependsOnId) {
-    delete data.dependsOnId;
+  if (!data.linkedFormTemplateId) {
+    delete data.linkedFormTemplateId;
     if (!data.$unset) {
       data.$unset = {};
     }
-    data.$unset.dependsOnId = '';
+    data.$unset.linkedFormTemplateId = '';
   }
   return data;
 };
@@ -27,12 +27,12 @@ export default function (router) {
     index: {
       authorize: authorizedForDomain,
       populate: [
-        { path: 'dependsOnId', select: 'name' },
+        { path: 'linkedFormTemplateId', select: 'name' },
       ],
     },
     get: {
       populate: [
-        { path: 'dependsOnId', select: 'name' },
+        { path: 'linkedFormTemplateId', select: 'name' },
       ],
     },
     put: {

@@ -2,7 +2,9 @@ import React, { PropTypes } from 'react';
 import FormField from '../../components/FormField';
 
 const FormLine = (props) => {
-  const { error, field, formTemplateField, linkedField, onChange } = props;
+  const {
+    error, field, formTemplateField, linkedField, linkedFormControl, onChange,
+  } = props;
 
   let contents;
   if (linkedField) {
@@ -42,6 +44,7 @@ const FormLine = (props) => {
     <FormField label={formTemplateField.name}
       help={formTemplateField.help} error={error}>
       {contents}
+      {linkedFormControl}
     </FormField>
   );
 };
@@ -51,6 +54,7 @@ FormLine.propTypes = {
   field: PropTypes.object,
   formTemplateField: PropTypes.object.isRequired,
   linkedField: PropTypes.object,
+  linkedFormControl: PropTypes.element,
   onChange: PropTypes.func.isRequired,
 };
 
@@ -58,6 +62,7 @@ FormLine.defaultProps = {
   error: undefined,
   field: {},
   linkedField: undefined,
+  linkedFormControl: undefined,
 };
 
 export default FormLine;

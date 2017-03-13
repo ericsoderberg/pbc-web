@@ -815,7 +815,7 @@
   margin: 0 auto;
   text-align: left;
 
-  .item--full .button-plain {
+  .item--full > .button-plain {
     padding: 0;
   }
 }
@@ -1036,5 +1036,16 @@
     display: block;
     width: $form-width;
     text-align: left;
+  }
+}
+
+.form__link {
+  display: block;
+  text-align: right;
+  padding: $quarter-unit $half-unit;
+  color: $tertiary-color;
+
+  a {
+    color: $tertiary-color;
   }
 }

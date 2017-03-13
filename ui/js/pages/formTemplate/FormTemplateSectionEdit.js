@@ -55,7 +55,7 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render() {
-    const { includeName, dependableFields, dependsOnFormTemplate } = this.props;
+    const { includeName, dependableFields, linkedToFormTemplate } = this.props;
     const { detailsActive, formState, expandedFields } = this.state;
     const section = formState.object;
 
@@ -125,7 +125,7 @@ export default class FormTemplateSectionEdit extends Component {
         edit = (
           <FormTemplateFieldEdit field={field} index={index}
             dependableFields={dependableFields}
-            dependsOnFormTemplate={dependsOnFormTemplate}
+            linkedToFormTemplate={linkedToFormTemplate}
             onChange={formState.changeAt('fields', index)} />
         );
       }
@@ -170,12 +170,12 @@ export default class FormTemplateSectionEdit extends Component {
 
 FormTemplateSectionEdit.propTypes = {
   dependableFields: PropTypes.arrayOf(PropTypes.object).isRequired,
-  dependsOnFormTemplate: PropTypes.object,
+  linkedToFormTemplate: PropTypes.object,
   includeName: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
 };
 
 FormTemplateSectionEdit.defaultProps = {
-  dependsOnFormTemplate: undefined,
+  linkedToFormTemplate: undefined,
 };

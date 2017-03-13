@@ -41,13 +41,13 @@ class FormAdd extends Component {
       props.formTemplateId || props.location.query.formTemplateId;
     getItem('form-templates', formTemplateId)
     .then((formTemplate) => {
-      if (formTemplate.dependsOnId) {
+      if (formTemplate.linkedFormTemplateId) {
         // get forms already filled out
         return getItems('forms', {
-          formTemplateId: formTemplate.dependsOnId._id,
+          formTemplateId: formTemplate.linkedFormTemplateId._id,
           userId: (form || session || {}).userId,
         })
-        .then(dependedOnForms => ({ formTemplate, dependedOnForms }));
+        .then(linkedToForms => ({ formTemplate, linkedToForms }));
       }
       return { formTemplate };
     })
