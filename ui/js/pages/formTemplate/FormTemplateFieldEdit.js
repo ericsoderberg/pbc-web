@@ -119,7 +119,7 @@ export default class FormTemplateFieldEdit extends Component {
     if (field.type === 'line') {
       Object.keys(LINK_TO_USER_FIELDS).some((fieldName) => {
         const regexp = LINK_TO_USER_FIELDS[fieldName];
-        if (field.name.match(regexp)) {
+        if (field.name && field.name.match(regexp)) {
           sessionField = (
             <FormField>
               <input name="sessionField" type="checkbox"
