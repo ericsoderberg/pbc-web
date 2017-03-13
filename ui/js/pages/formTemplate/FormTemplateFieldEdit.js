@@ -9,6 +9,7 @@ import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateOptionEdit from './FormTemplateOptionEdit';
+import { dependableFields } from './FormTemplateUtils';
 
 const LINK_TO_USER_FIELDS = {
   name: /name/i,
@@ -42,7 +43,7 @@ export default class FormTemplateFieldEdit extends Component {
   }
 
   render() {
-    const { dependableFields, linkedToFormTemplate } = this.props;
+    const { formTemplate, linkedToFormTemplate } = this.props;
     const { formState } = this.state;
     const field = formState.object;
 
@@ -57,9 +58,10 @@ export default class FormTemplateFieldEdit extends Component {
     let min;
     let sessionField;
 
-    if (field.type === 'line' || field.type === 'choice' ||
+    if (formTemplate.payable &&
+      (field.type === 'line' || field.type === 'choice' ||
       field.type === 'choices' || field.type === 'count' ||
-      field.type === 'number') {
+      field.type === 'number')) {
       monetary = (
         <FormField>
           <input name="monetary" type="checkbox"
@@ -216,24 +218,24 @@ export default class FormTemplateFieldEdit extends Component {
       );
     }
 
-    const dependsOnOptions = dependableFields
-    .filter(dependableField => (
-      dependableField.id !== (field._id || field.id)
-    ))
+    let dependsOn;
+    const dependsOnOptions = dependableFields(formTemplate, undefined, field)
     .map(dependableField => (
       <option key={dependableField._id || dependableField.id}
         label={dependableField.name}
         value={dependableField.id} />
     ));
-    dependsOnOptions.unshift(<option key={0} />);
-    const dependsOn = (
-      <FormField label="Depends on">
-        <select name="dependsOnId" value={field.dependsOnId || ''}
-          onChange={formState.change('dependsOnId')}>
-          {dependsOnOptions}
-        </select>
-      </FormField>
-    );
+    if (dependsOnOptions.length > 0) {
+      dependsOnOptions.unshift(<option key={0} />);
+      dependsOn = (
+        <FormField label="Depends on">
+          <select name="dependsOnId" value={field.dependsOnId || ''}
+            onChange={formState.change('dependsOnId')}>
+            {dependsOnOptions}
+          </select>
+        </FormField>
+      );
+    }
 
     let linkedField;
     if (linkedToFormTemplate) {
@@ -285,13 +287,12 @@ export default class FormTemplateFieldEdit extends Component {
 }
 
 FormTemplateFieldEdit.propTypes = {
-  dependableFields: PropTypes.arrayOf(PropTypes.object),
+  formTemplate: PropTypes.object.isRequired,
   linkedToFormTemplate: PropTypes.object,
   field: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
 FormTemplateFieldEdit.defaultProps = {
-  dependableFields: [],
   linkedToFormTemplate: undefined,
 };

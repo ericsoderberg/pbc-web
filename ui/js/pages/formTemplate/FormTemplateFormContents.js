@@ -99,20 +99,6 @@ export default class FormTemplateFormContents extends Component {
     const { expandedSections, detailsActive, linkedToFormTemplate } = this.state;
     const formTemplate = formState.object;
 
-    // build field id/name list for dependencies
-    const dependableFields = [];
-    (formTemplate.sections || []).forEach((section) => {
-      (section.fields || []).forEach((field) => {
-        if (field.type !== 'instructions') {
-          dependableFields.push({
-            id: field._id || field.id,
-            name: field.name,
-            sectionId: section._id || section.id,
-          });
-        }
-      });
-    });
-
     const sections = (formTemplate.sections || []).map((section, index) => {
       let sectionClassName;
 
@@ -156,9 +142,8 @@ export default class FormTemplateFormContents extends Component {
         expandedSections[section.id]) {
         edit = (
           <FormTemplateSectionEdit section={section}
-            dependableFields={dependableFields}
+            formTemplate={formTemplate}
             linkedToFormTemplate={linkedToFormTemplate}
-            includeName={formTemplate.sections.length > 1}
             onChange={formState.changeAt('sections', index)} />
         );
       }

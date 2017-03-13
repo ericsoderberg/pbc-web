@@ -8,6 +8,7 @@ import UpIcon from '../../icons/Up';
 import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateFieldEdit from './FormTemplateFieldEdit';
+import { dependableFields } from './FormTemplateUtils';
 
 const FIELD_TYPES = [
   'line', 'lines', 'choice', 'choices', 'number',
@@ -55,19 +56,18 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render() {
-    const { includeName, dependableFields, linkedToFormTemplate } = this.props;
+    const {
+      formTemplate, linkedToFormTemplate, payable,
+    } = this.props;
     const { detailsActive, formState, expandedFields } = this.state;
     const section = formState.object;
 
     let sectionFields;
-    if (includeName) {
+    if (formTemplate.sections.length > 1) {
       let details;
 
       if (detailsActive) {
-        const dependsOnOptions = dependableFields
-        .filter(dependableField => (
-          dependableField.sectionId !== (section._id || section.id)
-        ))
+        const dependsOnOptions = dependableFields(formTemplate, section)
         .map(dependableField => (
           <option key={dependableField.id} label={dependableField.name}
             value={dependableField.id} />
@@ -123,8 +123,8 @@ export default class FormTemplateSectionEdit extends Component {
       let edit;
       if (expandedFields[field._id] || expandedFields[field.id]) {
         edit = (
-          <FormTemplateFieldEdit field={field} index={index}
-            dependableFields={dependableFields}
+          <FormTemplateFieldEdit field={field}
+            formTemplate={formTemplate}
             linkedToFormTemplate={linkedToFormTemplate}
             onChange={formState.changeAt('fields', index)} />
         );
@@ -169,9 +169,8 @@ export default class FormTemplateSectionEdit extends Component {
 }
 
 FormTemplateSectionEdit.propTypes = {
-  dependableFields: PropTypes.arrayOf(PropTypes.object).isRequired,
+  formTemplate: PropTypes.object.isRequired,
   linkedToFormTemplate: PropTypes.object,
-  includeName: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
 };
