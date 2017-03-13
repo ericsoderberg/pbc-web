@@ -36,13 +36,15 @@ export default class DateSelector extends Component {
     this.setState({ reference });
   }
 
-  _onPrevious() {
+  _onPrevious(event) {
+    event.stopPropagation();
     const { reference } = this.state;
     const nextReference = moment(reference).subtract(1, 'month');
     this.setState({ reference: nextReference });
   }
 
-  _onNext() {
+  _onNext(event) {
+    event.stopPropagation();
     const { reference } = this.state;
     const nextReference = moment(reference).add(1, 'month');
     this.setState({ reference: nextReference });

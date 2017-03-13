@@ -120,7 +120,7 @@ export default class DateInput extends Component {
       input = (
         <input ref={(ref) => { this._dateInputRef = ref; }}
           className={'date-input__input'} type="date"
-          value={dateValue}
+          value={dateValue} placeholder="YYYY-MM-DD"
           onChange={this._onChange} onFocus={this._onOpen} />
       );
     }

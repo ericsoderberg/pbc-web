@@ -17,7 +17,8 @@ import SessionSection from '../session/SessionSection';
 const LABEL = {
   Register: 'Registered',
   'Sign Up': 'Signed up',
-  Submit: 'Submitted',  Subscribe: 'Subscribed',
+  Submit: 'Submitted',
+  Subscribe: 'Subscribed',
 };
 
 const LOADING = 'loading';
@@ -278,8 +279,17 @@ class FormSection extends Component {
       } else if (linkedToForms.length === 0) {
         activeFormTemplateId = linkedFormTemplateId;
         state = ADDING;
-      } else if (finalForms.length === 0 && linkedToForms.length === 1) {
-        linkedForm = linkedToForms[0];
+      } else if (finalForms.length !== linkedToForms.length) {
+        if (finalForms.length === 0) {
+          linkedForm = linkedToForms[0];
+        } else {
+          linkedToForms.forEach((linkedForm2) => {
+            if (!linkedForm ||
+              moment(linkedForm2.modified).isAfter(linkedForm.modified)) {
+              linkedForm = linkedForm2;
+            }
+          });
+        }
         state = ADDING;
       } else {
         state = SUMMARY;
@@ -304,7 +314,6 @@ class FormSection extends Component {
   }
 
   _onDone() {
-    this._resetState(this.props);
     this._loadForms(this.state.activeFormTemplateId);
   }
 
