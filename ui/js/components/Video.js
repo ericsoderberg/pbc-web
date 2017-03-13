@@ -4,7 +4,7 @@ import React, { Component, PropTypes } from 'react';
 const VIMEO_REGEXP = /vimeo\.com\/(\d+)/;
 // e.g. https://vimeo.com/album/4142534
 const VIMEO_ALBUM_REGEXP = /vimeo\.com\/album\/(\d+)/;
-const YOUTUBE_REGEXP = /youtube\.com\/(\w+)|youtu\.be\/(\w+)/;
+const YOUTUBE_REGEXP = /youtube\.com\/([\w-]+)|youtu\.be\/([\w-]+)/;
 
 export default class Video extends Component {
 
@@ -41,7 +41,7 @@ export default class Video extends Component {
       match = url.match(YOUTUBE_REGEXP);
       if (match) {
         const src = `${window.location.protocol}//www.youtube.com/embed/` +
-          `${match[1]}`;
+          `${match[1] || match[2]}`;
         contents = (
           <iframe className="video youtube-player" type="text/html" src={src}
             frameBorder="0" width="960" height="540" />
