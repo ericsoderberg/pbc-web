@@ -8,17 +8,18 @@ const FormChoices = (props) => {
   const optionIds = field.optionIds || [];
   const contents = (formTemplateField.options || []).map((option) => {
     const name = formTemplateField.name;
-    const checked = (optionIds.indexOf(option._id) !== -1);
+    const id = option._id || option.id;
+    const checked = (optionIds.indexOf(id) !== -1);
     return (
-      <div key={option._id || option.id} className="form__field-option">
-        <input name={name} type="checkbox" checked={checked}
+      <div key={id} className="form__field-option">
+        <input id={id} name={name} type="checkbox" checked={checked}
           onChange={() => onChange({
             templateFieldId: formTemplateField._id,
             optionIds: (checked ?
-              optionIds.filter(id => id !== option._id) :
-              optionIds.slice(0).concat([option._id])),
+              optionIds.filter(id2 => id2 !== id) :
+              optionIds.slice(0).concat([id])),
           })} />
-        <FormOptionLabel name={name} formTemplateField={formTemplateField}
+        <FormOptionLabel htmlFor={id} formTemplateField={formTemplateField}
           option={option} selected={checked} />
       </div>
     );

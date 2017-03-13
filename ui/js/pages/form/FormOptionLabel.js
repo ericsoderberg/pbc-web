@@ -5,11 +5,28 @@ export default class FormOptionLabel extends Component {
 
   constructor() {
     super();
+    this._toggleHelp = this._toggleHelp.bind(this);
     this.state = {};
   }
 
+  componentWillUnmount() {
+    if (this.state.helpActive) {
+      document.removeEventListener('click', this._toggleHelp);
+    }
+  }
+
+  _toggleHelp() {
+    const helpActive = !this.state.helpActive;
+    if (helpActive) {
+      document.addEventListener('click', this._toggleHelp);
+    } else {
+      document.removeEventListener('click', this._toggleHelp);
+    }
+    this.setState({ helpActive });
+  }
+
   render() {
-    const { name, option, formTemplateField, selected } = this.props;
+    const { htmlFor, option, formTemplateField, selected } = this.props;
     const { helpActive } = this.state;
 
     const labels = [<span key="name">{option.name}</span>];
@@ -35,9 +52,7 @@ export default class FormOptionLabel extends Component {
       labels.push(
         <span key="help" className={classNames.join(' ')}>
           <button className="button-plain" type="button"
-            onClick={() => this.setState({ helpActive: !helpActive })}>
-            ?
-          </button>
+            onClick={this._toggleHelp}> ? </button>
           <div className="form-field__help-drop">
             <Markdown>{option.help}</Markdown>
           </div>
@@ -46,7 +61,7 @@ export default class FormOptionLabel extends Component {
     }
 
     return (
-      <label htmlFor={name} className="form-option-label">
+      <label htmlFor={htmlFor} className="form-option-label">
         {labels}
       </label>
     );
@@ -55,7 +70,7 @@ export default class FormOptionLabel extends Component {
 
 FormOptionLabel.propTypes = {
   formTemplateField: PropTypes.object.isRequired,
-  name: PropTypes.string.isRequired,
+  htmlFor: PropTypes.string.isRequired,
   option: PropTypes.object.isRequired,
   selected: PropTypes.bool,
 };

@@ -7,15 +7,17 @@ const FormChoice = (props) => {
 
   const contents = (formTemplateField.options || []).map((option) => {
     const name = formTemplateField.name;
-    const checked = (field.optionId === option._id);
+    const id = option._id || option.id;
+    const checked = (field.optionId === id);
     return (
-      <div key={option._id || option.id} className="form__field-option">
-        <input name={name} type="radio" checked={checked}
+      <div key={id} className="form__field-option">
+        <input id={id} name={name} type="radio"
+          checked={checked}
           onChange={() => onChange({
             templateFieldId: formTemplateField._id,
-            optionId: option._id,
+            optionId: id,
           })} />
-        <FormOptionLabel name={name} formTemplateField={formTemplateField}
+        <FormOptionLabel htmlFor={id} formTemplateField={formTemplateField}
           option={option} selected={checked} />
       </div>
     );
