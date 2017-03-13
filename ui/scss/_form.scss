@@ -197,7 +197,7 @@
 
     & + label {
       display: inline-block;
-      max-width: 400px;
+      max-width: 406px; // empirical, to align with form total $
       margin: $half-unit;
       vertical-align: top;
 
@@ -334,7 +334,6 @@
 
 .form__field-option-amount {
   white-space: nowrap;
-  padding-right: $unit;
 }
 
 .form__tabs {
