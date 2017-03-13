@@ -248,6 +248,7 @@ const formTemplateOptionSchema = Schema({
   limit: Number,
   name: String,
   oldId: Number,
+  required: Boolean,
   value: String,
 });
 

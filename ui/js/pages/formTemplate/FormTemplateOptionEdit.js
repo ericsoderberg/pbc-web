@@ -18,8 +18,21 @@ export default class FormTemplateOptionEdit extends Component {
   }
 
   render() {
+    const { requirable } = this.props;
     const { formState } = this.state;
     const option = formState.object;
+
+    let required;
+    if (requirable) {
+      required = (
+        <FormField>
+          <input name="required" type="checkbox"
+            checked={option.required || false}
+            onChange={formState.toggle('required')} />
+          <label htmlFor="required">Required</label>
+        </FormField>
+      );
+    }
 
     return (
       <div>
@@ -36,6 +49,11 @@ export default class FormTemplateOptionEdit extends Component {
             <textarea name="help" value={option.help || ''} rows={1}
               onChange={formState.change('help')} />
           </FormField>
+          {required}
+          <FormField label="Total available">
+            <input name="limit" type="number" min="0" value={option.limit || ''}
+              onChange={formState.change('limit')} />
+          </FormField>
         </fieldset>
       </div>
     );
@@ -45,4 +63,5 @@ export default class FormTemplateOptionEdit extends Component {
 FormTemplateOptionEdit.propTypes = {
   option: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  requirable: PropTypes.bool.isRequired,
 };

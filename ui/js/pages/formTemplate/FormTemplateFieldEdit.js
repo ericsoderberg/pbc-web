@@ -201,6 +201,7 @@ export default class FormTemplateFieldEdit extends Component {
             </div>
           </div>
           <FormTemplateOptionEdit option={option} index={index}
+            requirable={field.type === 'choices'}
             onChange={formState.changeAt('options', index)} />
         </div>
       );
