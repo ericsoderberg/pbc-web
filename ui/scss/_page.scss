@@ -472,7 +472,7 @@ a.event-section__text {
   object-fit: cover;
 }
 
-.page-summaries,
+.pages-section,
 .people-summaries {
   display: flex;
   @include section-content;
@@ -497,7 +497,7 @@ a.event-section__text {
   }
 }
 
-.page-summaries {
+.pages-section {
   @media all and (min-width: 700px) {
 
     .section__container--center & {
@@ -510,7 +510,7 @@ a.event-section__text {
   }
 }
 
-.page-summary {
+.pages-section__page {
   position: relative;
 
   @media all and (min-width: 700px) {
@@ -522,6 +522,25 @@ a.event-section__text {
     @media all and (min-width: 700px) {
       transform: translateY(0);
     }
+  }
+}
+
+.pages-section__name {
+  position: relative;
+  display: inline-block;
+  padding-left: $unit;
+  padding-right: $unit;
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  .control-icon {
+    position: absolute;
+    right: - $quarter-unit;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.7s;
   }
 }
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { getItem } from '../../actions';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
+import RightIcon from '../../icons/Right';
 
 export default class PagesSection extends Component {
 
@@ -31,7 +32,7 @@ export default class PagesSection extends Component {
           pages[pageRef.id] = page;
           this.setState({ pages });
         })
-        .catch(error => console.error('!!! PageSummaries catch', error));
+        .catch(error => console.error('!!! PagesSection catch', error));
       }
     });
   }
@@ -39,7 +40,7 @@ export default class PagesSection extends Component {
   render() {
     const { className, pages } = this.props;
 
-    const classes = ['page-summaries'];
+    const classes = ['pages-section'];
     if (className) {
       classes.push(className);
     }
@@ -63,15 +64,25 @@ export default class PagesSection extends Component {
       let link;
       if (pageRef.image) {
         link = (
-          <Link key={page._id} className="page-tile page-summary" to={path}
+          <Link key={page._id} className="page-tile pages-section__page" to={path}
             style={style}>
             <Image image={pageRef.image} />
             <Button>{page.name}</Button>
           </Link>
         );
+      } else if (pages.length === 1) {
+        link = (
+          <Button key={page._id} className="pages-section__page"
+            plain={true} path={path} style={style}>
+            <div className="pages-section__name">
+              <h2>{page.name}</h2>
+              <RightIcon />
+            </div>
+          </Button>
+        );
       } else {
         link = (
-          <Button key={page._id} className="page-summary"
+          <Button key={page._id} className="pages-section__page"
             circle={true} path={path} style={style}>
             {page.name}
           </Button>
