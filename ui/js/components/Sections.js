@@ -59,6 +59,8 @@ export default class Sections extends Component {
         contents = (
           <Map className="section" address={section.address} plain={true} />
         );
+      } else if (section.type === 'donate') {
+        contents = <Donate className="section" />;
       } else {
         contents = <span>TBD</span>;
       }
