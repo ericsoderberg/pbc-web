@@ -70,10 +70,25 @@ export default class Calendar extends Component {
 
   _stateFromLocation(location) {
     const { query } = location;
-    const focus = (query.focus ?
-      moment(query.focus, DATE_FORMAT, true) : undefined);
-    const date = focus ||
-      (query.date ? moment(query.date, DATE_FORMAT, true) : moment());
+    let focus;
+    if (query.focus) {
+      focus = moment(query.focus, DATE_FORMAT, true);
+      if (!focus.isValid()) {
+        focus = undefined;
+      }
+    }
+    let date = focus;
+    if (!date) {
+      if (query.date) {
+        date = moment(query.date, DATE_FORMAT, true);
+        if (!date.isValid()) {
+          date = undefined;
+        }
+      }
+      if (!date) {
+        date = moment();
+      }
+    }
     const state = {
       date,
       focus,
@@ -279,9 +294,13 @@ export default class Calendar extends Component {
         classNames.push('calendar__day--alternate');
       }
 
+      const path = ((calendar.path || calendar._id) ?
+        `/calendars/${calendar.path || calendar._id}` : '/calendar') +
+        `?focus=${encodeURIComponent(moment(date).format(DATE_FORMAT))}`;
+
       days.push(
         <div key={date.valueOf()} className={classNames.join(' ')}>
-          <div className="calendar__day-date">
+          <Link to={path} className="calendar__day-date">
             <span className="calendar__day-date-dayofweek">
               {date.format('dddd')}
             </span>
@@ -289,7 +308,7 @@ export default class Calendar extends Component {
               {date.format('MMMM')}
             </span>
             {date.format('D')}
-          </div>
+          </Link>
           <ol className="calendar__events">
             {dayEvents}
           </ol>
