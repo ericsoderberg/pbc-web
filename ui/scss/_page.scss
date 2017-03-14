@@ -468,8 +468,10 @@ a.event-section__text {
 }
 
 .person-summary__image {
-  max-width: 100%;
+  width: $tile-width - $unit;
+  height: $tile-width - $unit;
   object-fit: cover;
+
 }
 
 .pages-section,

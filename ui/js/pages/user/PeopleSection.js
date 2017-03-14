@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import Markdown from 'markdown-to-jsx';
 import { getItem } from '../../actions';
 import Image from '../../components/Image';
+import UserIcon from '../../icons/User';
 
 export default class PeopleSection extends Component {
 
@@ -59,6 +60,8 @@ export default class PeopleSection extends Component {
           <Image className="person-summary__image" plain={true}
             image={person.image || user.image} />
         );
+      } else {
+        image = <UserIcon className="person-summary__image" />;
       }
 
       return (
