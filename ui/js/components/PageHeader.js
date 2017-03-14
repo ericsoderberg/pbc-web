@@ -54,20 +54,22 @@ export default class PageHeader extends Component {
     if (homer) {
       let contents;
       const navClasses = ['page-header__nav-control'];
-      if (site && site.logo) {
-        contents = (
-          <img className="page-header__logo" alt="logo" src={site.logo.data} />
+      if (site) {
+        if (site.logo) {
+          contents = (
+            <img className="page-header__logo" alt="logo" src={site.logo.data} />
+          );
+          navClasses.push('button-plain');
+        } else {
+          contents = 'Home';
+          navClasses.push('button-plain');
+        }
+        navControl = (
+          <button className={navClasses.join(' ')} onClick={this._onHome}>
+            {contents}
+          </button>
         );
-        navClasses.push('button-plain');
-      } else {
-        contents = 'Home';
-        navClasses.push('button-plain');
       }
-      navControl = (
-        <button className={navClasses.join(' ')} onClick={this._onHome}>
-          {contents}
-        </button>
-      );
     } else if (back) {
       navControl = (
         <button className="button-icon page-header__nav-control"
