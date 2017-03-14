@@ -64,18 +64,32 @@ class PaymentFormContents extends Component {
     const { forms } = this.state;
     const payment = formState.object;
 
-    // const formFilter = { 'paymentId': payment._id };
-    // const formFilterLabel = `Payment`;
-    // const formsPath = `/forms?` +
-    //   `filter=${encodeURIComponent(JSON.stringify(formFilter))}` +
-    //   `&filter-name=${encodeURIComponent(formFilterLabel)}`;
-
-    let checkInstructions;
-    if (payment.method === 'check' && payByCheckInstructions) {
-      checkInstructions = (
-        <div className="form-field__text">
-          <Markdown>{payByCheckInstructions || ''}</Markdown>
-        </div>
+    let method;
+    if (payByCheckInstructions) {
+      let checkInstructions;
+      if (payment.method === 'check') {
+        checkInstructions = (
+          <div className="form-field__text">
+            <Markdown>{payByCheckInstructions || ''}</Markdown>
+          </div>
+        );
+      }
+      method = (
+        <FormField label="Method">
+          <div className="box--row">
+            <input id="methodPaypal" name="method" type="radio" value="paypal"
+              checked={payment.method === 'paypal'}
+              onChange={formState.change('method')} />
+            <label htmlFor="methodPaypal">paypal</label>
+          </div>
+          <div className="box--row">
+            <input id="methodCheck" name="method" type="radio" value="check"
+              checked={payment.method === 'check'}
+              onChange={formState.change('method')} />
+            <label htmlFor="methodCheck">check</label>
+          </div>
+          {checkInstructions}
+        </FormField>
       );
     }
 
@@ -157,21 +171,7 @@ class PaymentFormContents extends Component {
                 onChange={formState.change('amount')} />
             </div>
           </FormField>
-          <FormField label="Method">
-            <div className="box--row">
-              <input id="methodPaypal" name="method" type="radio" value="paypal"
-                checked={payment.method === 'paypal'}
-                onChange={formState.change('method')} />
-              <label htmlFor="methodPaypal">paypal</label>
-            </div>
-            <div className="box--row">
-              <input id="methodCheck" name="method" type="radio" value="check"
-                checked={payment.method === 'check'}
-                onChange={formState.change('method')} />
-              <label htmlFor="methodCheck">check</label>
-            </div>
-            {checkInstructions}
-          </FormField>
+          {method}
           <FormField label="Notes">
             <textarea name="notes" value={payment.notes || ''} rows={2}
               onChange={formState.change('notes')} />

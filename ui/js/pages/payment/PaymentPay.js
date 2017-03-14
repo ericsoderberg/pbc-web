@@ -20,7 +20,7 @@ class PaymentPay extends Component {
     this._onCancel = this._onCancel.bind(this);
 
     const { amount, formIds, payByCheckInstructions } = props;
-    const payment = { amount, formIds, payByCheckInstructions, method: 'check' };
+    const payment = { amount, formIds, payByCheckInstructions, method: 'paypal' };
     this.state = { formState: new FormState(payment, this._setItem) };
   }
 
