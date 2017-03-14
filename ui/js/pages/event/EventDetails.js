@@ -171,6 +171,13 @@ export default class EventDetails extends Component {
               onChange={formState.toggle('public')} />
             <label htmlFor="public">public</label>
           </FormField>
+          <FormField key="align">
+            <input name="align" type="checkbox"
+              checked={event.align !== 'start'}
+              onChange={() => formState.set('align',
+                event.align === 'start' ? 'center' : 'start')} />
+            <label htmlFor="align">center</label>
+          </FormField>
           {administeredBy}
           {primaryEvent}
           {otherTimes}
