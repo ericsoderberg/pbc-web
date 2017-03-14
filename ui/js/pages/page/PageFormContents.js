@@ -9,6 +9,8 @@ const SECTION_TYPES = [
   'people', 'pages', 'video', 'form', 'files',
 ];
 
+const DONATE_REGEXP = /giving at PBC/i;
+
 export default class PageFormContents extends Component {
 
   componentDidMount() {
@@ -22,6 +24,11 @@ export default class PageFormContents extends Component {
     const { className, formState, session } = this.props;
     const page = formState.object;
 
+    const types = [...SECTION_TYPES];
+    if (page.name && page.name.match(DONATE_REGEXP)) {
+      types.push('donate');
+    }
+
     return (
       <div className={className}>
         <fieldset className="form__fields">
@@ -30,7 +37,7 @@ export default class PageFormContents extends Component {
               onChange={formState.change('name')} />
           </FormField>
         </fieldset>
-        <SectionsFormContents formState={formState} types={SECTION_TYPES} />
+        <SectionsFormContents formState={formState} types={types} />
         <PageDetailsFormContents formState={formState} session={session} />
       </div>
     );

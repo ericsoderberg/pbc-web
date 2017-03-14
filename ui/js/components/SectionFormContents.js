@@ -13,9 +13,11 @@ import PagesSectionEdit from '../pages/page/PagesSectionEdit';
 import VideoSectionEdit from './VideoSectionEdit';
 import FormSectionEdit from '../pages/form/FormSectionEdit';
 import MapSectionEdit from './MapSectionEdit';
+import DonateSectionEdit from './DonateSectionEdit';
 
 const SECTIONS = {
   calendar: CalendarSectionEdit,
+  donate: DonateSectionEdit,
   event: EventSectionEdit,
   files: FilesSectionEdit,
   form: FormSectionEdit,

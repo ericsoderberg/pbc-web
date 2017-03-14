@@ -11,6 +11,7 @@ import Video from './Video';
 import FormSection from '../pages/form/FormSection';
 import FilesSection from '../pages/file/FilesSection';
 import Map from './Map';
+import Donate from './Donate';
 
 export default class Sections extends Component {
   render() {
