@@ -18,12 +18,17 @@ export default class FormTemplateOptionEdit extends Component {
   }
 
   render() {
-    const { requirable } = this.props;
+    const { field } = this.props;
     const { formState } = this.state;
     const option = formState.object;
 
+    let prefix;
+    if (field.monetary) {
+      prefix = <span className="prefix">$</span>;
+    }
+
     let required;
-    if (requirable) {
+    if (field.type === 'choices') {
       required = (
         <FormField>
           <input name="required" type="checkbox"
@@ -42,8 +47,11 @@ export default class FormTemplateOptionEdit extends Component {
               onChange={formState.change('name')} />
           </FormField>
           <FormField label="Value">
-            <input name="value" value={option.value || ''}
-              onChange={formState.change('value')} />
+            <div className="box--row">
+              {prefix}
+              <input name="value" value={option.value || ''}
+                onChange={formState.change('value')} />
+            </div>
           </FormField>
           <FormField label="Help">
             <textarea name="help" value={option.help || ''} rows={1}
@@ -61,7 +69,7 @@ export default class FormTemplateOptionEdit extends Component {
 }
 
 FormTemplateOptionEdit.propTypes = {
+  field: PropTypes.object.isRequired,
   option: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
-  requirable: PropTypes.bool.isRequired,
 };

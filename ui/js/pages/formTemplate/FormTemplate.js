@@ -159,7 +159,14 @@ export default class FormTemplate extends Component {
     } else if (templateField.type === 'choice' && field.optionId) {
       contents = optionMap[field.optionId].name;
     } else if (templateField.type === 'choices' && field.optionIds) {
-      contents = field.optionIds.map(optionId => optionMap[optionId].name)
+      contents = field.optionIds.map((optionId) => {
+        const option = optionMap[optionId];
+        let suffix;
+        if (templateField.monetary) {
+          suffix = ` $ ${option.value}`;
+        }
+        return `${option.name}${suffix}`;
+      })
       .join(', ');
     } else if (templateField.type === 'date') {
       contents = moment(contents).format('YYYY-MM-DD');

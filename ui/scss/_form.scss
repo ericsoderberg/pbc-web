@@ -197,12 +197,16 @@
 
     & + label {
       display: inline-block;
-      max-width: 406px; // empirical, to align with form total $
+      max-width: 404px; // empirical, to align with form total $
       margin: $half-unit;
       vertical-align: top;
 
       &.form-option-label {
         display: flex;
+
+        .form__field-option-amount {
+          padding-right: 0;
+        }
       }
     }
   }
@@ -334,6 +338,7 @@
 
 .form__field-option-amount {
   white-space: nowrap;
+  padding-right: $unit;
 }
 
 .form__tabs {
