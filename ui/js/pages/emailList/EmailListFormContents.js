@@ -22,7 +22,7 @@ export default class EmailListFormContents extends Component {
   }
 
   render() {
-    const { className, formState, session } = this.props;
+    const { className, errors, formState, session } = this.props;
     const emailList = formState.object;
 
     let administeredBy;
@@ -32,7 +32,7 @@ export default class EmailListFormContents extends Component {
       ));
       domains.unshift(<option key={0} />);
       administeredBy = (
-        <FormField label="Administered by">
+        <FormField label="Administered by" error={errors.domainId}>
           <select name="domainId" value={emailList.domainId || ''}
             onChange={formState.change('domainId')}>
             {domains}
@@ -44,15 +44,17 @@ export default class EmailListFormContents extends Component {
     return (
       <div className={className}>
         <fieldset className="form__fields">
-          <FormField label="Name">
+          <FormField label="Name" error={errors.name}>
             <input name="name" value={emailList.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField name="text" label="Description" help={<TextHelp />}>
+          <FormField name="text" label="Description" help={<TextHelp />}
+            error={errors.text}>
             <textarea name="text" value={emailList.text || ''} rows={4}
               onChange={formState.change('text')} />
           </FormField>
-          <FormField label="Path" help="unique url name">
+          <FormField label="Url ID" help="unique url name"
+            error={errors.path}>
             <input name="path" value={emailList.path || ''}
               onChange={formState.change('path')} />
           </FormField>
@@ -71,10 +73,12 @@ export default class EmailListFormContents extends Component {
 
 EmailListFormContents.propTypes = {
   className: PropTypes.string,
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 EmailListFormContents.defaultProps = {
   className: undefined,
+  errors: {},
 };

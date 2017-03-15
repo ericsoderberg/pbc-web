@@ -52,8 +52,7 @@ export default class PageDetailsFormContents extends Component {
               page.align === 'start' ? 'center' : 'start')} />
           <label htmlFor="align">center</label>
         </FormField>,
-        <FormField key="path" name="path" label="Path"
-          help="unique url name, only a-z and -"
+        <FormField key="path" name="path" label="Url ID" help="unique url name"
           error={errors.path}>
           <input name="path" value={page.path || ''}
             onChange={formState.change('path')} />

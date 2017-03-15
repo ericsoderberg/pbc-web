@@ -162,7 +162,7 @@ export default class EventDetails extends Component {
               {calendarOptions}
             </select>
           </FormField>
-          <FormField label="Path" help="unique url name" error={errors.path}>
+          <FormField label="Url ID" help="unique url name" error={errors.path}>
             <input name="path" value={event.path || ''}
               onChange={formState.change('path')} />
           </FormField>

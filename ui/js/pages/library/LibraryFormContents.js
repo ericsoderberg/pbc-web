@@ -24,7 +24,7 @@ export default class LibraryFormContents extends Component {
   }
 
   render() {
-    const { className, formState, session } = this.props;
+    const { className, errors, formState, session } = this.props;
     const library = formState.object;
 
     let administeredBy;
@@ -34,7 +34,7 @@ export default class LibraryFormContents extends Component {
       ));
       domains.unshift(<option key={0} />);
       administeredBy = (
-        <FormField label="Administered by">
+        <FormField label="Administered by" error={errors.domainId}>
           <select name="domainId" value={library.domainId || ''}
             onChange={formState.change('domainId')}>
             {domains}
@@ -54,11 +54,12 @@ export default class LibraryFormContents extends Component {
     return (
       <div className={className}>
         <fieldset className="form__fields">
-          <FormField label="Name">
+          <FormField label="Name" error={errors.name}>
             <input name="name" value={library.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField name="path" label="Path" help="unique url name">
+          <FormField name="path" label="Url ID" help="unique url name"
+            error={errors.path}>
             <input name="path" value={library.path || ''}
               onChange={formState.change('path')} />
           </FormField>
@@ -79,10 +80,12 @@ export default class LibraryFormContents extends Component {
 
 LibraryFormContents.propTypes = {
   className: PropTypes.string,
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 LibraryFormContents.defaultProps = {
   className: undefined,
+  errors: {},
 };

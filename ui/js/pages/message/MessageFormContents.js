@@ -132,7 +132,7 @@ export default class MessageFormContents extends Component {
   }
 
   render() {
-    const { className, formState, session } = this.props;
+    const { className, errors, formState, session } = this.props;
     const { domains, libraries } = this.state;
     const message = formState.object;
 
@@ -144,7 +144,7 @@ export default class MessageFormContents extends Component {
     let seriesField;
     if (!message.series) {
       seriesField = (
-        <FormField name="seriesId" label="In Series">
+        <FormField name="seriesId" label="In Series" error={errors.seriesId}>
           <SelectSearch category="messages" clearable={true}
             options={{ filter: { series: true } }}
             value={(message.seriesId || {}).name || ''}
@@ -172,7 +172,7 @@ export default class MessageFormContents extends Component {
       ));
       domainOptions.unshift(<option key={0} />);
       administeredBy = (
-        <FormField label="Administered by">
+        <FormField label="Administered by" error={errors.domainId}>
           <select name="domainId" value={message.domainId || ''}
             onChange={formState.change('domainId')}>
             {domainOptions}
@@ -189,19 +189,20 @@ export default class MessageFormContents extends Component {
     return (
       <div className={className}>
         <fieldset className="form__fields">
-          <FormField label="Name">
+          <FormField label="Name" error={errors.name}>
             <input name="name" value={message.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField label="Author">
+          <FormField label="Author" error={errors.author}>
             <input name="author" value={message.author || ''}
               onChange={formState.change('author')} />
           </FormField>
-          <FormField label="Date">
+          <FormField label="Date" error={errors.date}>
             <DateInput value={message.date || ''}
               onChange={formState.change('date')} />
           </FormField>
-          <FormField label="Verses">
+          <FormField label="Verses" help="don't abbreviate"
+            error={errors.verses}>
             <input name="verses" value={message.verses || ''}
               onChange={formState.change('verses')} />
           </FormField>
@@ -209,11 +210,12 @@ export default class MessageFormContents extends Component {
         <fieldset className="form__fields">
           <ImageField label="Image" name="image"
             formState={formState} property="image" />
-          <FormField name="text" label="Text" help={<TextHelp />}>
+          <FormField name="text" label="Text" help={<TextHelp />}
+            error={errors.text}>
             <textarea name="text" value={message.text || ''} rows={4}
               onChange={formState.change('text')} />
           </FormField>
-          <FormField label="Video URL">
+          <FormField label="Video URL" error={errors.videoUrl}>
             <input name="videoUrl" value={message.videoUrl || ''}
               onChange={formState.change('videoUrl')} />
           </FormField>
@@ -228,13 +230,14 @@ export default class MessageFormContents extends Component {
         <fieldset className="form__fields">
           {seriesField}
           {nonSeriesField}
-          <FormField label="Library">
+          <FormField label="Library" error={errors.libraryId}>
             <select name="libraryId" value={message.libraryId || ''}
               onChange={formState.change('libraryId')}>
               {libraryOptions}
             </select>
           </FormField>
-          <FormField name="path" label="Path" help="unique url name">
+          <FormField name="path" label="Url ID" help="unique url name"
+            error={errors.path}>
             <input name="path" value={message.path || ''}
               onChange={formState.change('path')} />
           </FormField>
@@ -247,10 +250,12 @@ export default class MessageFormContents extends Component {
 
 MessageFormContents.propTypes = {
   className: PropTypes.string,
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 MessageFormContents.defaultProps = {
   className: undefined,
+  errors: {},
 };
