@@ -99,7 +99,7 @@ class FormAdd extends Component {
 
   render() {
     const {
-      className, onCancel, full, inline, linkedForm, signInControl,
+      className, onCancel, full, inline, linkedForm, onLinkedForm, signInControl,
     } = this.props;
     const { form, formTemplate, error, showSignIn } = this.state;
     const classNames = ['form'];
@@ -137,12 +137,33 @@ class FormAdd extends Component {
         signIn = signInControl;
       }
 
+      let linkedFormControl;
+      if (linkedForm) {
+        if (!inline) {
+          linkedFormControl = (
+            <span className="form__link">
+              from <Link to={`/forms/${linkedForm._id}/edit`}>
+                {linkedForm.formTemplateId.name}
+              </Link>
+            </span>
+          );
+        } else {
+          linkedFormControl = (
+            <span className="form__link">
+              from <a onClick={() => onLinkedForm(linkedForm._id)}>
+                {linkedForm.formTemplateId.name}
+              </a>
+            </span>
+          );
+        }
+      }
+
       result = (
         <form className={classNames.join(' ')} action={'/forms'}
           onSubmit={this._onAdd}>
           {header}
           <FormContents form={form} formTemplate={formTemplate}
-            linkedForm={linkedForm}
+            linkedForm={linkedForm} linkedFormControl={linkedFormControl}
             full={full} onChange={this._onChange} error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">
@@ -173,6 +194,7 @@ FormAdd.propTypes = {
   }),
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
+  onLinkedForm: PropTypes.func,
   session: PropTypes.object,
   signInControl: PropTypes.element,
 };
@@ -186,6 +208,7 @@ FormAdd.defaultProps = {
   location: undefined,
   onCancel: undefined,
   onDone: undefined,
+  onLinkedForm: undefined,
   session: undefined,
   signInControl: undefined,
 };

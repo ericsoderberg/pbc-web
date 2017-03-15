@@ -393,6 +393,7 @@ class FormSection extends Component {
           <FormAdd full={false} inline={true}
             formTemplateId={activeFormTemplateId} linkedForm={linkedForm}
             onDone={this._onDone} onCancel={onCancel}
+            onLinkedForm={id => this.setState({ state: EDITING, editId: id })}
             signInControl={<Button label="Sign In" secondary={true}
               onClick={this._nextState(SESSION)} />} />
         );
