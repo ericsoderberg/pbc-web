@@ -21,7 +21,7 @@ export default class PageFormContents extends Component {
   }
 
   render() {
-    const { className, formState, session } = this.props;
+    const { className, errors, formState, session } = this.props;
     const page = formState.object;
 
     const types = [...SECTION_TYPES];
@@ -38,7 +38,8 @@ export default class PageFormContents extends Component {
           </FormField>
         </fieldset>
         <SectionsFormContents formState={formState} types={types} />
-        <PageDetailsFormContents formState={formState} session={session} />
+        <PageDetailsFormContents formState={formState} session={session}
+          errors={errors} />
       </div>
     );
   }
@@ -46,10 +47,12 @@ export default class PageFormContents extends Component {
 
 PageFormContents.propTypes = {
   className: PropTypes.string,
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 PageFormContents.defaultProps = {
   className: undefined,
+  errors: undefined,
 };

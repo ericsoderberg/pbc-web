@@ -10,6 +10,16 @@ const PASSWORD = process.env.DATABASE_PASSWORD || 'pbc';
 
 // Schemas
 
+const PATH_TYPE = {
+  type: String,
+  unique: true,
+  sparse: true,
+  validate: {
+    validator: v => (!v || /^[a-z0-9-]+$/.test(v)),
+    message: 'a-z, 0-9, or -',
+  },
+};
+
 const image = {
   dark: Boolean,
   data: String,
@@ -36,7 +46,7 @@ const userSchema = Schema({
   modified: Date,
   name: { type: String, required: true },
   oldId: Number,
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   phone: String,
   temporaryToken: String,
   text: String,
@@ -126,7 +136,7 @@ const pageSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   public: Boolean,
   sections: [pageSectionSchema],
   // sections: [Schema(sectionDef, {
@@ -164,7 +174,7 @@ const calendarSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: { type: String, required: true },
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   public: Boolean,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
@@ -197,7 +207,7 @@ const eventSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   // set in one-off cases
   primaryEventId: { type: Schema.Types.ObjectId, ref: 'Event' },
   public: Boolean,
@@ -368,7 +378,7 @@ const librarySchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: { type: String, required: true },
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   podcast: podcastSchema,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
@@ -395,7 +405,7 @@ const messageSchema = Schema({
   modified: Date,
   name: String,
   oldId: Number,
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   series: Boolean,
   seriesId: { type: Schema.Types.ObjectId, ref: 'Message' },
   text: String,
@@ -467,7 +477,7 @@ const emailListSchema = Schema({
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
   name: { type: String, required: true, unique: true },
-  path: { type: String, unique: true, sparse: true },
+  path: PATH_TYPE,
   public: Boolean,
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },

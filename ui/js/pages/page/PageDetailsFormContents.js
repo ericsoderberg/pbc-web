@@ -38,14 +38,14 @@ export default class PageDetailsFormContents extends Component {
   }
 
   render() {
-    const { formState, session } = this.props;
+    const { formState, errors, session } = this.props;
     const { active } = this.state;
     const page = formState.object;
 
     let contents;
     if (active) {
       contents = [
-        <FormField key="align">
+        <FormField key="align" error={errors.align}>
           <input name="align" type="checkbox"
             checked={page.align !== 'start'}
             onChange={() => formState.set('align',
@@ -53,7 +53,8 @@ export default class PageDetailsFormContents extends Component {
           <label htmlFor="align">center</label>
         </FormField>,
         <FormField key="path" name="path" label="Path"
-          help="unique url name, only a-z and -">
+          help="unique url name, only a-z and -"
+          error={errors.path}>
           <input name="path" value={page.path || ''}
             onChange={formState.change('path')} />
         </FormField>,
@@ -66,7 +67,8 @@ export default class PageDetailsFormContents extends Component {
         ));
         domains.unshift(<option key={0} />);
         administeredBy = (
-          <FormField key="admin" label="Administered by">
+          <FormField key="admin" label="Administered by"
+            error={errors.domainId}>
             <select name="domainId" value={page.domainId || ''}
               onChange={formState.change('domainId')}>
               {domains}
@@ -90,6 +92,11 @@ export default class PageDetailsFormContents extends Component {
 }
 
 PageDetailsFormContents.propTypes = {
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
+};
+
+PageDetailsFormContents.defaultProps = {
+  errors: {},
 };

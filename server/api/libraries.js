@@ -1,10 +1,22 @@
 import mongoose from 'mongoose';
 import register from './register';
 import { authorizedAdministrator } from './auth';
+import { unsetDomainIfNeeded } from './domains';
 
 mongoose.Promise = global.Promise;
 
 // /api/libraries
+
+const prepareLibrary = (data) => {
+  data = unsetDomainIfNeeded(data);
+  if (!data.path) {
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.path = '';
+  }
+  return data;
+};
 
 export default function (router) {
   // podcast image
@@ -37,6 +49,7 @@ export default function (router) {
       authorize: authorizedAdministrator,
     },
     put: {
+      transformIn: prepareLibrary,
       transformOut: (library) => {
         // update all Messages in this library to have the same domain
         const Message = mongoose.model('Message');

@@ -78,6 +78,17 @@ const checkAddresses = listName => (
   })
 );
 
+const prepareEmailList = (data) => {
+  data = unsetDomainIfNeeded(data);
+  if (!data.path) {
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.path = '';
+  }
+  return data;
+};
+
 // /api/email-lists
 
 const populateEmailList = (emailList) => {
@@ -144,7 +155,7 @@ export default function (router) {
       ),
     },
     put: {
-      transformIn: unsetDomainIfNeeded,
+      transformIn: prepareEmailList,
     },
     delete: {
       deleteRelated: emailList => (

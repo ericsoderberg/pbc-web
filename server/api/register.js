@@ -84,7 +84,7 @@ export default (router, options) => {
       .then(data => (putOpts.transformIn ?
         putOpts.transformIn(data, req) : data))
       .then(data => Doc.findOneAndUpdate({ _id: id }, data,
-        { new: true }).exec())
+        { new: true, runValidators: true }).exec())
       .then(doc => (putOpts.transformOut ?
         putOpts.transformOut(doc, req) : doc))
       .then(doc => res.status(200).json(doc))

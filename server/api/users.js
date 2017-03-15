@@ -39,6 +39,12 @@ const prepareUser = userData => (
     if (data.email) {
       data.email = data.email.toLowerCase();
     }
+    if (!data.path) {
+      if (!data.$unset) {
+        data.$unset = {};
+      }
+      data.$unset.path = '';
+    }
     return data;
   })
 );

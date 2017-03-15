@@ -2,12 +2,24 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 import register from './register';
 import { authorize, authorizedAdministrator } from './auth';
+import { unsetDomainIfNeeded } from './domains';
 
 mongoose.Promise = global.Promise;
 
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 // /api/calendars and /api/calendar
+
+const prepareCalendar = (data) => {
+  data = unsetDomainIfNeeded(data);
+  if (!data.path) {
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.path = '';
+  }
+  return data;
+};
 
 export default function (router) {
   register(router, {
@@ -17,6 +29,7 @@ export default function (router) {
       authorize: authorizedAdministrator,
     },
     put: {
+      transformIn: prepareCalendar,
       transformOut: (calendar) => {
         // update all Events in this calendar to have the same domain
         const Event = mongoose.model('Event');

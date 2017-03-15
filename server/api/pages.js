@@ -181,6 +181,17 @@ const publicize = (data) => {
   });
 };
 
+const preparePage = (data) => {
+  data = unsetDomainIfNeeded(data);
+  if (!data.path) {
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.path = '';
+  }
+  return data;
+};
+
 export default function (router) {
   router.get('/pages/:id/map', (req, res) => {
     authorize(req, res)
@@ -258,7 +269,7 @@ export default function (router) {
       },
     },
     put: {
-      transformIn: unsetDomainIfNeeded,
+      transformIn: preparePage,
       transformOut: (data) => {
         publicize(); // don't wait
         return data;

@@ -132,6 +132,12 @@ function eventDates(event) {
 const unsetReferences = (data) => {
   data = unsetCalendarIfNeeded(data);
   data = unsetDomainIfNeeded(data);
+  if (!data.path) {
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.path = '';
+  }
   // remove deprecated text property
   if (!data.$unset) {
     data.$unset = {};
