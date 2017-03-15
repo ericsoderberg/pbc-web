@@ -8,6 +8,7 @@ import EventSection from './EventSection';
 
 const EventContents = (props) => {
   const event = props.item;
+  const align = event.align || 'center';
 
   let text;
   if (event.text) {
@@ -23,13 +24,13 @@ const EventContents = (props) => {
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
   .filter(date => date.isAfter(now)).slice(1, 4) // skip next one
   .map(date => (
-    <li key={date} className={`item item--${event.align}`}>
+    <li key={date} className={`item item--${align}`}>
       {date.format('MMMM Do YYYY')}
     </li>
   ));
   if (upcomingDates.length > 0) {
     upcoming = (
-      <Section align={event.align} full={false}>
+      <Section align={align} full={false}>
         <div>
           <h3>Upcoming</h3>
           <ul className="list">
@@ -45,7 +46,7 @@ const EventContents = (props) => {
       <Section full={false} align="start" backgroundImage={event.image}>
         <EventSection id={event} navigable={false} />
       </Section>
-      <Sections align={event.align} sections={event.sections} />
+      <Sections align={align} sections={event.sections} />
       {text}
       {upcoming}
     </div>
