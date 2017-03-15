@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import register from './register';
-import { authorize, authorizedAdministrator } from './auth';
+import { authorize, authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 
 mongoose.Promise = global.Promise;
@@ -27,7 +27,7 @@ export default function (router) {
     category: 'calendars',
     modelName: 'Calendar',
     index: {
-      authorize: authorizedAdministrator,
+      authorize: authorizedForDomain,
     },
     put: {
       transformIn: prepareCalendar,

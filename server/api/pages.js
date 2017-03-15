@@ -248,7 +248,9 @@ export default function (router) {
     category: 'pages',
     modelName: 'Page',
     index: {
-      authorize: authorizedForDomain,
+      authorize: session => ({ $or: [
+        { public: true }, authorizedForDomain(session),
+      ] }),
     },
     get: {
       populate: [

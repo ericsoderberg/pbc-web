@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import register from './register';
-import { authorizedAdministrator } from './auth';
+import { authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 
 mongoose.Promise = global.Promise;
@@ -47,7 +47,7 @@ export default function (router) {
     category: 'libraries',
     modelName: 'Library',
     index: {
-      authorize: authorizedAdministrator,
+      authorize: authorizedForDomain,
     },
     put: {
       transformIn: prepareLibrary,
