@@ -664,13 +664,9 @@ a.event-section__text {
   }
 }
 
-.file-summaries {
-  text-align: center;
-}
-
-.file-summary {
-  display: block;
-  margin: $half-unit 0;
+.files-section__file > .item::after {
+  content: '...';
+  padding-left: $half-unit;
 }
 
 .event-times__separator {

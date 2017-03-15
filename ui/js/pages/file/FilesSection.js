@@ -38,7 +38,7 @@ export default class FilesSection extends Component {
     const { className, files } = this.props;
     const { playIndex } = this.state;
 
-    const classes = ['list'];
+    const classes = ['list files-section'];
     if (className) {
       classes.push(className);
     }
@@ -75,7 +75,7 @@ export default class FilesSection extends Component {
         );
       }
       return (
-        <a key={key} className="item__container" href={path}>
+        <a key={key} className="item__container files-section__file" href={path}>
           <div className="item">{file.label || file.name}</div>
         </a>
       );

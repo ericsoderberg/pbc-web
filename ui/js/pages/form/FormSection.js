@@ -21,6 +21,10 @@ const LABEL = {
   Subscribe: 'Subscribed',
 };
 
+const LABEL_MULTIPLE = {
+  Submit: 'Submitted for',
+};
+
 const LOADING = 'loading';
 const AUTHENTICATION_NEEDED = 'authenticationNeeded';
 const SESSION = 'session';
@@ -36,16 +40,18 @@ const FormItem = (props) => {
   const classNames = ['item__container', className];
   const buttonClassNames = ['button'];
   let message;
+  let timestamp;
   if (intermediate) {
     buttonClassNames.push('button--secondary');
     message = `${form.name}`;
   } else {
-    buttonClassNames.push('button-plain ');
-    const timestamp = moment(form.modified).format('MMM Do YYYY');
+    buttonClassNames.push('button-plain');
+    const date = moment(form.modified).format('MMM Do YYYY');
+    timestamp = <span className="tertiary">{date}</span>;
     if (distinguish) {
-      message = `${verb} for ${form.name} ${timestamp}`;
+      message = `${verb} ${form.name}`;
     } else {
-      message = `${verb} ${timestamp}`;
+      message = `${verb}`;
     }
   }
 
@@ -54,7 +60,7 @@ const FormItem = (props) => {
       <div className="item item--full">
         <div>
           <button className={buttonClassNames.join(' ')} onClick={onClick}>
-            {message}
+            {message} {timestamp} ...
           </button>
         </div>
       </div>
@@ -416,10 +422,14 @@ class FormSection extends Component {
         const items = bestForms.map((form) => {
           let itemContents;
           if (form.formTemplateId._id === finalFormTemplateId) {
+            const label = (formTemplate.anotherLabel ?
+              LABEL_MULTIPLE[formTemplate.submitLabel] : undefined) ||
+              LABEL[formTemplate.submitLabel] ||
+              LABEL.Submit;
             itemContents = (
               <FormItem item={form} onClick={this._edit(form._id)}
-                verb={LABEL[formTemplate.submitLabel] || LABEL.Submit}
-                distinguish={bestForms.length > 1} />
+                verb={label}
+                distinguish={bestForms.length > 1 || formTemplate.anotherLabel} />
             );
           } else {
             itemContents = (
@@ -430,10 +440,23 @@ class FormSection extends Component {
           return <li key={form._id}>{itemContents}</li>;
         });
 
-        contents = (
-          <div className="form-summary">
+        let addControl;
+        let another;
+        if (formTemplate.anotherLabel) {
+          another = (
+            <Button className="button form-summary__another" plain={true}
+              label={`${formTemplate.anotherLabel} ...`} onClick={this._add()} />
+          );
+        } else {
+          addControl = (
             <Button className="form-summary__add" plain={true}
               icon={<AddIcon />} onClick={this._add()} />
+          );
+        }
+
+        contents = (
+          <div className="form-summary">
+            {addControl}
             <div className="form-summary__message">
               <Markdown>
                 {formTemplate.postSubmitMessage || `## ${formTemplate.name}`}
@@ -442,6 +465,7 @@ class FormSection extends Component {
             <ul className="list">
               {items}
             </ul>
+            {another}
           </div>
         );
         break;

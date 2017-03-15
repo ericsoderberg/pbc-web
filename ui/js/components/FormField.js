@@ -68,7 +68,7 @@ export default class FormField extends Component {
           <span className={helpClassNames.join(' ')}>
             <button className="button-plain" type="button"
               onClick={() => this.setState({ helpActive: !helpActive })}>
-              what?
+              ?
             </button>
             <div className="form-field__help-drop">
               <Markdown>{this.props.help}</Markdown>

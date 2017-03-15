@@ -171,6 +171,13 @@ export default class FormTemplateFormContents extends Component {
             value={formTemplate.postSubmitMessage || ''}
             onChange={formState.change('postSubmitMessage')} />
         </FormField>,
+        <FormField key="another" label="Another button label"
+          help="if multiple are expected per user"
+          error={errors.anotherLabel}>
+          <input name="anotherLabel"
+            value={formTemplate.anotherLabel || ''}
+            onChange={formState.change('anotherLabel')} />
+        </FormField>,
         <FormField key="ack" error={errors.acknowledge}>
           <input name="acknowledge" type="checkbox"
             checked={formTemplate.acknowledge || false}

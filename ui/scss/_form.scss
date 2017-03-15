@@ -821,8 +821,15 @@
   margin: 0 auto;
   text-align: left;
 
-  .item--full > .button-plain {
-    padding: 0;
+  .item--full {
+
+    .button-plain {
+      font-size: 1.25rem;
+    }
+    
+    > .button-plain {
+      padding: 0;
+    }
   }
 }
 

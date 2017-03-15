@@ -301,6 +301,7 @@ const formTemplateSectionSchema = Schema({
 
 const formTemplateSchema = Schema({
   acknowledge: Boolean,
+  anotherLabel: String,
   authenticate: Boolean,
   created: Date,
   linkedFormTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
