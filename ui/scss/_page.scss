@@ -530,8 +530,16 @@ a.event-section__text {
 .pages-section__name {
   position: relative;
   display: inline-block;
-  padding-left: $unit;
-  padding-right: $unit;
+  padding-left: $double-unit;
+  padding-right: $double-unit;
+
+  &:hover {
+    background-color: $hover-background;
+
+    .control-icon {
+      right: $half-unit;
+    }
+  }
 
   h2 {
     font-size: 2rem;
@@ -539,7 +547,7 @@ a.event-section__text {
 
   .control-icon {
     position: absolute;
-    right: - $quarter-unit;
+    right: $half-unit + $quarter-unit;
     top: 50%;
     transform: translateY(-50%);
     transition: all 0.7s;
