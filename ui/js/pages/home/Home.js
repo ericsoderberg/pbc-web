@@ -27,7 +27,7 @@ class Home extends Component {
     this._showMenu = this._showMenu.bind(this);
     this._hideMenu = this._hideMenu.bind(this);
     this._onSearch = this._onSearch.bind(this);
-    this.state = { menuHeight: 0, showMenu: false };
+    this.state = { menuHeight: 0, menuReady: false, showMenu: false };
   }
 
   componentDidMount() {
@@ -41,6 +41,8 @@ class Home extends Component {
       .catch(error => console.error('!!! Home re-catch', error));
     }
     window.addEventListener('resize', this._onResize);
+    // delay readiness of menu to avoid initial style animation on mobile
+    this._readyTimer = setTimeout(() => this.setState({ menuReady: true }), 1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -59,6 +61,7 @@ class Home extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
     clearTimeout(this._resizeTimer);
+    clearTimeout(this._readyTimer);
   }
 
   _siteReady(site) {
@@ -306,7 +309,8 @@ class Home extends Component {
 
   render() {
     const { site } = this.props;
-    const { menuHeight, showMenu } = this.state;
+    const { menuHeight, menuReady, showMenu } = this.state;
+    const classNames = ['home'];
 
     let contents;
     let style;
@@ -315,12 +319,15 @@ class Home extends Component {
       if (!showMenu) {
         style = { transform: `translateY(-${menuHeight}px)` };
       }
+      if (menuReady) {
+        classNames.push('home--ready');
+      }
     } else {
       contents = <Loading />;
     }
 
     return (
-      <main className="home" style={style}
+      <main className={classNames.join(' ')} style={style}
         onClick={showMenu ? this._hideMenu : undefined} >
         {contents}
       </main>
