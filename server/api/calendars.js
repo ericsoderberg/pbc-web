@@ -13,6 +13,7 @@ const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 const prepareCalendar = (data) => {
   data = unsetDomainIfNeeded(data);
   if (!data.path) {
+    delete data.path;
     if (!data.$unset) {
       data.$unset = {};
     }

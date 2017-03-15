@@ -48,6 +48,7 @@ const unsetReferences = (data) => {
   data = unsetLibraryIfNeeded(data);
   data = unsetDomainIfNeeded(data);
   if (!data.path) {
+    delete data.path;
     if (!data.$unset) {
       data.$unset = {};
     }

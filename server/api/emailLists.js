@@ -81,6 +81,7 @@ const checkAddresses = listName => (
 const prepareEmailList = (data) => {
   data = unsetDomainIfNeeded(data);
   if (!data.path) {
+    delete data.path;
     if (!data.$unset) {
       data.$unset = {};
     }
