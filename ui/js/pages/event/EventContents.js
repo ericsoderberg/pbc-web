@@ -21,7 +21,7 @@ const EventContents = (props) => {
   let upcoming;
   const now = moment();
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
-  .filter(date => date.isAfter(now)).slice(0, 3)
+  .filter(date => date.isAfter(now)).slice(1, 4) // skip next one
   .map(date => (
     <li key={date} className={`item item--${event.align}`}>
       {date.format('MMMM Do YYYY')}
