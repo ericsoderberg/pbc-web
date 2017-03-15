@@ -50,15 +50,19 @@
   }
 }
 
-.section__container--left {
+.section__container--start {
   text-align: left;
 
   form.form {
     max-width: $form-width;
   }
+
+  .form-summary {
+    margin: 0;
+  }
 }
 
-.section__container--right {
+.section__container--end {
   text-align: right;
 }
 
@@ -289,7 +293,7 @@
 .event-section__text-container {
   text-align: center;
 
-  .section__container--left & {
+  .section__container--start & {
     text-align: left;
   }
 
