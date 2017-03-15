@@ -808,4 +808,9 @@ a.event-section__text {
   max-width: $form-width;
   margin: $double-unit auto;
   background-color: $secondary-background-color;
+
+  .button {
+    display: inline-block;
+    margin: $unit 0;
+  }
 }

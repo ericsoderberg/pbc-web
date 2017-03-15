@@ -1,12 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router';
+import Button from './Button';
 
 const NotFound = () => (
   <div className="not-found">
     <p>
-      Appologies, but we {"can't"} seem to find what {"you're"} looking for.
+      Apologies, but we {"can't"} seem to find what {"you're"} looking for.
     </p>
-    <Link to="/">Home</Link>
+    <Button path="/search" label="Search" />
   </div>
 );
 
