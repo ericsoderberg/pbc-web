@@ -24,6 +24,7 @@ export default class CalendarSection extends Component {
   }
 
   _load(props) {
+    const { omitRecurring } = props;
     if (props.id) {
       let calendarId;
       if (typeof props.id === 'object') {
@@ -42,15 +43,17 @@ export default class CalendarSection extends Component {
       } else {
         const start = moment().startOf('day');
         const end = moment(start).add(2, 'month');
-        getItems('events', {
-          filter: {
-            calendarId,
-            $or: [
-              { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-              { dates: { $gte: start.toDate(), $lt: end.toDate() } },
-            ],
-          },
-        })
+        const filter = {
+          calendarId,
+          $or: [
+            { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+            { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+          ],
+        };
+        if (omitRecurring) {
+          filter.dates = { $exists: true, $size: 0 };
+        }
+        getItems('events', { filter })
         .then((events) => {
           // sort by which comes next
           const nextDate = event => (
@@ -117,10 +120,12 @@ CalendarSection.propTypes = {
   events: PropTypes.arrayOf(PropTypes.object),
   excludeEventIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  omitRecurring: PropTypes.bool,
 };
 
 CalendarSection.defaultProps = {
   className: undefined,
   events: undefined,
   id: undefined,
+  omitRecurring: false,
 };

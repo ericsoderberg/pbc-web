@@ -31,7 +31,8 @@ export default class Sections extends Component {
         contents = (
           <CalendarSection key={section._id || section.id}
             id={section.calendarId} events={section.events}
-            excludeEventIds={excludeEventIds} />
+            excludeEventIds={excludeEventIds}
+            omitRecurring={section.omitRecurring} />
         );
       } else if (section.type === 'event') {
         contents = (

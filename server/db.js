@@ -76,6 +76,7 @@ const imageSectionDef = { image };
 const videoSectionDef = { url: String };
 const calendarSectionDef = {
   calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
+  omitRecurring: Boolean,
 };
 const eventSectionDef = {
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },

@@ -48,6 +48,12 @@ export default class CalendarSectionEdit extends Component {
             {calendarOptions}
           </select>
         </FormField>
+        <FormField>
+          <input name="omitRecurring" type="checkbox"
+            checked={section.omitRecurring || false}
+            onChange={formState.toggle('omitRecurring')} />
+          <label htmlFor="omitRecurring">Omit recurring events</label>
+        </FormField>
       </fieldset>
     );
   }

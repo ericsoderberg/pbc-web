@@ -66,14 +66,18 @@ const populatePage = (page) => {
   .forEach((section) => {
     const start = moment(date);
     const end = moment(start).add(2, 'month');
+    const filter = {
+      calendarId: section.calendarId,
+      $or: [
+        { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+        { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+      ],
+    };
+    if (section.omitRecurring) {
+      filter.dates = { $exists: true, $size: 0 };
+    }
     promises.push(
-      Event.find({
-        calendarId: section.calendarId,
-        $or: [
-          { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-          { dates: { $gte: start.toDate(), $lt: end.toDate() } },
-        ],
-      })
+      Event.find(filter)
       .then((events) => {
         // sort by which comes next
         const nextDate = event => (
