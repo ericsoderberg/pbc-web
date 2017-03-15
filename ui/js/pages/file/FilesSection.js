@@ -76,7 +76,7 @@ export default class FilesSection extends Component {
       }
       return (
         <a key={key} className="item__container files-section__file" href={path}>
-          <div className="item">{file.label || file.name}</div>
+          <div className="item"><span>{file.label || file.name}</span></div>
         </a>
       );
     });

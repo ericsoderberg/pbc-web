@@ -664,7 +664,7 @@ a.event-section__text {
   }
 }
 
-.files-section__file > .item::after {
+.files-section__file > .item > span::after {
   content: '...';
   padding-left: $half-unit;
 }
