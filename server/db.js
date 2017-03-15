@@ -187,6 +187,7 @@ const eventSectionSchema = Schema({
   ...textSectionDef,
   ...mapSectionDef,
   ...imageSectionDef,
+  ...librarySectionDef,
   ...videoSectionDef,
   ...formSectionDef,
   ...peopleSectionDef,

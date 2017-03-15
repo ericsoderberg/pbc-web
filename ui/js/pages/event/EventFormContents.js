@@ -9,7 +9,7 @@ import EventDetails from './EventDetails';
 import EventResources from './EventResources';
 
 const SECTION_TYPES = [
-  'text', 'map', 'image', 'people', 'video', 'form', 'files',
+  'text', 'map', 'image', 'people', 'video', 'form', 'files', 'library',
 ];
 
 export default class EventFormContents extends Component {

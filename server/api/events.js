@@ -213,6 +213,9 @@ export default function (router) {
         { path: 'sections.formTemplateId',
           select: 'name',
           model: 'FormTemplate' },
+        { path: 'sections.libraryId',
+          select: 'name',
+          model: 'Library' },
       ],
       transformOut: (doc) => {
         // convert deprecated text property to a section
