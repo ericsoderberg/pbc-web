@@ -35,6 +35,12 @@ const prepareUser = userData => (
       return data;
     });
   })
+  .then((data) => {
+    if (data.email) {
+      data.email = data.email.toLowerCase();
+    }
+    return data;
+  })
 );
 
 const deleteUserRelated = (doc) => {
@@ -51,6 +57,9 @@ export default function (router, transporter) {
     // if this is the first user, make them administrator
     User.count()
     .then((count) => {
+      if (data.email) {
+        data.email = data.email.toLowerCase();
+      }
       if (data.password) {
         data.encryptedPassword = bcrypt.hashSync(data.password, 10);
         delete data.password;
@@ -77,7 +86,8 @@ export default function (router, transporter) {
     const User = mongoose.model('User');
     const Site = mongoose.model('Site');
     // make sure we have a user with this email
-    User.findOne({ email: data.email }).exec()
+    const emailRegexp = new RegExp(`^${data.email}`, 'i');
+    User.findOne({ email: emailRegexp }).exec()
     .then((user) => {
       if (!user) {
         return Promise.reject({
@@ -170,7 +180,8 @@ export function createUser(data) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  return User.findOne({ email: data.email }).exec()
+  const emailRegexp = new RegExp(`^${data.email}`, 'i');
+  return User.findOne({ email: emailRegexp }).exec()
   .then((user) => {
     if (user) {
       return Promise.reject({
@@ -190,7 +201,8 @@ export function findOrCreateUser(email, name) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  return User.findOne({ email }).exec()
+  const emailRegexp = new RegExp(`^${email}`, 'i');
+  return User.findOne({ email: emailRegexp }).exec()
   .then((user) => {
     if (!user) {
       // create a new user

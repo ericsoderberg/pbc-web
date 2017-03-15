@@ -28,7 +28,8 @@ export default function (router) {
   router.post('/sessions', (req, res) => {
     const User = mongoose.model('User');
     const { email, password } = req.body;
-    User.findOne({ email })
+    const emailRegexp = new RegExp(`^${email}`, 'i');
+    User.findOne({ email: emailRegexp })
     .exec()
     .then((user) => {
       if (user && user.encryptedPassword &&
