@@ -34,26 +34,26 @@ export default class EventFormContents extends Component {
   }
 
   render() {
-    const { className, formState, session } = this.props;
+    const { className, errors, formState, session } = this.props;
     const event = formState.object;
 
     return (
       <div className={className}>
 
         <fieldset className="form__fields">
-          <FormField label="Name">
+          <FormField label="Name" error={errors.name}>
             <input name="name" value={event.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField label="Starts">
+          <FormField label="Starts" error={errors.start}>
             <DateTimeInput value={event.start || ''}
               onChange={this._onStartChange} />
           </FormField>
-          <FormField label="Ends">
+          <FormField label="Ends" error={errors.end}>
             <DateTimeInput value={event.end || ''}
               onChange={formState.change('end')} />
           </FormField>
-          <FormField label="Location">
+          <FormField label="Location" error={errors.location}>
             <input name="location" value={event.location || ''}
               onChange={formState.change('location')} />
           </FormField>
@@ -63,7 +63,8 @@ export default class EventFormContents extends Component {
 
         <SectionsFormContents formState={formState} types={SECTION_TYPES} />
 
-        <EventDetails formState={formState} session={session} />
+        <EventDetails formState={formState} session={session}
+          errors={errors} />
         <EventResources formState={formState} session={session} />
         <EventDates formState={formState} session={session} />
       </div>
@@ -73,10 +74,12 @@ export default class EventFormContents extends Component {
 
 EventFormContents.propTypes = {
   className: PropTypes.string,
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 EventFormContents.defaultProps = {
   className: undefined,
+  errors: {},
 };

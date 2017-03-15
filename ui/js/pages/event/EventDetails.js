@@ -92,7 +92,7 @@ export default class EventDetails extends Component {
   }
 
   render() {
-    const { formState, session } = this.props;
+    const { errors, formState, session } = this.props;
     const { active, calendars, domains } = this.state;
     const event = formState.object;
 
@@ -101,7 +101,8 @@ export default class EventDetails extends Component {
       let primaryEvent;
       if (!event.dates || event.dates.length === 0) {
         primaryEvent = (
-          <FormField label="Primary event" help="For recurring event one-offs">
+          <FormField label="Primary event" help="For recurring event one-offs"
+            error={errors.primaryEventId}>
             <SelectSearch category="events"
               options={{ select: 'name start', sort: '-start' }}
               Suggestion={Suggestion} clearable={true}
@@ -138,7 +139,7 @@ export default class EventDetails extends Component {
         ));
         domainOptions.unshift(<option key={0} />);
         administeredBy = (
-          <FormField label="Administered by">
+          <FormField label="Administered by" error={errors.domainId}>
             <select name="domainId" value={event.domainId || ''}
               onChange={formState.change('domainId')}>
               {domainOptions}
@@ -154,14 +155,14 @@ export default class EventDetails extends Component {
 
       contents = (
         <fieldset className="form__fields">
-          <FormField label="Calendar">
+          <FormField label="Calendar" error={errors.calendarId}>
             <select name="calendarId"
               value={(event.calendarId || {})._id || event.calendarId || ''}
               onChange={formState.change('calendarId')}>
               {calendarOptions}
             </select>
           </FormField>
-          <FormField label="Path" help="unique url name">
+          <FormField label="Path" help="unique url name" error={errors.path}>
             <input name="path" value={event.path || ''}
               onChange={formState.change('path')} />
           </FormField>
@@ -203,6 +204,11 @@ export default class EventDetails extends Component {
 }
 
 EventDetails.propTypes = {
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
+};
+
+EventDetails.defaultProps = {
+  errors: {},
 };
