@@ -60,6 +60,13 @@
   .form-summary {
     margin: 0;
   }
+
+  .form-summary__container {
+    .form,
+    .form__contents {
+      padding: 0;
+    }
+  }
 }
 
 .section__container--end {
