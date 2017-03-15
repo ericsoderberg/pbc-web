@@ -3,6 +3,7 @@ import { postItem } from '../../actions';
 import Stored from '../../components/Stored';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
+import Loading from '../../components/Loading';
 import FormState from '../../utils/FormState';
 import PaymentFormContents from './PaymentFormContents';
 
@@ -126,6 +127,8 @@ class PaymentPay extends Component {
       submitButton = (
         <Button type="submit" label="Submit" onClick={this._onSubmit} />
       );
+    } else if (!this._paypalRendered) {
+      submitButton = <Loading />;
     }
 
     return (

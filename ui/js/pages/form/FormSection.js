@@ -38,14 +38,11 @@ const FormItem = (props) => {
     className, distinguish, intermediate, item: form, onClick, verb,
   } = props;
   const classNames = ['item__container', className];
-  const buttonClassNames = ['button'];
   let message;
   let timestamp;
   if (intermediate) {
-    buttonClassNames.push('button--secondary');
     message = `${form.name}`;
   } else {
-    buttonClassNames.push('button-plain');
     const date = moment(form.modified).format('MMM Do YYYY');
     timestamp = <span className="tertiary">{date}</span>;
     if (distinguish) {
@@ -59,7 +56,7 @@ const FormItem = (props) => {
     <div className={classNames.join(' ')}>
       <div className="item item--full">
         <div>
-          <button className={buttonClassNames.join(' ')} onClick={onClick}>
+          <button className="button button-plain" onClick={onClick}>
             {message} {timestamp} ...
           </button>
         </div>
@@ -194,7 +191,7 @@ class FormSection extends Component {
       })
       .then((forms) => {
         const formTemplate = formTemplates[formTemplateId];
-        let paymentNeeded;
+        let paymentNeeded = this.state.paymentNeeded;
         if (finalFormTemplateId === formTemplateId && formTemplate.payable) {
           // See if there's any balance still to be paid
           let amount = 0;
@@ -212,6 +209,8 @@ class FormSection extends Component {
           });
           if (amount > 0) {
             paymentNeeded = { amount, formIds };
+          } else {
+            paymentNeeded = undefined;
           }
         }
         const nextForms = { ...this.state.forms };
@@ -293,18 +292,18 @@ class FormSection extends Component {
       } else if (linkedToForms.length === 0) {
         activeFormTemplateId = linkedFormTemplateId;
         nextState = ADDING;
-      } else if (finalForms.length !== linkedToForms.length) {
-        if (finalForms.length === 0) {
-          linkedForm = linkedToForms[0];
-        } else {
-          linkedToForms.forEach((linkedForm2) => {
-            if (!linkedForm ||
-              moment(linkedForm2.modified).isAfter(linkedForm.modified)) {
-              linkedForm = linkedForm2;
-            }
-          });
-        }
-        nextState = ADDING;
+      // } else if (finalForms.length !== linkedToForms.length) {
+      //   if (finalForms.length === 0) {
+      //     linkedForm = linkedToForms[0];
+      //   } else {
+      //     linkedToForms.forEach((linkedForm2) => {
+      //       if (!linkedForm ||
+      //         moment(linkedForm2.modified).isAfter(linkedForm.modified)) {
+      //         linkedForm = linkedForm2;
+      //       }
+      //     });
+      //   }
+      //   nextState = ADDING;
       } else {
         nextState = SUMMARY;
       }
@@ -420,6 +419,7 @@ class FormSection extends Component {
       }
 
       case SUMMARY: {
+        let anyPending = false;
         const items = bestForms.map((form) => {
           let itemContents;
           if (form.formTemplateId._id === finalFormTemplateId) {
@@ -430,9 +430,11 @@ class FormSection extends Component {
             itemContents = (
               <FormItem item={form} onClick={this._edit(form._id)}
                 verb={label}
-                distinguish={bestForms.length > 1 || formTemplate.anotherLabel} />
+                distinguish={bestForms.length > 1 ||
+                  formTemplate.anotherLabel !== undefined} />
             );
           } else {
+            anyPending = true;
             itemContents = (
               <FormItem item={form} onClick={this._add(form)}
                 intermediate={true} />
@@ -455,18 +457,33 @@ class FormSection extends Component {
           );
         }
 
+        let paymentControl;
+        if (paymentNeeded) {
+          paymentControl = (
+            <Button className="button form-summary__another" plain={true}
+              label={`Pay current balance of $${paymentNeeded.amount} ...`}
+              onClick={this._nextState(PAYING)} />
+          );
+        }
+
+        let message;
+        if (!paymentNeeded && !anyPending) {
+          message = formTemplate.postSubmitMessage;
+        } else {
+          message = `## ${formTemplate.name}`;
+        }
+
         contents = (
           <div className="form-summary">
             {addControl}
             <div className="form-summary__message">
-              <Markdown>
-                {formTemplate.postSubmitMessage || `## ${formTemplate.name}`}
-              </Markdown>
+              <Markdown>{message}</Markdown>
             </div>
             <ul className="list">
               {items}
             </ul>
             {another}
+            {paymentControl}
           </div>
         );
         break;
