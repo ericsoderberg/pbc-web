@@ -20,6 +20,7 @@
   @media all and (min-width: 700px) {
     min-width: $form-width;
     border-left: 1px solid $nav-background-color;
+    pointer-events: none;
 
     .form {
       padding: 0 $unit;
@@ -826,7 +827,7 @@
     .button-plain {
       font-size: 1.25rem;
     }
-    
+
     > .button-plain {
       padding: 0;
     }
