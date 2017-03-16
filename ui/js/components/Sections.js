@@ -36,9 +36,13 @@ export default class Sections extends Component {
             omitRecurring={section.omitRecurring} />
         );
       } else if (section.type === 'event') {
+        let innerColor;
+        if (section.eventId.image && section.eventId.color) {
+          innerColor = section.eventId.color;
+        }
         contents = (
           <EventSection id={section.eventId} includeMap={section.includeMap}
-            navigable={section.navigable}
+            navigable={section.navigable} color={innerColor}
             includeBackground={section.backgroundImage === undefined} />
         );
         if (!backgroundImage) {

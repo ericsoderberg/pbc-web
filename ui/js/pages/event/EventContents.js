@@ -41,11 +41,16 @@ const EventContents = (props) => {
     );
   }
 
+  let innerColor;
+  if (event.image && event.color) {
+    innerColor = event.color;
+  }
+
   return (
     <div>
       <Section full={false} align={event.align || 'center'}
         backgroundImage={event.image} color={event.color}>
-        <EventSection id={event} navigable={false} />
+        <EventSection id={event} navigable={false} color={innerColor} />
       </Section>
       <Sections align={align} sections={event.sections} />
       {text}

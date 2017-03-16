@@ -316,6 +316,7 @@
 
 .event-section__text {
   display: inline-block;
+  padding: $unit;
 
   h1,
   h2,
@@ -343,7 +344,6 @@
 }
 
 a.event-section__text {
-  padding: $unit;
   text-decoration: none;
 
   @media all and (min-width: 700px) {

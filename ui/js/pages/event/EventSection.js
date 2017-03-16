@@ -36,7 +36,7 @@ export default class EventSection extends Component {
   }
 
   render() {
-    const { className, includeMap, navigable } = this.props;
+    const { className, color, includeMap, navigable } = this.props;
     const { event } = this.state;
 
     const classes = ['event-section'];
@@ -53,11 +53,15 @@ export default class EventSection extends Component {
           <div className="event-section__location">{event.location}</div>
         );
       }
+      let style;
+      if (color) {
+        style = { backgroundColor: color };
+      }
 
       if (navigable === false) {
         contents = (
           <div className="event-section__text-container">
-            <div className="event-section__text">
+            <div className="event-section__text" style={style}>
               <h2 className="event-section__name">{event.name}</h2>
               <EventTimes event={event} reverse={true} size="large" />
               {location}
@@ -67,7 +71,7 @@ export default class EventSection extends Component {
       } else {
         contents = (
           <div className="event-section__text-container">
-            <Link className="event-section__text"
+            <Link className="event-section__text" style={style}
               to={`/events/${event.path || event._id}`}>
               <div className="event-section__name">
                 <h2>{event.name}</h2>
@@ -104,6 +108,7 @@ export default class EventSection extends Component {
 
 EventSection.propTypes = {
   className: PropTypes.string,
+  color: PropTypes.string,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   includeMap: PropTypes.bool,
   navigable: PropTypes.bool,
@@ -111,6 +116,7 @@ EventSection.propTypes = {
 
 EventSection.defaultProps = {
   className: undefined,
+  color: undefined,
   id: undefined,
   includeMap: false,
   navigable: true,
