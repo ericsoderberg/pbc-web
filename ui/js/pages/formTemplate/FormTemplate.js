@@ -30,7 +30,10 @@ export default class FormTemplate extends Component {
   }
 
   componentDidUpdate() {
-    setTimeout(this._layout, 20);
+    setTimeout(() => {
+      this._layout();
+      this._onScroll();
+    }, 20);
   }
 
   componentWillUnmount() {
