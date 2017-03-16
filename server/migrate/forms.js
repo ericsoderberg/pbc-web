@@ -80,9 +80,6 @@ function normalizeForm(item, fields, options, formTemplates, payments,
 
   item.fields = fields[item.id].map((field) => {
     const templateField = templateFields[field.form_field_id];
-    if (!templateField) {
-      console.log('!!!', field, item.oldId, template.oldId);
-    }
     field.oldId = field.id;
     field.templateFieldId = templateField._id;
 
