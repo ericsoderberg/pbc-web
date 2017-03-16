@@ -98,7 +98,7 @@ class FormEdit extends Component {
 
   render() {
     const { className, full, inline, onLinkedForm } = this.props;
-    const { form, formTemplate, linkedForm } = this.state;
+    const { error, form, formTemplate, linkedForm } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -151,7 +151,7 @@ class FormEdit extends Component {
           {header}
           <FormContents form={form} formTemplate={formTemplate}
             linkedForm={linkedForm} linkedFormControl={linkedFormControl}
-            full={full} onChange={this._onChange} />
+            full={full} onChange={this._onChange} error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />

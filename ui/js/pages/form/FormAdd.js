@@ -101,7 +101,7 @@ class FormAdd extends Component {
     const {
       className, onCancel, full, inline, linkedForm, onLinkedForm, signInControl,
     } = this.props;
-    const { form, formTemplate, error, showSignIn } = this.state;
+    const { error, form, formTemplate, showSignIn } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);

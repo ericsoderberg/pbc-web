@@ -18,6 +18,32 @@ export function setFormError(formTemplate, form) {
           }
           error[templateField._id] = 'required';
         }
+      } else if (templateField.options) {
+        templateField.options.filter(option => option.required)
+        .forEach((option) => {
+          // see if we have it
+          let found = false;
+          form.fields
+          .filter(field => (field.templateFieldId === templateField._id))
+          .forEach((field) => {
+            if (field.optionId === option._id) {
+              found = true;
+            } else {
+              (field.optionIds || []).some((optionId) => {
+                if (optionId === option._id) {
+                  found = true;
+                }
+                return found;
+              });
+            }
+          });
+          if (!found) {
+            if (!error) {
+              error = {};
+            }
+            error[templateField._id] = 'required';
+          }
+        });
       }
     });
   });
