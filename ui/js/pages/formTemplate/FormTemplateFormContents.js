@@ -178,7 +178,9 @@ export default class FormTemplateFormContents extends Component {
             value={formTemplate.anotherLabel || ''}
             onChange={formState.change('anotherLabel')} />
         </FormField>,
-        <FormField key="ack" error={errors.acknowledge}>
+        <FormField key="ack" error={errors.acknowledge}
+          help={`After a form is submitted, the submitter will be sent a
+            standardized email indicating that we received it`}>
           <input name="acknowledge" type="checkbox"
             checked={formTemplate.acknowledge || false}
             onChange={formState.toggle('acknowledge')} />

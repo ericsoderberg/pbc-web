@@ -95,6 +95,9 @@ export default class FormField extends Component {
 
     let labels;
     if (label || help || error) {
+      if (!label) {
+        label = <span />;
+      }
       labels = (
         <div className="form-field__labels">
           {label}
