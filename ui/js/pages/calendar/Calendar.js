@@ -126,6 +126,24 @@ export default class Calendar extends Component {
         }
       });
 
+      // sort days
+      Object.keys(days).forEach((day) => {
+        days[day].sort((e1, e2) => {
+          const m1 = moment(e1.start);
+          const m2 = moment(e2.start);
+          if (m1.hours() < m2.hours()) {
+            return -1;
+          } else if (m1.hours() > m2.hours()) {
+            return 1;
+          } else if (m1.minutes() < m2.minutes()) {
+            return -1;
+          } else if (m1.minutes() > m2.minutes()) {
+            return 1;
+          }
+          return 0;
+        });
+      });
+
       if (calendar.name) {
         document.title = `${calendar.name} Calendar`;
       }
@@ -284,7 +302,7 @@ export default class Calendar extends Component {
         }
         days = [];
       }
-      const dayEvents = this._renderEvents(date, days);
+      const dayEvents = this._renderEvents(date);
 
       const classNames = ['calendar__day'];
       if (focus && date.isSame(focus, 'date')) {
