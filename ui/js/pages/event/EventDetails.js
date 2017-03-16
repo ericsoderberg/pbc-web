@@ -7,6 +7,7 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
 import DateTimeInput from '../../components/DateTimeInput';
 import SelectSearch from '../../components/SelectSearch';
+import ImageField from '../../components/ImageField';
 import TrashIcon from '../../icons/Trash';
 import { getLocationParams } from '../../utils/Params';
 
@@ -178,6 +179,12 @@ export default class EventDetails extends Component {
               onChange={() => formState.set('align',
                 event.align === 'start' ? 'center' : 'start')} />
             <label htmlFor="align">center</label>
+          </FormField>
+          <ImageField label="Image" name="image"
+            formState={formState} property="image" />
+          <FormField label="Background color">
+            <input name="color" value={event.color || ''}
+              onChange={formState.change('color')} />
           </FormField>
           {administeredBy}
           {primaryEvent}

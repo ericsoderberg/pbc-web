@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 import FormField from '../../components/FormField';
 import DateTimeInput from '../../components/DateTimeInput';
-import ImageField from '../../components/ImageField';
 import SectionsFormContents from '../../components/SectionsFormContents';
 import EventDates from './EventDates';
 import EventDetails from './EventDetails';
@@ -57,8 +56,6 @@ export default class EventFormContents extends Component {
             <input name="location" value={event.location || ''}
               onChange={formState.change('location')} />
           </FormField>
-          <ImageField label="Image" name="image"
-            formState={formState} property="image" />
         </fieldset>
 
         <SectionsFormContents formState={formState} types={SECTION_TYPES} />

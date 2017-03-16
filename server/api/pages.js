@@ -259,7 +259,7 @@ export default function (router) {
         {
           path: 'sections.eventId',
           select: 'name path start end dates times address location ' +
-            'image',
+            'image color',
           model: 'Event',
         },
         { path: 'sections.libraryId', select: 'name path', model: 'Library' },

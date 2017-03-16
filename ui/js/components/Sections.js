@@ -19,6 +19,7 @@ export default class Sections extends Component {
     const elements = sections.map((section) => {
       let contents;
       let backgroundImage = section.backgroundImage;
+      let color = section.color;
       if (section.type === 'text') {
         contents = <Text text={section.text} />;
       } else if (section.type === 'image') {
@@ -42,6 +43,9 @@ export default class Sections extends Component {
         );
         if (!backgroundImage) {
           backgroundImage = section.eventId.image;
+        }
+        if (!color) {
+          color = section.eventId.color;
         }
       } else if (section.type === 'library') {
         contents =
@@ -69,7 +73,7 @@ export default class Sections extends Component {
       if (section.type !== 'calendar') {
         contents = (
           <Section key={section._id || section.id} align={align}
-            full={section.full} color={section.color}
+            full={section.full} color={color}
             backgroundImage={backgroundImage} plain={section.plain}>
             {contents}
           </Section>

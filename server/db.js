@@ -199,6 +199,7 @@ const eventSchema = Schema({
   address: String, // mappable
   align: String,
   calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
+  color: String,
   created: Date,
   dates: [Date],
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
