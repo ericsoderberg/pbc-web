@@ -10,7 +10,9 @@ const PageItem = (props) => {
     itemClassNames.push(`item--${align}`);
   }
   let path;
-  if (page.path && page.path[0] !== '/') {
+  if (page.path === 'home') {
+    path = '/';
+  } else if (page.path && page.path[0] !== '/') {
     path = `/${page.path}`;
   } else {
     path = `/pages/${page._id}`;
