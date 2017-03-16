@@ -1,8 +1,8 @@
 
 const COLOR_HASH_SHORT_REGEXP = /#([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})/;
 const COLOR_HASH_REGEXP = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})/;
-const COLOR_RGB_REGEXP = /rgb\((\d+), (\d+), (\d+)\)/;
-const COLOR_RGBA_REGEXP = /rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/;
+const COLOR_RGB_REGEXP = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/;
+const COLOR_RGBA_REGEXP = /rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/;
 
 export function isDarkBackground(color) {
   // convert to RGB elements
