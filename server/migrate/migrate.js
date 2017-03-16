@@ -15,15 +15,15 @@ import emailLists from './emailLists';
 import results from './results';
 
 Promise.resolve()
-.then(() => users())
-.then(() => messages())
-.then(() => libraries())
-.then(() => events())
+// .then(() => users())
+// .then(() => messages())
+// .then(() => libraries())
+// .then(() => events())
 .then(() => forms())
-.then(() => pages())
-.then(() => calendars())
-.then(() => domains())
-.then(() => emailLists())
+// .then(() => pages())
+// .then(() => calendars())
+// .then(() => domains())
+// .then(() => emailLists())
 .then(() => console.log(results.log()))
 .then(() => console.log(`Finished`))
 .catch(error => console.log(error));

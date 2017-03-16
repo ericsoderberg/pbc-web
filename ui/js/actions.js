@@ -153,6 +153,9 @@ export function getItem(category, id, options = {}) {
       `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
     );
   }
+  if (options.totals) {
+    params.push(`totals=${encodeURIComponent(options.totals)}`);
+  }
   const q = params.length > 0 ? `?${params.join('&')}` : '';
   return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
     method: 'GET', headers: _headers })
