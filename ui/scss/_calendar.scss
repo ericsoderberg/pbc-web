@@ -29,6 +29,12 @@
       }
     }
   }
+
+  @media all and (max-width: 699px) {
+    select {
+      width: 100%;
+    }
+  }
 }
 
 .calendar__week {
@@ -93,6 +99,10 @@
       text-align: right;
     }
   }
+
+  @media all and (max-width: 699px) {
+    display: block;
+  }
 }
 
 .calendar__day--alternate {
@@ -110,6 +120,12 @@
       background-color: $control-hover-background;
       color: $control-hover-color;
     }
+  }
+}
+
+.calendar__day--empty {
+  @media all and (max-width: 699px) {
+    display: none;
   }
 }
 
@@ -179,6 +195,10 @@
 
   @media all and (min-width: 700px) {
     min-height: $double-unit;
+  }
+
+  @media all and (max-width: 699px) {
+    margin-bottom: $unit;
   }
 }
 

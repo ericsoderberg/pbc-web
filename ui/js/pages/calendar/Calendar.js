@@ -311,6 +311,9 @@ export default class Calendar extends Component {
       if (date.month() !== referenceDate.month()) {
         classNames.push('calendar__day--alternate');
       }
+      if (dayEvents.length === 0) {
+        classNames.push('calendar__day--empty');
+      }
 
       const path = ((calendar.path || calendar._id) ?
         `/calendars/${calendar.path || calendar._id}` : '/calendar') +
