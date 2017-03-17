@@ -7,7 +7,7 @@ import { getItems, getItem } from '../../actions';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import Button from '../../components/Button';
-import AddIcon from '../../icons/Add';
+// import AddIcon from '../../icons/Add';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
 import PaymentPay from '../payment/PaymentPay';
@@ -176,7 +176,7 @@ class FormSection extends Component {
   }
 
   _loadFormTemplate(id) {
-    getItem('form-templates', id)
+    getItem('form-templates', id, { totals: true })
     .then(formTemplate => this._formTemplateReady(formTemplate))
     .catch(error => console.error('!!! FormSection formTemplate catch', error));
   }
@@ -472,11 +472,11 @@ class FormSection extends Component {
             <Button className="button form-summary__another" plain={true}
               label={`${formTemplate.anotherLabel} ...`} onClick={this._add()} />
           );
-        } else {
-          addControl = (
-            <Button className="form-summary__add" plain={true}
-              icon={<AddIcon />} onClick={this._add()} />
-          );
+        // } else {
+        //   addControl = (
+        //     <Button className="form-summary__add" plain={true}
+        //       icon={<AddIcon />} onClick={this._add()} />
+        //   );
         }
 
         let paymentControl;
@@ -489,7 +489,7 @@ class FormSection extends Component {
         }
 
         let message;
-        if (!paymentNeeded && !anyPending) {
+        if (!paymentNeeded && !anyPending && formTemplate.postSubmitMessage) {
           message = formTemplate.postSubmitMessage;
         } else {
           message = `## ${formTemplate.name}`;

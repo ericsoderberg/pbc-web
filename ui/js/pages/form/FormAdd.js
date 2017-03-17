@@ -32,7 +32,7 @@ class FormAdd extends Component {
     const { session, linkedForm } = props;
     const formTemplateId =
       props.formTemplateId || props.location.query.formTemplateId;
-    getItem('form-templates', formTemplateId)
+    getItem('form-templates', formTemplateId, { totals: true })
     .then((formTemplate) => {
       const form = {
         fields: [],

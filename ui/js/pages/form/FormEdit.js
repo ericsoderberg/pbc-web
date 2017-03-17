@@ -48,7 +48,8 @@ class FormEdit extends Component {
       }
       return form;
     })
-    .then(form => getItem('form-templates', form.formTemplateId._id))
+    .then(form => getItem('form-templates', form.formTemplateId._id,
+      { totals: true }))
     .then((formTemplate) => {
       this.setState({ formTemplate });
       document.title = formTemplate.name;

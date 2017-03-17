@@ -3,7 +3,7 @@ import FormField from '../../components/FormField';
 import FormOptionLabel from './FormOptionLabel';
 
 const FormChoice = (props) => {
-  const { error, field, formTemplateField, onChange } = props;
+  const { error, field, formTemplateField, onChange, remaining } = props;
 
   const contents = (formTemplateField.options || []).map((option) => {
     const name = formTemplateField._id || formTemplateField.id;
@@ -18,7 +18,7 @@ const FormChoice = (props) => {
             optionId: id,
           })} />
         <FormOptionLabel htmlFor={id} formTemplateField={formTemplateField}
-          option={option} selected={checked} />
+          option={option} selected={checked} remaining={remaining[id]} />
       </div>
     );
   });
@@ -36,11 +36,13 @@ FormChoice.propTypes = {
   field: PropTypes.object,
   formTemplateField: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  remaining: PropTypes.object,
 };
 
 FormChoice.defaultProps = {
   error: undefined,
   field: {},
+  remaining: {},
 };
 
 export default FormChoice;

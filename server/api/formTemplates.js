@@ -47,30 +47,63 @@ const calculateTotals = (data) => {
     const templateFieldMap = {};
     const optionMap = {};
     const totals = {};
+    const remains = {};
     formTemplate.sections.forEach((section) => {
       section.fields.forEach((field) => {
         templateFieldMap[field._id] = field;
         field.options.forEach((option) => { optionMap[option._id] = option; });
-        if (field.type === 'count' || field.type === 'number' ||
-        field.monetary) {
+        if (field.type === 'count' || field.type === 'number'
+          || field.monetary) {
           totals[field._id] = 0;
+        }
+        if (field.limit) {
+          remains[field._id] = parseFloat(field.limit, 10);
+        } else {
+          field.options.forEach((option) => {
+            if (option.limit !== undefined) {
+              if (!remains[field._id]) {
+                remains[field._id] = {};
+              }
+              remains[field._id][option._id] = parseFloat(option.limit, 10);
+            }
+          });
         }
       });
     });
+
     forms.forEach((form) => {
       form.fields.forEach((field) => {
         const total = totals[field.templateFieldId];
         if (total >= 0) {
           const value = parseFloat(
-            fieldValue(field, templateFieldMap, optionMap),
-            10);
+            fieldValue(field, templateFieldMap, optionMap), 10);
           if (value) {
             totals[field.templateFieldId] += value;
+          }
+        }
+
+        const remaining = remains[field.templateFieldId];
+        if (remaining !== undefined) {
+          if (typeof remaining === 'object') {
+            // options
+            (field.optionIds || []).forEach((optionId) => {
+              if (remaining[optionId] >= 0) {
+                remaining[optionId] -= 1;
+              }
+            });
+          } else {
+            const templateField = templateFieldMap[field.templateFieldId];
+            if (templateField.type === 'number' || templateField.type === 'count') {
+              remains[field.templateFieldId] -= parseFloat(field.value, 10);
+            } else {
+              remains[field.templateFieldId] -= 1;
+            }
           }
         }
       });
     });
     formTemplate.totals = totals;
+    formTemplate.remains = remains;
     return formTemplate;
   });
 };

@@ -11,7 +11,7 @@ FormTemplateAdd.defaultProps = {
   default: { sections: [
     { id: 1000,
       fields: [
-        { id: 1000, type: 'instructions', help: '# Title' },
+        { id: 1000, type: 'instructions', help: '## Title' },
         { id: 1001, type: 'line', name: 'Name', linkToUserProperty: 'name' },
         { id: 1002, type: 'line', name: 'Email', linkToUserProperty: 'email' },
       ],

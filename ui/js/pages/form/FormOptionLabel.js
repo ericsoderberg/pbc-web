@@ -26,7 +26,7 @@ export default class FormOptionLabel extends Component {
   }
 
   render() {
-    const { htmlFor, option, formTemplateField, selected } = this.props;
+    const { htmlFor, option, formTemplateField, remaining, selected } = this.props;
     const { helpActive } = this.state;
 
     const labels = [<span key="name">{option.name}</span>];
@@ -44,7 +44,12 @@ export default class FormOptionLabel extends Component {
       );
     }
 
-    if (option.help) {
+    let help = option.help || '';
+    if (remaining !== undefined) {
+      help += `${remaining} remaining`;
+    }
+
+    if (help) {
       const classNames = ['form-field__help'];
       if (helpActive) {
         classNames.push('form-field__help--active');
@@ -54,7 +59,7 @@ export default class FormOptionLabel extends Component {
           <button className="button-plain" type="button"
             onClick={this._toggleHelp}> ? </button>
           <div className="form-field__help-drop">
-            <Markdown>{option.help}</Markdown>
+            <Markdown>{help}</Markdown>
           </div>
         </span>,
       );
@@ -72,9 +77,11 @@ FormOptionLabel.propTypes = {
   formTemplateField: PropTypes.object.isRequired,
   htmlFor: PropTypes.string.isRequired,
   option: PropTypes.object.isRequired,
+  remaining: PropTypes.number,
   selected: PropTypes.bool,
 };
 
 FormOptionLabel.defaultProps = {
+  remaining: undefined,
   selected: false,
 };

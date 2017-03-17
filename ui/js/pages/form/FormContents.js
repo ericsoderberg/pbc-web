@@ -96,6 +96,7 @@ class FormContents extends Component {
     .map(section => (
       <FormContentsSection key={section._id || section.id}
         formTemplateSection={section} fields={fields}
+        remains={formTemplate.remains || {}}
         linkedForm={linkedForm} linkedFormControl={linkedFormControl}
         error={error} onChange={this._onChangeField} />
     ));

@@ -21,6 +21,7 @@ const TYPE_COMPONENT = {
 const FormContentsField = (props) => {
   const {
     error, field, formTemplateField, linkedForm, linkedFormControl, onChange,
+    remaining,
   } = props;
   const Component = TYPE_COMPONENT[formTemplateField.type];
   let linkedField;
@@ -34,7 +35,7 @@ const FormContentsField = (props) => {
   }
   return (
     <Component key={formTemplateField._id || formTemplateField.id}
-      formTemplateField={formTemplateField} field={field}
+      formTemplateField={formTemplateField} field={field} remaining={remaining}
       linkedField={linkedField} linkedFormControl={linkedFormControl}
       onChange={onChange} error={error} />
   );
@@ -47,6 +48,7 @@ FormContentsField.propTypes = {
   linkedForm: PropTypes.object,
   linkedFormControl: PropTypes.element,
   onChange: PropTypes.func.isRequired,
+  remaining: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
 };
 
 FormContentsField.defaultProps = {
@@ -54,6 +56,7 @@ FormContentsField.defaultProps = {
   field: undefined,
   linkedForm: undefined,
   linkedFormControl: undefined,
+  remaining: undefined,
 };
 
 export default FormContentsField;
