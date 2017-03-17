@@ -199,7 +199,7 @@ export default class FormTemplate extends Component {
     } else if (templateField.type === 'choices' && field.optionIds) {
       contents = field.optionIds.map((optionId) => {
         const option = optionMap[optionId];
-        let suffix;
+        let suffix = '';
         if (templateField.monetary) {
           suffix = ` $ ${option.value}`;
         }

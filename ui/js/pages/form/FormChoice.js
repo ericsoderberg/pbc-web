@@ -6,7 +6,7 @@ const FormChoice = (props) => {
   const { error, field, formTemplateField, onChange } = props;
 
   const contents = (formTemplateField.options || []).map((option) => {
-    const name = formTemplateField.name;
+    const name = formTemplateField._id || formTemplateField.id;
     const id = option._id || option.id;
     const checked = (field.optionId === id);
     return (
