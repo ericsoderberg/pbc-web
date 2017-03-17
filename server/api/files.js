@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
 import rmdir from 'rimraf';
+import mime from 'mime';
 import { authorize } from './auth';
 
 mongoose.Promise = global.Promise;
@@ -12,7 +13,18 @@ export const FILES_PATH = `${__dirname}/../../public/files`;
 export default function (router) {
   router.get('/files/:id/:name', (req, res) => {
     const { id, name } = req.params;
-    res.download(`${FILES_PATH}/${id}/${name}`);
+
+    const path = `${FILES_PATH}/${id}/${name}`;
+    const stat = fs.statSync(path);
+    res.writeHead(200, {
+      'Content-Type': mime.lookup(path),
+      'Content-Length': stat.size,
+    });
+
+    const readStream = fs.createReadStream(path);
+    readStream.pipe(res);
+
+    // res.download(`${FILES_PATH}/${id}/${name}`);
   });
 
   router.get('/files/:id', (req, res) => {
@@ -21,7 +33,17 @@ export default function (router) {
       if (error) {
         res.status(400).json(error);
       } else {
-        res.download(`${FILES_PATH}/${id}/${files[0]}`);
+        const path = `${FILES_PATH}/${id}/${files[0]}`;
+        const stat = fs.statSync(path);
+        res.writeHead(200, {
+          'Content-Type': mime.lookup(path),
+          'Content-Length': stat.size,
+        });
+
+        const readStream = fs.createReadStream(path);
+        readStream.pipe(res);
+
+        // res.download(`${FILES_PATH}/${id}/${files[0]}`);
       }
     });
   });
