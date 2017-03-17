@@ -923,23 +923,23 @@
     vertical-align: top;
   }
 
-  th {
+  th.sortable {
     cursor: s-resize;
-  }
 
-  th.sort {
-    background-color: $control-background-color;
-    color: $control-color;
-    cursor: n-resize;
-  }
+    &.sort {
+      background-color: $control-background-color;
+      color: $control-color;
+      cursor: n-resize;
+    }
 
-  th.sort.sort--reverse {
-    cursor: s-resize;
-  }
+    &.sort.sort--reverse {
+      cursor: s-resize;
+    }
 
-  th:hover {
-    background-color: $hover-background;
-    color: $color;
+    &:hover {
+      background-color: $hover-background;
+      color: $color;
+    }
   }
 
   th.numeric,

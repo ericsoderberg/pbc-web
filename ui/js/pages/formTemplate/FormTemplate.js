@@ -258,10 +258,16 @@ export default class FormTemplate extends Component {
   }
 
   _renderHeaderCells() {
-    const { columns, templateFieldMap, sortFieldId, sortReverse, totals } = this.state;
+    const {
+      columns, mightHaveMore, templateFieldMap, sortFieldId, sortReverse,
+      totals,
+    } = this.state;
     const cells = columns.map((fieldId) => {
       const field = templateFieldMap[fieldId];
       const classes = [];
+      if (!mightHaveMore) {
+        classes.push('sortable');
+      }
       if (sortFieldId === fieldId) {
         classes.push('sort');
         if (sortReverse) {
@@ -271,9 +277,13 @@ export default class FormTemplate extends Component {
       if (totals[fieldId] >= 0) {
         classes.push('numeric');
       }
+      let onClick;
+      if (!mightHaveMore) {
+        onClick = this._sortForms(fieldId);
+      }
       return (
         <th key={fieldId} className={classes.join(' ')}
-          onClick={this._sortForms(fieldId)}>
+          onClick={onClick}>
           {field.name}
         </th>
       );
