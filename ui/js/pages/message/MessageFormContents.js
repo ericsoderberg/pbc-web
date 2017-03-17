@@ -231,7 +231,7 @@ export default class MessageFormContents extends Component {
           {seriesField}
           {nonSeriesField}
           <FormField label="Library" error={errors.libraryId}>
-            <select name="libraryId" value={message.libraryId || ''}
+            <select name="libraryId" value={(message.libraryId || {})._id || ''}
               onChange={formState.change('libraryId')}>
               {libraryOptions}
             </select>
