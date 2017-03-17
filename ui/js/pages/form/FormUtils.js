@@ -4,46 +4,52 @@ export function isFieldSet(field) {
     (field.optionIds && field.optionIds.length > 0));
 }
 
+function formFieldError(templateField, form) {
+  let result;
+  if (templateField.required && !templateField.linkedFieldId) {
+    // see if we have it
+    if (!form.fields.some(field => (
+      field.templateFieldId === templateField._id))) {
+      result = 'required';
+    }
+  } else if (templateField.options) {
+    templateField.options.filter(option => option.required)
+    .forEach((option) => {
+      // see if we have it
+      let found = false;
+      form.fields
+      .filter(field => (field.templateFieldId === templateField._id))
+      .forEach((field) => {
+        if (field.optionId === option._id) {
+          found = true;
+        } else {
+          (field.optionIds || []).some((optionId) => {
+            if (optionId === option._id) {
+              found = true;
+            }
+            return found;
+          });
+        }
+      });
+      if (!found) {
+        result = 'required';
+      }
+    });
+  }
+  return result;
+}
+
 export function setFormError(formTemplate, form) {
   let error;
   // check for required fields
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
-      if (templateField.required && !templateField.linkedFieldId) {
-        // see if we have it
-        if (!form.fields.some(field => (
-          field.templateFieldId === templateField._id))) {
-          if (!error) {
-            error = {};
-          }
-          error[templateField._id] = 'required';
+      const errorMessage = formFieldError(templateField, form);
+      if (errorMessage) {
+        if (!error) {
+          error = {};
         }
-      } else if (templateField.options) {
-        templateField.options.filter(option => option.required)
-        .forEach((option) => {
-          // see if we have it
-          let found = false;
-          form.fields
-          .filter(field => (field.templateFieldId === templateField._id))
-          .forEach((field) => {
-            if (field.optionId === option._id) {
-              found = true;
-            } else {
-              (field.optionIds || []).some((optionId) => {
-                if (optionId === option._id) {
-                  found = true;
-                }
-                return found;
-              });
-            }
-          });
-          if (!found) {
-            if (!error) {
-              error = {};
-            }
-            error[templateField._id] = 'required';
-          }
-        });
+        error[templateField._id] = errorMessage;
       }
     });
   });
@@ -54,12 +60,9 @@ export function clearFormError(formTemplate, form, error) {
   let result = { ...error };
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
-      if (templateField.required) {
-        // see if we have it
-        if (form.fields.some(field => (
-          field.templateFieldId === templateField._id && isFieldSet(field)))) {
-          delete result[templateField._id];
-        }
+      const errorMessage = formFieldError(templateField, form);
+      if (!errorMessage) {
+        delete result[templateField._id];
       }
     });
   });
