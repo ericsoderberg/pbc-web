@@ -75,13 +75,13 @@ class FormAdd extends Component {
       .then((response) => {
         // if we didn't have a session and we created one as part of adding,
         // remember it.
-        if (!haveSession() && response.token) {
+        if (!haveSession() && response.session) {
           // console.log('!!! FormAdd set session', response);
-          setSession(response);
+          setSession(response.session);
         }
-        return {};
+        return response._id;
       })
-      .then(() => (onDone ? onDone() : this.context.router.goBack()))
+      .then(id => (onDone ? onDone(id) : this.context.router.goBack()))
       .catch((error2) => {
         console.error('!!! FormAdd post error', error2);
         this.setState({ error: error2, showSignIn: error2.code === 'userExists' });

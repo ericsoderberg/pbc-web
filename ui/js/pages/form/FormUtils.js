@@ -51,7 +51,7 @@ export function setFormError(formTemplate, form) {
 }
 
 export function clearFormError(formTemplate, form, error) {
-  const result = { ...error };
+  let result = { ...error };
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
       if (templateField.required) {
@@ -63,6 +63,9 @@ export function clearFormError(formTemplate, form, error) {
       }
     });
   });
+  if (Object.keys(result).length === 0) {
+    result = undefined;
+  }
   return result;
 }
 

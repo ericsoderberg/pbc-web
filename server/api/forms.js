@@ -226,12 +226,12 @@ export default function (router, transporter) {
     })
     .then(sendEmails(req, transporter))
     .then((context) => {
-      const { session } = context;
+      const { form, session } = context;
       if (!session.loginAt) {
         // we created this session here, return it
-        res.status(200).json(session);
+        res.status(200).json({ _id: form._id, session });
       } else {
-        res.status(200).send({});
+        res.status(200).send({ _id: form._id });
       }
     })
     .catch((error) => {

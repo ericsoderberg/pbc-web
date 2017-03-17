@@ -106,10 +106,10 @@ class FormEdit extends Component {
 
     let result;
     if (form && formTemplate) {
-      let submitLabel = 'Update';
-      if (formTemplate.payable && form.paymentIds.length === 0) {
-        submitLabel = 'Pay';
-      }
+      const submitLabel = 'Update';
+      // if (formTemplate.payable && form.paymentIds.length === 0) {
+      //   submitLabel = 'Pay';
+      // }
 
       let header;
       if (!inline) {
