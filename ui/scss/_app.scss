@@ -22,6 +22,10 @@
     z-index: 200;
     width: 100%;
   }
+
+  @media print {
+   display: none;
+  }
 }
 
 .app__content {
@@ -36,7 +40,7 @@
 }
 
 .app--nav {
-  @media all and (max-width: 699px) {
+  @media screen and (max-width: 699px) {
     max-height: 100vh;
     overflow: hidden;
 
@@ -68,6 +72,10 @@
 
   @media all and (max-width: 699px) {
     display: none;
+  }
+
+  @media print {
+   display: none;
   }
 }
 
@@ -178,7 +186,7 @@
 
   .page-header__actions {
 
-    @media all and (min-width: 700px) {
+    @media screen and (min-width: 700px) {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
@@ -186,7 +194,7 @@
       height: $triple-unit;
     }
 
-    @media all and (max-width: 699px) {
+    @media screen and (max-width: 699px) {
       display: none;
       flex-direction: column;
       min-height: $double-unit;
@@ -194,7 +202,7 @@
   }
 
   .page-header__menu--active {
-    @media all and (max-width: 699px) {
+    @media screen and (max-width: 699px) {
       .page-header__actions {
         position: absolute;
         z-index: 100;
@@ -237,11 +245,11 @@
     justify-content: flex-end;
     align-items: center;
 
-    @media all and (min-width: 700px) {
+    @media screen and (min-width: 700px) {
       height: $triple-unit;
     }
 
-    @media all and (max-width: 699px) {
+    @media screen and (max-width: 699px) {
       height: $double-unit;
     }
   }
@@ -287,8 +295,12 @@
   flex: 1 1;
   text-align: right;
 
-  @media all and (max-width: 699px) {
+  @media screen and (max-width: 699px) {
     position: relative;
+  }
+
+  @media print {
+   display: none;
   }
 }
 

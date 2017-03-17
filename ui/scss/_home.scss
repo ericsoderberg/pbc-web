@@ -4,13 +4,17 @@
 }
 
 .home__header {
-  @media all and (min-width: 700px) {
+  @media screen and (min-width: 700px) {
     height: $triple-unit;
     text-align: right;
   }
 
-  @media all and (max-width: 699px) {
+  @media screen and (max-width: 699px) {
     text-align: center;
+  }
+
+  @media print {
+   display: none;
   }
 }
 
@@ -22,7 +26,7 @@
 
 .home__menu {
 
-  @media all and (min-width: 700px) {
+  @media screen and (min-width: 700px) {
     position: absolute;
     z-index: 100;
     top: 0;
@@ -34,9 +38,13 @@
     transition: transform 0.3s;
   }
 
-  @media all and (max-width: 699px) {
+  @media screen and (max-width: 699px) {
     text-align: center;
     padding: $half-unit 0;
+  }
+
+  @media print {
+   display: none;
   }
 
   > button {
@@ -199,15 +207,19 @@
   align-items: center;
   font-size: 1.5rem;
 
-  @media all and (min-width: 700px) {
+  @media screen and (min-width: 700px) {
     max-width: $form-width;
     margin: $double-unit auto;
   }
 
-  @media all and (max-width: 699px) {
+  @media screen and (max-width: 699px) {
     width: 100%;
     margin: $unit 0;
     padding: 0 $unit;
+  }
+
+  @media print {
+   display: none;
   }
 
   input {

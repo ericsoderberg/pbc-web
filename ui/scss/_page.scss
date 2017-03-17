@@ -748,7 +748,7 @@ a.event-section__text {
 .footer__links {
   display: flex;
 
-  @media all and (min-width: 700px) {
+  @media screen and (min-width: 700px) {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
@@ -756,10 +756,14 @@ a.event-section__text {
     margin: 0 auto $double-unit;
   }
 
-  @media all and (max-width: 699px) {
+  @media screen and (max-width: 699px) {
     flex-direction: column;
     align-items: center;
     margin: $unit;
+  }
+
+  @media print {
+   display: none;
   }
 }
 
@@ -789,6 +793,10 @@ a.event-section__text {
 
 .page-context {
   margin-top: $quadruple-unit;
+
+  @media print {
+   display: none;
+  }
 }
 
 .user__summary {
