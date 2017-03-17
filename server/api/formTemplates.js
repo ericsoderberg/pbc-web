@@ -60,7 +60,7 @@ const calculateTotals = (data) => {
           remains[field._id] = parseFloat(field.limit, 10);
         } else {
           field.options.forEach((option) => {
-            if (option.limit !== undefined) {
+            if (option.limit !== undefined && option.limit !== null) {
               if (!remains[field._id]) {
                 remains[field._id] = {};
               }
