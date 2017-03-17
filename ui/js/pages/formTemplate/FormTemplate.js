@@ -106,7 +106,7 @@ export default class FormTemplate extends Component {
       return context;
     })
     .then(() => getItems('forms', {
-      filter: { formTemplateId: id }, populate: true,
+      filter: { formTemplateId: id }, populate: true, sort: '-modified',
     })
     .then((forms) => {
       this.setState({ forms, mightHaveMore: forms.length >= 20 });
@@ -119,7 +119,7 @@ export default class FormTemplate extends Component {
     this.setState({ loadingMore: true });
     const skip = this.state.forms.length;
     getItems('forms', {
-      filter: { formTemplateId: id }, populate: true, skip,
+      filter: { formTemplateId: id }, populate: true, skip, sort: '-modified',
     })
     .then((response) => {
       const forms = this.state.forms.concat(response);

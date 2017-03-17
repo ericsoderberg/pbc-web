@@ -120,8 +120,7 @@ Promise.resolve({})
         getOptionId(childFormTemplate, i[0], i[1], i[2]),
         fields,
         getFieldId(formTemplate, i[3], i[4]),
-        getOptionId(formTemplate, i[3], i[4], i[5]),
-      );
+        getOptionId(formTemplate, i[3], i[4], i[5]) );
     });
 
     // merge fields
