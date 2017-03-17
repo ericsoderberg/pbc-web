@@ -7,7 +7,7 @@ const Item = (props) => {
   const classNames = ['item__container', className];
   return (
     <Link className={classNames.join(' ')}
-      to={`/resources/${resource._id}/edit`}>
+      to={`/resources/${resource._id}`}>
       <div className="item">
         <span className="item__name">{resource.name}</span>
       </div>

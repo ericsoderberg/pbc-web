@@ -1,13 +1,62 @@
-import React from 'react';
-import Show from '../../components/Show';
+import React, { Component, PropTypes } from 'react';
+import { getItem } from '../../actions';
+import ItemHeader from '../../components/ItemHeader';
+import Loading from '../../components/Loading';
+import ResourceContents from './ResourceContents';
 
-const ResourceContents = () => (
-  <div>TBD</div>
-);
+export default class Resource extends Component {
 
-export default class Resource extends Show {}
+  constructor() {
+    super();
+    this.state = {};
+  }
 
-Resource.defaultProps = {
-  category: 'resources',
-  Contents: ResourceContents,
+  componentDidMount() {
+    this._load(this.props.params.id);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.params.id !== this.props.params.id) {
+      this._load(nextProps.params.id);
+    }
+  }
+
+  _load(id) {
+    getItem('resources', id, { populate: true })
+    .then((resource) => {
+      document.title = resource.name;
+      this.setState({ resource });
+    })
+    .catch(error => console.error('!!! Resource catch', error));
+  }
+
+  render() {
+    const { resource } = this.state;
+    let contents;
+    let actions;
+    if (resource) {
+      contents = <ResourceContents item={resource} />;
+      // const library = message.libraryId || {};
+      // const path = `/libraries/${library.path || library._id}`;
+      // actions = [
+      //   <Link key="library" to={path}>Library</Link>,
+      // ];
+    } else {
+      contents = <Loading />;
+    }
+
+    return (
+      <main>
+        <ItemHeader category="resources" title={(resource || {}).name}
+          item={resource} actions={actions} />
+        {contents}
+      </main>
+    );
+  }
+}
+
+Resource.propTypes = {
+  params: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };

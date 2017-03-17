@@ -278,6 +278,14 @@ export function getUnavailableDates(event) {
   .then(response => response.json());
 }
 
+// Resources
+
+export function getResourceEvents(resource) {
+  return fetch(`/api/resources/${resource._id}/events`, {
+    method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
+
 // Newsletter
 
 export function postNewsletterRender(newsletter) {
