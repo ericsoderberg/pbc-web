@@ -633,7 +633,13 @@ a.event-section__text {
   position: relative;
   padding-left: $double-unit;
   padding-right: $double-unit;
+
+  .item--start & {
+    padding-left: 0;
+  }
 }
+
+
 
 .event-times__separator {
   margin: 0 $half-unit;

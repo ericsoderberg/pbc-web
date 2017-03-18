@@ -8,6 +8,7 @@ import Audio from '../../components/Audio';
 import Video from '../../components/Video';
 import Button from '../../components/Button';
 import Section from '../../components/Section';
+import RightIcon from '../../icons/Right';
 import MessageItem from './MessageItem';
 
 const LEFT_KEY = 37;
@@ -57,7 +58,7 @@ export default class MessageContents extends Component {
     const message = this.props.item;
 
     let seriesMessages;
-    let align = 'center';
+    let align = 'start'; // 'center';
     if (message.seriesMessages && message.seriesMessages.length > 0) {
       const messages = message.seriesMessages.map(seriesMessage => (
         <MessageItem key={seriesMessage._id} item={seriesMessage} />
@@ -106,7 +107,12 @@ export default class MessageContents extends Component {
         } else {
           files.push(
             <a key={file._id} className="item__container" href={path}>
-              <div className="item item--center">{file.label || file.name}</div>
+              <div className={`item item--${align}`}>
+                <span className="files-section__file-name">
+                  {file.label || file.name}
+                  <RightIcon className="anchor__indicator" />
+                </span>
+              </div>
             </a>,
           );
         }
