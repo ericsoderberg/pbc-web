@@ -330,10 +330,6 @@
     font-size: 1.75rem;
   }
 
-  // .event-times {
-  //   text-align: center;
-  // }
-
   .event-times > .event-times__separator {
     display: none;
   }
@@ -349,16 +345,12 @@ a.event-section__text {
   @media all and (min-width: 700px) {
     &:hover {
       background-color: $hover-background;
-
-      .control-icon {
-        right: - $half-unit;
-      }
     }
   }
 
   .event-section__name {
-    padding-left: $unit;
-    padding-right: $unit;
+    padding-left: $double-unit;
+    padding-right: $double-unit;
   }
 }
 
@@ -366,14 +358,6 @@ a.event-section__text {
   position: relative;
   display: inline-block;
   margin-bottom: $unit;
-
-  .control-icon {
-    position: absolute;
-    right: - $quarter-unit;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.7s;
-  }
 }
 
 .event-section__date {
@@ -392,7 +376,6 @@ a.event-section__text {
 
   @media all and (min-width: 700px) {
     flex: 0 0 50%;
-    // padding: $unit 0;
   }
 
   @media all and (max-width: 699px) {
@@ -422,11 +405,6 @@ a.event-section__text {
     max-width: $page-width;
     margin: 0 auto;
   }
-
-  // @media all and (max-width: 699px) {
-  //   flex-direction: column;
-  //   align-items: center;
-  // }
 }
 
 .library-summary__library {
@@ -442,10 +420,6 @@ a.event-section__text {
     @media all and (min-width: 700px) {
       &:hover {
         background-color: $hover-background;
-
-        .control-icon {
-          right: $half-unit;
-        }
       }
     }
   }
@@ -453,14 +427,6 @@ a.event-section__text {
   h2 {
     display: inline-block;
     font-size: 1.75rem;
-  }
-
-  .control-icon {
-    position: absolute;
-    right: $half-unit + $quarter-unit;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.7s;
   }
 }
 
@@ -546,22 +512,10 @@ a.event-section__text {
 
   &:hover {
     background-color: $hover-background;
-
-    .control-icon {
-      right: $half-unit;
-    }
   }
 
   h2 {
     font-size: 2rem;
-  }
-
-  .control-icon {
-    position: absolute;
-    right: $half-unit + $quarter-unit;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.7s;
   }
 }
 
@@ -675,9 +629,10 @@ a.event-section__text {
   }
 }
 
-.files-section__file > .item > span::after {
-  content: '...';
-  padding-left: $half-unit;
+.files-section__file-name {
+  position: relative;
+  padding-left: $double-unit;
+  padding-right: $double-unit;
 }
 
 .event-times__separator {

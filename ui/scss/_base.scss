@@ -37,6 +37,21 @@ a,
   }
 }
 
+.anchor__indicator.control-icon {
+  position: absolute;
+  right: $half-unit;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.7s;
+  width: $third-unit + $third-unit;
+  height: $third-unit + $third-unit;
+  stroke: #E3A235; // TODO: use site/page color
+
+  path {
+    stroke-width: 6px;
+  }
+}
+
 .button,
 .button-circle,
 .button-right,

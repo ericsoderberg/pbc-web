@@ -75,7 +75,7 @@ export default class EventSection extends Component {
               to={`/events/${event.path || event._id}`}>
               <div className="event-section__name">
                 <h2>{event.name}</h2>
-                <RightIcon />
+                <RightIcon className="anchor__indicator" />
               </div>
               <EventTimes event={event} reverse={true} size="large" />
               {location}

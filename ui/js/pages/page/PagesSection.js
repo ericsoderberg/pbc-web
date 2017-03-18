@@ -76,7 +76,7 @@ export default class PagesSection extends Component {
             plain={true} path={path} style={style}>
             <div className="pages-section__name">
               <h2>{page.name}</h2>
-              <RightIcon />
+              <RightIcon className="anchor__indicator" />
             </div>
           </Button>
         );

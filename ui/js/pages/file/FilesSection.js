@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItem } from '../../actions';
 import Audio from '../../components/Audio';
+import RightIcon from '../../icons/Right';
 
 export default class FilesSection extends Component {
 
@@ -76,7 +77,12 @@ export default class FilesSection extends Component {
       }
       return (
         <a key={key} className="item__container files-section__file" href={path}>
-          <div className="item"><span>{file.label || file.name}</span></div>
+          <div className="item">
+            <span className="files-section__file-name">
+              {file.label || file.name}
+              <RightIcon className="anchor__indicator" />
+            </span>
+          </div>
         </a>
       );
     });

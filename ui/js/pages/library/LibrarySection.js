@@ -91,7 +91,8 @@ export default class LibrarySection extends Component {
       <div className={classes.join(' ')}>
         <div className="library-summary__library">
           <Link to={`/libraries/${library.path || library._id}`}>
-            <h2>{library.name} Library</h2><RightIcon />
+            <h2>{library.name} Library</h2>
+            <RightIcon className="anchor__indicator" />
           </Link>
         </div>
         <div className="library-summary__message">
