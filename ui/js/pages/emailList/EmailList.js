@@ -95,11 +95,11 @@ class EmailList extends Component {
       if (session && (session.userId.administrator ||
         session.userId.administratorDomainId === emailList.domainId)) {
         actions.push(
-          <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
-            Edit
-          </Link>,
           <Link key="add" to={`/email-lists/${emailList._id}/subscribe`}>
             Subscribe
+          </Link>,
+          <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
+            Edit
           </Link>,
         );
       }
@@ -126,6 +126,7 @@ class EmailList extends Component {
           <div key={address._id} className="item__container">
             <div className={classNames.join(' ')}>
               <span className="item__name">{address.address}</span>
+              <span className="box__connector" />
               <div className="box--row">
                 {user}
                 {state}
@@ -155,7 +156,7 @@ class EmailList extends Component {
           <PageHeader title={emailList.name} homer={true} focusOnSearch={false}
             searchText={searchText} onSearch={this._onSearch}
             actions={actions} />
-          <ul className="list">
+          <ul className="list email-list__addresses">
             {items}
           </ul>
           {message}
