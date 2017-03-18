@@ -1,6 +1,18 @@
 import moment from 'moment';
 import { markdown } from 'markdown';
 
+function markupText(text, section) {
+  let contents = markdown.toHTML(text);
+  if (section.color) {
+    contents = `
+<div style="padding: 1px 24px; margin: 24px 0px; background-color: ${section.color}">
+${contents}
+</div>
+    `;
+  }
+  return contents;
+}
+
 function nextDates(event) {
   const start = moment(event.start);
   const yesterday = moment().subtract(1, 'day');
@@ -128,7 +140,7 @@ src="${section.backgroundImage.data}" /></a>
 function markupFile(file, section, urlBase) {
   const url = `${urlBase}/file/${file._id}/${file.name}`;
   return `
-<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+<div style="margin-bottom: 24px; border-top: solid 1px #cccccc;">
   <a style="display: block; padding-top: 24px; padding-bottom: 24px;
   font-size: 18px; font-weight: 600;" href="${url}">${file.name}</a>
 </a>
@@ -139,7 +151,7 @@ export function render(newsletter, urlBase) {
   const sections = (newsletter.sections || []).map((section) => {
     switch (section.type) {
       case 'text':
-        return markdown.toHTML(section.text);
+        return markupText(section.text, section);
 
       case 'image':
         return `<img style="max-width: 432px;" src="${section.image.data}" />`;
