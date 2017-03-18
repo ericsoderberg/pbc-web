@@ -34,10 +34,7 @@ export default function (router) {
       .then(events => sortEvents(events))
       .then(events => res.json(events));
     })
-    .catch(error => {
-      console.log('!!!', error);
-      res.status(400).json(error);
-    });
+    .catch(error => res.status(400).json(error));
   });
 
   register(router, {

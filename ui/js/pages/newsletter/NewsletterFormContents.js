@@ -6,8 +6,7 @@ import SectionsFormContents from '../../components/SectionsFormContents';
 import DateInput from '../../components/DateInput';
 
 const SECTION_TYPES = [
-  'text', 'image', 'event', 'calendar', 'library',
-  'people', 'pages', 'files',
+  'text', 'image', 'event', 'library', 'pages', 'files',
 ];
 
 export default class NewsletterFormContents extends Component {
@@ -62,7 +61,6 @@ export default class NewsletterFormContents extends Component {
     const { className, formState, session } = this.props;
     const { domains } = this.state;
     const newsletter = formState.object;
-
 
     let administeredBy;
     if (session.userId.administrator) {

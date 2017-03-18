@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-// import moment from 'moment';
 import { authorize, authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
@@ -18,83 +17,58 @@ const unsetReferences = (data) => {
 
 const populateNewsletterForRendering = (newsletter) => {
   const Event = mongoose.model('Event');
-  // const Message = mongoose.model('Message');
-  // const messageFields = 'name verses date path author';
+  const eventFields = 'name start end location times image dates';
+  const Message = mongoose.model('Message');
+  const messageFields = 'name verses date path author';
+  const Page = mongoose.model('Page');
+  const pageFields = 'name path';
 
   return Promise.all(newsletter.sections.map((section) => {
     switch (section.type) {
       case 'text': return section;
+
       case 'image': return section;
-      case 'event': return Event.findOne({ _id: section.eventId },
-        'name start end location times image dates')
+
+      case 'event': return Event.findOne({ _id: section.eventId })
+      .select(eventFields).exec()
       .then(event => ({ ...section.toObject(), eventId: event }));
+
+      case 'library': return Promise.all([
+        Message.find({
+          libraryId: section.libraryId,
+          date: { $gt: newsletter.date },
+          series: { $ne: true },
+        }).sort('date').limit(1).select(messageFields)
+        .exec(),
+        Message.find({
+          libraryId: section.libraryId,
+          date: { $lt: newsletter.date },
+          series: { $ne: true },
+        }).sort('-date').limit(1).select(messageFields)
+        .exec(),
+      ])
+      .then(docs => ({
+        ...section.toObject(),
+        nextMessage: docs[0][0],
+        previousMessage: docs[1][0],
+      }));
+
+      case 'pages': return Promise.all(section.pages.map(pageRef =>
+        Page.findOne({ _id: pageRef.id }).select(pageFields).exec()))
+      .then(pages => ({
+        ...section.toObject(),
+        pages: section.pages.map((page, index) => ({
+          ...page.toObject(),
+          page: pages[index],
+        })),
+      }));
+
+      case 'files': return section;
+
       default: return section;
     }
   }))
-  .then((sections) => {
-    newsletter.sections = sections;
-    return newsletter;
-  });
-
-  // // nextMessage
-  // let nextPromise;
-  // if (newsletter.date && newsletter.libraryId) {
-  //   nextPromise = Message.find({
-  //     libraryId: newsletter.libraryId,
-  //     date: { $gt: newsletter.date },
-  //     series: { $ne: true },
-  //   })
-  //   .sort('date').limit(1).select(messageFields)
-  //   .exec();
-  // } else {
-  //   nextPromise = Promise.resolve([]);
-  // }
-  //
-  // // previousMessage
-  // let previousPromise;
-  // if (newsletter.date && newsletter.libraryId) {
-  //   previousPromise = Message.find({
-  //     libraryId: newsletter.libraryId,
-  //     date: { $lt: newsletter.date },
-  //     series: { $ne: true },
-  //   })
-  //   .sort('-date').limit(1).select(messageFields)
-  //   .exec();
-  // } else {
-  //   previousPromise = Promise.resolve([]);
-  // }
-  //
-  // // events
-  // const eventPromises = [];
-  // (newsletter.eventIds || []).forEach((eventId) => {
-  //   const promise = Event.findOne({ _id: eventId }).exec();
-  //   eventPromises.push(promise);
-  // });
-
-  // if (newsletter.date && newsletter.calendarId) {
-  //   const start = moment(newsletter.date);
-  //   const end = moment(start).add(2, 'months');
-  //   // find events withing the time window for this calendar
-  //   eventsPromise = Event.find({
-  //     calendarId: newsletter.calendarId,
-  //     $or: [
-  //       { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-  //       { dates: { $gte: start.toDate(), $lt: end.toDate() }}
-  //     ]
-  //   }).exec();
-  // } else {
-  //   eventsPromise = Promise.resolve([]);
-  // }
-
-  // return Promise.all([Promise.resolve(newsletter), nextPromise,
-  //   previousPromise, Promise.all(eventPromises)])
-  // .then((docs) => {
-  //   const newsletterData = docs[0].toObject();
-  //   newsletterData.nextMessage = docs[1][0];
-  //   newsletterData.previousMessage = docs[2][0];
-  //   newsletterData.events = docs[3];
-  //   return newsletterData;
-  // });
+  .then(sections => ({ ...newsletter.toObject(), sections }));
 };
 
 export default function (router, transporter) {

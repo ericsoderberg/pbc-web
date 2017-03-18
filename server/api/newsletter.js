@@ -45,24 +45,15 @@ function nextDates(event) {
   return { dates, times };
 }
 
-// function compareEvents (e1, e2) {
-//   // order by next date and time
-//   const d1 = e1.nextDates.dates[0];
-//   const d2 = e2.nextDates.dates[0];
-//   const t1 = e1.nextDates.times[0];
-//   const t2 = e2.nextDates.times[0];
-//   return (d1.isBefore(d2) ? -1 :
-//     d2.isBefore(d1) ? 1 :
-//       (t1.isBefore(t2) ? -1 : t2.isBefore(t1) ? 1 : 0)
-//   );
-// }
-
 function markupEvent(event, urlBase) {
   const { nextDates: { dates, times } } = event;
   const url = `${urlBase}/events/${event.path || event._id}`;
   let image = '';
   if (event.image) {
-    image = `<a href="${url}"><img style="max-width: 432px; padding-top: 24px;" src="${event.image.data}" /></a>`;
+    image = `
+<a href="${url}"><img style="max-width: 432px; padding-top: 24px;"
+src="${event.image.data}" /></a>
+  `;
   }
   let at = dates.map(d => d.format('MMMM Do')).join(' - ');
   if (dates.length <= 1) {
@@ -107,12 +98,40 @@ function markupMessage(label, message, urlBase) {
     author = `<div style="padding-top: 6px; color: #999999">${message.author}</div>`;
   }
   return `
-  <div>
-    <h2 style="font-weight: 100;">${label}</h2>
-    <a style="font-size: 18px; font-weight: 600;" href="${url}">${message.name}</a>
-    ${verses}
-    ${author}
-  </div>
+<div>
+  <h2 style="font-weight: 100;">${label}</h2>
+  <a style="font-size: 18px; font-weight: 600;" href="${url}">${message.name}</a>
+  ${verses}
+  ${author}
+</div>
+  `;
+}
+
+function markupPage(page, section, urlBase) {
+  const url = `${urlBase}/${page.path || `pages/${page._id}`}`;
+  let image = '';
+  if (section.backgroundImage) {
+    image = `
+<a href="${url}"><img style="max-width: 432px; padding-top: 24px;"
+src="${section.backgroundImage.data}" /></a>
+  `;
+  }
+  return `
+<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+  ${image}
+  <a style="display: block; padding-top: 24px; padding-bottom: 24px;
+  font-size: 18px; font-weight: 600;" href="${url}">${page.name}</a>
+</a>
+  `;
+}
+
+function markupFile(file, section, urlBase) {
+  const url = `${urlBase}/file/${file._id}/${file.name}`;
+  return `
+<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+  <a style="display: block; padding-top: 24px; padding-bottom: 24px;
+  font-size: 18px; font-weight: 600;" href="${url}">${file.name}</a>
+</a>
   `;
 }
 
@@ -121,54 +140,38 @@ export function render(newsletter, urlBase) {
     switch (section.type) {
       case 'text':
         return markdown.toHTML(section.text);
+
       case 'image':
         return `<img style="max-width: 432px;" src="${section.image.data}" />`;
+
       case 'event': {
         const event = section.eventId;
         return markupEvent({ ...event.toObject(), nextDates: nextDates(event) }, urlBase);
       }
+
+      case 'library': {
+        const nextMessageMarkup = section.nextMessage ?
+          markupMessage('This week', section.nextMessage, urlBase) : '';
+        const previousMessageMarkup = section.previousMessage ?
+          markupMessage('Last week', section.previousMessage, urlBase) : '';
+        return `
+<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+${nextMessageMarkup}
+${previousMessageMarkup}
+</div>
+        `;
+      }
+
+      case 'pages': return section.pages.map(page =>
+        markupPage(page.page, section, urlBase));
+
+      case 'files': return section.files.map(file =>
+        markupFile(file, section, urlBase));
+
       default:
         return '<span>TBD</span>';
     }
   }).join('');
-
-//   let imageMarkup = '';
-//   if (image) {
-//     imageMarkup = `<img style="max-width: 432px;" src="${image.data}" />`;
-//   }
-//
-//   let textMarkup = '';
-//   if (text) {
-//     textMarkup = markdown.toHTML(text);
-//   }
-//
-//   let libraryMarkup = '';
-//   if (previousMessage || nextMessage) {
-//     let previousMessageMarkup;
-//     if (previousMessage) {
-//       previousMessageMarkup =
-//         markupMessage('Last week', previousMessage, urlBase);
-//     }
-//
-//     let nextMessageMarkup;
-//     if (nextMessage) {
-//       nextMessageMarkup = markupMessage('This week', nextMessage, urlBase);
-//     }
-//
-//     libraryMarkup = `
-// <div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
-// ${nextMessageMarkup}
-// ${previousMessageMarkup}
-// </div>
-//     `;
-//   }
-//
-//   const eventsMarkup = events.map(event => ({
-//     // decorate with nextDates
-//     ...event.toObject(), nextDates: nextDates(event),
-//   }))
-//   // .sort(compareEvents)
-//   .map(event => markupEvent(event, urlBase)).join('\n');
 
   return `
 <html>
