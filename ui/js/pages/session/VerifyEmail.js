@@ -56,7 +56,7 @@ const Verified = (props) => {
       </div>
       <div className="form__footer-container">
         <footer className="form__footer">
-          <Button path={`/users/${session.userId}/edit`} secondary={true}>
+          <Button path={`/users/${session.userId._id}/edit`} secondary={true}>
             Edit Account
           </Button>
           {homeControl}
