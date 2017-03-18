@@ -1,7 +1,5 @@
-"use strict";
 // import fs from 'fs';
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import '../db';
 import users from './users';
 import messages from './messages';
@@ -14,16 +12,18 @@ import domains from './domains';
 import emailLists from './emailLists';
 import results from './results';
 
+mongoose.Promise = global.Promise;
+
 Promise.resolve()
-// .then(() => users())
-// .then(() => messages())
+.then(() => users())
+.then(() => messages())
 // .then(() => libraries())
 // .then(() => events())
 .then(() => forms())
 // .then(() => pages())
 // .then(() => calendars())
 // .then(() => domains())
-// .then(() => emailLists())
+.then(() => emailLists())
 .then(() => console.log(results.log()))
 .then(() => console.log(`Finished`))
 .catch(error => console.log(error));

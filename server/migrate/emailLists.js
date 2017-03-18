@@ -1,23 +1,23 @@
-"use strict";
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 import { execFile } from 'child_process';
 import '../db';
 import results from './results';
+
+mongoose.Promise = global.Promise;
 
 // EmailList
 
 export default function () {
   const EmailList = mongoose.model('EmailList');
   return new Promise((resolve, reject) => {
-    execFile('list_lists', ['-b'], (error, stdout, stderr) => {
+    execFile('list_lists', ['-b'], (error, stdout) => {
       if (error) {
         return reject(error);
       }
-      return resolve(stdout.split("\n"));
+      return resolve(stdout.split('\n'));
     });
   })
-  .then(listNames => {
+  .then((listNames) => {
     let emailListPromise = Promise.resolve();
     listNames.filter(listName => listName).forEach((listName) => {
       // process email lists sequentially
@@ -25,23 +25,22 @@ export default function () {
       // get EmailList
       .then(() => EmailList.findOne({ name: listName }).exec())
       // create EmailList, if needed
-      .then(emailList => {
+      .then((emailList) => {
         if (emailList) {
           return results.skipped('EmailList', emailList);
-        } else {
-          const emailList = new EmailList({ name: listName, path: listName });
-          return emailList.save()
-          .then(emailList => results.saved('EmailList', emailList))
-          .catch(error => results.errored('EmailList', emailList, error));
         }
+        const emailListData = new EmailList({ name: listName, path: listName });
+        return emailListData.save()
+        .then(emailListSaved => results.saved('EmailList', emailListSaved))
+        .catch(error => results.errored('EmailList', emailList, error));
       })
       // populate addresses
       .then(emailList => new Promise((resolve, reject) => {
-        execFile('list_members', [emailList.name], (error, stdout, stderr) => {
+        execFile('list_members', [emailList.name], (error, stdout) => {
           if (error) {
             return reject(error);
           }
-          emailList.addresses = stdout.split("\n")
+          emailList.addresses = stdout.split('\n')
           .filter(a => a).map(a => ({ address: a }));
           return resolve(emailList.save());
         });
@@ -50,5 +49,5 @@ export default function () {
     return emailListPromise;
   })
   .then(() => console.log('!!! emailLists done'))
-  .catch(error => console.log('!!! emailLists catch', error, error.stack));
+  .catch(error => console.error('!!! emailLists catch', error, error.stack));
 }
