@@ -149,6 +149,8 @@ class EmailList extends Component {
             'No addresses have been subscribed';
           message = <div className="list__message">{text}</div>;
         }
+      } else {
+        message = <div className="list__count">{items.length}</div>;
       }
 
       result = (
