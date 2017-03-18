@@ -144,10 +144,6 @@ export default class NewsletterFormContents extends Component {
           </FormFieldAdd>
         </fieldset>
         <fieldset className="form__fields">
-          <FormField label="Address">
-            <input name="address" value={newsletter.address || ''}
-              onChange={formState.change('address')} />
-          </FormField>
           {administeredBy}
         </fieldset>
       </div>

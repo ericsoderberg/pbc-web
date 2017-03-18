@@ -7,7 +7,7 @@ const Item = (props) => {
   const { className, item: newsletter } = props;
   const classNames = ['item__container', className];
   return (
-    <Link className={classNames.join(' ')} to={`/newsletters/${newsletter._id}/edit`}>
+    <Link className={classNames.join(' ')} to={`/newsletters/${newsletter._id}`}>
       <div className="item">
         <span className="item__name">{moment(newsletter.date).format('MMM Do YYYY')}</span>
         <span>{newsletter.name}</span>

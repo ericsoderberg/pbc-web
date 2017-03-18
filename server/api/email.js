@@ -4,7 +4,7 @@ export const renderNotification = (title, message, label, url) => ({
 `
 <html>
 <head></head>
-<body style="background-color: #f2f2f2">
+<body style="background-color: #f2f2f2;">
 <div style="padding: 48px; max-width: 480px; margin: 48px auto;
 background-color: #ffffff; color: #333333;
 font-family: 'Work Sans', Arial, sans-serif; font-size: 18px;">

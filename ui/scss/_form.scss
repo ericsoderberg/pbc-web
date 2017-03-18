@@ -1070,3 +1070,26 @@
     background-color: $secondary-background-color; //$background-color;
   }
 }
+
+.newsletter-header {
+  padding: $unit;
+  background-color: $secondary-background-color;
+}
+
+.newsletter-send {
+  max-width: $form-width;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+
+  input {
+    flex: 1 1;
+  }
+}
+
+.newsletter-send__state {
+  padding: $half-unit $unit;
+  font-size: 1.25rem;
+  text-align: center;
+}

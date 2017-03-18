@@ -298,6 +298,13 @@ export function postNewsletterRender(newsletter) {
   .then(response => response.text());
 }
 
+export function postNewsletterSend(id, address) {
+  return fetch(`/api/newsletters/${id}/send`, {
+    method: 'POST', headers: _headers, body: JSON.stringify({ address }) })
+  .then(processStatus)
+  .then(response => response.text());
+}
+
 // Map
 
 export function getGeocode(address) {

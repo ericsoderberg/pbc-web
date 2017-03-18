@@ -14,7 +14,9 @@ export default class NewsletterContents extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this._load(nextProps);
+    if (!nextProps.once && this.props.item) {
+      this._load(nextProps);
+    }
   }
 
   componentWillUnmount() {
@@ -40,6 +42,11 @@ export default class NewsletterContents extends Component {
   }
 }
 
-NewsletterContents.PropTypes = {
+NewsletterContents.propTypes = {
   item: PropTypes.object.isRequired,
+  once: PropTypes.boolean,
+};
+
+NewsletterContents.defaultProps = {
+  once: false,
 };

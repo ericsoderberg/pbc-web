@@ -454,7 +454,7 @@ const siteSchema = Schema({
 mongoose.model('Site', siteSchema);
 
 const newsletterSchema = Schema({
-  address: String,
+  // address: String,
   // calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   created: Date,
   date: Date,

@@ -12,12 +12,10 @@ export default class NewsletterEdit extends Component {
     super();
     this._onChange = this._onChange.bind(this);
     this._onCopy = this._onCopy.bind(this);
-    this.state = { submitLabel: 'Update' };
   }
 
   _onChange(newsletter) {
-    const submitLabel = newsletter.address ? 'Send' : 'Update';
-    this.setState({ newsletter, submitLabel });
+    this.setState({ newsletter });
   }
 
   _onCopy(event) {
@@ -36,7 +34,6 @@ export default class NewsletterEdit extends Component {
 
   render() {
     const { params } = this.props;
-    const { submitLabel } = this.state;
     const copyControl = (
       <Button label="Copy" secondary={true} onClick={this._onCopy} />
     );
@@ -44,7 +41,7 @@ export default class NewsletterEdit extends Component {
       <Edit title="Edit Newsletter" category="newsletters" params={params}
         footerActions={copyControl} removeBackLevel={1}
         FormContents={NewsletterFormContents} Preview={NewsletterPreview}
-        submitLabel={submitLabel} onChange={this._onChange} />
+        onChange={this._onChange} />
     );
   }
 }

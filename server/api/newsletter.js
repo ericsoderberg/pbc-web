@@ -160,15 +160,24 @@ ${previousMessageMarkup}
 <html>
 <head></head>
 <body>
-<div style="padding: 24px; max-width: 480px; margin: 0 auto; color: #333333;">
-<table style="max-width: 432px; width: 100%; padding-bottom: 24px; font-size: 20px;"><tbody><tr>
-<td>${newsletter.name}</td>
-<td style="text-align: right; color: #999999;">${moment(newsletter.date).format('MMM Do YYYY')}</td>
-</tr></tbody></table>
+<div style="background-color: #f2f2f2; padding: 24px;">
+<div style="padding: 24px; max-width: 480px; margin: 0 auto;
+background-color: #ffffff; color: #333333;
+font-family: 'Work Sans', Arial, sans-serif; font-size: 18px;">
+<table style="max-width: 432px; width: 100%; margin-bottom: 24px;
+font-size: 20px;">
+<tbody><tr>
+<td><strong>${newsletter.name}</strong></td>
+<td style="text-align: right; color: #999999;">
+${moment(newsletter.date).format('MMM Do YYYY')}
+</td>
+</tr></tbody>
+</table>
 ${imageMarkup}
 ${textMarkup}
 ${libraryMarkup}
 ${eventsMarkup}
+</div>
 </div>
 </body>
 </html>
