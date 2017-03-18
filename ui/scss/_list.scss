@@ -179,3 +179,44 @@ button.item__container {
   justify-content: space-between;
   align-items: center;
 }
+
+.resource-day {
+  font-size: 1.25rem;
+  font-weight: 100;
+  justify-content: flex-start;
+
+  @media all and (max-width: 699px) {
+    flex-direction: row;
+    padding: $half-unit;
+    justify-content: space-between;
+
+    > *:not(:first-child) {
+      margin-top: 0;
+    }
+
+    > *:not(:last-child) {
+      margin-right: $half-unit;
+    }
+  }
+}
+
+.resource-event {
+  justify-content: flex-start;
+
+  @media all and (max-width: 699px) {
+    flex-direction: row;
+    padding: $half-unit;
+
+    > *:not(:first-child) {
+      margin-top: 0;
+    }
+
+    > *:not(:last-child) {
+      margin-right: $half-unit;
+    }
+  }
+}
+
+.resource-event__time {
+  flex: 0 0 round($unit * 4);;
+}

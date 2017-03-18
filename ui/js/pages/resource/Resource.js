@@ -36,11 +36,6 @@ export default class Resource extends Component {
     let actions;
     if (resource) {
       contents = <ResourceContents item={resource} />;
-      // const library = message.libraryId || {};
-      // const path = `/libraries/${library.path || library._id}`;
-      // actions = [
-      //   <Link key="library" to={path}>Library</Link>,
-      // ];
     } else {
       contents = <Loading />;
     }
