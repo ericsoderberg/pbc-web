@@ -16,8 +16,8 @@
 
 .section__container--active {
   @media all and (min-width: 700px) {
-    animation: fadein 1s forwards;
-    animation-delay: 0.3s;
+    animation: fadein 0.8s forwards;
+    animation-delay: 0.2s;
   }
 }
 
@@ -494,7 +494,7 @@ a.event-section__text {
 
   @media all and (min-width: 700px) {
     transform: translateY($quadruple-unit);
-    transition: transform 1s;
+    transition: transform 0.8s;
   }
 
   .section__container--active & {

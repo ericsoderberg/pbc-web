@@ -60,7 +60,7 @@ export default class PagesSection extends Component {
     .map((context, index) => {
       const { page, pageRef } = context;
       const path = page.path ? `/${page.path}` : `/pages/${page._id}`;
-      const style = { transitionDelay: `${100 + (100 * index)}ms` };
+      const style = { transitionDelay: `${100 + (50 * index)}ms` };
       let link;
       if (pageRef.image) {
         link = (
