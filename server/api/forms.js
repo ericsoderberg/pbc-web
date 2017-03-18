@@ -1,11 +1,39 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
 import { authorize, authorizedForDomainOrSelf } from './auth';
 import { useOrCreateSession } from './sessions';
 import { unsetDomainIfNeeded } from './domains';
+import { renderNotification } from './email';
 import register from './register';
 
 mongoose.Promise = global.Promise;
+
+const SUBMIT_GERUND = {
+  Register: 'registering',
+  'Sign Up': 'signing up',
+  Submit: 'submitting',
+  Subscribe: 'subscribing',
+};
+
+const UPDATE_GERUND = {
+  Register: 'updating your registration',
+  'Sign Up': 'updating',
+  Submit: 'updating your submittal',
+  Subscribe: 'updating your subscription',
+};
+
+const SUBMIT_PAST = {
+  Register: 'registered',
+  'Sign Up': 'signed up',
+  Submit: 'submitted',
+  Subscribe: 'subscribed',
+};
+
+const UPDATE_PAST = {
+  Register: 'updated their registration',
+  'Sign Up': 'updated',
+  Submit: 'updated their submittal',
+  Subscribe: 'updated their subscription',
+};
 
 // /api/forms
 
@@ -29,7 +57,7 @@ function pullUserData(formTemplate, form) {
   return result;
 }
 
-const sendEmails = (req, transporter) => (
+const sendEmails = (req, transporter, update = false) => (
   context => (
     Promise.resolve(context)
     .then((emailContext) => {
@@ -41,24 +69,26 @@ const sendEmails = (req, transporter) => (
       // send acknowledgement, if needed
       const { session, formTemplate, form, site } = emailContext;
       if (formTemplate.acknowledge) {
+        const title = formTemplate.name;
+        let gerund;
+        if (update) {
+          gerund = UPDATE_GERUND[formTemplate.submitLabel] || UPDATE_GERUND.Submit;
+        } else {
+          gerund = SUBMIT_GERUND[formTemplate.submitLabel] || SUBMIT_GERUND.Submit;
+        }
+        let suffix = '';
+        if (formTemplate.anotherLabel && form.name) {
+          suffix = `${update ? ' for' : ''} ${form.name}`;
+        }
+        const message = `Thank you for ${gerund}${suffix}.`;
         const url = `${req.headers.origin}/forms/${form._id}/edit`;
-        const instructions =
-`### Thank you for filling out
+        const contents = renderNotification(title, message, 'Review', url);
 
-
-# [${formTemplate.name}](${url})
-
-
-### on ${moment(form.modified).format('MMMM Do YYYY')}
-
-
-${formTemplate.postSubmitMessage}
-`;
         transporter.sendMail({
           from: site.email,
           to: session.userId.email,
-          subject: 'Thank you',
-          markdown: instructions,
+          subject: title,
+          ...contents,
         }, (err, info) => {
           if (err) {
             console.error('!!! sendMail', err, info);
@@ -71,21 +101,26 @@ ${formTemplate.postSubmitMessage}
       // send notification, if needed
       const { session, formTemplate, form, site } = emailContext;
       if (formTemplate.notify) {
+        const title = formTemplate.name;
+        let past;
+        if (update) {
+          past = UPDATE_PAST[formTemplate.submitLabel] || UPDATE_PAST.Submit;
+        } else {
+          past = SUBMIT_PAST[formTemplate.submitLabel] || SUBMIT_PAST.Submit;
+        }
+        let suffix = '';
+        if (formTemplate.anotherLabel && form.name) {
+          suffix = `${update ? ' for' : ''} ${form.name}`;
+        }
+        const message =
+`${session.userId.name} (${session.userId.email}) ${past}${suffix}.`;
         const url = `${req.headers.origin}/forms/${form._id}/edit`;
-        const instructions =
-`
-# [${formTemplate.name}](${url})
-
-
-### Submitted by ${session.userId.name} (${session.userId.email}) on ${moment(form.modified).format('MMMM Do YYYY')}
-
-Just letting you know.
-`;
+        const contents = renderNotification(title, message, 'Review', url);
         transporter.sendMail({
           from: site.email,
           to: formTemplate.notify,
           subject: `${formTemplate.name} submittal`,
-          markdown: instructions,
+          ...contents,
         }, (err, info) => {
           if (err) {
             console.error('!!! sendMail', err, info);
@@ -273,7 +308,7 @@ export default function (router, transporter) {
       return form.update(data)
       .then(formUpdated => ({ ...context, form: formUpdated }));
     })
-    .then(sendEmails(req, transporter))
+    .then(sendEmails(req, transporter, true))
     .then(context => res.status(200).json(context.form))
     .catch((error) => {
       console.error('!!! post form catch', error);

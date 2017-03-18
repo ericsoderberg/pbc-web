@@ -4,6 +4,7 @@ import hat from 'hat';
 import register from './register';
 import { authorizedDomainAdministrator } from './auth';
 import { compressImage } from './image';
+import { renderNotification } from './email';
 
 mongoose.Promise = global.Promise;
 
@@ -110,30 +111,26 @@ export default function (router, transporter) {
     ))
     .then((context) => {
       const { user, site } = context;
+
       const params = [
         `token=${user.temporaryToken}`,
       ];
       if (data.returnPath) {
         params.push(`returnPath=${encodeURIComponent(data.returnPath)}`);
       }
+      const title = `Email verification for ${site.name}`;
+      const message =
+`The link below is valid for 2 hours from the time this message was sent.
+It will sign you in to the ${site.name} web site.`;
       const url =
         `${req.headers.origin}/verify-email?${params.join('&')}`;
-      const instructions =
-`## Email verification for ${site.name}
+      const contents = renderNotification(title, message, 'Verify email', url);
 
-The link below is valid for 2 hours from the time this message was sent.
-It will allow sign you in to the ${site.name} web site.
-
-
-# [Verify email](${url})
-
-
-`;
       transporter.sendMail({
         from: site.email,
         to: user.email,
-        subject: 'Verify Email',
-        markdown: instructions,
+        subject: title,
+        ...contents,
       }, (err, info) => {
         if (err) {
           console.error('!!! sendMail', err, info);
