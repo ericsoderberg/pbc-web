@@ -68,7 +68,7 @@ export default function (router) {
       const Event = mongoose.model('Event');
       const date = moment(req.query.date || undefined);
       const start = moment(date).startOf('month').startOf('week');
-      const end = moment(date).endOf('month').endOf('week');
+      const end = moment(date).startOf('month').add((req.query.months || 1), 'month').endOf('week');
       const previous = moment(date).subtract(1, 'month').startOf('month');
       const next = moment(date).add(1, 'month').startOf('month');
 

@@ -250,6 +250,9 @@ export function getCalendar(options = {}) {
   if (options.date) {
     params.push(`date=${encodeURIComponent(options.date.toISOString())}`);
   }
+  if (options.months) {
+    params.push(`months=${encodeURIComponent(options.months)}`);
+  }
   if (options.id) {
     params.push(`id=${encodeURIComponent(options.id)}`);
   }

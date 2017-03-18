@@ -8,12 +8,13 @@ import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
 import PageContext from '../page/PageContext';
+import Stored from '../../components/Stored';
 
 const LEFT_KEY = 37;
 const RIGHT_KEY = 39;
 const DATE_FORMAT = 'YYYY-MM-DD';
 
-export default class Calendar extends Component {
+class Calendar extends Component {
 
   constructor() {
     super();
@@ -23,6 +24,7 @@ export default class Calendar extends Component {
     this._onSearch = this._onSearch.bind(this);
     this._onFilter = this._onFilter.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
+    this._onMore = this._onMore.bind(this);
     this.state = {
       activeCalendars: {},
       days: {},
@@ -100,10 +102,10 @@ export default class Calendar extends Component {
 
   _load(props) {
     const { params: { id } } = props;
-    const { activeCalendars, date, searchText } = this.state;
+    const { activeCalendars, date, months, searchText } = this.state;
     this.setState({ loading: true });
     const ids = Object.keys(activeCalendars);
-    getCalendar({ date, searchText, id, ids })
+    getCalendar({ date, searchText, id, ids, months })
     .then((calendar) => {
       // structure by day to make rendering more efficient
       const days = {};
@@ -148,7 +150,7 @@ export default class Calendar extends Component {
         document.title = `${calendar.name} Calendar`;
       }
 
-      this.setState({ calendar, days, loading: false });
+      this.setState({ calendar, days, loading: false, loadingMore: false });
     })
     .catch(error => console.error('!!! Calendar get catch', error));
   }
@@ -215,6 +217,10 @@ export default class Calendar extends Component {
     this.context.router.replace({ pathname: '/calendar', search });
   }
 
+  _onMore() {
+    this.setState({ months: 3, loadingMore: true }, this._throttledLoad);
+  }
+
   _onKeyDown(event) {
     const { calendar } = this.state;
     const key = (event.keyCode ? event.keyCode : event.which);
@@ -267,19 +273,13 @@ export default class Calendar extends Component {
     const events = days[date.valueOf()];
     return (events || []).map((event) => {
       const start = moment(event.start);
-      let time;
-      if (true || start.isSame(date, 'day')) {
-        time = (
-          <span className="calendar__event-time">
-            {start.format('h:mm a')}
-          </span>
-        );
-      }
 
       return (
         <li key={event._id} className="calendar__event">
           <Link to={`/events/${event.path || event._id}`}>
-            {time}
+            <span className="calendar__event-time">
+              {start.format('h:mm a')}
+            </span>
             <span className="calendar__event-name">{event.name}</span>
           </Link>
         </li>
@@ -314,6 +314,9 @@ export default class Calendar extends Component {
       if (dayEvents.length === 0) {
         classNames.push('calendar__day--empty');
       }
+      if (date.date() === 1) {
+        classNames.push('calendar__day--first');
+      }
 
       const path = ((calendar.path || calendar._id) ?
         `/calendars/${calendar.path || calendar._id}` : '/calendar') +
@@ -328,7 +331,9 @@ export default class Calendar extends Component {
             <span className="calendar__day-date-month">
               {date.format('MMMM')}
             </span>
-            {date.format('D')}
+            <span className="calendar__day-date-day">
+              {date.format('D')}
+            </span>
           </Link>
           <ol className="calendar__events">
             {dayEvents}
@@ -373,8 +378,8 @@ export default class Calendar extends Component {
   }
 
   render() {
-    const { params: { id } } = this.props;
-    const { calendar, filterActive, searchText, loading } = this.state;
+    const { params: { id }, session } = this.props;
+    const { calendar, filterActive, loadingMore, searchText, loading } = this.state;
 
     let contents;
     if (calendar) {
@@ -435,6 +440,13 @@ export default class Calendar extends Component {
         today = <a onClick={this._changeDate(moment())}>Today</a>;
       }
 
+      let more;
+      if (loadingMore) {
+        more = <Loading />;
+      } else if (session && session.userId.administrator && weeks && weeks.length < 7) {
+        more = <Button plain={true} onClick={this._onMore}>more</Button>;
+      }
+
       let pageContext;
       if (id && calendar) {
         pageContext = (
@@ -475,6 +487,7 @@ export default class Calendar extends Component {
             </div>
             {weeks}
           </div>
+          {more}
           {pageContext}
         </main>
       );
@@ -493,8 +506,24 @@ Calendar.propTypes = {
   params: PropTypes.shape({
     id: PropTypes.string,
   }).isRequired,
+  session: PropTypes.shape({
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      administratorDomainId: PropTypes.string,
+    }),
+  }),
+};
+
+Calendar.defaultProps = {
+  session: undefined,
 };
 
 Calendar.contextTypes = {
   router: PropTypes.any,
 };
+
+const select = state => ({
+  session: state.session,
+});
+
+export default Stored(Calendar, select);

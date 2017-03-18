@@ -142,6 +142,12 @@
   }
 }
 
+.calendar__day--first {
+  .calendar__day-date-month {
+    display: inline;
+  }
+}
+
 .calendar__day-date-weekday {
   margin-right: $quarter-unit;
   display: none;
