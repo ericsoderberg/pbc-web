@@ -80,7 +80,7 @@ class List extends Component {
     const searchParams = [];
 
     const searchText = options.searchText !== undefined ? options.searchText :
-      (this.state.searchText || undefined);
+      (this.state.searchText !== undefined ? this.state.searchText : undefined);
     if (searchText) {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }

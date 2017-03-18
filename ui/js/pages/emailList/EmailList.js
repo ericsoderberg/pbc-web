@@ -57,7 +57,8 @@ class EmailList extends Component {
     const { router } = this.context;
     const searchParams = [];
 
-    const searchText = options.searchText || this.state.searchText || undefined;
+    const searchText = options.searchText !== undefined ? options.searchText :
+      (this.state.searchText !== undefined ? this.state.searchText : undefined);
     if (searchText) {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
