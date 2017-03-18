@@ -274,9 +274,7 @@ VerifyEmail.propTypes = {
   onSignIn: PropTypes.func,
   onSignUp: PropTypes.func,
   returnPath: PropTypes.string,
-  session: PropTypes.shape({
-    name: PropTypes.string,
-  }),
+  session: PropTypes.object,
 };
 
 VerifyEmail.defaultProps = {

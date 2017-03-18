@@ -14,6 +14,7 @@ import EmailListAdd from './pages/emailList/EmailListAdd';
 import EmailList from './pages/emailList/EmailList';
 import EmailListEdit from './pages/emailList/EmailListEdit';
 import EmailListSubscribe from './pages/emailList/EmailListSubscribe';
+import EmailListUnsubscribe from './pages/emailList/EmailListUnsubscribe';
 import Events from './pages/event/Events';
 import EventAdd from './pages/event/EventAdd';
 import Event from './pages/event/Event';
@@ -117,7 +118,8 @@ export default {
     { path: 'email-lists/add', component: EmailListAdd, onEnter: requireSession },
     { path: 'email-lists/:id', component: EmailList, onEnter: requireSession },
     { path: 'email-lists/:id/edit', component: EmailListEdit, onEnter: requireSession },
-    { path: 'email-lists/:id/subscribe', component: EmailListSubscribe },
+    { path: 'email-lists/:name/subscribe', component: EmailListSubscribe },
+    { path: 'email-lists/:name/unsubscribe', component: EmailListUnsubscribe },
     { path: 'email-lists', component: EmailLists },
     { path: 'newsletters/add', component: NewsletterAdd, onEnter: requireSession },
     { path: 'newsletters/:id', component: Newsletter, onEnter: requireSession },

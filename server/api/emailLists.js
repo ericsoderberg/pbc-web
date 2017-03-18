@@ -179,8 +179,12 @@ export default function (router) {
         typeof a === 'string' ? { address: a } : a
       ));
       addresses.forEach((address) => {
-        if (!doc.addresses.some(a => a.address === address.address)) {
-          doc.addresses.push(address);
+        if (!doc.addresses.some(a =>
+          a.address.toLowerCase() === address.address.toLowerCase())) {
+          doc.addresses.push({
+            ...address,
+            address: address.address.toLowerCase(),
+          });
         }
       });
       doc.modified = new Date();
@@ -188,7 +192,10 @@ export default function (router) {
     })
     .then(doc => addAddresses(doc.name, req.body))
     .then(() => res.status(200).send())
-    .catch(error => res.status(400).json(error));
+    .catch((error) => {
+      console.error('!!!', error);
+      res.status(400).json(error);
+    });
   });
 
   router.post('/email-lists/:id/unsubscribe', (req, res) => {
@@ -205,13 +212,17 @@ export default function (router) {
       ));
       addresses.forEach((address) => {
         doc.addresses =
-          doc.addresses.filter(a => a.address !== address.address);
+          doc.addresses.filter(a =>
+            a.address.toLowerCase() !== address.address.toLowerCase());
       });
       doc.modified = new Date();
       return doc.save();
     })
     .then(doc => removeAddresses(doc.name, req.body))
     .then(() => res.status(200).send())
-    .catch(error => res.status(400).json(error));
+    .catch((error) => {
+      console.error('!!!', error);
+      res.status(400).json(error);
+    });
   });
 }

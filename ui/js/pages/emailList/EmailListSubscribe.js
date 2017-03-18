@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { getItem, postSubscribe } from '../../actions';
+import { getItems, postSubscribe } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
@@ -19,9 +19,9 @@ export default class EmailListSubscribe extends Component {
   }
 
   _loadEmailList() {
-    const { params: { id } } = this.props;
-    getItem('email-lists', id)
-    .then(emailList => this.setState({ emailList }))
+    const { params: { name } } = this.props;
+    getItems('email-lists', { filter: { name } })
+    .then(emailLists => this.setState({ emailList: emailLists[0] }))
     .catch(error => console.error('!!! EmailListSubscribe catch', error));
   }
 
@@ -80,7 +80,7 @@ export default class EmailListSubscribe extends Component {
 
 EmailListSubscribe.propTypes = {
   params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
   }).isRequired,
 };
 

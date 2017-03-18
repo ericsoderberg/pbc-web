@@ -95,10 +95,10 @@ class EmailList extends Component {
       if (session && (session.userId.administrator ||
         session.userId.administratorDomainId === emailList.domainId)) {
         actions.push(
-          <Link key="add" to={`/email-lists/${emailList._id}/subscribe`}>
+          <Link key="add" to={`/email-lists/${emailList.name}/subscribe`}>
             Subscribe
           </Link>,
-          <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
+          <Link key="edit" to={`/email-lists/${emailList.name}/edit`}>
             Edit
           </Link>,
         );

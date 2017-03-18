@@ -79,7 +79,7 @@ export default function (router, transporter) {
       const newsletter = new Newsletter(req.body);
       return populateNewsletterForRendering(newsletter);
     })
-    .then(newsletter => renderNewsletter(newsletter, `${req.headers.origin}`))
+    .then(newsletter => renderNewsletter(newsletter, `${req.headers.origin}`, ''))
     .then(markup => res.send(markup))
     .catch((error) => {
       console.error('!!! error', error);
@@ -96,7 +96,7 @@ export default function (router, transporter) {
     .then(() => Newsletter.findOne({ _id: id }).exec())
     .then(newsletter => populateNewsletterForRendering(newsletter))
     .then((newsletter) => {
-      const markup = renderNewsletter(newsletter, `${req.headers.origin}`);
+      const markup = renderNewsletter(newsletter, `${req.headers.origin}`, address);
       return { newsletter, markup };
     })
     .then(context => Site.findOne({}).exec()

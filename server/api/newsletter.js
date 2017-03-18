@@ -147,7 +147,7 @@ function markupFile(file, section, urlBase) {
   `;
 }
 
-export function render(newsletter, urlBase) {
+export function render(newsletter, urlBase, address) {
   const sections = (newsletter.sections || []).map((section) => {
     switch (section.type) {
       case 'text':
@@ -205,6 +205,10 @@ ${moment(newsletter.date).format('MMM Do YYYY')}
 </table>
 ${sections}
 </div>
+<a style="font-size: 12px;"
+href="${urlBase}/email-lists/${address.split('@')[0]}/unsubscribe">
+unsubscribe
+</a>
 </div>
 </body>
 </html>
