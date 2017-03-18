@@ -84,14 +84,15 @@ function markupEvent(event, urlBase) {
     text = '<div style="padding-bottom: 24px;"></div>';
   }
   return `
-  <div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
-    ${image}
-    <a style="display: block; padding-top: 24px; padding-bottom: 24px; font-size: 18px; font-weight: 600;" href="${url}">${event.name}</a>
-    <div>${at}</div>
-    ${location}
-    ${address}
-    ${text}
-  </a>
+<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+  ${image}
+  <a style="display: block; padding-top: 24px; padding-bottom: 24px;
+  font-size: 18px; font-weight: 600;" href="${url}">${event.name}</a>
+  <div>${at}</div>
+  ${location}
+  ${address}
+  ${text}
+</a>
   `;
 }
 
@@ -116,45 +117,58 @@ function markupMessage(label, message, urlBase) {
 }
 
 export function render(newsletter, urlBase) {
-  const { events, image, nextMessage, previousMessage, text } = newsletter;
-
-  let imageMarkup = '';
-  if (image) {
-    imageMarkup = `<img style="max-width: 432px;" src="${image.data}" />`;
-  }
-
-  let textMarkup = '';
-  if (text) {
-    textMarkup = markdown.toHTML(text);
-  }
-
-  let libraryMarkup = '';
-  if (previousMessage || nextMessage) {
-    let previousMessageMarkup;
-    if (previousMessage) {
-      previousMessageMarkup =
-        markupMessage('Last week', previousMessage, urlBase);
+  const sections = (newsletter.sections || []).map((section) => {
+    switch (section.type) {
+      case 'text':
+        return markdown.toHTML(section.text);
+      case 'image':
+        return `<img style="max-width: 432px;" src="${section.image.data}" />`;
+      case 'event': {
+        const event = section.eventId;
+        return markupEvent({ ...event.toObject(), nextDates: nextDates(event) }, urlBase);
+      }
+      default:
+        return '<span>TBD</span>';
     }
+  }).join('');
 
-    let nextMessageMarkup;
-    if (nextMessage) {
-      nextMessageMarkup = markupMessage('This week', nextMessage, urlBase);
-    }
-
-    libraryMarkup = `
-<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
-${nextMessageMarkup}
-${previousMessageMarkup}
-</div>
-    `;
-  }
-
-  const eventsMarkup = events.map(event => ({
-    // decorate with nextDates
-    ...event.toObject(), nextDates: nextDates(event),
-  }))
-  // .sort(compareEvents)
-  .map(event => markupEvent(event, urlBase)).join('\n');
+//   let imageMarkup = '';
+//   if (image) {
+//     imageMarkup = `<img style="max-width: 432px;" src="${image.data}" />`;
+//   }
+//
+//   let textMarkup = '';
+//   if (text) {
+//     textMarkup = markdown.toHTML(text);
+//   }
+//
+//   let libraryMarkup = '';
+//   if (previousMessage || nextMessage) {
+//     let previousMessageMarkup;
+//     if (previousMessage) {
+//       previousMessageMarkup =
+//         markupMessage('Last week', previousMessage, urlBase);
+//     }
+//
+//     let nextMessageMarkup;
+//     if (nextMessage) {
+//       nextMessageMarkup = markupMessage('This week', nextMessage, urlBase);
+//     }
+//
+//     libraryMarkup = `
+// <div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+// ${nextMessageMarkup}
+// ${previousMessageMarkup}
+// </div>
+//     `;
+//   }
+//
+//   const eventsMarkup = events.map(event => ({
+//     // decorate with nextDates
+//     ...event.toObject(), nextDates: nextDates(event),
+//   }))
+//   // .sort(compareEvents)
+//   .map(event => markupEvent(event, urlBase)).join('\n');
 
   return `
 <html>
@@ -162,6 +176,7 @@ ${previousMessageMarkup}
 <body>
 <div style="background-color: #f2f2f2; padding: 24px;">
 <div style="padding: 24px; max-width: 480px; margin: 0 auto;
+box-sizing: border-box;
 background-color: #ffffff; color: #333333;
 font-family: 'Work Sans', Arial, sans-serif; font-size: 18px;">
 <table style="max-width: 432px; width: 100%; margin-bottom: 24px;
@@ -173,10 +188,7 @@ ${moment(newsletter.date).format('MMM Do YYYY')}
 </td>
 </tr></tbody>
 </table>
-${imageMarkup}
-${textMarkup}
-${libraryMarkup}
-${eventsMarkup}
+${sections}
 </div>
 </div>
 </body>

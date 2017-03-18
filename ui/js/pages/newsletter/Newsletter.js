@@ -72,7 +72,7 @@ export default class Newsletter extends Component {
           </form>
         </div>
       );
-      contents = <NewsletterContents item={newsletter} once={true} />;
+      contents = <NewsletterContents item={newsletter} reload={false} />;
     } else {
       contents = <Loading />;
     }

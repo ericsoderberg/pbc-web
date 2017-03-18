@@ -14,7 +14,7 @@ export default class NewsletterContents extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.once && this.props.item) {
+    if (nextProps.reload && this.props.item) {
       this._load(nextProps);
     }
   }
@@ -44,9 +44,9 @@ export default class NewsletterContents extends Component {
 
 NewsletterContents.propTypes = {
   item: PropTypes.object.isRequired,
-  once: PropTypes.boolean,
+  reload: PropTypes.bool,
 };
 
 NewsletterContents.defaultProps = {
-  once: false,
+  reload: true,
 };

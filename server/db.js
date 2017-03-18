@@ -453,18 +453,31 @@ const siteSchema = Schema({
 
 mongoose.model('Site', siteSchema);
 
+const newsletterSectionSchema = Schema({
+  type: { type: String },
+  ...sectionDef,
+  ...textSectionDef,
+  ...imageSectionDef,
+  ...calendarSectionDef,
+  ...eventSectionDef,
+  ...librarySectionDef,
+  ...pagesSectionDef,
+  ...filesSectionDef,
+});
+
 const newsletterSchema = Schema({
   // address: String,
   // calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
   created: Date,
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  eventIds: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
-  image,
-  libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
+  // eventIds: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
+  // image,
+  // libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },
   modified: Date,
   name: { type: String, required: true },
-  text: String,
+  sections: [newsletterSectionSchema],
+  // text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 

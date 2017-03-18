@@ -17,44 +17,60 @@ const unsetReferences = (data) => {
 };
 
 const populateNewsletterForRendering = (newsletter) => {
-  const Message = mongoose.model('Message');
   const Event = mongoose.model('Event');
-  const messageFields = 'name verses date path author';
+  // const Message = mongoose.model('Message');
+  // const messageFields = 'name verses date path author';
 
-  // nextMessage
-  let nextPromise;
-  if (newsletter.date && newsletter.libraryId) {
-    nextPromise = Message.find({
-      libraryId: newsletter.libraryId,
-      date: { $gt: newsletter.date },
-      series: { $ne: true },
-    })
-    .sort('date').limit(1).select(messageFields)
-    .exec();
-  } else {
-    nextPromise = Promise.resolve([]);
-  }
-
-  // previousMessage
-  let previousPromise;
-  if (newsletter.date && newsletter.libraryId) {
-    previousPromise = Message.find({
-      libraryId: newsletter.libraryId,
-      date: { $lt: newsletter.date },
-      series: { $ne: true },
-    })
-    .sort('-date').limit(1).select(messageFields)
-    .exec();
-  } else {
-    previousPromise = Promise.resolve([]);
-  }
-
-  // events
-  const eventPromises = [];
-  (newsletter.eventIds || []).forEach((eventId) => {
-    const promise = Event.findOne({ _id: eventId }).exec();
-    eventPromises.push(promise);
+  return Promise.all(newsletter.sections.map((section) => {
+    switch (section.type) {
+      case 'text': return section;
+      case 'image': return section;
+      case 'event': return Event.findOne({ _id: section.eventId },
+        'name start end location times image dates')
+      .then(event => ({ ...section.toObject(), eventId: event }));
+      default: return section;
+    }
+  }))
+  .then((sections) => {
+    newsletter.sections = sections;
+    return newsletter;
   });
+
+  // // nextMessage
+  // let nextPromise;
+  // if (newsletter.date && newsletter.libraryId) {
+  //   nextPromise = Message.find({
+  //     libraryId: newsletter.libraryId,
+  //     date: { $gt: newsletter.date },
+  //     series: { $ne: true },
+  //   })
+  //   .sort('date').limit(1).select(messageFields)
+  //   .exec();
+  // } else {
+  //   nextPromise = Promise.resolve([]);
+  // }
+  //
+  // // previousMessage
+  // let previousPromise;
+  // if (newsletter.date && newsletter.libraryId) {
+  //   previousPromise = Message.find({
+  //     libraryId: newsletter.libraryId,
+  //     date: { $lt: newsletter.date },
+  //     series: { $ne: true },
+  //   })
+  //   .sort('-date').limit(1).select(messageFields)
+  //   .exec();
+  // } else {
+  //   previousPromise = Promise.resolve([]);
+  // }
+  //
+  // // events
+  // const eventPromises = [];
+  // (newsletter.eventIds || []).forEach((eventId) => {
+  //   const promise = Event.findOne({ _id: eventId }).exec();
+  //   eventPromises.push(promise);
+  // });
+
   // if (newsletter.date && newsletter.calendarId) {
   //   const start = moment(newsletter.date);
   //   const end = moment(start).add(2, 'months');
@@ -70,45 +86,16 @@ const populateNewsletterForRendering = (newsletter) => {
   //   eventsPromise = Promise.resolve([]);
   // }
 
-  return Promise.all([Promise.resolve(newsletter), nextPromise,
-    previousPromise, Promise.all(eventPromises)])
-  .then((docs) => {
-    const newsletterData = docs[0].toObject();
-    newsletterData.nextMessage = docs[1][0];
-    newsletterData.previousMessage = docs[2][0];
-    newsletterData.events = docs[3];
-    return newsletterData;
-  });
+  // return Promise.all([Promise.resolve(newsletter), nextPromise,
+  //   previousPromise, Promise.all(eventPromises)])
+  // .then((docs) => {
+  //   const newsletterData = docs[0].toObject();
+  //   newsletterData.nextMessage = docs[1][0];
+  //   newsletterData.previousMessage = docs[2][0];
+  //   newsletterData.events = docs[3];
+  //   return newsletterData;
+  // });
 };
-
-// const send = (data, req, transporter) => {
-//   if (data.address) {
-//     // console.log('!!! send to', data.address);
-//     const urlBase = `${req.headers.origin}`;
-//     const Site = mongoose.model('Site');
-//     return populateNewsletterForRendering(data)
-//     .then(newsletterData => renderNewsletter(newsletterData, urlBase))
-//     .then(markup => (
-//       Site.findOne({}).exec()
-//       .then(site => ({ markup, site }))
-//     ))
-//     .then((context) => {
-//       const { markup, site } = context;
-//       transporter.sendMail({
-//         from: site.email,
-//         to: data.address,
-//         subject: data.name,
-//         html: markup,
-//       }, (err, info) => {
-//         if (err) {
-//           console.error('!!! sendMail', err, info);
-//         }
-//       });
-//     })
-//     .then(() => data);
-//   }
-//   return data;
-// };
 
 export default function (router, transporter) {
   router.post('/newsletters/render', (req, res) => {

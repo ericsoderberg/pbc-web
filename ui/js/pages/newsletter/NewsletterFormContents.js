@@ -2,11 +2,13 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
-import FormFieldAdd from '../../components/FormFieldAdd';
+import SectionsFormContents from '../../components/SectionsFormContents';
 import DateInput from '../../components/DateInput';
-import ImageField from '../../components/ImageField';
-import SelectSearch from '../../components/SelectSearch';
-import TrashIcon from '../../icons/Trash';
+
+const SECTION_TYPES = [
+  'text', 'image', 'event', 'calendar', 'library',
+  'people', 'pages', 'files',
+];
 
 export default class NewsletterFormContents extends Component {
 
@@ -15,21 +17,11 @@ export default class NewsletterFormContents extends Component {
     this._onAddEvent = this._onAddEvent.bind(this);
     this._changeEvent = this._changeEvent.bind(this);
     this._removeEvent = this._removeEvent.bind(this);
-    this.state = { libraries: [], calendars: [], domains: [] };
+    this.state = { domains: [] };
   }
 
   componentDidMount() {
     const { formState, session } = this.props;
-
-    getItems('libraries', { sort: 'name' })
-    .then(libraries => this.setState({ libraries }))
-    .catch(error => console.error('NewsletterFormContents libraries catch',
-      error));
-
-    getItems('calendars', { sort: 'name' })
-    .then(calendars => this.setState({ calendars }))
-    .catch(error => console.error('NewsletterFormContents calendars catch',
-      error));
 
     if (session.userId.administrator) {
       getItems('domains', { sort: 'name' })
@@ -68,18 +60,9 @@ export default class NewsletterFormContents extends Component {
 
   render() {
     const { className, formState, session } = this.props;
-    const { calendars, domains, libraries } = this.state;
+    const { domains } = this.state;
     const newsletter = formState.object;
 
-    const libraryOptions = libraries.map(library => (
-      <option key={library._id} label={library.name} value={library._id} />
-    ));
-    libraryOptions.unshift(<option key={0} />);
-
-    const calendarOptions = calendars.map(calendar => (
-      <option key={calendar._id} label={calendar.name} value={calendar._id} />
-    ));
-    calendarOptions.unshift(<option key={0} />);
 
     let administeredBy;
     if (session.userId.administrator) {
@@ -97,21 +80,6 @@ export default class NewsletterFormContents extends Component {
       );
     }
 
-    const events = (newsletter.eventIds || []).map((eventId, index) => {
-      const removeControl = (
-        <button type="button" className="button-icon"
-          onClick={this._removeEvent(index)}>
-          <TrashIcon secondary={true} />
-        </button>
-      );
-      return (
-        <FormField key={eventId._id} label="Event" closeControl={removeControl}>
-          <SelectSearch category="events" value={eventId.name || ''}
-            onChange={this._changeEvent(index)} />
-        </FormField>
-      );
-    });
-
     return (
       <div className={className}>
         <fieldset className="form__fields">
@@ -123,26 +91,8 @@ export default class NewsletterFormContents extends Component {
             <DateInput value={newsletter.date || ''}
               onChange={formState.change('date')} />
           </FormField>
-          <ImageField label="Image" name="image"
-            formState={formState} property="image" />
-          <FormField label="Text">
-            <textarea name="text" value={newsletter.text || ''} rows={4}
-              onChange={formState.change('text')} />
-          </FormField>
-          <FormField label="Library">
-            <select name="libraryId" value={newsletter.libraryId || ''}
-              onChange={formState.change('libraryId')}>
-              {libraryOptions}
-            </select>
-          </FormField>
-          {events}
-          <FormFieldAdd>
-            <button type="button" className="button button--secondary"
-              onClick={this._onAddEvent}>
-              Add event
-            </button>
-          </FormFieldAdd>
         </fieldset>
+        <SectionsFormContents formState={formState} types={SECTION_TYPES} />
         <fieldset className="form__fields">
           {administeredBy}
         </fieldset>
