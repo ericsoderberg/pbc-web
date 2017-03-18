@@ -153,7 +153,8 @@ export default class SelectSearch extends Component {
           <input className="select-search__value" disabled={true}
             placeholder={placeholder} value={value} />
           {clearControl}
-          <Button className="select-search__control" icon={<Icon />} />
+          <Button className="select-search__control"
+            icon={<Icon className="select-search__control-icon" />} />
         </div>
         {details}
       </div>

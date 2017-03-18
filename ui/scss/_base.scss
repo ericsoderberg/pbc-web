@@ -195,6 +195,16 @@ a,
   color: $secondary-color;
 }
 
+.button__indicator.control-icon {
+  width: $third-unit + $third-unit;
+  height: $third-unit + $third-unit;
+  stroke: #E3A235; // TODO: use site/page color
+
+  path {
+    stroke-width: 6px;
+  }
+}
+
 input,
 textarea,
 select {

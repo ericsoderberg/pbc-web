@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
-import DownIcon from '../icons/Down';
-import UpIcon from '../icons/Up';
+import DownIcon from '../icons/DownArrow';
+import UpIcon from '../icons/UpArrow';
+import BlankIcon from '../icons/Blank';
 import TrashIcon from '../icons/Trash';
 import TextSectionEdit from './TextSectionEdit';
 import ImageSectionEdit from './ImageSectionEdit';
@@ -66,6 +67,12 @@ export default class SectionFormContents extends Component {
         <button type="button" className="button-icon"
           onClick={formState.swapWith('sections', index, index + 1)}>
           <DownIcon />
+        </button>
+      );
+    } else {
+      lower = (
+        <button type="button" className="button-icon">
+          <BlankIcon />
         </button>
       );
     }

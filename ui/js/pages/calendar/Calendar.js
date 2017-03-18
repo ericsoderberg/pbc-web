@@ -410,7 +410,7 @@ class Calendar extends Component {
             <div className="calendar__header">
               <button type="button" className="button-icon"
                 onClick={this._changeDate(moment(calendar.previous))}>
-                <LeftIcon />
+                <LeftIcon className="button__indicator" />
               </button>
               <span>
                 <select value={moment(calendar.date).format('MMMM')}
@@ -424,7 +424,7 @@ class Calendar extends Component {
               </span>
               <button type="button" className="button-icon"
                 onClick={this._changeDate(moment(calendar.next))}>
-                <RightIcon />
+                <RightIcon className="button__indicator" />
               </button>
             </div>
             <div className="calendar__week calendar__week--header">

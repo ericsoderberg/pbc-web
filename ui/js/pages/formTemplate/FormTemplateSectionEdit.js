@@ -3,8 +3,9 @@ import React, { Component, PropTypes } from 'react';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
+import DownIcon from '../../icons/DownArrow';
+import UpIcon from '../../icons/UpArrow';
+import BlankIcon from '../../icons/Blank';
 import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateFieldEdit from './FormTemplateFieldEdit';
@@ -107,18 +108,30 @@ export default class FormTemplateSectionEdit extends Component {
     }
 
     const fields = (section.fields || []).map((field, index) => {
-      const raise = (index === 0 ? undefined : (
-        <button type="button" className="button-icon"
-          onClick={formState.swapWith('fields', index, index - 1)}>
-          <UpIcon />
-        </button>
-      ));
-      const lower = (index === (section.fields.length - 1) ? undefined : (
-        <button type="button" className="button-icon"
-          onClick={formState.swapWith('fields', index, index + 1)}>
-          <DownIcon />
-        </button>
-        ));
+      let raise;
+      if (index !== 0) {
+        raise = (
+          <button type="button" className="button-icon"
+            onClick={formState.swapWith('fields', index, index - 1)}>
+            <UpIcon />
+          </button>
+        );
+      }
+      let lower;
+      if (index < (section.fields.length - 1)) {
+        lower = (
+          <button type="button" className="button-icon"
+            onClick={formState.swapWith('fields', index, index + 1)}>
+            <DownIcon />
+          </button>
+        );
+      } else {
+        lower = (
+          <button type="button" className="button-icon">
+            <BlankIcon />
+          </button>
+        );
+      }
 
       let edit;
       if (expandedFields[field._id] || expandedFields[field.id]) {

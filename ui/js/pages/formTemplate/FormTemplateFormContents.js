@@ -6,8 +6,9 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import SelectSearch from '../../components/SelectSearch';
 import Button from '../../components/Button';
 import TextHelp from '../../components/TextHelp';
-import DownIcon from '../../icons/Down';
-import UpIcon from '../../icons/Up';
+import DownIcon from '../../icons/DownArrow';
+import UpIcon from '../../icons/UpArrow';
+import BlankIcon from '../../icons/Blank';
 import TrashIcon from '../../icons/Trash';
 import FormTemplateSectionEdit from './FormTemplateSectionEdit';
 
@@ -102,19 +103,30 @@ export default class FormTemplateFormContents extends Component {
     const sections = (formTemplate.sections || []).map((section, index) => {
       let sectionClassName;
 
-      const raise = (index === 0 ? undefined : (
-        <button type="button" className="button-icon"
-          onClick={formState.swapWith('sections', index, index - 1)}>
-          <UpIcon />
-        </button>
-      ));
-      const lower = (index === (formTemplate.sections.length - 1) ?
-        undefined : (
+      let raise;
+      if (index !== 0) {
+        raise = (
+          <button type="button" className="button-icon"
+            onClick={formState.swapWith('sections', index, index - 1)}>
+            <UpIcon />
+          </button>
+        );
+      }
+      let lower;
+      if (index < (formTemplate.sections.length - 1)) {
+        lower = (
           <button type="button" className="button-icon"
             onClick={formState.swapWith('sections', index, index + 1)}>
             <DownIcon />
           </button>
-        ));
+        );
+      } else {
+        lower = (
+          <button type="button" className="button-icon">
+            <BlankIcon />
+          </button>
+        );
+      }
 
       let header;
       if (formTemplate.sections.length > 1) {

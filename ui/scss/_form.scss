@@ -690,24 +690,6 @@
   transform: translate(-50%, -50%);
 }
 
-// .date-time__time {
-//   display: flex;
-//   flex-direction: row;
-//   justify-content: center;
-//   padding: $half-unit 0;
-//   font-size: 1.125rem;;
-//   font-weight: 700;
-// }
-//
-// .date-time__time-select {
-//   display: flex;
-//   flex-direction: column;
-//   margin: 0 $quarter-unit;
-// }
-//
-// .date-time__time-element {
-//   margin: $quarter-unit 0;
-// }
 
 // select-search
 
@@ -715,6 +697,11 @@
   position: relative;
   display: inline-block;
   flex: 1;
+}
+
+.select-search__control-icon.control-icon {
+  width: $third-unit + $third-unit;
+  height: $third-unit + $third-unit;
 }
 
 .select-search__value {
