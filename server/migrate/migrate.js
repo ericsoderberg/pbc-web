@@ -15,15 +15,15 @@ import results from './results';
 mongoose.Promise = global.Promise;
 
 Promise.resolve()
-.then(() => users())
-.then(() => messages())
+// .then(() => users())
+// .then(() => messages())
 // .then(() => libraries())
 // .then(() => events())
-.then(() => forms())
+// .then(() => forms())
 // .then(() => pages())
 // .then(() => calendars())
 // .then(() => domains())
-.then(() => emailLists())
+// .then(() => emailLists())
 .then(() => console.log(results.log()))
 .then(() => console.log(`Finished`))
 .catch(error => console.log(error));

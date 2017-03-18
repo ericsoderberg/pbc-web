@@ -19,7 +19,9 @@ export default function () {
   })
   .then((listNames) => {
     let emailListPromise = Promise.resolve();
-    listNames.filter(listName => listName).forEach((listName) => {
+    listNames.filter(listName => listName)
+    .filter(listName => listName !== 'primetime_community')
+    .forEach((listName) => {
       // process email lists sequentially
       emailListPromise = emailListPromise
       // get EmailList
