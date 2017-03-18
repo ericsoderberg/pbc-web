@@ -29,6 +29,9 @@ export default class EmailLists extends List {}
 EmailLists.defaultProps = {
   ...List.defaultProps,
   category: 'email-lists',
+  filters: [
+    { property: 'addresses.address', category: 'users', allLabel: 'All' },
+  ],
   Item,
   path: '/email-lists',
   select: 'name path',

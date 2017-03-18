@@ -699,7 +699,12 @@
   flex: 1;
 }
 
-.select-search__control-icon.control-icon {
+.select-search__clear {
+  position: relative;
+}
+
+.select-search__control-icon.control-icon,
+.select-search__clear-icon.control-icon {
   width: $third-unit + $third-unit;
   height: $third-unit + $third-unit;
 }

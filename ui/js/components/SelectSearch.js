@@ -67,7 +67,8 @@ export default class SelectSearch extends Component {
     };
   }
 
-  _onClear() {
+  _onClear(event) {
+    event.stopPropagation();
     this.setState({ active: false });
     this.props.onChange(undefined);
   }
@@ -120,7 +121,8 @@ export default class SelectSearch extends Component {
     let clearControl;
     if (clearable && value) {
       clearControl = (
-        <Button className="select-search__clear" icon={<CloseIcon />}
+        <Button className="select-search__clear"
+          icon={<CloseIcon className="select-search__clear-icon" />}
           onClick={this._onClear} />
       );
     }

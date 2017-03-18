@@ -7,6 +7,8 @@ import SelectSearch from './SelectSearch';
 import Stored from './Stored';
 import Loading from './Loading';
 
+const UNSET = '$unset';
+
 class List extends Component {
 
   constructor(props) {
@@ -93,11 +95,13 @@ class List extends Component {
         let value;
         let name;
         if (options[property]) {
-          if (typeof options[property] === 'object') {
-            value = options[property]._id;
-            name = options[property].name;
-          } else {
-            value = options[property];
+          if (options[property] !== UNSET) {
+            if (typeof options[property] === 'object') {
+              value = options[property]._id;
+              name = options[property].name;
+            } else {
+              value = options[property];
+            }
           }
         } else if (this.state.filter[property]) {
           value = this.state.filter[property];
@@ -161,7 +165,7 @@ class List extends Component {
     return (event) => {
       let value = event.target.value;
       if (value.match(/^all$/i)) {
-        value = undefined;
+        value = UNSET;
       }
       const options = {};
       options[property] = value;
@@ -172,7 +176,7 @@ class List extends Component {
   _select(property) {
     return (suggestion) => {
       const options = {};
-      options[property] = suggestion;
+      options[property] = suggestion || UNSET;
       this._setLocation(options);
     };
   }
