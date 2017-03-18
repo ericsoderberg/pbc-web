@@ -107,50 +107,10 @@ class Calendar extends Component {
     const ids = Object.keys(activeCalendars);
     getCalendar({ date, searchText, id, ids, months })
     .then((calendar) => {
-      // structure by day to make rendering more efficient
-      const days = {};
-      calendar.events.forEach((event) => {
-        const day = moment(event.start).startOf('day').valueOf();
-        if (!days[day]) {
-          days[day] = [];
-        }
-        days[day].push(event);
-        if (event.dates) {
-          event.dates.forEach((eventDate) => {
-            const day2 = moment(eventDate).startOf('day').valueOf();
-            if (day2 !== day) {
-              if (!days[day2]) {
-                days[day2] = [];
-              }
-              days[day2].push(event);
-            }
-          });
-        }
-      });
-
-      // sort days
-      Object.keys(days).forEach((day) => {
-        days[day].sort((e1, e2) => {
-          const m1 = moment(e1.start);
-          const m2 = moment(e2.start);
-          if (m1.hours() < m2.hours()) {
-            return -1;
-          } else if (m1.hours() > m2.hours()) {
-            return 1;
-          } else if (m1.minutes() < m2.minutes()) {
-            return -1;
-          } else if (m1.minutes() > m2.minutes()) {
-            return 1;
-          }
-          return 0;
-        });
-      });
-
       if (calendar.name) {
         document.title = `${calendar.name} Calendar`;
       }
-
-      this.setState({ calendar, days, loading: false, loadingMore: false });
+      this.setState({ calendar, loading: false, loadingMore: false });
     })
     .catch(error => console.error('!!! Calendar get catch', error));
   }
@@ -256,99 +216,85 @@ class Calendar extends Component {
     return result;
   }
 
-  _renderWeek(days, date, focus) {
-    const classNames = ['calendar__week'];
-    if (focus && date.isSame(focus, 'week')) {
-      classNames.push('calendar__week--focus');
-    }
+  _renderEvent(event) {
     return (
-      <div key={date.valueOf()} className={classNames.join(' ')}>
-        {days}
+      <li key={event.id} className="calendar__event">
+        <Link to={`/events/${event.path || event._id}`}>
+          <span className="calendar__event-time">
+            {moment(event.start).format('h:mm a')}
+          </span>
+          <span className="calendar__event-name">{event.name}</span>
+        </Link>
+      </li>
+    );
+  }
+
+  _renderDay(day) {
+    const { calendar, date: referenceDate, focus } = this.state;
+    const { events } = day;
+    const date = moment(day.date);
+
+    const dayClassNames = ['calendar__day'];
+    if (focus && date.isSame(focus, 'date')) {
+      dayClassNames.push('calendar__day--today');
+    }
+    if (date.month() !== referenceDate.month()) {
+      dayClassNames.push('calendar__day--alternate');
+    }
+    if (events.length === 0) {
+      dayClassNames.push('calendar__day--empty');
+    }
+    if (date.date() === 1) {
+      dayClassNames.push('calendar__day--first');
+    }
+
+    const path = `${((calendar.path || calendar._id) ?
+      `/calendars/${calendar.path || calendar._id}` : '/calendar')}
+      ?focus=${encodeURIComponent(moment(date).format(DATE_FORMAT))}`;
+
+    const eventItems = events.map(event => this._renderEvent(event));
+
+    return (
+      <div key={date.valueOf()} className={dayClassNames.join(' ')}>
+        <Link to={path} className="calendar__day-date">
+          <span className="calendar__day-date-dayofweek">
+            {date.format('dddd')}
+          </span>
+          <span className="calendar__day-date-month">
+            {date.format('MMMM')}
+          </span>
+          <span className="calendar__day-date-day">
+            {date.format('D')}
+          </span>
+        </Link>
+        <ol className="calendar__events">
+          {eventItems}
+        </ol>
       </div>
     );
   }
 
-  _renderEvents(date) {
-    const { days } = this.state;
-    const events = days[date.valueOf()];
-    return (events || []).map((event) => {
-      const start = moment(event.start);
+  _renderWeeks() {
+    const { calendar, focus } = this.state;
+    const weeks = calendar.weeks;
+
+    return weeks.map((week) => {
+      const { days } = week;
+      const startOfWeek = moment(week.startOfWeek);
+
+      const weekClassNames = ['calendar__week'];
+      if (focus && startOfWeek.isSame(focus, 'week')) {
+        weekClassNames.push('calendar__week--focus');
+      }
+
+      const dayItems = days.map(day => this._renderDay(day));
 
       return (
-        <li key={event._id} className="calendar__event">
-          <Link to={`/events/${event.path || event._id}`}>
-            <span className="calendar__event-time">
-              {start.format('h:mm a')}
-            </span>
-            <span className="calendar__event-name">{event.name}</span>
-          </Link>
-        </li>
+        <div key={startOfWeek.valueOf()} className={weekClassNames.join(' ')}>
+          {dayItems}
+        </div>
       );
     });
-  }
-
-  _renderWeeks() {
-    const { calendar, date: referenceDate, focus } = this.state;
-    const weeks = [];
-    const date = moment(calendar.start).startOf('day');
-    const end = moment(calendar.end);
-    let days;
-    let previous;
-
-    while (date.isSameOrBefore(end)) {
-      if (!previous || previous.isBefore(date, 'week')) {
-        if (previous) {
-          weeks.push(this._renderWeek(days, previous, focus));
-        }
-        days = [];
-      }
-      const dayEvents = this._renderEvents(date);
-
-      const classNames = ['calendar__day'];
-      if (focus && date.isSame(focus, 'date')) {
-        classNames.push('calendar__day--today');
-      }
-      if (date.month() !== referenceDate.month()) {
-        classNames.push('calendar__day--alternate');
-      }
-      if (dayEvents.length === 0) {
-        classNames.push('calendar__day--empty');
-      }
-      if (date.date() === 1) {
-        classNames.push('calendar__day--first');
-      }
-
-      const path = ((calendar.path || calendar._id) ?
-        `/calendars/${calendar.path || calendar._id}` : '/calendar') +
-        `?focus=${encodeURIComponent(moment(date).format(DATE_FORMAT))}`;
-
-      days.push(
-        <div key={date.valueOf()} className={classNames.join(' ')}>
-          <Link to={path} className="calendar__day-date">
-            <span className="calendar__day-date-dayofweek">
-              {date.format('dddd')}
-            </span>
-            <span className="calendar__day-date-month">
-              {date.format('MMMM')}
-            </span>
-            <span className="calendar__day-date-day">
-              {date.format('D')}
-            </span>
-          </Link>
-          <ol className="calendar__events">
-            {dayEvents}
-          </ol>
-        </div>,
-      );
-
-      previous = moment(date);
-      date.add(1, 'day');
-    }
-    if (previous) {
-      weeks.push(this._renderWeek(days, previous, focus));
-    }
-
-    return weeks;
   }
 
   _renderFilter() {
@@ -385,7 +331,7 @@ class Calendar extends Component {
     if (calendar) {
       const date = moment(calendar.date);
       const daysOfWeek = this._renderDaysOfWeek();
-      const weeks = loading ? undefined : this._renderWeeks();
+      const weeks = loading ? <Loading /> : this._renderWeeks();
 
       let filter;
       if (filterActive) {
@@ -435,10 +381,10 @@ class Calendar extends Component {
         yearDate.add(1, 'year');
       }
 
-      let today;
-      if (false && !date.isSame(now, 'date')) {
-        today = <a onClick={this._changeDate(moment())}>Today</a>;
-      }
+      // let today;
+      // if (false && !date.isSame(now, 'date')) {
+      //   today = <a onClick={this._changeDate(moment())}>Today</a>;
+      // }
 
       let more;
       if (loadingMore) {
@@ -475,7 +421,6 @@ class Calendar extends Component {
                   onChange={this._onChangeYear}>
                   {years}
                 </select>
-                {today}
               </span>
               <button type="button" className="button-icon"
                 onClick={this._changeDate(moment(calendar.next))}>
