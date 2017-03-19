@@ -36,7 +36,7 @@ const FormNumber = (props) => {
       amountClasses.push('tertiary');
     }
     contents = (
-      <div className="box--row">
+      <div className="box--row box--static">
         <span className="prefix">{prefix}</span>
         <span className="prefix">x</span>
         {contents}

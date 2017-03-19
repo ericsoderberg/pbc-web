@@ -7,6 +7,7 @@ import { getItems, getItem } from '../../actions';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import Button from '../../components/Button';
+import RightIcon from '../../icons/Right';
 // import AddIcon from '../../icons/Add';
 import FormAdd from './FormAdd';
 import FormEdit from './FormEdit';
@@ -57,7 +58,7 @@ const FormItem = (props) => {
       <div className="item item--full">
         <div>
           <button className="button button-plain" onClick={onClick}>
-            {message} {timestamp} ...
+            {message} {timestamp} <RightIcon className="button__indicator" />
           </button>
         </div>
       </div>
@@ -470,7 +471,9 @@ class FormSection extends Component {
         if (formTemplate.anotherLabel) {
           another = (
             <Button className="button form-summary__another" plain={true}
-              label={`${formTemplate.anotherLabel} ...`} onClick={this._add()} />
+              label={<span>
+                {formTemplate.anotherLabel} <RightIcon className="button__indicator" />
+              </span>} onClick={this._add()} />
           );
         // } else {
         //   addControl = (
@@ -483,7 +486,7 @@ class FormSection extends Component {
         if (paymentNeeded) {
           paymentControl = (
             <Button className="button form-summary__pay" secondary={true}
-              label={`Pay current balance of $${paymentNeeded.amount} ...`}
+              label={`Pay current balance of $${paymentNeeded.amount}`}
               onClick={this._nextState(PAYING)} />
           );
         }
