@@ -123,12 +123,23 @@ class PaymentPay extends Component {
     const payment = formState.object;
 
     let submitButton;
+    let notification;
     if (payment.method !== 'paypal') {
       submitButton = (
         <Button type="submit" label="Submit" onClick={this._onSubmit} />
       );
-    } else if (!this._paypalRendered) {
-      submitButton = <Loading />;
+    } else {
+      notification = (
+        <div className="form__text paypal-notification">
+          Unfortunately, our payment processing system is offline at the moment.
+          While we have a record of your registration, we will not be able to
+          accept payment at this time. We will notify you when we are able to
+          accept payment, hopefully within a few days.
+        </div>
+      );
+      if (!this._paypalRendered) {
+        submitButton = <Loading />;
+      }
     }
 
     return (
@@ -138,6 +149,7 @@ class PaymentPay extends Component {
         <PaymentFormContents inline={true} full={false} amount={amount}
           payByCheckInstructions={payByCheckInstructions} formIds={formIds}
           formState={formState} session={session} />
+        {notification}
         <footer className="form__footer">
           <div id="paypalButton" style={{
             display: (payment.method === 'paypal' ? 'block' : 'none') }} />
