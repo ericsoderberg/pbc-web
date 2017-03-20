@@ -642,6 +642,10 @@ a.event-section__text {
 .event-times {
   text-align: center;
 
+  .item &:last-child {
+    text-align: right;
+  }
+
   > .event-times__separator {
     display: block;
   }

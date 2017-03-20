@@ -101,17 +101,36 @@ const EventTimes = (props) => {
           <span className="event-times__separator">-</span>
           <span className="event-times__label">{formatDate(last)}</span>
         </div>,
-        <span key={2} className="event-times__separator">@</span>,
         <TimesSet key={3} start={start} end={end} />,
       ];
     } else if (weekly) {
-      contents = (
-        <div className="event-times__set">
-          <span className="event-times__label">{start.format('dddd[s]')}</span>
-          <span className="event-times__separator">@</span>
-          <span className="event-times__label">{formatTimes(start, end)}</span>
-        </div>
-      );
+      if (event.times && event.times.length > 0) {
+        // multiple times
+        const secondTime = event.times[0];
+        contents = [
+          <div key={1} className="event-times__set">
+            <span className="event-times__label">{start.format('dddd[s]')}</span>
+          </div>,
+          <div key={2} className="event-times__set">
+            <span className="event-times__label">{formatTimes(start, end)}</span>
+          </div>,
+          <div key={3} className="event-times__set">
+            <span className="event-times__label">
+              {formatTimes(moment(secondTime.start), moment(secondTime.end))}
+            </span>
+          </div>,
+        ];
+      } else {
+        // single time
+        contents = [
+          <div key={1} className="event-times__set">
+            <span className="event-times__label">{start.format('dddd[s]')}</span>
+          </div>,
+          <div key={2} className="event-times__set">
+            <span className="event-times__label">{formatTimes(start, end)}</span>
+          </div>,
+        ];
+      }
     } else if (sameDayOfWeek && dates.length > 4) {
       // not weekly, but regular enough
       // pick the next date in the future
@@ -126,13 +145,14 @@ const EventTimes = (props) => {
         nextDate = dates[dates.length - 1];
       }
 
-      contents = (
-        <div className="event-times__set">
+      contents = [
+        <div key={1} className="event-times__set">
           <span className="event-times__label">{formatDate(nextDate)}</span>
-          <span className="event-times__separator">@</span>
+        </div>,
+        <div key={2} className="event-times__set">
           <span className="event-times__label">{formatTimes(start, end)}</span>
-        </div>
-      );
+        </div>,
+      ];
     } else {
       // irreguler
       const datesString = dates.filter(date => date.isSameOrAfter(now))
@@ -143,7 +163,6 @@ const EventTimes = (props) => {
         <div key={1} className="event-times__set">
           <span className="event-times__label">{datesString}</span>
         </div>,
-        <span key={2} className="event-times__separator">@</span>,
         <TimesSet key={3} start={start} end={end} />,
       ];
     }
@@ -152,25 +171,26 @@ const EventTimes = (props) => {
     contents = [
       <div key={1} className="event-times__set">
         <span className="event-times__label">{formatDate(start)}</span>
-        <span className="event-times__separator">@</span>
+        <span className="event-times__separator" />
         <span className="event-times__label">{formatTime(start)}</span>
       </div>,
-      <span key={2} className="event-times__separator">-</span>,
+      <span key={2} className="event-times__separator">to</span>,
       <div key={3} className="event-times__set">
         <span className="event-times__label">{formatDate(end)}</span>
-        <span className="event-times__separator">@</span>
+        <span className="event-times__separator" />
         <span className="event-times__label">{formatTime(end)}</span>
       </div>,
     ];
   } else {
     // single day, non-recurring
-    contents = (
-      <div className="event-times__set">
+    contents = [
+      <div key={1} className="event-times__set">
         <span className="event-times__label">{formatDate(start)}</span>
-        <span className="event-times__separator">@</span>
+      </div>,
+      <div key={2} className="event-times__set">
         <span className="event-times__label">{formatTimes(start, end)}</span>
-      </div>
-    );
+      </div>,
+    ];
   }
 
   return <div className={classes.join(' ')}>{contents}</div>;
