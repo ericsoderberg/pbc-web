@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { getItem } from '../../actions';
-import EventTimes from '../../components/EventTimes';
+import EventTimes from './EventTimes';
 import Map from '../../components/Map';
 import RightIcon from '../../icons/Right';
 // import Button from '../../components/Button';
@@ -63,7 +63,7 @@ export default class EventSection extends Component {
           <div className="event-section__text-container">
             <div className="event-section__text" style={style}>
               <h2 className="event-section__name">{event.name}</h2>
-              <EventTimes event={event} reverse={true} size="large" />
+              <EventTimes event={event} size="large" />
               {location}
             </div>
           </div>
@@ -77,7 +77,7 @@ export default class EventSection extends Component {
                 <h2>{event.name}</h2>
                 <RightIcon className="anchor__indicator" />
               </div>
-              <EventTimes event={event} reverse={true} size="large" />
+              <EventTimes event={event} size="large" />
               {location}
             </Link>
           </div>

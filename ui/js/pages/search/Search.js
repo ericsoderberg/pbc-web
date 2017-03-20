@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { getSearch } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Text from '../../components/Text';
-import EventTimes from '../../components/EventTimes';
+import EventTimes from '../event/EventTimes';
 import Loading from '../../components/Loading';
 import { getLocationParams } from '../../utils/Params';
 

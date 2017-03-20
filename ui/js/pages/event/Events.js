@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 import List from '../../components/List';
-import EventTimes from '../../components/EventTimes';
+import EventTimes from './EventTimes';
 
 const Item = (props) => {
   const { className, item: event } = props;

@@ -330,9 +330,9 @@
     font-size: 1.75rem;
   }
 
-  .event-times > .event-times__separator {
-    display: none;
-  }
+  // .event-times > .event-times__separator {
+  //   display: none;
+  // }
 
   .event-times__dates {
     display: block;
@@ -639,18 +639,20 @@ a.event-section__text {
   }
 }
 
+.event-times {
+  text-align: center;
 
+  > .event-times__separator {
+    display: block;
+  }
+}
 
 .event-times__separator {
   margin: 0 $half-unit;
-  color: $secondary-color;
+  color: $tertiary-color;
 }
 
-.event-times__date {
-  display: inline-block;
-}
-
-.event-times__time {
+.event-times__label {
   display: inline-block;
   white-space: nowrap;
 }
