@@ -30,7 +30,7 @@ export default function (router) {
       const exp = new RegExp(req.query.search, 'i');
       pages = pages.map((doc) => {
         doc.sections = doc.sections
-        .filter(section => section.type === 'text')
+        .filter(section => section.type === 'text' && section.text)
         .map((section) => {
           // prune text down to just snippet with first match
           const index = section.text.search(exp);
