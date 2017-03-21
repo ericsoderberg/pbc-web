@@ -44,6 +44,8 @@ class FormEdit extends Component {
       if (form.linkedFormId) {
         return getItem('forms', form.linkedFormId)
         .then(linkedForm => this.setState({ linkedForm }))
+        // .then(() => form)
+        .catch(error => console.error('!!! FormEdit linked catch', error))
         .then(() => form);
       }
       return form;

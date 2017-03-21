@@ -88,6 +88,7 @@ export default class FormTemplate extends Component {
       });
       return { formTemplate };
     })
+    // TODO: refactor to put linked form/field stuff on server side
     .then((context) => {
       const { formTemplate } = context;
       if (formTemplate.linkedFormTemplateId) {
@@ -95,10 +96,13 @@ export default class FormTemplate extends Component {
         return getItems('forms', {
           filter: { formTemplateId: formTemplate.linkedFormTemplateId._id },
           populate: true,
+          limit: 1000, // no limit, really need to move this server side
         })
         .then((forms) => {
           const linkedForms = {};
-          forms.forEach((form) => { linkedForms[form._id] = form; });
+          forms.forEach((form) => {
+            linkedForms[form._id] = form;
+          });
           this.setState({ linkedForms });
           return context;
         });
