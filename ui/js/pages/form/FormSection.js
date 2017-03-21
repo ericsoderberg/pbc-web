@@ -367,7 +367,10 @@ class FormSection extends Component {
     }
 
     let formTemplateLink;
-    if (session && session.userId.administrator && finalFormTemplate) {
+    if (session && finalFormTemplate &&
+      (session.userId.administrator ||
+        (session.userId.administratorDomainId &&
+          session.userId.administratorDomainId === finalFormTemplate.domainId))) {
       const formTemplatePath = `/form-templates/${finalFormTemplateId}`;
       formTemplateLink = (
         <Link className="form-summary__template" to={formTemplatePath}>
