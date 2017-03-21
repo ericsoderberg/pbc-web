@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router';
 import moment from 'moment';
-import { getItem, getItems } from '../../actions';
+import { getItem, getItems, getFormTemplateDownload } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Button from '../../components/Button';
 import DateInput from '../../components/DateInput';
@@ -21,6 +21,7 @@ export default class FormTemplate extends Component {
     super();
     this._layout = this._layout.bind(this);
     this._onScroll = this._onScroll.bind(this);
+    this._onDownload = this._onDownload.bind(this);
     this.state = { linkedForms: {}, sortReverse: false };
   }
 
@@ -145,6 +146,12 @@ export default class FormTemplate extends Component {
         }
       }
     }
+  }
+
+  _onDownload(event) {
+    const { params: { id } } = this.props;
+    event.preventDefault();
+    getFormTemplateDownload(id);
   }
 
   _filterForms() {
@@ -463,9 +470,10 @@ export default class FormTemplate extends Component {
     );
 
     actions.push(
-      <Link key="download" to={`/form-templates/${id}/download`}>
+      <a key="download" href={`/api/form-templates/${id}.csv`}
+        onClick={this._onDownload}>
         Download
-      </Link>,
+      </a>,
     );
 
     actions.push(

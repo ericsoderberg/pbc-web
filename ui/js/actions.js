@@ -289,6 +289,13 @@ export function getResourceEvents(resource) {
   .then(response => response.json());
 }
 
+// Forms
+
+export function getFormTemplateDownload(id) {
+  return fetch(`/api/form-templates/${id}.csv`, {
+    method: 'GET', headers: _headers });
+}
+
 // Newsletter
 
 export function postNewsletterRender(newsletter) {

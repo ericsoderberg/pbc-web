@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
+import json2csv from 'json2csv';
 import register from './register';
-import { authorizedForDomain } from './auth';
+import { authorize, authorizedForDomain } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 
 mongoose.Promise = global.Promise;
@@ -37,6 +39,34 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
     value = field.value;
   }
   return value;
+};
+
+const fieldContents = (field, templateField, optionMap) => {
+  let contents = field.value;
+  if (templateField.type === 'count' || templateField.type === 'number') {
+    let prefix;
+    if (templateField.monetary) {
+      prefix = '$';
+    }
+    contents = `${prefix}${templateField.value} x ${field.value}`;
+  } else if (templateField.type === 'choice' && field.optionId) {
+    contents = optionMap[field.optionId].name;
+  } else if (templateField.type === 'choices' && field.optionIds) {
+    contents = field.optionIds.map((optionId) => {
+      const option = optionMap[optionId];
+      let suffix = '';
+      if (templateField.monetary) {
+        suffix = ` $${option.value}`;
+      }
+      return `${option.name}${suffix}`;
+    })
+    .join(', ');
+  } else if (templateField.type === 'date') {
+    contents = moment(contents).format('YYYY-MM-DD');
+  } else if (templateField.monetary) {
+    contents = `$${contents}`;
+  }
+  return contents;
 };
 
 const calculateTotals = (data) => {
@@ -109,6 +139,59 @@ const calculateTotals = (data) => {
 };
 
 export default function (router) {
+  router.get('/form-templates/:id.csv', (req, res) => {
+    authorize(req, res)
+    .then((session) => {
+      const id = req.params.id;
+      const FormTemplate = mongoose.model('FormTemplate');
+      return FormTemplate.findOne({ _id: id, ...authorizedForDomain(session) }).exec();
+    })
+    .then((formTemplate) => {
+      const Form = mongoose.model('Form');
+      return Form.find({ formTemplateId: formTemplate._id }).exec()
+      .then(forms => ({ forms, formTemplate }));
+    })
+    .then((context) => {
+      const { forms, formTemplate } = context;
+
+      const fields = [];
+      const fieldNames = [];
+      const templateFieldMap = {};
+      const optionMap = {};
+      formTemplate.sections.forEach(section =>
+        section.fields.filter(field => field.type !== 'instructions')
+        .forEach((field) => {
+          templateFieldMap[field._id] = field;
+          field.options.forEach((option) => { optionMap[option._id] = option; });
+          fields.push(`${field._id}`);
+          fieldNames.push(field.name || section.name);
+        }));
+      fields.push('created');
+      fieldNames.push('created');
+      fields.push('modified');
+      fieldNames.push('modified');
+
+      const data = forms.map((form) => {
+        const item = { created: form.created, modified: form.modified };
+        form.fields.forEach((field) => {
+          item[field.templateFieldId] =
+            fieldContents(field, templateFieldMap, optionMap);
+        });
+        return item;
+      });
+      // console.log('!!!', fields, fieldNames);
+
+      const csv = json2csv({ data, fields, fieldNames });
+
+      res.attachment('data.csv');
+      res.end(csv);
+    })
+    .catch((error) => {
+      console.error('!!! error', error);
+      res.status(400).json(error);
+    });
+  });
+
   register(router, {
     category: 'form-templates',
     modelName: 'FormTemplate',

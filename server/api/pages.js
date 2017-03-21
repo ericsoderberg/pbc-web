@@ -83,7 +83,8 @@ const populatePage = (page) => {
         const nextDate = event => (
           [...event.dates, event.start]
             .map(d => moment(d))
-            .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0]
+            .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0] ||
+            moment(event.start)
         );
         events.sort((e1, e2) => {
           const d1 = nextDate(e1);
