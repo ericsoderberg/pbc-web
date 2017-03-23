@@ -237,6 +237,23 @@
   }
 }
 
+@media screen {
+  .textarea-print {
+    display: none;
+  }
+}
+
+@media print {
+  .textarea-print {
+    padding: $half-unit;
+    white-space: pre-wrap;
+
+    & + textarea {
+      display: none;
+    }
+  }
+}
+
 .form-field--closable {
   padding-right: $double-unit;
 }
@@ -402,6 +419,10 @@
 
   & + .form__footer {
     margin-top: $unit;
+  }
+
+  @media print {
+    display: none;
   }
 }
 

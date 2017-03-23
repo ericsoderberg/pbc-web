@@ -7,6 +7,7 @@ const FormLines = (props) => {
   return (
     <FormField label={formTemplateField.name}
       help={formTemplateField.help} error={error}>
+      <div className="textarea-print">{field.value}</div>
       <textarea name={formTemplateField.name} value={field.value || ''}
         onChange={event => onChange({
           templateFieldId: formTemplateField._id,
