@@ -130,7 +130,7 @@ class Home extends Component {
   }
 
   _renderMenuLinks() {
-    const { page } = this.props;
+    const { page, session } = this.props;
     const links = [
       <Link key="search" to="/search">Search</Link>,
     ];
@@ -163,6 +163,22 @@ class Home extends Component {
         links.push(<Link key={path} to={path}>Library</Link>);
       });
     }
+
+    if (session && session.token) {
+      links.push(
+        <Link key="edit" to={`/users/${session.userId._id}/edit`}>
+          {session.userId.name}
+        </Link>,
+      );
+      links.push(
+        <a key="sign-out" className="home__sign-out" onClick={this._signOut}>
+          <span className="link__text">Sign Out</span>
+        </a>,
+      );
+    } else {
+      links.push(<Link key="sign-in" to="/sign-in">Sign In</Link>);
+    }
+
     return links;
   }
 
