@@ -30,7 +30,7 @@ export default class EventDates extends Component {
     if (event.dates) {
       const selectedDates = {};
       event.dates.forEach((date) => {
-        selectedDates[moment(date).startOf('day').valueOf()] = true;
+        selectedDates[moment(date).format('YYYY-MM-DD')] = date;
       });
       this.setState({ selectedDates });
     }
@@ -55,7 +55,7 @@ export default class EventDates extends Component {
         .then((dates) => {
           const unavailableDates = {};
           dates.forEach((date) => {
-            unavailableDates[moment(date).startOf('day').valueOf()] = true;
+            unavailableDates[moment(date).format('YYYY-MM-DD')] = date;
           });
           this.setState({ unavailableDates, scroll: true });
         })
@@ -136,11 +136,11 @@ export default class EventDates extends Component {
     const { formState } = this.props;
     const event = formState.object;
     const { start, end, selectedDates, unavailableDates } = this.state;
-    const startValue = moment(event.start).valueOf();
+    const startDay = moment(event.start).startOf('day').format('YYYY-MM-DD');
 
     const weeks = [];
     let days = [];
-    const today = moment().startOf('day');
+    const today = moment();
     const date = moment(start);
 
     while (date.isBefore(end)) {
@@ -153,18 +153,18 @@ export default class EventDates extends Component {
         classNames.push('calendar__day--alternate');
       }
 
-      const dateValue = date.valueOf();
-      const checked = selectedDates[dateValue] || (dateValue === startValue);
-      const disabled = unavailableDates[dateValue];
-      const dateString = date.toISOString();
+      const dateDay = date.format('YYYY-MM-DD');
+      const dateValue = selectedDates[dateDay] || date.toISOString(); // deals with DST
+      const checked = selectedDates[dateDay] || (dateDay === startDay);
+      const disabled = unavailableDates[dateDay];
 
       days.push(
         <div key={name} className={classNames.join(' ')}>
           <div className="calendar__day-date">
-            <label htmlFor={dateString}>{name}</label>
-            <input id={dateString} type="checkbox"
+            <label htmlFor={dateValue}>{name}</label>
+            <input id={dateValue} type="checkbox"
               checked={checked} disabled={disabled}
-              onChange={formState.toggleIn('dates', dateString)} />
+              onChange={formState.toggleIn('dates', dateValue)} />
           </div>
         </div>,
       );
