@@ -46,7 +46,7 @@ export default class EventSection extends Component {
 
     let contents;
     let map;
-    if (event) {
+    if (event && event.name) {
       let location;
       if (event.location) {
         location = (

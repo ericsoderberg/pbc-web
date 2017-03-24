@@ -37,7 +37,7 @@ export default class Sections extends Component {
         );
       } else if (section.type === 'event') {
         let innerColor;
-        if (section.eventId.image && section.eventId.color) {
+        if (section.eventId && section.eventId.image && section.eventId.color) {
           innerColor = section.eventId.color;
         }
         contents = (
@@ -45,10 +45,10 @@ export default class Sections extends Component {
             navigable={section.navigable} color={innerColor}
             includeBackground={section.backgroundImage === undefined} />
         );
-        if (!backgroundImage) {
+        if (!backgroundImage && section.eventId) {
           backgroundImage = section.eventId.image;
         }
-        if (!color) {
+        if (!color && section.eventId) {
           color = section.eventId.color;
         }
       } else if (section.type === 'library') {
