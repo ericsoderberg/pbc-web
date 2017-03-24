@@ -85,7 +85,7 @@ length="${file.size}" type="${file.type}" />`
 router.get('/:id.rss', (req, res) => {
   const id = req.params.id;
   const Library = mongoose.model('Library');
-  Library.findOne({ _id: id }).populate('userId', 'name email').exec()
+  Library.findOne({ $or: [{ _id: id }, { path: id }] }).populate('userId', 'name email').exec()
   .then((library) => {
     // do we have a podcast for this library?
     if (!library.podcast) {
