@@ -10,16 +10,17 @@ const router = express.Router();
 // /*.rss
 
 const FILE_TYPE_REGEXP = /^audio/;
+const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 function rfc822(date) {
   return moment(date).format('ddd, DD MMM YYYY HH:mm:ss ZZ');
 }
 
-function renderRSS(req, library, messages, pages, site) {
+function renderRSS(req, library, messages) {
   const { podcast } = library;
-  const urlBase = req.headers.origin;
-  const page = pages[0];
-  const path = (page._id.equals(site.homePageId) ? '' : page.path || page._id);
+  console.log('!!! renderRSS', req.headers);
+  const urlBase = req.headers.origin || `https://${req.headers.host}`;
+  const path = `/libraries/${library.path || library._id}`;
 
   const items = messages.map((message) => {
     const enclosures = message.files
@@ -49,7 +50,7 @@ length="${file.size}" type="${file.type}" />`
   const channel = `<channel>
     <title>${podcast.title}</title>
     <description>${podcast.description}</description>
-    <link>${urlBase}/${path}</link>
+    <link>${urlBase}${path}</link>
     <language>en-us</language>
     <copyright>Copyright ${moment().year()}</copyright>
     <lastBuildDate>${rfc822(messages[0].modified)}</lastBuildDate>
@@ -85,7 +86,8 @@ length="${file.size}" type="${file.type}" />`
 router.get('/:id.rss', (req, res) => {
   const id = req.params.id;
   const Library = mongoose.model('Library');
-  Library.findOne({ $or: [{ _id: id }, { path: id }] }).populate('userId', 'name email').exec()
+  const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+  Library.findOne(criteria).populate('userId', 'name email').exec()
   .then((library) => {
     // do we have a podcast for this library?
     if (!library.podcast) {
@@ -98,25 +100,12 @@ router.get('/:id.rss', (req, res) => {
     const today = moment();
     promises.push(
       Message.find({
-        libraryId: id,
+        libraryId: library._id,
         date: { $lte: today.toDate() },
         'files.type': { $regex: /^audio/ },
       })
       .sort('-date').limit(10)
       .exec(),
-    );
-
-    // find the page hosting this library
-    const Page = mongoose.model('Page');
-    promises.push(
-      Page.find({ 'sections.libraryId': library._id })
-      .select('name path').exec(),
-    );
-
-    // get the site so we can check if this is the home page
-    const Site = mongoose.model('Site');
-    promises.push(
-      Site.findOne({}).select('homePageId').exec(),
     );
 
     return Promise.all(promises);
@@ -125,12 +114,13 @@ router.get('/:id.rss', (req, res) => {
     // build RSS
     const library = docs[0];
     const messages = docs[1];
-    const pages = docs[2];
-    const site = docs[3];
-    const rss = renderRSS(req, library, messages, pages, site);
+    const rss = renderRSS(req, library, messages);
     res.status(200).send(rss);
   })
-  .catch(error => res.status(400).json(error));
+  .catch((error) => {
+    console.error('!!!', error);
+    res.status(400).json(error);
+  });
 });
 
 module.exports = router;
