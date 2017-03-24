@@ -13,6 +13,9 @@ const FormError = (props) => {
   } else if (error && error.errmsg) {
     classes.push('form-error--active');
     text = error.errmsg;
+  } else if (typeof error === 'string') {
+    classes.push('form-error--active');
+    text = error;
   }
   return (
     <div className={classes.join(' ')}>
@@ -25,11 +28,11 @@ const FormError = (props) => {
 
 FormError.propTypes = {
   message: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  error: PropTypes.shape({
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({
     errmsg: PropTypes.string,
     message: PropTypes.string,
     name: PropTypes.string,
-  }),
+  })]),
 };
 
 FormError.defaultProps = {

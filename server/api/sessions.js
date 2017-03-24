@@ -85,7 +85,11 @@ export function useOrCreateSession(session, userData) {
         token: hat(), // better to encrypt this before storing it, someday
         userId: user._id,
       });
-      return newSession.save();
+      return newSession.save()
+      .then(sessionSaved => Session.findOne({ token: sessionSaved.token })
+        .populate('userId', 'email name administrator administratorDomainId phone')
+        .exec(),
+      );
     });
   }
   return Promise.resolve(session);

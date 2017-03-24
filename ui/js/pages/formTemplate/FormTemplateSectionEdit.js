@@ -91,7 +91,7 @@ export default class FormTemplateSectionEdit extends Component {
         ];
       } else {
         details = (
-          <button className="form-fields__more-control button button-plain"
+          <button className="form__more-control button button-plain"
             onClick={() => this.setState({ detailsActive: true })}>details</button>
         );
       }

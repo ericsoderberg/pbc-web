@@ -114,20 +114,24 @@
   // padding-top: $half-unit;
   padding-bottom: $unit;
 
-  .form__fields:first-of-type {
+  .form__fields:first-child {
     margin-top: 0;
   }
 
-  .form__fields:last-of-type {
+  .form__fields:last-child {
     margin-bottom: 0;
   }
+}
+
+.form-error + .form__fields {
+  margin-top: 0;
 }
 
 .section-edit {
   margin: $unit 0;
 }
 
-.form-fields__more-control {
+.form__more-control {
   display: block;
   // margin: $half-unit $unit;
 }

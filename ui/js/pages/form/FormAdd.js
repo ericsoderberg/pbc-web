@@ -1,5 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
