@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import { postSignUp } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
@@ -72,7 +71,7 @@ export default class SignUp extends Component {
   }
 
   render() {
-    const { inline, onCancel, onSignIn, onVerifyEmail } = this.props;
+    const { inline, onCancel, onSignIn } = this.props;
     const { formState, errorMessage, errors } = this.state;
     const user = formState.object;
     const classNames = ['form__container'];
@@ -153,14 +152,12 @@ SignUp.propTypes = {
   inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onSignIn: PropTypes.func,
-  onVerifyEmail: PropTypes.func,
 };
 
 SignUp.defaultProps = {
   inline: undefined,
   onCancel: undefined,
   onSignIn: undefined,
-  onVerifyEmail: undefined,
 };
 
 SignUp.contextTypes = {

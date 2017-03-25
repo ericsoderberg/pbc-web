@@ -18,7 +18,6 @@ function rfc822(date) {
 
 function renderRSS(req, library, messages) {
   const { podcast } = library;
-  console.log('!!! renderRSS', req.headers);
   const urlBase = req.headers.origin || `https://${req.headers.host}`;
   const path = `/libraries/${library.path || library._id}`;
 

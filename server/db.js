@@ -361,7 +361,7 @@ const formSchema = Schema({
   // This is an array in case the form is modified to increase the amount
   // and needs a subsequent payment.
   paymentIds: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
-  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   version: Number,
 });
 

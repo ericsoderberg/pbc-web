@@ -264,9 +264,9 @@ export default function (router, transporter) {
       const { form, session } = context;
       if (!session.loginAt) {
         // we created this session here, return it
-        res.status(200).json({ _id: form._id, session });
+        res.status(200).json({ form, session });
       } else {
-        res.status(200).send({ _id: form._id });
+        res.status(200).send({ form });
       }
     })
     .catch((error) => {

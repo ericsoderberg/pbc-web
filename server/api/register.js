@@ -83,6 +83,8 @@ export default (router, options) => {
       })
       .then(data => (putOpts.transformIn ?
         putOpts.transformIn(data, req) : data))
+      .then(data => (putOpts.validate ?
+        putOpts.validate(data, req) : data))
       .then(data => Doc.findOneAndUpdate({ _id: id }, data,
         { new: true, runValidators: true }).exec())
       .then(doc => (putOpts.transformOut ?
@@ -200,6 +202,8 @@ export default (router, options) => {
       })
       .then(data => (postOpts.transformIn ?
         postOpts.transformIn(data, req) : data))
+      .then(data => (postOpts.validate ?
+        postOpts.validate(data, req) : data))
       .then(data => (new Doc(data)).save())
       .then(doc => (postOpts.transformOut ?
         postOpts.transformOut(doc, req) : doc))

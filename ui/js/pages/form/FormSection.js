@@ -187,7 +187,7 @@ class FormSection extends Component {
     const {
       activeFormTemplateId, finalFormTemplateId, formTemplates,
     } = this.state;
-    const { addedFormId } = nextState;
+    const { latestForm } = nextState;
 
     if (session) {
       getItems('forms', {
@@ -199,11 +199,11 @@ class FormSection extends Component {
         const nextForms = { ...this.state.forms };
         nextForms[formTemplateId] = forms;
 
-        if (activeFormTemplateId === formTemplateId && addedFormId) {
+        if (activeFormTemplateId === formTemplateId && latestForm) {
           // find new linkedForm
           let linkedForm;
           forms.some((form) => {
-            if (form._id === addedFormId) {
+            if (form._id === latestForm._id) {
               linkedForm = form;
             }
             return linkedForm;
@@ -335,14 +335,14 @@ class FormSection extends Component {
     };
   }
 
-  _onDone(addedFormId) {
+  _onDone(latestForm) {
     const { activeFormTemplateId, finalFormTemplateId } = this.state;
     let nextState;
-    if (addedFormId && finalFormTemplateId !== activeFormTemplateId) {
+    if (latestForm) {
       nextState = {
         activeFormTemplateId: finalFormTemplateId,
-        addedFormId,
-        state: ADDING,
+        latestForm,
+        state: (finalFormTemplateId !== activeFormTemplateId ? ADDING : SUMMARY),
       };
     }
     this._loadForms(this.state.activeFormTemplateId, nextState);

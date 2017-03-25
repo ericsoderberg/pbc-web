@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
 import { authorizedDomainAdministrator } from './auth';
+import { createSession } from './sessions';
 import { compressImage } from './image';
 import { renderNotification } from './email';
 
@@ -77,8 +78,10 @@ export default function (router, transporter) {
       const doc = new User(data);
       return doc.save();
     })
-    .then(doc => res.status(200).json(doc))
+    .then(user => createSession(user))
+    .then(session => res.status(200).json(session))
     .catch((error) => {
+      console.error('!!!', error);
       error = error.toJSON();
       delete error.op.encryptedPassword;
       if (error.errmsg.match(/^E11000/)) {

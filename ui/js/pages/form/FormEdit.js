@@ -70,7 +70,7 @@ class FormEdit extends Component {
     } else {
       finalizeForm(formTemplate, form, linkedForm);
       putItem('forms', this.state.form)
-      .then(() => (onDone ? onDone() : this.context.router.goBack()))
+      .then(formSaved => (onDone ? onDone(formSaved) : this.context.router.goBack()))
       .catch(error2 => this.setState({ error2 }));
     }
   }

@@ -9,7 +9,7 @@ mongoose.Promise = global.Promise;
 
 // /api/sessions
 
-function createSession(user) {
+export function createSession(user) {
   const Session = mongoose.model('Session');
   const data = {
     loginAt: new Date(),

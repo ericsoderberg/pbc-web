@@ -138,6 +138,25 @@ const calculateTotals = (data) => {
   });
 };
 
+const validate = (data) => {
+  // ensure that either authenticate is true or
+  // we have a required field linked to the session email
+  if (data.authenticate) {
+    return data;
+  }
+  if (data.sections.some(section =>
+    section.fields.some((field) => {
+      if (field.linkToUserProperty === 'email' && field.required) {
+        return true;
+      }
+      return false;
+    }))) {
+    return data;
+  }
+  return Promise.reject(`Must either require authentication
+    or have a required field tied to the session user email.`);
+};
+
 export default function (router) {
   router.get('/form-templates/:id.csv', (req, res) => {
     authorize(req, res)
@@ -212,6 +231,9 @@ export default function (router) {
         return formTemplate;
       },
     },
+    post: {
+      validate,
+    },
     put: {
       transformIn: unsetReferences,
       transformOut: (formTemplate) => {
@@ -221,6 +243,7 @@ export default function (router) {
           { $set: { domainId: formTemplate.domainId } }, { multi: true }).exec()
           .then(() => formTemplate);
       },
+      validate,
     },
   });
 }

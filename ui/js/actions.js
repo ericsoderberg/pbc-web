@@ -209,7 +209,8 @@ export function postSignUp(user) {
   return fetch('/api/users/sign-up', {
     method: 'POST', headers: _headers, body: JSON.stringify(user) })
   .then(processStatus)
-  .then(response => response.json());
+  .then(response => response.json())
+  .then(setSession);
 }
 
 export function postVerifyEmail(email, returnPath) {
