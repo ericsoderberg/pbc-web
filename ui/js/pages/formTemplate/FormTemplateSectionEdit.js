@@ -150,7 +150,7 @@ export default class FormTemplateSectionEdit extends Component {
               onClick={this._toggleField(field._id || field.id)}>
               <h4>{field.name || field.type}</h4>
             </button>
-            <div className="box--row">
+            <div className="box--row box--static">
               {raise}
               {lower}
               <button type="button" className="button-icon"
