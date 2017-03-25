@@ -107,7 +107,7 @@ router.get('/:id.rss', (req, res) => {
   Library.findOne(criteria).populate('userId', 'name email').exec()
   .then((library) => {
     // do we have a podcast for this library?
-    if (!library.podcast || !library.podcast.title) {
+    if (!library || !library.podcast || !library.podcast.title) {
       return Promise.reject({ status: 404 });
     }
     const promises = [Promise.resolve(library)];
