@@ -153,23 +153,20 @@ export default class Audio extends Component {
       classes.push(className);
     }
 
-    let label;
-    if (file.label) {
-      label = <span className="audio__label">{file.label}</span>;
-    }
+    const label = file.label || 'Listen';
 
     let playControl;
     if (playing) {
       playControl = (
         <Button className="audio__toggle" plain={true} onClick={this._onPause}>
-          <span>Listen</span>
+          <span>{label}</span>
           <PauseIcon />
         </Button>
       );
     } else {
       playControl = (
         <Button className="audio__toggle" plain={true} onClick={this._onPlay}>
-          <span>Listen</span>
+          <span>{label}</span>
           <PlayIcon />
         </Button>
       );
@@ -191,7 +188,6 @@ export default class Audio extends Component {
             No audio with this browser
           </audio>
           <span className="audio__control">
-            {label}
             {playControl}
           </span>
           <input className="audio__position" type="range"
