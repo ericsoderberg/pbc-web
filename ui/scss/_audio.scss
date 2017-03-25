@@ -12,7 +12,6 @@
 
   @media all and (max-width: 699px) {
     flex-direction: column;
-    align-items: center;
   }
 
   audio {
@@ -33,7 +32,7 @@
   }
 
   @media all and (max-width: 699px) {
-    padding: $half-unit;
+    padding: 0;
   }
 }
 
@@ -45,9 +44,13 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 0 $half-unit 0 $unit;
 
   @media all and (max-width: 699px) {
-    margin: $half-unit 0;
+    justify-content: center;
+    padding: $half-unit;
+    width: 100%;
+    text-align: center;
   }
 
   .control-icon:not(:first-child) {
@@ -60,6 +63,20 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  @media all and (min-width: 700px) {
+    margin-right: $half-unit;
+  }
+
+  &:hover {
+    color: $control-hover-color;
+    background-color: $control-hover-background;
+
+    .control-icon {
+      fill: $control-hover-color;
+      stroke: $control-hover-color;
+    }
+  }
 }
 
 .audio__position,
@@ -71,7 +88,7 @@
   // Reset
   &[type=range] {
     -webkit-appearance: none; // Hides the slider so that custom slider can be made
-    width: 100%; // Specific width is required for Firefox.
+    // width: 100%; // Specific width is required for Firefox.
   }
 
   &[type=range]:focus {
@@ -169,18 +186,55 @@
   }
 }
 
+.audio__volume {
+  &[type=range] {
+    width: round($unit * 4);
+  }
+}
+
+.audio__details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 0 0 auto;
+
+  @media all and (max-width: 699px) {
+    align-self: stretch;
+  }
+}
+
 .audio__duration {
   font-size: 1rem;
   color: $secondary-color;
-}
 
-.audio__volume {
   @media all and (min-width: 700px) {
-    flex: 0 1 $quadruple-unit;
-    margin-left: $unit;
+    margin-right: $unit;
   }
 
   @media all and (max-width: 699px) {
-    margin: $unit 0;
+    flex: 1 0 auto;
+    text-align: left;
+    margin-left: $half-unit;
+  }
+}
+
+.audio__volume {
+  margin-right: $half-unit;
+
+  @media all and (min-width: 700px) {
+    flex: 0 1 $quadruple-unit;
+  }
+
+  @media all and (max-width: 699px) {
+    margin: 0 $half-unit;
+  }
+}
+
+.audio__volume-toggle,
+.audio__download {
+  line-height: normal;
+
+  @media all and (max-width: 699px) {
+    flex: 0 0 auto;
   }
 }

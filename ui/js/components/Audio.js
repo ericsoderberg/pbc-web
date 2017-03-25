@@ -5,6 +5,7 @@ import Button from './Button';
 import PlayIcon from '../icons/Play';
 import PauseIcon from '../icons/Pause';
 import VolumeIcon from '../icons/Volume';
+import DownloadIcon from '../icons/Download';
 
 function pad(num, size) {
   let s = `${num}`;
@@ -195,12 +196,17 @@ export default class Audio extends Component {
           </span>
           <input className="audio__position" type="range"
             min={start} max={end} value={at} onChange={this._onSeek} />
-          <span className="audio__duration">{friendlyDuration(end - at)}</span>
-          {volumeControl}
-          <Button className="audio__toggle" plain={true}
-            onClick={this._onToggleVolume}>
-            <VolumeIcon />
-          </Button>
+          <div className="audio__details">
+            <span className="audio__duration">{friendlyDuration(end - at)}</span>
+            {volumeControl}
+            <Button className="audio__volume-toggle button-icon" plain={true}
+              onClick={this._onToggleVolume}>
+              <VolumeIcon />
+            </Button>
+            <a className="audio__download link-icon" href={path}>
+              <DownloadIcon />
+            </a>
+          </div>
         </div>
       </Section>
     );
