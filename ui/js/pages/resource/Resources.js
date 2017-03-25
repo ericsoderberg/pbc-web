@@ -28,6 +28,7 @@ export default class Resources extends List {}
 
 Resources.defaultProps = {
   ...List.defaultProps,
+  actions: [<Link key="calendar" to="/resources/calendar">Calendar</Link>],
   category: 'resources',
   Item,
   path: '/resources',

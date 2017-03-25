@@ -48,6 +48,7 @@ import PaymentAdd from './pages/payment/PaymentAdd';
 import PaymentEdit from './pages/payment/PaymentEdit';
 import Payments from './pages/payment/Payments';
 import Resources from './pages/resource/Resources';
+import ResourcesCalendar from './pages/resource/ResourcesCalendar';
 import ResourceAdd from './pages/resource/ResourceAdd';
 import Resource from './pages/resource/Resource';
 import ResourceEdit from './pages/resource/ResourceEdit';
@@ -130,6 +131,7 @@ export default {
     { path: 'domains/:id/edit', component: DomainEdit, onEnter: requireSession },
     { path: 'domains', component: Domains, onEnter: requireSession },
     { path: 'resources/add', component: ResourceAdd, onEnter: requireSession },
+    { path: 'resources/calendar', component: ResourcesCalendar, onEnter: requireSession },
     { path: 'resources/:id', component: Resource, onEnter: requireSession },
     { path: 'resources/:id/edit', component: ResourceEdit, onEnter: requireSession },
     { path: 'resources', component: Resources, onEnter: requireSession },

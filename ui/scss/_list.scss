@@ -201,7 +201,10 @@ button.item__container {
 }
 
 .resource-event {
-  justify-content: flex-start;
+
+  @media all and (min-width: 700px) {
+    align-items: flex-start;
+  }
 
   @media all and (max-width: 699px) {
     flex-direction: row;
@@ -218,7 +221,27 @@ button.item__container {
 }
 
 .resource-event__time {
-  flex: 0 0 round($unit * 4);;
+  flex: 0 0 round($unit * 4);
+  margin-right: $unit;
+}
+
+.resource-event__name {
+  flex: 0 1 auto;
+  margin-right: $unit;
+}
+
+.resource-event__resources {
+  flex: 1 0 round($unit * 8);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.resource-event__resource {
+  margin-left: $unit;
+  margin-bottom: $half-unit;
+  flex: 0 0 round($unit * 8);
 }
 
 .box__connector {

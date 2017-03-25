@@ -8,11 +8,14 @@ mongoose.Promise = global.Promise;
 
 const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
-export function splitEvents(events, start, end) {
+export function splitEvents(events, start, end, includeResources = false) {
   // separate by dates within the range
   const result = [];
   events.forEach((event) => {
     const base = { _id: event._id, name: event.name, path: event.path };
+    if (includeResources) {
+      base.resourceIds = event.resourceIds.slice(0);
+    }
 
     if (moment(event.start).isBetween(start, end) ||
       moment(event.end).isBetween(start, end)) {
