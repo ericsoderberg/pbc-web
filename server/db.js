@@ -368,13 +368,13 @@ const formSchema = Schema({
 mongoose.model('Form', formSchema);
 
 const podcastSchema = Schema({
-  category: String,
-  description: String,
+  category: { type: String, required: true },
+  description: { type: String, required: true },
   image,
   subCategory: String,
   subtitle: String,
   summary: String,
-  title: String,
+  title: { type: String, required: true },
 });
 
 const librarySchema = Schema({

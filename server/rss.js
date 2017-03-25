@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import moment from 'moment';
 import escape from 'escape-html';
+import fs from 'fs';
+import { FILES_PATH } from './api/files';
 
 mongoose.Promise = global.Promise;
 
@@ -16,20 +18,27 @@ function rfc822(date) {
   return moment(date).format('ddd, DD MMM YYYY HH:mm:ss ZZ');
 }
 
-function renderRSS(req, library, messages) {
+function renderRSS(urlBase, library, messages) {
   const { podcast } = library;
-  const urlBase = req.headers.origin || `https://${req.headers.host}`;
   const path = `/libraries/${library.path || library._id}`;
 
   const items = messages.map((message) => {
     const enclosures = message.files
     .filter(file => FILE_TYPE_REGEXP.test(file.type))
-    .map(file => (
+    .map((file) => {
+      if (!file.size) {
+        const filePath = `${FILES_PATH}/${file._id}/${file.name}`;
+        const stat = fs.statSync(filePath);
+        file.size = stat.size;
+      }
+      return (
       `<enclosure url="${urlBase}/api/files/${file._id}/${file.name}"
 length="${file.size}" type="${file.type}" />`
-    )).join('\n');
+      );
+    }).join('\n');
 
-    return `<item>
+    return `
+    <item>
       <title>${message.name}</title>
       <link>${urlBase}/messages/${message._id}</link>
       <guid>${urlBase}/messages/${message._id}</guid>
@@ -43,10 +52,12 @@ length="${file.size}" type="${file.type}" />`
       <itunes:explicit>No</itunes:explicit>
       <itunes:subtitle>${message.text}</itunes:subtitle>
       <itunes:summary>${message.text}</itunes:summary>
-    </item>`;
+    </item>
+    `;
   }).join('\n\n    ');
 
-  const channel = `<channel>
+  const channel = `
+  <channel>
     <title>${podcast.title}</title>
     <description>${podcast.description}</description>
     <link>${urlBase}${path}</link>
@@ -61,8 +72,8 @@ length="${file.size}" type="${file.type}" />`
     <itunes:summary>${podcast.summary}</itunes:summary>
 
     <itunes:owner>
-     <itunes:name>${library.userId.name}</itunes:name>
-     <itunes:email>${library.userId.email}</itunes:email>
+      <itunes:name>${library.userId.name}</itunes:name>
+      <itunes:email>${library.userId.email}</itunes:email>
     </itunes:owner>
 
     <itunes:explicit>No</itunes:explicit>
@@ -70,27 +81,34 @@ length="${file.size}" type="${file.type}" />`
     <itunes:image href="${urlBase}/api/libraries/${library._id}/${podcast.image.name}"/>
 
     <itunes:category text="${escape(podcast.category)}">
-     <itunes:category text="${escape(podcast.subCategory)}"/>
+      <itunes:category text="${escape(podcast.subCategory)}"/>
     </itunes:category>
 
     ${items}
-</channel>`;
+  </channel>
+  `;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
   ${channel}
-</rss>`;
+</rss>
+  `;
 }
 
 router.get('/:id.rss', (req, res) => {
+  const urlBase = req.headers.origin || `https://${req.headers['x-forwarded-host'] || req.headers.host}`;
   const id = req.params.id;
+  // Temporary hard code redirect for few weeks. Remove June 2017
+  if (id === 'messages') {
+    return res.redirect(301, `${urlBase}/sermon.rss`);
+  }
   const Library = mongoose.model('Library');
   const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
   Library.findOne(criteria).populate('userId', 'name email').exec()
   .then((library) => {
     // do we have a podcast for this library?
-    if (!library.podcast) {
-      return Promise.reject({ error: 'No feed' });
+    if (!library.podcast || !library.podcast.title) {
+      return Promise.reject({ status: 404 });
     }
     const promises = [Promise.resolve(library)];
 
@@ -113,12 +131,12 @@ router.get('/:id.rss', (req, res) => {
     // build RSS
     const library = docs[0];
     const messages = docs[1];
-    const rss = renderRSS(req, library, messages);
+    const rss = renderRSS(urlBase, library, messages);
     res.status(200).send(rss);
   })
   .catch((error) => {
     console.error('!!!', error);
-    res.status(400).json(error);
+    res.status(error.status || 400).json(error);
   });
 });
 

@@ -90,9 +90,11 @@ export default function (router) {
         (fieldname, file, filename, encoding, mimetype) => {
           const dir = `${FILES_PATH}/${id}`;
           fs.mkdir(dir, () => {
-            fstream = fs.createWriteStream(`${dir}/${filename}`);
+            const path = `${dir}/${filename}`;
+            fstream = fs.createWriteStream(path);
             file.pipe(fstream);
             fstream.on('close', () => {
+              const stat = fs.statSync(path);
               res.json({ _id: id, name: filename, type: mimetype });
             });
           });
