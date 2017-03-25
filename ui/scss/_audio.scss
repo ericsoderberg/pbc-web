@@ -187,6 +187,16 @@
 }
 
 .audio__volume {
+  margin-right: $half-unit;
+
+  @media all and (min-width: 700px) {
+    flex: 0 1 $quadruple-unit;
+  }
+
+  @media all and (max-width: 699px) {
+    margin: 0 $half-unit;
+  }
+
   &[type=range] {
     width: round($unit * 4);
   }
@@ -215,18 +225,6 @@
     flex: 1 0 auto;
     text-align: left;
     margin-left: $half-unit;
-  }
-}
-
-.audio__volume {
-  margin-right: $half-unit;
-
-  @media all and (min-width: 700px) {
-    flex: 0 1 $quadruple-unit;
-  }
-
-  @media all and (max-width: 699px) {
-    margin: 0 $half-unit;
   }
 }
 
