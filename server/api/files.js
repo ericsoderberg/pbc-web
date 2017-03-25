@@ -95,7 +95,7 @@ export default function (router) {
             file.pipe(fstream);
             fstream.on('close', () => {
               const stat = fs.statSync(path);
-              res.json({ _id: id, name: filename, type: mimetype });
+              res.json({ _id: id, name: filename, size: stat.size, type: mimetype });
             });
           });
         });
