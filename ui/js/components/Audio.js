@@ -33,6 +33,7 @@ export default class Audio extends Component {
 
   constructor() {
     super();
+    this._onLoaded = this._onLoaded.bind(this);
     this._onTimeUpdate = this._onTimeUpdate.bind(this);
     this._onEnded = this._onEnded.bind(this);
     this._onResize = this._onResize.bind(this);
@@ -50,6 +51,7 @@ export default class Audio extends Component {
   componentDidMount() {
     const audio = this._audioRef;
     audio.volume = this.state.volume;
+    audio.addEventListener('loadedmetadata', this._onLoaded);
     audio.addEventListener('timeupdate', this._onTimeUpdate);
     audio.addEventListener('ended', this._onEnded);
     window.addEventListener('resize', this._onResize);
@@ -66,9 +68,15 @@ export default class Audio extends Component {
 
   componentWillUnmount() {
     const audio = this._audioRef;
+    audio.removeEventListener('loadedmetadata', this._onLoaded);
     audio.removeEventListener('timeupdate', this._onTimeUpdate);
     audio.removeEventListener('ended', this._onEnded);
     window.removeEventListener('resize', this._onResize);
+  }
+
+  _onLoaded() {
+    const audio = this._audioRef;
+    this.setState({ end: audio.duration });
   }
 
   _onTimeUpdate() {
@@ -99,8 +107,8 @@ export default class Audio extends Component {
     audio.play();
     this.setState({
       playing: true,
-      start: audio.seekable.start(0),
-      end: audio.seekable.end(0),
+      // start: audio.seekable.start(0),
+      // end: audio.seekable.end(0),
     });
     if (onStart) {
       onStart();

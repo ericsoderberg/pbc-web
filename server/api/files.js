@@ -16,15 +16,33 @@ export default function (router) {
 
     const path = `${FILES_PATH}/${id}/${name}`;
     const stat = fs.statSync(path);
-    res.writeHead(200, {
-      'Content-Type': mime.lookup(path),
-      'Content-Length': stat.size,
-    });
+    const size = stat.size;
+    const mimeType = mime.lookup(path);
 
-    const readStream = fs.createReadStream(path);
-    readStream.pipe(res);
+    if (req.headers.range) {
+      // byte range request, likely due to audio scrubbing
 
-    // res.download(`${FILES_PATH}/${id}/${name}`);
+      const range = req.headers.range;
+      const [startPart, endPart] = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(startPart, 10);
+      const end = endPart ? parseInt(endPart, 10) : size - 1;
+      const chunksize = (end - start) + 1;
+
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': mimeType });
+      const readStream = fs.createReadStream(path, { start, end });
+      readStream.pipe(res);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': mimeType,
+        'Content-Length': size,
+      });
+      const readStream = fs.createReadStream(path);
+      readStream.pipe(res);
+    }
   });
 
   router.get('/files/:id', (req, res) => {
