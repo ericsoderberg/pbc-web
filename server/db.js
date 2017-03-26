@@ -239,8 +239,8 @@ const eventSchema = Schema({
 // eventSections.discriminator('files',
 //   Schema(filesSectionDef, { _id: false }));
 
-eventSchema.index({ name: 'text', text: 'text' },
-  { weights: { name: 5, text: 1 } });
+eventSchema.index({ name: 'text', 'sections.text': 'text' },
+  { weights: { name: 5, 'sections.text': 1 } });
 
 const Event = mongoose.model('Event', eventSchema);
 Event.on('index', () => console.log('Event index ready'));
@@ -388,7 +388,8 @@ const librarySchema = Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
-librarySchema.index({ name: 'text' }, { weights: { name: 5 } });
+librarySchema.index({ name: 'text', text: 'text' },
+  { weights: { name: 5, text: 1 } });
 
 const Library = mongoose.model('Library', librarySchema);
 Library.on('index', () => console.log('Library index ready'));
