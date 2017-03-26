@@ -216,6 +216,7 @@ export default function (router) {
         { path: 'sections.libraryId',
           select: 'name',
           model: 'Library' },
+        { path: 'sections.people.id', select: 'name image', model: 'User' },
       ],
       transformOut: (doc) => {
         // convert deprecated text property to a section
