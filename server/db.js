@@ -384,12 +384,14 @@ const librarySchema = Schema({
   name: { type: String, required: true },
   path: PATH_TYPE,
   podcast: podcastSchema,
+  text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
-librarySchema.index({ name: 'text' });
+librarySchema.index({ name: 'text' }, { weights: { name: 5 } });
 
-mongoose.model('Library', librarySchema);
+const Library = mongoose.model('Library', librarySchema);
+Library.on('index', () => console.log('Library index ready'));
 
 const messageSchema = Schema({
   author: String,

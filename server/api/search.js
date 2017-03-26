@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { authorize, authorizedForDomain } from './auth';
+import moment from 'moment';
+import { authorize } from './auth';
 
 mongoose.Promise = global.Promise;
 
@@ -14,7 +15,7 @@ export default function (router) {
       return Page.find(
         {
           $text: { $search: req.query.search },
-          $or: [authorizedForDomain(session), { public: true }],
+          public: true,
         },
         { score: { $meta: 'textScore' } },
       )
@@ -57,12 +58,17 @@ export default function (router) {
     })
     // check events too
     .then((context) => {
-      const { session } = context;
       const Event = mongoose.model('Event');
+      const recently = moment().subtract(1, 'week');
+      const dateCriteria = [
+        { end: { $gte: recently.toDate() } },
+        { dates: { $gte: recently.toDate() } },
+      ];
       return Event.find(
         {
           $text: { $search: req.query.search },
-          $or: [authorizedForDomain(session), { public: true }],
+          public: true,
+          $or: dateCriteria,
         },
         { score: { $meta: 'textScore' } },
       )
@@ -85,20 +91,6 @@ export default function (router) {
       .exec()
       .then(libraries => ({ ...context, libraries }));
     })
-    // // check messages
-    // .then(context => {
-    //   const Message = mongoose.model('Message');
-    //   return Message.find(
-    //     {
-    //       $text: { $search: req.query.search }
-    //     },
-    //     { score : { $meta: "textScore" } }
-    //   )
-    //   .sort({ score: { $meta: "textScore" }, modified: -1 })
-    //   .limit(10)
-    //   .exec()
-    //   .then(messages => ({ ...context, messages }));
-    // })
     .then((context) => {
       const { pages, events, libraries } = context;
       res.status(200).json({ pages, events, libraries });

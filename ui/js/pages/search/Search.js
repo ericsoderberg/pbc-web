@@ -87,6 +87,16 @@ export default class Search extends Component {
       );
     });
 
+    (categories.libraries || []).forEach((library) => {
+      library.name = `${library.name} Library`;
+      contents.push(
+        <Item key={library._id} item={library}
+          path={`/libraries/${library.path || library._id}`}>
+          <Text text={library.text} />
+        </Item>,
+      );
+    });
+
     (categories.events || []).forEach((event) => {
       contents.push(
         <Item key={event._id} item={event}
@@ -94,13 +104,6 @@ export default class Search extends Component {
           <EventTimes event={event} />
           <Text text={event.text} />
         </Item>,
-      );
-    });
-
-    (categories.libraries || []).forEach((library) => {
-      contents.push(
-        <Item key={library._id} item={library}
-          path={`/libraries/${library.path || library._id}`} />,
       );
     });
 

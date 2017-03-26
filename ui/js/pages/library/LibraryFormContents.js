@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';
+import TextHelp from '../../components/TextHelp';
 import PodcastEdit from './PodcastEdit';
 
 export default class LibraryFormContents extends Component {
@@ -57,6 +58,10 @@ export default class LibraryFormContents extends Component {
           <FormField label="Name" error={errors.name}>
             <input name="name" value={library.name || ''}
               onChange={formState.change('name')} />
+          </FormField>
+          <FormField name="text" label="Description" help={<TextHelp />}>
+            <textarea name="text" value={library.text || ''} rows={4}
+              onChange={formState.change('text')} />
           </FormField>
           <FormField name="path" label="Url ID" help="unique url name"
             error={errors.path}>
