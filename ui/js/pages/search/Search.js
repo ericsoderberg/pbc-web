@@ -79,32 +79,32 @@ export default class Search extends Component {
       const content = page.sections.map(section => (
         <Text key={section._id}>{section.text}</Text>
       ));
-      contents.push(
+      contents.push([page.score, (
         <Item key={page._id} item={page}
           path={page.path || `/pages/${page._id}`}>
           {content}
-        </Item>,
-      );
+        </Item>
+      )]);
     });
 
     (categories.libraries || []).forEach((library) => {
       library.name = `${library.name} Library`;
-      contents.push(
+      contents.push([library.score, (
         <Item key={library._id} item={library}
           path={`/libraries/${library.path || library._id}`}>
           <Text text={library.text} />
-        </Item>,
-      );
+        </Item>
+      )]);
     });
 
     (categories.events || []).forEach((event) => {
-      contents.push(
+      contents.push([event.score, (
         <Item key={event._id} item={event}
           path={`/events/${event.path || event._id}`}>
           <EventTimes event={event} />
           <Text text={event.text} />
-        </Item>,
-      );
+        </Item>
+      )]);
     });
 
     if (contents.length === 0) {
@@ -114,6 +114,8 @@ export default class Search extends Component {
         const message = searchText ? 'No matches' : 'Awaiting your input';
         contents = <div className="search__message">{message}</div>;
       }
+    } else {
+      contents = contents.sort((c1, c2) => c2[0] - c1[0]).map(c => c[1]);
     }
 
     return (
