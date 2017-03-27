@@ -12,8 +12,8 @@ FormTemplateAdd.defaultProps = {
     { id: 1000,
       fields: [
         { id: 1000, type: 'instructions', help: '## Title' },
-        { id: 1001, type: 'line', name: 'Name', linkToUserProperty: 'name' },
-        { id: 1002, type: 'line', name: 'Email', linkToUserProperty: 'email' },
+        { id: 1001, type: 'line', name: 'Name', required: true, linkToUserProperty: 'name' },
+        { id: 1002, type: 'line', name: 'Email', required: true, linkToUserProperty: 'email' },
       ],
     },
   ] },
