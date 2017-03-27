@@ -42,7 +42,7 @@ export default function (router) {
     })
     .then((site) => {
       // copy shortcut and mobile icons
-      if (site.shortcutIcon) {
+      if (site.shortcutIcon && site.shortcutIcon.data) {
         // strip metadata
         const matches = site.shortcutIcon.data.match(/^(data:.+;base64,)(.*)$/);
         // const metadata = matches[1];
@@ -52,7 +52,7 @@ export default function (router) {
             console.error(err);
           });
       }
-      if (site.mobileIcon) {
+      if (site.mobileIcon && site.mobileIcon.data) {
         // strip metadata
         const matches = site.mobileIcon.data.match(/^(data:.+;base64,)(.*)$/);
         // const metadata = matches[1];
@@ -65,6 +65,9 @@ export default function (router) {
       return site;
     })
     .then(site => res.status(200).json(site))
-    .catch(error => res.status(400).json(error));
+    .catch((error) => {
+      console.error(error);
+      res.status(400).json(error);
+    });
   });
 }
