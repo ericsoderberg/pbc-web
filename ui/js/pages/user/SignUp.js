@@ -31,7 +31,8 @@ export default class SignUp extends Component {
   }
 
   _onCancel() {
-    this.context.router.goBack();
+    const { router } = this.context;
+    router.history.goBack();
   }
 
   _errorToState(error) {
@@ -55,11 +56,12 @@ export default class SignUp extends Component {
 
   _onSignUp(event) {
     const { inline } = this.props;
+    const { router } = this.context;
     event.preventDefault();
     postSignUp(this.state.formState.object)
       .then(() => {
         if (!inline) {
-          this.context.router.push('/');
+          router.history.push('/');
         }
       })
       .catch(error => this.setState(this._errorToState(error)))

@@ -28,6 +28,7 @@ export default class PaymentAdd extends Component {
   _onAdd(payment) {
     const { onDone } = this.props;
     const { form, error } = this.state;
+    const { router } = this.context;
 
     if (error) {
       this.setState({ error });
@@ -38,17 +39,18 @@ export default class PaymentAdd extends Component {
         form.paymentIds.push(form._id);
         return putItem('forms', form);
       })
-      .then(() => (onDone ? onDone() : this.context.router.goBack()))
+      .then(() => (onDone ? onDone() : router.history.goBack()))
       .catch(error2 => this.setState({ error: error2 }));
     }
   }
 
   _onCancel() {
     const { onCancel } = this.props;
+    const { router } = this.context;
     if (onCancel) {
       onCancel();
     } else {
-      this.context.router.goBack();
+      router.history.goBack();
     }
   }
 

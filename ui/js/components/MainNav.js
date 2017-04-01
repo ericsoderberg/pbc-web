@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link, NavLink } from 'react-router-dom';
 import { deleteSession } from '../actions';
 import Stored from './Stored';
 
@@ -43,19 +43,14 @@ class MainNav extends Component {
   }
 
   _renderLinks(routes) {
-    const links = routes.map((route) => {
-      const classes = ['main-nav__link'];
-      if (this.context.router.isActive(route.path, true)) {
-        classes.push('main-nav__link--active');
-      }
-      return (
-        <li key={route.path}>
-          <Link to={route.path} className={classes.join(' ')}>
-            {route.label}
-          </Link>
-        </li>
-      );
-    });
+    const links = routes.map(route => (
+      <li key={route.path}>
+        <NavLink to={route.path} exact={true} className="main-nav__link"
+          activeClassName="main-nav__link--active">
+          {route.label}
+        </NavLink>
+      </li>
+    ));
 
     return (
       <ul className="main-nav__items">

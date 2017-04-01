@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItems } from '../actions';
+import { searchToObject } from '../utils/Params';
 import PageHeader from './PageHeader';
 import Filter from './Filter';
 import SelectSearch from './SelectSearch';
@@ -40,25 +41,26 @@ class List extends Component {
   _setStateFromLocation(props) {
     let filter;
     let filterNames;
-    if (props.location.query.filter) {
-      filter = props.location.query.filter;
+    const query = searchToObject(props.location.search);
+    if (query.filter) {
+      filter = query.filter;
     } else if (props.filter) {
       filter = props.filter;
     } else if (props.filters) {
       filter = {};
       filterNames = {};
       props.filters.forEach((aFilter) => {
-        const value = props.location.query[aFilter.property];
+        const value = query[aFilter.property];
         if (value) {
           filter[aFilter.property] = value;
-          const name = props.location.query[`${aFilter.property}-name`];
+          const name = query[`${aFilter.property}-name`];
           if (name) {
             filterNames[value] = name;
           }
         }
       });
     }
-    const searchText = props.location.query.search || '';
+    const searchText = query.search || '';
     this.setState({ filter, filterNames, searchText }, this._get);
   }
 
@@ -79,6 +81,8 @@ class List extends Component {
   _setLocation(options) {
     const { filters, location } = this.props;
     const { filterNames } = this.state;
+    const { router } = this.context;
+    const query = searchToObject(location.search);
     const searchParams = [];
 
     const searchText = options.searchText !== undefined ? options.searchText :
@@ -87,8 +91,8 @@ class List extends Component {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
 
-    if (location.query.filter) {
-      searchParams.push(`filter=${location.query.filter}`);
+    if (query.filter) {
+      searchParams.push(`filter=${query.filter}`);
     } else if (filters) {
       filters.forEach((filter) => {
         const property = filter.property;
@@ -118,7 +122,7 @@ class List extends Component {
       });
     }
 
-    this.context.router.replace({
+    router.history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
@@ -182,7 +186,8 @@ class List extends Component {
   }
 
   _removeFilter() {
-    this.context.router.replace({
+    const { router } = this.context;
+    router.history.replace({
       pathname: window.location.pathname,
     });
   }

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
 import { getItems } from '../../actions';
 import FormField from '../../components/FormField';

@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
@@ -14,16 +14,17 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 class Event extends Component {
 
   componentDidMount() {
-    if (!this.props.event) {
-      getItem('events', this.props.params.id, { cache: true, populate: true })
+    const { event, match } = this.props;
+    if (!event) {
+      getItem('events', match.params.id, { cache: true, populate: true })
       .catch(error => console.error('!!! Event catch', error));
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id &&
+    if (nextProps.match.params.id !== this.props.match.params.id &&
       !nextProps.event) {
-      getItem('events', nextProps.params.id, { cache: true, populate: true })
+      getItem('events', nextProps.match.params.id, { cache: true, populate: true })
       .catch(error => console.error('!!! Event catch', error));
     }
     if (nextProps.event) {
@@ -78,8 +79,10 @@ class Event extends Component {
 
 Event.propTypes = {
   event: PropTypes.object,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };
 
@@ -90,7 +93,7 @@ Event.defaultProps = {
 const select = (state, props) => {
   let event;
   if (state.events) {
-    event = state.events[props.params.id];
+    event = state.events[props.match.params.id];
   }
   return { event };
 };

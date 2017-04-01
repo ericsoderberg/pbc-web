@@ -19,8 +19,8 @@ export default class EmailListSubscribe extends Component {
   }
 
   _loadEmailList() {
-    const { params: { name } } = this.props;
-    getItems('email-lists', { filter: { name } })
+    const { match } = this.props;
+    getItems('email-lists', { filter: { name: match.params.name } })
     .then(emailLists => this.setState({ emailList: emailLists[0] }))
     .catch(error => console.error('!!! EmailListSubscribe catch', error));
   }
@@ -28,13 +28,15 @@ export default class EmailListSubscribe extends Component {
   _onSubscribe(event) {
     event.preventDefault();
     const { addresses, emailList } = this.state;
+    const { router } = this.context;
     postSubscribe(emailList, addresses.split('\n'))
-    .then(() => this.context.router.goBack())
+    .then(() => router.history.goBack())
     .catch(error => this.setState({ error }));
   }
 
   _onCancel() {
-    this.context.router.goBack();
+    const { router } = this.context;
+    router.history.goBack();
   }
 
   render() {
@@ -79,8 +81,10 @@ export default class EmailListSubscribe extends Component {
 }
 
 EmailListSubscribe.propTypes = {
-  params: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };
 

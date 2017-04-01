@@ -24,6 +24,7 @@ export default class Add extends Component {
 
   _onAdd(item) {
     const { category, createSession, showable } = this.props;
+    const { router } = this.context;
     postItem(category, item)
     .then((response) => {
       if (createSession) {
@@ -35,16 +36,17 @@ export default class Add extends Component {
         }
       }
       if (showable) {
-        this.context.router.push(`/${category}/${response._id}`);
+        router.history.push(`/${category}/${response._id}`);
       } else {
-        this.context.router.goBack();
+        router.history.goBack();
       }
     })
     .catch(error => this.setState({ error, item }));
   }
 
   _onCancel() {
-    this.context.router.goBack();
+    const { router } = this.context;
+    router.history.goBack();
   }
 
   render() {

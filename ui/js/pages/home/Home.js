@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getSite, getItem, deleteSession } from '../../actions';
 import Sections from '../../components/Sections';
 import Section from '../../components/Section';
@@ -78,8 +78,9 @@ class Home extends Component {
   }
 
   _signOut() {
+    const { router } = this.context;
     deleteSession()
-    .then(() => this.context.router.go('/'))
+    .then(() => router.history.go('/'))
     .catch(error => console.error('!!! Home _signOut catch', error));
   }
 
@@ -107,8 +108,9 @@ class Home extends Component {
 
   _onSearch(event) {
     const { searchText } = this.state;
+    const { router } = this.context;
     event.preventDefault();
-    this.context.router.push(`/search?q=${searchText}`);
+    router.history.push(`/search?q=${searchText}`);
   }
 
   _renderSession() {

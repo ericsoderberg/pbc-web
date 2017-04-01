@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem, putItem, deleteItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
@@ -31,14 +31,14 @@ class FormEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id ||
+    if (nextProps.match.params.id !== this.props.match.params.id ||
       nextProps.id !== this.props.id) {
       this._load(nextProps);
     }
   }
 
   _load(props) {
-    getItem('forms', props.id || props.params.id)
+    getItem('forms', props.id || props.match.params.id)
     .then((form) => {
       this.setState({ form, formTemplate: undefined, linkedForm: undefined });
       if (form.linkedFormId) {
@@ -63,6 +63,7 @@ class FormEdit extends Component {
     event.preventDefault();
     const { onDone } = this.props;
     const { formTemplate, form, linkedForm } = this.state;
+    const { router } = this.context;
     const error = setFormError(formTemplate, form);
 
     if (error) {
@@ -70,25 +71,27 @@ class FormEdit extends Component {
     } else {
       finalizeForm(formTemplate, form, linkedForm);
       putItem('forms', this.state.form)
-      .then(formSaved => (onDone ? onDone(formSaved) : this.context.router.goBack()))
+      .then(formSaved => (onDone ? onDone(formSaved) : router.history.goBack()))
       .catch(error2 => this.setState({ error2 }));
     }
   }
 
   _onCancel() {
     const { onCancel } = this.props;
+    const { router } = this.context;
     if (onCancel) {
       onCancel();
     } else {
-      this.context.router.goBack();
+      router.history.goBack();
     }
   }
 
   _onRemove(event) {
     const { onDone } = this.props;
+    const { router } = this.context;
     event.preventDefault();
-    deleteItem('forms', this.props.id || this.props.params.id)
-    .then(() => (onDone ? onDone() : this.context.router.goBack()))
+    deleteItem('forms', this.props.id || this.props.match.params.id)
+    .then(() => (onDone ? onDone() : router.history.goBack()))
     .catch(error => this.setState({ error }));
   }
 
@@ -186,8 +189,10 @@ FormEdit.propTypes = {
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   onLinkedForm: PropTypes.func,
-  params: PropTypes.shape({
-    id: PropTypes.string,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+    }),
   }),
 };
 
@@ -201,7 +206,7 @@ FormEdit.defaultProps = {
   onCancel: undefined,
   onDone: undefined,
   onLinkedForm: undefined,
-  params: {},
+  match: {},
 };
 
 FormEdit.contextTypes = {

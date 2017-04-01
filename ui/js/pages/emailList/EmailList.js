@@ -1,11 +1,12 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem, postUnsubscribe } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
 import TrashIcon from '../../icons/Trash';
+import { searchToObject } from '../../utils/Params';
 
 class EmailList extends Component {
 
@@ -26,7 +27,8 @@ class EmailList extends Component {
 
   _setStateFromLocation(props) {
     const { emailList } = this.state;
-    const searchText = props.location.query.search || '';
+    const query = searchToObject(props.location.search);
+    const searchText = query.search || '';
     let addresses = (emailList || {}).addresses || [];
     if (searchText) {
       const exp = new RegExp(searchText, 'i');
@@ -38,9 +40,9 @@ class EmailList extends Component {
   }
 
   _loadEmailList() {
-    const { params: { id } } = this.props;
+    const { match } = this.props;
     const { searchText } = this.state;
-    getItem('email-lists', id)
+    getItem('email-lists', match.params.id)
     .then((emailList) => {
       let addresses = emailList.addresses;
       if (searchText) {
@@ -63,7 +65,7 @@ class EmailList extends Component {
       searchParams.push(`search=${encodeURIComponent(searchText)}`);
     }
 
-    router.replace({
+    router.history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
@@ -170,8 +172,10 @@ class EmailList extends Component {
 }
 
 EmailList.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({

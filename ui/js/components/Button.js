@@ -41,11 +41,13 @@ export default class Button extends Component {
   }
 
   _onClick(event) {
+    const { path, replaceHistory } = this.props;
+    const { router } = this.context;
     event.preventDefault();
-    if (this.props.replaceHistory) {
-      this.context.router.replace(this.props.path);
+    if (replaceHistory) {
+      router.history.replace(path);
     } else {
-      this.context.router.push(this.props.path);
+      router.history.push(path);
     }
   }
 
@@ -55,6 +57,7 @@ export default class Button extends Component {
       secondary, tag, type,
     } = this.props;
     const { width } = this.state;
+    const { router } = this.context;
     const Tag = tag || (path ? 'a' : 'button');
 
     const classNames = [];
@@ -111,7 +114,7 @@ export default class Button extends Component {
     if (this.props.onClick) {
       onClick = this.props.onClick;
     } else if (this.props.path) {
-      href = this.context.router.createPath(this.props.path);
+      href = router.history.createHref({ pathname: this.props.path });
       onClick = this._onClick;
     }
 
@@ -162,10 +165,6 @@ Button.defaultProps = {
   type: 'button',
 };
 
-Button.defaultProps = {
-  type: 'button',
-};
-
 Button.contextTypes = {
-  router: PropTypes.object.isRequired,
+  router: PropTypes.any,
 };

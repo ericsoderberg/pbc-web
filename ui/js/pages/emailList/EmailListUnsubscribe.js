@@ -32,14 +32,14 @@ class EmailListUnsubscribe extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.name !== this.props.params.name) {
+    if (nextProps.match.params.name !== this.props.match.params.name) {
       this._loadEmailList();
     }
   }
 
   _loadEmailList() {
-    const { params: { name } } = this.props;
-    getItems('email-lists', { filter: { name } })
+    const { match } = this.props;
+    getItems('email-lists', { filter: { name: match.params.name } })
     .then(emailLists => this.setState({ emailList: emailLists[0], state: READY }))
     .catch(error => console.error('!!! EmailListUnsubscribe catch', error));
   }
@@ -54,12 +54,15 @@ class EmailListUnsubscribe extends Component {
   }
 
   _onCancel() {
-    this.context.router.replace('/');
+    const { router } = this.context;
+    router.history.replace('/');
   }
 
   render() {
-    const { params: { name }, session } = this.props;
+    const { match, session } = this.props;
     const { emailList, state } = this.state;
+    const { router } = this.context;
+    const name = match.params.name;
 
     let contents;
     switch (state) {
@@ -133,7 +136,7 @@ class EmailListUnsubscribe extends Component {
               </fieldset>
               <footer className="form__footer">
                 <Button label="Home"
-                  onClick={() => this.context.router.replace('/')} />
+                  onClick={() => router.history.replace('/')} />
               </footer>
             </div>
           </div>
@@ -150,8 +153,10 @@ class EmailListUnsubscribe extends Component {
 }
 
 EmailListUnsubscribe.propTypes = {
-  params: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   session: PropTypes.object,
 };

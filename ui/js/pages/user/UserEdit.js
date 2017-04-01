@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem } from '../../actions';
 import Edit from '../../components/Edit';
 import Stored from '../../components/Stored';
@@ -8,23 +8,25 @@ import UserFormContents from './UserFormContents';
 class UserEdit extends Component {
 
   componentDidMount() {
-    if (!this.props.user) {
-      getItem('users', this.props.params.id, { cache: true, populate: true })
-      .catch(error => console.error('!!! UserEdit catch', error));
-    }
+    this._load(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id &&
-      !nextProps.user) {
-      getItem('users', nextProps.params.id, { cache: true, populate: true })
+    if (nextProps.match.params.id !== this.props.match.params.id) {
+      this._load(nextProps);
+    }
+  }
+
+  _load(props) {
+    if (!props.user) {
+      getItem('users', props.match.params.id, { cache: true, populate: true })
       .catch(error => console.error('!!! UserEdit catch', error));
     }
   }
 
   render() {
-    const { params, user } = this.props;
-    const id = encodeURIComponent(params.id);
+    const { match, user } = this.props;
+    const id = encodeURIComponent(match.params.id);
     const name = encodeURIComponent((user || {}).name);
     const email = encodeURIComponent((user || {}).email);
     const formsPath = `/forms?userId=${id}&userId-name=${name}`;
@@ -34,7 +36,7 @@ class UserEdit extends Component {
       <Link key="email" to={emailListsPath}>Email lists</Link>,
     ];
     return (
-      <Edit title="Edit Account" category="users" params={params}
+      <Edit title="Edit Account" category="users" match={match}
         actions={actions} FormContents={UserFormContents}
         onChange={this._onChange} />
     );
@@ -42,8 +44,10 @@ class UserEdit extends Component {
 }
 
 UserEdit.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   user: PropTypes.object,
 };
@@ -59,7 +63,7 @@ UserEdit.contextTypes = {
 const select = (state, props) => {
   let user;
   if (state.users) {
-    user = state.users[props.params.id];
+    user = state.users[props.match.params.id];
   }
   return { user };
 };

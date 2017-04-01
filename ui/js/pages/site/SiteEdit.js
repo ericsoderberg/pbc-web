@@ -21,13 +21,15 @@ export default class SiteEdit extends Component {
   }
 
   _onUpdate(site) {
+    const { router } = this.context;
     postSite(site)
-    .then(() => this.context.router.goBack())
+    .then(() => router.history.goBack())
     .catch(error => this.setState({ error }));
   }
 
   _onCancel() {
-    this.context.router.goBack();
+    const { router } = this.context;
+    router.history.goBack();
   }
 
   render() {

@@ -17,13 +17,13 @@ export default class PageMap extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.params.id !== nextProps.params.id) {
+    if (this.props.match.params.id !== nextProps.match.params.id) {
       this.setState({ rows: undefined }, () => this._get(nextProps));
     }
   }
 
   _get(props) {
-    getPageMap(props.params.id)
+    getPageMap(props.match.params.id)
     .then((map) => {
       const rows = [];
       this._relate(map, 'parents', rows, 0);
@@ -46,10 +46,11 @@ export default class PageMap extends Component {
   }
 
   _renderMap() {
+    const { router } = this.context;
     const rows = this.state.rows.map((row, index) => {
       const pages = row.map((page) => {
         const path = page.path || `/pages/${page._id}`;
-        if (this.context.router.isActive(`${path}/map`)) {
+        if (router.route.location.pathname === `${path}/map`) {
           return (
             <Button key={page._id} className="page-map__page"
               right={true} path={path} replaceHistory={true}>
@@ -98,8 +99,10 @@ export default class PageMap extends Component {
 }
 
 PageMap.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+    }).isRequired,
   }).isRequired,
 };
 

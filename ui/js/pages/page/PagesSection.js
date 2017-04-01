@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem } from '../../actions';
 import Image from '../../components/Image';
 import Button from '../../components/Button';

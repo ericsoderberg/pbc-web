@@ -1,13 +1,17 @@
 
-export function getLocationParams() {
+export function searchToObject(search) {
   const params = {};
-  if (window.location.search) {
-    window.location.search.slice(1).split('&').forEach((param) => {
+  if (search) {
+    search.slice(1).split('&').forEach((param) => {
       const [name, value] = param.split('=');
       params[name] = decodeURIComponent(value);
     });
   }
   return params;
+}
+
+export function getLocationParams() {
+  return searchToObject(window.location.search);
 }
 
 // export function replaceLocationParams (params) {

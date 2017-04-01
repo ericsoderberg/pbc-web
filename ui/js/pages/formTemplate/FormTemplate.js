@@ -1,7 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { getItem, getItems, getFormTemplateDownload } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
@@ -52,8 +52,8 @@ export default class FormTemplate extends Component {
   }
 
   _load() {
-    const { params: { id } } = this.props;
-    getItem('form-templates', id, { totals: true })
+    const { match } = this.props;
+    getItem('form-templates', match.params.id, { totals: true })
     .then((formTemplate) => {
       document.title = formTemplate.name;
 
@@ -111,7 +111,9 @@ export default class FormTemplate extends Component {
       return context;
     })
     .then(() => getItems('forms', {
-      filter: { formTemplateId: id }, populate: true, sort: '-modified',
+      filter: { formTemplateId: match.params.id },
+      populate: true,
+      sort: '-modified',
     })
     .then((forms) => {
       this.setState({ forms, mightHaveMore: forms.length >= 20 });
@@ -120,11 +122,14 @@ export default class FormTemplate extends Component {
   }
 
   _onMore() {
-    const { params: { id } } = this.props;
+    const { match } = this.props;
     this.setState({ loadingMore: true });
     const skip = this.state.forms.length;
     getItems('forms', {
-      filter: { formTemplateId: id }, populate: true, skip, sort: '-modified',
+      filter: { formTemplateId: match.params.id },
+      populate: true,
+      skip,
+      sort: '-modified',
     })
     .then((response) => {
       const forms = this.state.forms.concat(response);
@@ -149,9 +154,9 @@ export default class FormTemplate extends Component {
   }
 
   _onDownload(event) {
-    const { params: { id } } = this.props;
+    const { match } = this.props;
     event.preventDefault();
-    getFormTemplateDownload(id);
+    getFormTemplateDownload(match.params.id);
   }
 
   _filterForms() {
@@ -166,7 +171,8 @@ export default class FormTemplate extends Component {
 
   _editForm(id) {
     return () => {
-      this.context.router.push(`/forms/${id}/edit`);
+      const { router } = this.context;
+      router.history.push(`/forms/${id}/edit`);
     };
   }
 
@@ -449,7 +455,7 @@ export default class FormTemplate extends Component {
   }
 
   render() {
-    const { params: { id } } = this.props;
+    const { match } = this.props;
     const {
       filterActive, formTemplate, forms, loadingMore, mightHaveMore,
     } = this.state;
@@ -470,7 +476,7 @@ export default class FormTemplate extends Component {
     );
 
     actions.push(
-      <a key="download" href={`/api/form-templates/${id}.csv`}
+      <a key="download" href={`/api/form-templates/${match.params.id}.csv`}
         onClick={this._onDownload}>
         Download
       </a>,
@@ -478,7 +484,7 @@ export default class FormTemplate extends Component {
 
     actions.push(
       <Link key="add"
-        to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}>
+        to={`/forms/add?formTemplateId=${encodeURIComponent(match.params.id)}`}>
         Add
       </Link>,
     );
@@ -509,16 +515,18 @@ export default class FormTemplate extends Component {
           title={title} actions={actions} />
         {contents}
         {more}
-        <PageContext filter={id ? { 'sections.formTemplateId': id } :
-          undefined} />
+        <PageContext filter={match.params.id ?
+          { 'sections.formTemplateId': match.params.id } : undefined} />
       </main>
     );
   }
 }
 
 FormTemplate.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };
 

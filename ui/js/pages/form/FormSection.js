@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import Markdown from 'markdown-to-jsx';
 import { getItems, getItem } from '../../actions';

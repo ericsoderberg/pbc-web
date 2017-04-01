@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
@@ -30,8 +30,9 @@ export default class MessageContents extends Component {
   }
 
   _changeToMessage(message) {
+    const { router } = this.context;
     const path = `/messages/${message.path || message._id}`;
-    this.context.router.replace(path);
+    router.history.replace(path);
   }
 
   _onKey(event) {

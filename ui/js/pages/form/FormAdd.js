@@ -1,11 +1,12 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import Stored from '../../components/Stored';
+import { searchToObject } from '../../utils/Params';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
@@ -31,8 +32,9 @@ class FormAdd extends Component {
 
   _load(props) {
     const { session, linkedForm } = props;
-    const formTemplateId =
-      props.formTemplateId || props.location.query.formTemplateId;
+    const { router } = this.context;
+    const query = searchToObject(router.route.location.search);
+    const formTemplateId = props.formTemplateId || query.formTemplateId;
     getItem('form-templates', formTemplateId, { totals: true })
     .then((formTemplate) => {
       const form = {
@@ -66,6 +68,7 @@ class FormAdd extends Component {
     event.preventDefault();
     const { linkedForm, onDone } = this.props;
     const { formTemplate, form } = this.state;
+    const { router } = this.context;
     const error = setFormError(formTemplate, form);
 
     if (error) {
@@ -82,7 +85,7 @@ class FormAdd extends Component {
         }
         return response.form;
       })
-      .then(formSaved => (onDone ? onDone(formSaved) : this.context.router.goBack()))
+      .then(formSaved => (onDone ? onDone(formSaved) : router.history.goBack()))
       .catch((error2) => {
         console.error('!!! FormAdd post error', error2);
         this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
@@ -100,9 +103,11 @@ class FormAdd extends Component {
 
   render() {
     const {
-      className, onCancel, full, inline, linkedForm, onLinkedForm, signInControl,
+      className, onCancel, full, inline, linkedForm, location,
+      onLinkedForm, signInControl,
     } = this.props;
     const { error, form, formTemplate, showSignIn } = this.state;
+    const { router } = this.context;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -110,11 +115,11 @@ class FormAdd extends Component {
 
     let result;
     if (formTemplate && form) {
+      const query = searchToObject(router.route.location.search);
       let cancelControl;
       let headerCancelControl;
-      if (onCancel || (this.props.location &&
-        this.props.location.query.formTemplateId)) {
-        const cancelFunc = onCancel || (() => this.context.router.goBack());
+      if (onCancel || (location && query.formTemplateId)) {
+        const cancelFunc = onCancel || (() => router.history.goBack());
         cancelControl = (
           <Button secondary={true} label="Cancel" onClick={cancelFunc} />
         );
@@ -188,11 +193,7 @@ FormAdd.propTypes = {
   full: PropTypes.bool,
   inline: PropTypes.bool,
   linkedForm: PropTypes.object,
-  location: PropTypes.shape({
-    query: PropTypes.shape({
-      formTemplateId: PropTypes.string,
-    }),
-  }),
+  location: PropTypes.object,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   onLinkedForm: PropTypes.func,

@@ -1,11 +1,14 @@
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import List from '../../components/List';
 import UserIcon from '../../icons/User';
 
 const Item = (props) => {
   const { className, item: user } = props;
-  const classNames = ['item__container', className];
+  const classNames = ['item__container'];
+  if (className) {
+    classNames.push(className);
+  }
   let avatar;
   if (user.image) {
     avatar = <img className="avatar" alt="avatar" src={user.image.data} />;

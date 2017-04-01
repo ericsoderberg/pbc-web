@@ -16,21 +16,22 @@ export default class Show extends Component {
 
   componentWillReceiveProps(nextProps) {
     if ((nextProps.category !== this.props.category ||
-      nextProps.params.id !== this.props.params.id)) {
+      nextProps.match.params.id !== this.props.match.params.id)) {
       this._load(nextProps);
     }
   }
 
   _load(props) {
-    if (props.item) {
-      document.title = props.item.name;
-      this.setState({ item: props.item });
+    const { category, item, match } = props;
+    if (item) {
+      document.title = item.name;
+      this.setState({ item });
     } else {
       this.setState({ item: undefined });
-      getItem(props.category, props.params.id)
-      .then((item) => {
-        document.title = item.name;
-        this.setState({ item });
+      getItem(category, match.params.id)
+      .then((itemLoaded) => {
+        document.title = itemLoaded.name;
+        this.setState({ item: itemLoaded });
       })
       .catch(error => console.error('!!! Show catch', error));
     }
@@ -61,8 +62,10 @@ Show.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
   Contents: PropTypes.func.isRequired,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   title: PropTypes.string,
 };

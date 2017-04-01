@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { getCalendar, getItems } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -9,6 +9,7 @@ import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
 import PageContext from '../page/PageContext';
 import Stored from '../../components/Stored';
+import { searchToObject } from '../../utils/Params';
 
 const LEFT_KEY = 37;
 const RIGHT_KEY = 39;
@@ -51,17 +52,17 @@ class Calendar extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id ||
-      nextProps.location.query.date !== this.props.location.query.date) {
+    if (nextProps.match.params.id !== this.props.match.params.id ||
+      nextProps.location.search !== this.props.location.search) {
       const locationState = this._stateFromLocation(nextProps.location);
       this.setState(locationState, this._throttledLoad);
     }
   }
 
   componentDidUpdate() {
-    const { loading, needScrollToFocus } = this.state;
-    if (needScrollToFocus && !loading) {
-      this.setState({ needScrollToFocus: false });
+    const { loading } = this.state;
+    if (this._needScrollToFocus && !loading) {
+      this._needScrollToFocus = false;
       this._scrollToFocus();
     }
   }
@@ -71,7 +72,7 @@ class Calendar extends Component {
   }
 
   _stateFromLocation(location) {
-    const { query } = location;
+    const query = searchToObject(location.search);
     let focus;
     if (query.focus) {
       focus = moment(query.focus, DATE_FORMAT, true);
@@ -94,14 +95,14 @@ class Calendar extends Component {
     const state = {
       date,
       focus,
-      needScrollToFocus: query.focus !== undefined,
       searchText: query.search,
     };
+    this._needScrollToFocus = query.focus !== undefined;
     return state;
   }
 
   _load(props) {
-    const { params: { id } } = props;
+    const { match: { params: { id } } } = props;
     const { activeCalendars, date, months, searchText } = this.state;
     this.setState({ loading: true });
     const ids = Object.keys(activeCalendars);
@@ -116,6 +117,7 @@ class Calendar extends Component {
   }
 
   _throttledLoad() {
+    const { router } = this.context;
     const { date, focus, searchText } = this.state;
 
     // throttle gets when user is typing
@@ -134,7 +136,7 @@ class Calendar extends Component {
       searchParams.push(`date=${encodeURIComponent(date.format(DATE_FORMAT))}`);
     }
 
-    this.context.router.replace({
+    router.history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
@@ -172,9 +174,10 @@ class Calendar extends Component {
   }
 
   _onFilter(event) {
+    const { router } = this.context;
     const value = event.target.value;
     const search = (value && value !== 'All') ? `?name=${value}` : undefined;
-    this.context.router.replace({ pathname: '/calendar', search });
+    router.history.replace({ pathname: '/calendar', search });
   }
 
   _onMore() {
@@ -324,7 +327,7 @@ class Calendar extends Component {
   }
 
   render() {
-    const { params: { id }, session } = this.props;
+    const { match: { params: { id } }, session } = this.props;
     const { calendar, filterActive, loadingMore, searchText, loading } = this.state;
 
     let contents;
@@ -445,11 +448,11 @@ class Calendar extends Component {
 }
 
 Calendar.propTypes = {
-  location: PropTypes.shape({
-    query: PropTypes.object,
-  }).isRequired,
-  params: PropTypes.shape({
-    id: PropTypes.string,
+  location: PropTypes.object.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+    }).isRequired,
   }).isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({

@@ -1,18 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, browserHistory } from 'react-router';
-import routes from './routes';
 import { initialize } from './actions';
+import App from './components/App';
 
 require('leaflet/dist/leaflet.css');
 require('../scss/index.scss');
 
 initialize();
 
-const main = (
-  <Router history={browserHistory} routes={routes}
-    onUpdate={() => { document.body.scrollTop = 0; }} />
-);
+const main = <App />;
 
 const element = document.getElementById('content');
 

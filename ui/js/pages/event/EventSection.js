@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem } from '../../actions';
 import EventTimes from './EventTimes';
 import Map from '../../components/Map';

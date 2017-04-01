@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { postVerifyEmail, postSessionViaToken } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
@@ -143,7 +143,8 @@ class VerifyEmail extends Component {
 
   _onCancel() {
     const { returnPath } = this.props;
-    this.context.router.push(returnPath);
+    const { router } = this.context;
+    router.history.push(returnPath);
   }
 
   _onSendLink(event) {

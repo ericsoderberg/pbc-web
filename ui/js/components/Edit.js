@@ -17,15 +17,16 @@ export default class Edit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id) {
+    if (nextProps.match.params.id !== this.props.match.params.id) {
       this._load(nextProps);
     }
   }
 
   _load(props) {
-    document.title = props.title;
+    const { category, match, title } = props;
+    document.title = title;
     this.setState({ loading: true });
-    getItem(props.category, props.params.id)
+    getItem(category, match.params.id)
     .then((item) => {
       const { onChange } = props;
       this.setState({ item, loading: false });
@@ -37,38 +38,42 @@ export default class Edit extends Component {
   }
 
   _onUpdate(item) {
-    putItem(this.props.category, item)
+    const { category, onUpdate } = this.props;
+    const { router } = this.context;
+    putItem(category, item)
     .then((response) => {
-      if (this.props.onUpdate) {
-        return this.props.onUpdate(item);
+      if (onUpdate) {
+        return onUpdate(item);
       }
       return response;
     })
-    .then(() => this.context.router.goBack())
+    .then(() => router.history.goBack())
     .catch(error => this.setState({ error }));
   }
 
   _onRemove() {
-    const { category, params: { id }, removeBackLevel } = this.props;
-    deleteItem(category, id)
-    .then(() => this.context.router.go(-(removeBackLevel)))
+    const { category, match, removeBackLevel } = this.props;
+    const { router } = this.context;
+    deleteItem(category, match.params.id)
+    .then(() => router.history.go(-(removeBackLevel)))
     .catch(error => this.setState({ error }));
   }
 
   _onCancel() {
-    this.context.router.goBack();
+    const { router } = this.context;
+    router.history.goBack();
   }
 
   render() {
     const {
-      actions, category, params: { id }, footerActions, FormContents,
+      actions, category, match, footerActions, FormContents,
       onChange, Preview, submitLabel, title,
     } = this.props;
     const { item, error, loading } = this.state;
     return (
       <Form title={title} actions={actions} footerActions={footerActions}
         submitLabel={submitLabel} loading={loading}
-        action={`/api/${category}/${id}`}
+        action={`/api/${category}/${match.params.id}`}
         FormContents={FormContents} Preview={Preview} item={item}
         onChange={onChange}
         onSubmit={this._onUpdate} onRemove={this._onRemove}
@@ -84,8 +89,10 @@ Edit.propTypes = {
   footerActions: PropTypes.node,
   onChange: PropTypes.func,
   onUpdate: PropTypes.func,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   Preview: PropTypes.func,
   removeBackLevel: PropTypes.number,

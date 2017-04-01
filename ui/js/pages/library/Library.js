@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem, getItems } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
@@ -25,8 +25,8 @@ class Library extends Component {
   }
 
   _loadLibrary() {
-    const { params: { id } } = this.props;
-    getItem('libraries', id)
+    const { match } = this.props;
+    getItem('libraries', match.params.id)
     .then((library) => {
       this.setState({ library });
       getItems('pages', {
@@ -76,8 +76,10 @@ class Library extends Component {
 
 Library.propTypes = {
   location: PropTypes.object.isRequired,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getSearch } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Text from '../../components/Text';
@@ -59,13 +59,14 @@ export default class Search extends Component {
   }
 
   _onSearch(event) {
+    const { history } = this.props;
     const searchText = event.target.value;
     this.setState({ searchText, loading: true });
     // debounce typing
     clearTimeout(this._searchTimer);
     this._searchTimer = setTimeout(this._get, 100);
     // Put the search term in the browser location
-    this.context.router.replace({
+    history.replace({
       pathname: '/search',
       search: `?q=${encodeURIComponent(searchText)}`,
     });
@@ -128,6 +129,6 @@ export default class Search extends Component {
   }
 }
 
-Search.contextTypes = {
-  router: PropTypes.any,
+Search.propTypes = {
+  history: PropTypes.any.isRequired,
 };

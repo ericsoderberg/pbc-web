@@ -1,6 +1,6 @@
 
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const PageItem = (props) => {
   const { align, className, item: page } = props;

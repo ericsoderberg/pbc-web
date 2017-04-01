@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
@@ -10,16 +10,18 @@ import MessageContents from './MessageContents';
 class Message extends Component {
 
   componentDidMount() {
-    if (!this.props.message) {
-      getItem('messages', this.props.params.id, { cache: true, populate: true })
+    const { message, match } = this.props;
+    if (!message) {
+      getItem('messages', match.params.id, { cache: true, populate: true })
       .catch(error => console.error('!!! Message catch', error));
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id &&
+    if (nextProps.match.params.id !== this.props.match.params.id &&
       !nextProps.message) {
-      getItem('messages', nextProps.params.id, { cache: true, populate: true })
+      getItem('messages', nextProps.match.params.id,
+        { cache: true, populate: true })
       .catch(error => console.error('!!! Message catch', error));
     }
     if (nextProps.message) {
@@ -53,8 +55,10 @@ class Message extends Component {
 
 Message.propTypes = {
   message: PropTypes.object,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };
 
@@ -65,7 +69,7 @@ Message.defaultProps = {
 const select = (state, props) => {
   let message;
   if (state.messages) {
-    message = state.messages[props.params.id];
+    message = state.messages[props.match.params.id];
   }
   return {
     message,

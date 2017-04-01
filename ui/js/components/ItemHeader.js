@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { postItem } from '../actions';
 import PageHeader from './PageHeader';
 import Stored from './Stored';
@@ -15,13 +15,14 @@ class ItemHeader extends Component {
   _onCopy(event) {
     event.preventDefault();
     const { category, item } = this.props;
+    const { router } = this.context;
     const copyItem = { ...item };
     copyItem.name += ' - Copy';
     delete copyItem._id;
     delete copyItem.path;
     postItem(category, copyItem)
     .then((newItem) => {
-      this.context.router.push(`/${category}/${newItem._id}/edit`);
+      router.history.push(`/${category}/${newItem._id}/edit`);
     })
     .catch(error => console.error('!!! ItemHeader catch', error));
   }

@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
@@ -23,7 +23,7 @@ class Page extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id &&
+    if (nextProps.match.params.id !== this.props.match.params.id &&
       !nextProps.page) {
       this._load(nextProps);
     }
@@ -33,7 +33,7 @@ class Page extends Component {
   }
 
   _load(props) {
-    getItem('pages', props.params.id, { cache: true, populate: true })
+    getItem('pages', props.match.params.id, { cache: true, populate: true })
     .catch((error) => {
       console.error('!!! Page catch', error);
       this.setState({ error });
@@ -73,8 +73,10 @@ class Page extends Component {
 
 Page.propTypes = {
   page: PropTypes.object,
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({
@@ -92,7 +94,7 @@ Page.defaultProps = {
 const select = (state, props) => {
   let page;
   if (state.pages) {
-    page = state.pages[props.params.id];
+    page = state.pages[props.match.params.id];
   }
   return { page, session: state.session };
 };

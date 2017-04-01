@@ -19,12 +19,12 @@ export default class Newsletter extends Component {
   }
 
   componentDidMount() {
-    this._load(this.props.params.id);
+    this._load(this.props.match.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id) {
-      this._load(nextProps.params.id);
+    if (nextProps.match.params.id !== this.props.match.params.id) {
+      this._load(nextProps.match.params.id);
     }
   }
 
@@ -40,7 +40,7 @@ export default class Newsletter extends Component {
   _onSend(event) {
     const { address } = this.state;
     event.preventDefault();
-    postNewsletterSend(this.props.params.id, address)
+    postNewsletterSend(this.props.match.params.id, address)
     .then(() => this.setState({ sendState: SENT }))
     .catch(() => this.setState({ sendState: ERROR }));
   }
@@ -88,7 +88,9 @@ export default class Newsletter extends Component {
 }
 
 Newsletter.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };

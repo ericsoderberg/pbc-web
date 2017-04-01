@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
 import { getItem } from '../../actions';
 import Image from '../../components/Image';
@@ -51,9 +51,13 @@ export default class PeopleSection extends Component {
         user = person.id;
       } else {
         // populated via _load
-        user = this.state.users[person.id] || {};
+        user = this.state.users[person.id];
       }
-
+      return { person, user };
+    })
+    .filter(context => context.user)
+    .map((context) => {
+      const { person, user } = context;
       let image;
       if (person.image || user.image) {
         image = (
@@ -88,9 +92,10 @@ export default class PeopleSection extends Component {
 
 PeopleSection.propTypes = {
   className: PropTypes.string,
-  people: PropTypes.array.isRequired,
+  people: PropTypes.array,
 };
 
 PeopleSection.defaultProps = {
   className: undefined,
+  people: [],
 };

@@ -22,15 +22,17 @@ export default class PageHeader extends Component {
   }
 
   _onHome() {
-    this.context.router.push('/');
+    const { router } = this.context;
+    router.history.push('/');
   }
 
   _onBack() {
     const { back } = this.props;
+    const { router } = this.context;
     if (typeof back === 'string') {
-      this.context.router.push(back);
+      router.history.push(back);
     } else {
-      this.context.router.goBack();
+      router.history.goBack();
     }
   }
 

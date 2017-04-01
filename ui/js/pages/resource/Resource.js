@@ -12,12 +12,12 @@ export default class Resource extends Component {
   }
 
   componentDidMount() {
-    this._load(this.props.params.id);
+    this._load(this.props.match.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.params.id !== this.props.params.id) {
-      this._load(nextProps.params.id);
+    if (nextProps.match.params.id !== this.props.match.params.id) {
+      this._load(nextProps.match.params.id);
     }
   }
 
@@ -51,7 +51,9 @@ export default class Resource extends Component {
 }
 
 Resource.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };

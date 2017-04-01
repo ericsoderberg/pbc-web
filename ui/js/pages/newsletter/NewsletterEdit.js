@@ -19,6 +19,7 @@ export default class NewsletterEdit extends Component {
   }
 
   _onCopy(event) {
+    const { router } = this.context;
     event.preventDefault();
     const { newsletter } = this.state;
     const copyItem = { ...newsletter };
@@ -27,18 +28,18 @@ export default class NewsletterEdit extends Component {
     delete copyItem.address;
     postItem('newsletters', copyItem)
     .then((newItem) => {
-      this.context.router.replace(`/newsletters/${newItem._id}/edit`);
+      router.history.replace(`/newsletters/${newItem._id}/edit`);
     })
     .catch(error => console.error('!!! NewsletterEdit catch', error));
   }
 
   render() {
-    const { params } = this.props;
+    const { match } = this.props;
     const copyControl = (
       <Button label="Copy" secondary={true} onClick={this._onCopy} />
     );
     return (
-      <Edit title="Edit Newsletter" category="newsletters" params={params}
+      <Edit title="Edit Newsletter" category="newsletters" params={match.params}
         footerActions={copyControl} removeBackLevel={1}
         FormContents={NewsletterFormContents} Preview={NewsletterPreview}
         onChange={this._onChange} />
@@ -47,8 +48,10 @@ export default class NewsletterEdit extends Component {
 }
 
 NewsletterEdit.propTypes = {
-  params: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
 };
 

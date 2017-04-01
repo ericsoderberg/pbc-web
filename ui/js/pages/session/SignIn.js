@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { postSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
@@ -29,16 +29,18 @@ export default class SignIn extends Component {
   }
 
   _onCancel() {
-    this.context.router.push('/');
+    const { router } = this.context;
+    router.history.push('/');
   }
 
   _onSignIn(event) {
     const { inline } = this.props;
+    const { router } = this.context;
     event.preventDefault();
     postSession(this.state.formState.object)
       .then(() => {
         if (!inline) {
-          this.context.router.push('/');
+          router.history.push('/');
         }
       })
       .catch(error => this.setState({ error }));
