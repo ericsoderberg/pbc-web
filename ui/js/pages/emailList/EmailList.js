@@ -129,7 +129,7 @@ class EmailList extends Component {
             <div className={classNames.join(' ')}>
               <span className="item__name">{address.address}</span>
               <span className="box__connector" />
-              <div className="box--row">
+              <div className="box--row box--static box--between">
                 {user}
                 {state}
                 <button type="button" className="button-icon"

@@ -18,7 +18,7 @@ const Item = (props) => {
   return (
     <Link className={classNames.join(' ')} to={`/users/${user._id}`}>
       <div className="item">
-        <span className="box--row">
+        <span className="box--row box--static">
           {avatar}
           <span className="item__name">{user.name}</span>
         </span>

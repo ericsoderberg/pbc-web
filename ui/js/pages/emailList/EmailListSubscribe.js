@@ -58,19 +58,23 @@ export default class EmailListSubscribe extends Component {
             onSubmit={this._onSubscribe}>
             <PageHeader title={`Subscribe to ${emailList.name}`}
               actions={[cancel]} />
-            <fieldset className="form__fields">
-              <FormField label="Addresses" help="one per line">
-                <textarea name="addresses" rows="6" value={addresses}
-                  onChange={e =>
-                    this.setState({ addresses: e.target.value })} />
-              </FormField>
-            </fieldset>
-            <footer className="form__footer">
-              <button type="submit" className="button"
-                onClick={this._onSubscribe}>
-                Subscribe
-              </button>
-            </footer>
+            <div className="form__contents">
+              <fieldset className="form__fields">
+                <FormField label="Addresses" help="one per line">
+                  <textarea name="addresses" rows="6" value={addresses}
+                    onChange={e =>
+                      this.setState({ addresses: e.target.value })} />
+                </FormField>
+              </fieldset>
+            </div>
+            <div className="form__footer-container">
+              <footer className="form__footer">
+                <button type="submit" className="button"
+                  onClick={this._onSubscribe}>
+                  Subscribe
+                </button>
+              </footer>
+            </div>
           </form>
         </div>
       );

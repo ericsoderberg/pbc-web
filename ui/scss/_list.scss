@@ -249,6 +249,10 @@ button.item__container {
   height: 1px;
   border-left: $unit solid transparent;
   border-right: $unit solid transparent;
+
+  @media all and (max-width: 699px) {
+    display: none;
+  }
 }
 
 .email-list__addresses {
