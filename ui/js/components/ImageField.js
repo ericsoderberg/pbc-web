@@ -9,6 +9,7 @@ export default class ImageField extends Component {
 
     let result;
     if (image) {
+      const darkName = `${name}-dark`;
       result = (
         <FormField label={label} help={help}>
           <div>
@@ -16,13 +17,14 @@ export default class ImageField extends Component {
           </div>
           <div className="image-field__controls">
             <span>
-              <input name={`${name}-dark`} type="checkbox" checked={image.dark}
+              <input id={darkName} name={darkName} type="checkbox"
+                checked={image.dark}
                 onChange={() => formState.set(property,
                   { ...image, dark: !image.dark })} />
-              <label htmlFor={`${name}-dark`}>Dark</label>
+              <label htmlFor={darkName}>Dark</label>
             </span>
             <span>
-              <input name={name} type="checkbox" checked={false}
+              <input id={name} name={name} type="checkbox" checked={false}
                 onChange={() => formState.set(property, false)} />
               <label htmlFor={name}>Clear</label>
             </span>
