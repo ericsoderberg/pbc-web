@@ -52,7 +52,8 @@ export default class FilesItemEdit extends Component {
     } else if (file.name) {
       // uploading
       fileField = (
-        <FormField name={`file-${index}`} label="File">
+        <FormField name={`file-${index}`} label="File"
+          help="Uploading, PLEASE WAIT ...">
           <Loading small={true} />
         </FormField>
       );

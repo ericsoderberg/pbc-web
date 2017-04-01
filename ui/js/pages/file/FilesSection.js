@@ -57,7 +57,7 @@ export default class FilesSection extends Component {
       }
     });
 
-    const items = (files || []).map((file, index) => {
+    const items = (files || []).filter(file => file.name).map((file, index) => {
       if (!file._id) {
         // populated via _load
         file = this.state.files[file.id] || {};
