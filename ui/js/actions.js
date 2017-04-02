@@ -300,7 +300,17 @@ export function getResourcesEvents() {
 
 export function getFormTemplateDownload(id) {
   return fetch(`/api/form-templates/${id}.csv`, {
-    method: 'GET', headers: _headers });
+    method: 'GET', headers: _headers })
+    .then((response) => {
+      // const cd = response.headers.get('Content-Disposition');
+      // const name = cd && cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
+      response.blob()
+      // .then(blob => window.saveAs(blob, name));
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        window.location.replace(blobUrl);
+      });
+    });
 }
 
 // Newsletter

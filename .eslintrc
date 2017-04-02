@@ -16,6 +16,7 @@
     "localStorage": true,
     "paypal": true,
     # "test": true,
+    "URL": true,
     "window": true
   },
   "rules": {
