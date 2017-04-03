@@ -242,6 +242,11 @@
   }
 }
 
+.form-field--focus {
+  z-index: 2;
+  border-color: $focus-border-color;
+}
+
 @media screen {
   .textarea-print {
     display: none;

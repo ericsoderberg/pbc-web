@@ -6,11 +6,45 @@ export default class FormField extends Component {
   constructor() {
     super();
     this._onClick = this._onClick.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
     this._onDragEnter = this._onDragEnter.bind(this);
     this._onDragOver = this._onDragOver.bind(this);
     this._onDragLeave = this._onDragLeave.bind(this);
     this._onDrop = this._onDrop.bind(this);
-    this.state = {};
+    this.state = {
+      focus: false,
+    };
+  }
+
+  componentDidMount() {
+    const contentsElement = this._componentRef;
+    if (contentsElement) {
+      const inputElements = (
+        contentsElement.querySelectorAll('input, textarea, select')
+      );
+      if (inputElements.length === 1) {
+        this._inputElement = inputElements[0];
+        this._inputElement.addEventListener('focus', this._onFocus);
+        this._inputElement.addEventListener('blur', this._onBlur);
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    if (this._inputElement) {
+      this._inputElement.removeEventListener('focus', this._onFocus);
+      this._inputElement.removeEventListener('blur', this._onBlur);
+      delete this._inputElement;
+    }
+  }
+
+  _onFocus() {
+    this.setState({ focus: true });
+  }
+
+  _onBlur() {
+    this.setState({ focus: false });
   }
 
   _onClick() {
@@ -42,10 +76,14 @@ export default class FormField extends Component {
   }
 
   render() {
-    const { dragging, helpActive } = this.state;
+    const { dragging, helpActive, focus } = this.state;
     const classNames = ['form-field'];
     if (dragging) {
       classNames.push('form-field--dragging');
+    }
+
+    if (focus) {
+      classNames.push('form-field--focus');
     }
 
     let label;
