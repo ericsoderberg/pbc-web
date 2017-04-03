@@ -31,8 +31,10 @@ class FormEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id ||
-      nextProps.id !== this.props.id) {
+    if (nextProps.id !== this.props.id ||
+      (nextProps.match && this.props.match &&
+        nextProps.match.params && this.props.match.params &&
+        nextProps.match.params.id !== this.props.match.params.id)) {
       this._load(nextProps);
     }
   }
@@ -92,7 +94,10 @@ class FormEdit extends Component {
     event.preventDefault();
     deleteItem('forms', this.props.id || this.props.match.params.id)
     .then(() => (onDone ? onDone() : router.history.goBack()))
-    .catch(error => this.setState({ error }));
+    .catch((error) => {
+      console.error('!!!', error);
+      this.setState({ error });
+    });
   }
 
   _onChange(form) {

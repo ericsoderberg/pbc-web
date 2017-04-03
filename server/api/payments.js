@@ -2,10 +2,20 @@ import mongoose from 'mongoose';
 import register from './register';
 import { authorize, authorizedForDomainOrSelf } from './auth';
 import { unsetDomainIfNeeded } from './domains';
+import { getPostData } from './utils';
 
 mongoose.Promise = global.Promise;
 
 // /api/payments
+
+const deletePaymentRelated = (doc) => {
+  const Form = mongoose.model('Form');
+  Form.update(
+    { paymentIds: doc._id },
+    { $pull: { formIds: doc._id } },
+  ).exec()
+  .then(() => doc);
+};
 
 export default function (router) {
   register(router, {
@@ -26,20 +36,23 @@ export default function (router) {
     put: {
       transformIn: unsetDomainIfNeeded,
     },
+    delete: {
+      deleteRelated: deletePaymentRelated,
+    },
   });
 
   router.post('/payments', (req, res) => {
     authorize(req, res)
-    .then((session) => {
+    .then(session => getPostData(req).then(data => ({ session, data })))
+    .then((context) => {
+      const { data } = context;
       const FormTemplate = mongoose.model('FormTemplate');
-      const data = req.body;
       return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
-      .then(formTemplate => ({ formTemplate, session }));
+      .then(formTemplate => ({ formTemplate, ...context }));
     })
     .then((context) => {
-      const { formTemplate, session } = context;
+      const { data, formTemplate, session } = context;
       const Payment = mongoose.model('Payment');
-      const data = req.body;
       data.created = new Date();
       data.modified = data.created;
       if (!data.sent) {
@@ -53,20 +66,23 @@ export default function (router) {
         data.userId = session.userId;
       }
       const payment = new Payment(data);
-      return payment.save();
+      return payment.save().then(doc => ({ doc, ...context }));
     })
-    .then((doc) => {
+    .then((context) => {
+      const { data, doc } = context;
       // update forms to record payment
       const Form = mongoose.model('Form');
+      // PayPal NVP API doesn't preserve formIds array :(
+      const formIds = data.formIds.split(',');
       const promises = [];
-      req.body.formIds.forEach((formId) => {
+      formIds.forEach((formId) => {
         promises.push(Form.findOne({ _id: formId }).exec()
         .then((form) => {
           form.paymentIds.push(doc._id);
           return form.save();
         }));
       });
-      return Promise.all(promises);
+      return Promise.all(promises).then(() => doc);
     })
     .then(doc => res.status(200).send(doc))
     .catch((error) => {

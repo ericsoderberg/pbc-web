@@ -7,6 +7,14 @@ const _headers = {
 };
 let _sessionId;
 
+export function getHeaders() {
+  return { ..._headers };
+}
+
+export function getHeader(name) {
+  return _headers[name];
+}
+
 const processStatus = (response) => {
   if (response.ok) {
     return Promise.resolve(response);

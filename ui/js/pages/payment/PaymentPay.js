@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { postItem } from '../../actions';
+import { getHeader, postItem } from '../../actions';
 import Stored from '../../components/Stored';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
@@ -30,7 +30,7 @@ class PaymentPay extends Component {
     if (!paypalLoaded) {
       paypalLoaded = true;
       const script = document.createElement('script');
-      script.src = '//www.paypalobjects.com/api/checkout.js';
+      script.src = 'https://www.paypalobjects.com/api/checkout.js';
       script.async = true;
       document.body.appendChild(script);
       // wait for paypal to be ready
@@ -64,6 +64,55 @@ class PaymentPay extends Component {
     }
   }
 
+  _paypalPayment(resolve, reject) {
+    // const { site å} = this.props;
+    const { formTemplateName } = this.props;
+    const { formState } = this.state;
+    const payment = formState.object;
+
+    // PayPal NVP API integration
+    const payload = {
+      amount: payment.amount,
+      formTemplateName,
+      cancelUrl: window.location.href,
+      returnUrl: window.location.href,
+    };
+    // only set Authorization header
+    return paypal.request.post('/api/paypal', payload,
+      { headers: { Authorization: getHeader('Authorization') } })
+    .then(data => resolve(data.token))
+    .catch(err => reject(err));
+
+    // PayPal REST API integration
+    // return paypal.rest.payment.create('sandbox',
+    //   { sandbox: site.paypalClientId },
+    //   { transactions: [
+    //     { amount: { total: payment.amount, currency: 'USD' } },
+    //   ] },
+    // );
+  }
+
+  _onAuthorize(data) { // , actions) {
+    const { formTemplateId, onDone } = this.props;
+    const { formState } = this.state;
+    const payment = formState.object;
+
+    // PayPal NVP API integration
+    payment.formTemplateId = formTemplateId;
+    payment.payPalId = data.paymentToken;
+    return paypal.request.post('/api/payments', payment,
+      { headers: { Authorization: getHeader('Authorization') } })
+    .then(() => onDone())
+    .catch(err => this.setState({ error: err }));
+
+    // PayPal REST API integration
+    // return actions.payment.execute().then(() => {
+    //   payment.payPalId = data.paymentID;
+    //   payment.received = (new Date()).toISOString();
+    //   this._onAdd(payment);
+    // });
+  }
+
   _setItem(item) {
     this.setState({ formState: new FormState(item, this._setItem) });
   }
@@ -95,30 +144,8 @@ class PaymentPay extends Component {
     onCancel(this.state.formState.object);
   }
 
-  _paypalPayment() {
-    const { site } = this.props;
-    const { formState } = this.state;
-    const payment = formState.object;
-    return paypal.rest.payment.create('sandbox',
-      { sandbox: site.paypalClientId },
-      { transactions: [
-        { amount: { total: payment.amount, currency: 'USD' } },
-      ] },
-    );
-  }
-
-  _onAuthorize(data, actions) {
-    const { formState } = this.state;
-    const payment = formState.object;
-    return actions.payment.execute().then(() => {
-      payment.payPalId = data.paymentID;
-      payment.received = (new Date()).toISOString();
-      this._onAdd(payment);
-    });
-  }
-
   render() {
-    const { amount, formIds, payByCheckInstructions, session } = this.props;
+    const { payByCheckInstructions, session } = this.props;
     const { formState, error } = this.state;
     const payment = formState.object;
 
@@ -146,8 +173,8 @@ class PaymentPay extends Component {
       <form className="form" action="/api/payments" onSubmit={this._onSubmit}>
         <div className="form__text"><h2>Payment</h2></div>
         <FormError message={error} />
-        <PaymentFormContents inline={true} full={false} amount={amount}
-          payByCheckInstructions={payByCheckInstructions} formIds={formIds}
+        <PaymentFormContents full={false}
+          payByCheckInstructions={payByCheckInstructions}
           formState={formState} session={session} />
         {notification}
         <footer className="form__footer">
@@ -164,6 +191,8 @@ class PaymentPay extends Component {
 PaymentPay.propTypes = {
   amount: PropTypes.number.isRequired,
   formIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  formTemplateId: PropTypes.string.isRequired,
+  formTemplateName: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
   onDone: PropTypes.func.isRequired,
   payByCheckInstructions: PropTypes.string,

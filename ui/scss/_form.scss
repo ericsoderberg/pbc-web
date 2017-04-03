@@ -940,9 +940,15 @@
   }
 }
 
-.form-summary__pay {
+.form-summary__pay,
+.form-summary__paid {
+  display: block;
   margin-top: $unit;
   font-size: 1.25rem;
+}
+
+.form-summary__paid {
+  padding: 0 $unit;
 }
 
 .form-table {
