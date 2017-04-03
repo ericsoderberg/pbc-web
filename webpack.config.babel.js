@@ -1,32 +1,34 @@
 import webpack from 'webpack';
 import path from 'path';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
-var mode = process.env.NODE_ENV || 'production';
-var PRODUCTION = (mode === 'production');
-var DEVELOPMENT = (mode === 'development');
+const mode = process.env.NODE_ENV || 'production';
+const PRODUCTION = (mode === 'production');
+const DEVELOPMENT = (mode === 'development');
 
-var plugins = [
+const plugins = [
+  new CopyWebpackPlugin([{ from: './ui/index.html' }]),
   new webpack.ProvidePlugin({
-    'fetch':
-      'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+    fetch:
+      'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch',
   }),
   new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor',
-    minChunks: function (module) {
+    minChunks: (module) => (
       // this assumes your vendor imports exist in the node_modules directory
-      return module.context && module.context.indexOf('node_modules') !== -1;
-    }
-  })
+      module.context && module.context.indexOf('node_modules') !== -1
+    ),
+  }),
 ];
 if (PRODUCTION) {
   // plugins.push(new webpack.optimize.OccurenceOrderPlugin());
   plugins.push(new webpack.DefinePlugin({
     'process.env': {
-      NODE_ENV: JSON.stringify('production')
-    }
+      NODE_ENV: JSON.stringify('production'),
+    },
   }));
   plugins.push(new webpack.optimize.UglifyJsPlugin({
-    sourceMap: true
+    sourceMap: true,
   }));
 } else if (DEVELOPMENT) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
@@ -35,13 +37,13 @@ if (PRODUCTION) {
 const config = {
   entry: {
     app: './ui/js/index',
-    vendor: ['react-dom', 'react', 'moment', 'leaflet']
+    vendor: ['react-dom', 'react', 'moment', 'leaflet'],
   },
 
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/'
+    publicPath: '/',
   },
 
   devtool: DEVELOPMENT ? 'eval' : undefined,
@@ -49,8 +51,8 @@ const config = {
     hot: true,
     proxy: {
       '/api/*': 'http://localhost:8091',
-      '/file/*': 'http://localhost:8091'
-    }
+      '/file/*': 'http://localhost:8091',
+    },
   } : undefined,
 
   module: {
@@ -58,55 +60,54 @@ const config = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        exclude: /(node_modules|ui\/lib)/
+        exclude: /(node_modules|ui\/lib)/,
       },
       {
         test: /\.svg$/,
         use: [{
           loader: 'file-loader',
-          options: { mimetype: 'image/svg' }
-        }]
+          options: { mimetype: 'image/svg' },
+        }],
       },
       {
         test: /\.jpg$/,
         use: [{
           loader: 'file-loader',
-          options: { mimetype: 'image/jpg' }
-        }]
+          options: { mimetype: 'image/jpg' },
+        }],
       },
       {
         test: /\.png$/,
         use: [{
           loader: 'file-loader',
-          options: { mimetype: 'image/png' }
-        }]
+          options: { mimetype: 'image/png' },
+        }],
       },
       {
         test: /\.woff$/,
         use: [{
           loader: 'file-loader',
-          options: { mimetype: 'application/font-woff' }
-        }]
+          options: { mimetype: 'application/font-woff' },
+        }],
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
 
-  plugins: plugins,
+  plugins,
 
-  resolve : {
+  resolve: {
     extensions:
       ['.js', '.json', '.html', '.html', '.scss', '.md', '.svg']
-  }
+  },
 
 };
 
 export default config;
-module.exports = config;
