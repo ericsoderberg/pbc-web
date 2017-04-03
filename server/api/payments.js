@@ -73,7 +73,7 @@ export default function (router) {
       // update forms to record payment
       const Form = mongoose.model('Form');
       // PayPal NVP API doesn't preserve formIds array :(
-      const formIds = data.formIds.split(',');
+      const formIds = data.formIds; // .split(',');
       const promises = [];
       formIds.forEach((formId) => {
         promises.push(Form.findOne({ _id: formId }).exec()

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { getHeader, postItem } from '../../actions';
+import { postItem } from '../../actions';
 import Stored from '../../components/Stored';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
@@ -53,9 +53,11 @@ class PaymentPay extends Component {
     const { site } = this.props;
     if (!this._paypalRendered) {
       this._paypalRendered = true;
+      const client = {};
+      client[site.paypalEnv] = site.paypalClientId;
       paypal.Button.render({
-        env: 'sandbox',
-        client: { sandbox: site.paypalClientId },
+        env: site.paypalEnv,
+        client,
         commit: true,
         payment: this._paypalPayment,
         onAuthorize: this._onAuthorize,
@@ -64,53 +66,56 @@ class PaymentPay extends Component {
     }
   }
 
-  _paypalPayment(resolve, reject) {
-    // const { site å} = this.props;
-    const { formTemplateName } = this.props;
+  // _paypalPayment(resolve, reject) { PayPal NVP
+  _paypalPayment() {
+    const { site } = this.props;
+    // const { formTemplateName } = this.props;
     const { formState } = this.state;
     const payment = formState.object;
 
     // PayPal NVP API integration
-    const payload = {
-      amount: payment.amount,
-      formTemplateName,
-      cancelUrl: window.location.href,
-      returnUrl: window.location.href,
-    };
-    // only set Authorization header
-    return paypal.request.post('/api/paypal', payload,
-      { headers: { Authorization: getHeader('Authorization') } })
-    .then(data => resolve(data.token))
-    .catch(err => reject(err));
+    // const payload = {
+    //   amount: payment.amount,
+    //   formTemplateName,
+    //   cancelUrl: window.location.href,
+    //   returnUrl: window.location.href,
+    // };
+    // // only set Authorization header
+    // return paypal.request.post('/api/paypal', payload,
+    //   { headers: { Authorization: getHeader('Authorization') } })
+    // .then(data => resolve(data.token))
+    // .catch(err => reject(err));
 
     // PayPal REST API integration
-    // return paypal.rest.payment.create('sandbox',
-    //   { sandbox: site.paypalClientId },
-    //   { transactions: [
-    //     { amount: { total: payment.amount, currency: 'USD' } },
-    //   ] },
-    // );
+    const client = {};
+    client[site.paypalEnv] = site.paypalClientId;
+    return paypal.rest.payment.create(site.paypalEnv, client,
+      {
+        transactions: [{ amount: { total: payment.amount, currency: 'USD' } }],
+      },
+    );
   }
 
-  _onAuthorize(data) { // , actions) {
-    const { formTemplateId, onDone } = this.props;
+  // _onAuthorize(data) { PayPal NVP
+  _onAuthorize(data, actions) {
+    // const { formTemplateId, onDone } = this.props;
     const { formState } = this.state;
     const payment = formState.object;
 
     // PayPal NVP API integration
-    payment.formTemplateId = formTemplateId;
-    payment.payPalId = data.paymentToken;
-    return paypal.request.post('/api/payments', payment,
-      { headers: { Authorization: getHeader('Authorization') } })
-    .then(() => onDone())
-    .catch(err => this.setState({ error: err }));
+    // payment.formTemplateId = formTemplateId;
+    // payment.payPalId = data.paymentToken;
+    // return paypal.request.post('/api/payments', payment,
+    //   { headers: { Authorization: getHeader('Authorization') } })
+    // .then(() => onDone())
+    // .catch(err => this.setState({ error: err }));
 
     // PayPal REST API integration
-    // return actions.payment.execute().then(() => {
-    //   payment.payPalId = data.paymentID;
-    //   payment.received = (new Date()).toISOString();
-    //   this._onAdd(payment);
-    // });
+    return actions.payment.execute().then(() => {
+      payment.payPalId = data.paymentID;
+      payment.received = (new Date()).toISOString();
+      this._onAdd(payment);
+    });
   }
 
   _setItem(item) {
@@ -156,14 +161,14 @@ class PaymentPay extends Component {
         <Button type="submit" label="Submit" onClick={this._onSubmit} />
       );
     } else {
-      notification = (
-        <div className="form__text paypal-notification">
-          Unfortunately, our payment processing system is offline at the moment.
-          While we have a record of your registration, we will not be able to
-          accept payment at this time. We will notify you when we are able to
-          accept payment, hopefully within a few days.
-        </div>
-      );
+      // notification = (
+      //   <div className="form__text paypal-notification">
+      //     Unfortunately, our payment processing system is offline at the moment.
+      //     While we have a record of your registration, we will not be able to
+      //     accept payment at this time. We will notify you when we are able to
+      //     accept payment, hopefully within a few days.
+      //   </div>
+      // );
       if (!this._paypalRendered) {
         submitButton = <Loading />;
       }
@@ -191,8 +196,8 @@ class PaymentPay extends Component {
 PaymentPay.propTypes = {
   amount: PropTypes.number.isRequired,
   formIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  formTemplateId: PropTypes.string.isRequired,
-  formTemplateName: PropTypes.string.isRequired,
+  // formTemplateId: PropTypes.string.isRequired,
+  // formTemplateName: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
   onDone: PropTypes.func.isRequired,
   payByCheckInstructions: PropTypes.string,

@@ -2,11 +2,13 @@ import Paypal from 'paypal-nvp-api';
 import { authorize } from './auth';
 import { getPostData } from './utils';
 
+// NOTE: This file is deprecated in favor of the all-browser REST API integration
+
 const config = {
   mode: 'sandbox', // or 'live'
-  username: 'eric_soderberg-facilitator_api1.pbc.org',
-  password: '24WNG8MUBE9NE3LJ',
-  signature: 'An5ns1Kso7MWUdW4ErQKJJJ4qi4-AELF3GvW.UZOsm3mRrFahluaGxI-',
+  username: process.env.PAYPAL_USER,
+  password: process.env.PAYPAL_PASSWORD,
+  signature: process.env.PAYPAL_SIGNATURE,
 };
 
 const paypal = Paypal(config);

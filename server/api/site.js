@@ -23,6 +23,7 @@ export default function (router) {
     .then((site) => {
       site = site.toObject();
       site.paypalClientId = process.env.PAYPAL_CLIENT_ID;
+      site.paypalEnv = process.env.NODE_ENV === 'development' ? 'sandbox' : 'production';
       return site;
     })
     .then(site => res.json(site))
