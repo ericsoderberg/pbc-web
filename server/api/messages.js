@@ -154,7 +154,10 @@ export default function (router) {
     }
 
     query.exec()
-    .then(docs => res.json(docs))
+    .then((docs) => {
+      res.setHeader('Cache-Control', 'max-age=0');
+      res.json(docs);
+    })
     .catch(error => res.status(400).json(error));
   });
 }

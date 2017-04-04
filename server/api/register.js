@@ -60,6 +60,7 @@ export default (router, options) => {
         if (doc.modified) {
           res.setHeader('Last-Modified',
             moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'));
+          res.setHeader('Cache-Control', 'max-age=0');
         }
         res.json(doc);
       })
@@ -183,7 +184,10 @@ export default (router, options) => {
         query.exec()
         .then(docs => (indexOpts.transformOut ?
           indexOpts.transformOut(docs, req) : docs))
-        .then(docs => res.json(docs))
+        .then((docs) => {
+          res.setHeader('Cache-Control', 'max-age=0');
+          res.json(docs);
+        })
         .catch(error => res.status(400).json(error));
       });
     });
