@@ -230,6 +230,7 @@
   width: 100%;
   height: round($unit * 12);
   object-fit: cover;
+  margin-bottom: -4px; // empirical
 }
 
 .map {
