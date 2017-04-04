@@ -24,8 +24,8 @@ Image.propTypes = {
   className: PropTypes.string,
   full: PropTypes.bool,
   image: PropTypes.shape({
-    data: PropTypes.string.isRequired,
-  }).isRequired,
+    data: PropTypes.string,
+  }),
   style: PropTypes.object,
 };
 
@@ -33,6 +33,7 @@ Image.defaultProps = {
   avatar: false,
   className: undefined,
   full: false,
+  image: {},
   style: undefined,
 };
 

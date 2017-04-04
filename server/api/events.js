@@ -139,6 +139,13 @@ const unsetReferences = (data) => {
     }
     data.$unset.path = '';
   }
+  if (!data.image) {
+    delete data.image;
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.image = '';
+  }
   // remove deprecated text property
   if (!data.$unset) {
     data.$unset = {};

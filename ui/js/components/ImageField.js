@@ -25,7 +25,7 @@ export default class ImageField extends Component {
             </span>
             <span>
               <input id={name} name={name} type="checkbox" checked={false}
-                onChange={() => formState.set(property, false)} />
+                onChange={() => formState.set(property, undefined)} />
               <label htmlFor={name}>Clear</label>
             </span>
           </div>

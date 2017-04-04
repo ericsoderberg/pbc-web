@@ -14,7 +14,7 @@ export default class SectionsFormContents extends Component {
     return this.props.formState.addTo('sections', () => {
       const id = this.state.newSectionId;
       this.setState({ newSectionId: this.state.newSectionId + 1 });
-      return { type, id };
+      return { type, id, full: (type === 'image') };
     });
   }
 
