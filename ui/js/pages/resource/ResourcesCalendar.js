@@ -4,6 +4,7 @@ import moment from 'moment';
 import { getResourcesEvents } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
+import { formatTimes } from '../../utils/Time';
 
 export default class ResourcesCalendar extends Component {
 
@@ -30,6 +31,7 @@ export default class ResourcesCalendar extends Component {
       let day;
       events.forEach((event) => {
         const start = moment(event.start);
+        const end = moment(event.end);
 
         if (!day || !start.isSame(day, 'day')) {
           day = start;
@@ -47,7 +49,9 @@ export default class ResourcesCalendar extends Component {
         ));
         items.push(
           <div key={event.id} className="item resource-event">
-            <span className="resource-event__time tertiary">{start.format('h:mm a')}</span>
+            <span className="resource-event__time tertiary">
+              {formatTimes(start, end)}
+            </span>
             <Link className="resource-event__name" to={`/events/${event.path || event._id}`}>{event.name}</Link>
             <span className="resource-event__resources">
               {resources}
