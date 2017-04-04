@@ -423,7 +423,7 @@ const messageSchema = Schema({
 });
 
 messageSchema.index({ author: 'text', name: 'text', text: 'text', verses: 'text' },
-  { weights: { author: 3, name: 5, text: 1, verses: 8 } });
+  { weights: { author: 15, name: 5, text: 1, verses: 10 } });
 
 const Message = mongoose.model('Message', messageSchema);
 Message.on('index', () => console.log('Message index ready'));

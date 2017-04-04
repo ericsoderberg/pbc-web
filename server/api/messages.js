@@ -125,7 +125,7 @@ export default function (router) {
     if (req.query.search) {
       criteria = { ...criteria, $text: { $search: req.query.search } };
       options = { ...options, score: { $meta: 'textScore' } };
-      sort = { score: { $meta: 'textScore' }, date: -1 };
+      sort = { score: { $meta: 'textScore' } };
     }
 
     const query = Message.find(criteria, options);
