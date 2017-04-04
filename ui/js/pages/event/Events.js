@@ -43,6 +43,6 @@ Events.defaultProps = {
     ),
   },
   path: '/events',
-  sort: '-start',
+  sort: '-modified',
   title: 'Events',
 };

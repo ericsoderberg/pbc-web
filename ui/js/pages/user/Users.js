@@ -48,6 +48,6 @@ Users.defaultProps = {
   category: 'users',
   Item,
   path: '/users',
-  sort: 'name email',
+  sort: '-modified name email',
   title: 'People',
 };

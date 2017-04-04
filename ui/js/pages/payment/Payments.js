@@ -36,6 +36,6 @@ Payments.defaultProps = {
   Item,
   path: '/payments',
   populate: true,
-  sort: '-sent',
+  sort: '-modified',
   title: 'Payments',
 };

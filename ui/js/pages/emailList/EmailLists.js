@@ -35,5 +35,6 @@ EmailLists.defaultProps = {
   Item,
   path: '/email-lists',
   select: 'name path',
+  sort: '-modified',
   title: 'Email Lists',
 };
