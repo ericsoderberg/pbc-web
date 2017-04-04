@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { getItem } from '../../actions';
+import { isDarkBackground } from '../../utils/Color';
 import MessageContents from './MessageContents';
 
 export default class MessageItem extends Component {
@@ -37,6 +38,9 @@ export default class MessageItem extends Component {
     if (message.series) {
       if (message.color) {
         style.backgroundColor = message.color;
+        if (isDarkBackground(message.color)) {
+          classNames.push('dark-background');
+        }
       }
       linkContents = (
         <div className="message-item__series-header">

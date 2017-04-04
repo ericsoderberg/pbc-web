@@ -104,6 +104,7 @@ class App extends Component {
 
   componentDidUpdate() {
     this._hideNavControl();
+    window.scrollTo(0, 0);
   }
 
   _stateFromProps(props) {

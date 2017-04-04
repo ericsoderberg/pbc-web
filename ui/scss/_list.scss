@@ -57,13 +57,16 @@ a.item__container,
 button.item__container {
   display: block;
   text-decoration: none;
-  color: inherit;
   cursor: pointer;
   margin: 0;
   width: 100%;
 
   &:hover {
     background-color: $hover-background;
+  }
+
+  &:not(.dark-background) {
+    color: inherit;
   }
 }
 
