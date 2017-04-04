@@ -63,7 +63,7 @@ export default class FilesSection extends Component {
         file = this.state.files[file.id] || {};
       }
       const key = file._id || index;
-      const path = `/file/${file._id}/${file.name}`;
+      const path = `/files/${file._id}/${file.name}`;
       if (file.type && file.type.match(/audio/)) {
         return (
           <div key={key} className="item__container">

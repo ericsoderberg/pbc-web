@@ -101,11 +101,11 @@ export default class MessageContents extends Component {
     let audio;
     let files = [];
     (message.files || []).forEach((file) => {
-      const path = `/api/files/${file._id}`;
       if (file.type) {
         if (file.type.match(/audio/)) {
           audio = <Audio file={file} full={false} />;
         } else {
+          const path = `/files/${file._id}/${file.name}`;
           files.push(
             <a key={file._id} className="item__container" href={path}>
               <div className={`item item--${align}`}>

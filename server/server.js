@@ -9,6 +9,7 @@ import path from 'path';
 import api from './api';
 import rss from './rss';
 import file from './file';
+import redirects from './redirects';
 
 const PORT = process.env.PORT || 8091;
 const app = express();
@@ -22,7 +23,8 @@ app.set('etag', false)
 .use(busboy())
 .use('', router)
 .use('/api', api)
-.use('/file', file)
+.use('/files', file)
+.use('/', redirects)
 .use('/', rss)
 .use('/', express.static(path.join(__dirname, '/../dist')))
 .get('/*', (req, res) => {
