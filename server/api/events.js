@@ -13,13 +13,13 @@ mongoose.Promise = global.Promise;
 
 function eventMoments(event) {
   let result = [{
-    start: moment(event.start),
-    end: moment(event.end),
+    start: moment(event.start).subtract(event.setup || 0, 'minutes'),
+    end: moment(event.end).add(event.teardown || 0, 'minutes'),
   }];
   if (event.times) {
-    result.concat(event.times.map(time => ({
-      start: moment(time.start),
-      end: moment(time.end),
+    result = result.concat(event.times.map(time => ({
+      start: moment(time.start).subtract(event.setup || 0, 'minutes'),
+      end: moment(time.end).add(event.teardown || 0, 'minutes'),
     })));
   }
   if (event.dates) {
@@ -30,11 +30,11 @@ function eventMoments(event) {
           start: moment(date).set({
             hour: time.start.hour(),
             minute: time.start.minute(),
-          }),
+          }).subtract(event.setup || 0, 'minutes'),
           end: moment(date).set({
             hour: time.end.hour(),
             minute: time.end.minute(),
-          }),
+          }).add(event.teardown || 0, 'minutes'),
         });
       });
     });

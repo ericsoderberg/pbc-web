@@ -217,7 +217,9 @@ const eventSchema = Schema({
   resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource' }],
   sections: [eventSectionSchema],
   // sections: [Schema(sectionDef, { discriminatorKey: 'type', _id: false })],
+  setup: Number,
   start: Date,
+  teardown: Number,
   text: String, // deprecated but leave for now while upgrading to sections
   times: [{
     end: Date,

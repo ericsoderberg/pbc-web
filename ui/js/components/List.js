@@ -17,7 +17,7 @@ class List extends Component {
     this._onSearch = this._onSearch.bind(this);
     this._onScroll = this._onScroll.bind(this);
     this._removeFilter = this._removeFilter.bind(this);
-    this.state = { items: [], searchText: '' };
+    this.state = { loading: true, searchText: '' };
   }
 
   componentDidMount() {
@@ -204,7 +204,7 @@ class List extends Component {
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
-    const items = this.state.items.map((item, index) => {
+    const items = (this.state.items || []).map((item, index) => {
       if (marker && markerIndex === -1) {
         const value = item[marker.property];
         if ((descending && value < marker.value) ||
@@ -280,7 +280,9 @@ class List extends Component {
     }
 
     let message;
-    if (items.length === 0) {
+    if (!items) {
+      message = <Loading />;
+    } else if (items.length === 0) {
       if (loading) {
         message = <Loading />;
       } else {

@@ -9,31 +9,27 @@ export default class EventResources extends Component {
     super();
     this._onToggle = this._onToggle.bind(this);
     this._get = this._get.bind(this);
-    this.state = { resources: [], active: false, scroll: false };
+    this.state = { resources: [], active: false };
   }
 
   componentDidUpdate() {
-    const { scroll } = this.state;
-    if (scroll) {
+    if (this._scrollNeeded) {
+      this._scrollNeeded = false;
       const rect = this._containerRef.getBoundingClientRect();
       window.scrollBy(0, rect.top);
-      this.setState({ scroll: false });
     }
   }
 
   _get() {
     const { formState: { object: event } } = this.props;
-    const { active, resources } = this.state;
+    const { active } = this.state;
     if (active) {
-      if (resources.length === 0) {
-        getResources(event)
-        .then(resourcesResponse => this.setState({
-          resources: resourcesResponse, scroll: true,
-        }))
-        .catch(error => console.error('!!! EventResources catch', error));
-      } else {
-        this.setState({ scroll: true });
-      }
+      getResources(event)
+      .then((resources) => {
+        this.setState({ resources });
+        this._scrollNeeded = true;
+      })
+      .catch(error => console.error('!!! EventResources catch', error));
     }
   }
 
@@ -42,11 +38,11 @@ export default class EventResources extends Component {
   }
 
   render() {
-    const { formState } = this.props;
+    const { errors, formState } = this.props;
     const { active } = this.state;
     const event = formState.object;
 
-    let field;
+    let fields;
     if (active) {
       const resources = this.state.resources.map((resource) => {
         const classNames = ['choice'];
@@ -77,11 +73,23 @@ export default class EventResources extends Component {
         );
       });
 
-      field = (
-        <FormField>
+      fields = [
+        <FormField key="resources">
           {resources}
-        </FormField>
-      );
+        </FormField>,
+        <FormField key="setup" label="Setup time" help="minutes"
+          error={errors.setup}>
+          <input name="setup" type="number" min="0" step="15"
+            value={event.setup || 0}
+            onChange={formState.change('setup')} />
+        </FormField>,
+        <FormField key="teaddown" label="Teardown time" help="minutes"
+          error={errors.teardown}>
+          <input name="teardown" type="number" min="0" step="15"
+            value={event.teardown || 0}
+            onChange={formState.change('teardown')} />
+        </FormField>,
+      ];
     }
 
     return (
@@ -91,12 +99,17 @@ export default class EventResources extends Component {
           <Button secondary={true} label="Resource reservations"
             onClick={this._onToggle} />
         </div>
-        {field}
+        {fields}
       </fieldset>
     );
   }
 }
 
 EventResources.propTypes = {
+  errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
+};
+
+EventResources.defaultProps = {
+  errors: {},
 };
