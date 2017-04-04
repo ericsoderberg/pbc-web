@@ -8,6 +8,7 @@ import MainNav from './MainNav';
 import Stored from './Stored';
 
 import Home from '../pages/home/Home';
+import AuditLog from '../pages/auditLog/AuditLog';
 import Calendars from '../pages/calendar/Calendars';
 import CalendarAdd from '../pages/calendar/CalendarAdd';
 import Calendar from '../pages/calendar/Calendar';
@@ -244,6 +245,7 @@ class App extends Component {
 
         <PrivateRoute path="/files" component={Files} />
         <PrivateRoute path="/site" component={SiteEdit} />
+        <PrivateRoute path="/audit-log" component={AuditLog} />
 
         <Route path="/:id" component={Page} />
       </Switch>

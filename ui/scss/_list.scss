@@ -269,3 +269,16 @@ button.item__container {
     }
   }
 }
+
+.audit-log__type {
+  display: inline-block;
+  width: round($unit * 4);
+  font-weight: 100;
+  margin-left: $unit;
+}
+
+.audit-log__timestamp {
+  display: inline-block;
+  width: round($unit * 6);
+  text-align: right;
+}

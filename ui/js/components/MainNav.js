@@ -27,6 +27,7 @@ const ADMIN_ROUTES = [
   { label: 'Libraries', path: '/libraries' },
   { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' },
+  { label: 'Audit Log', path: '/audit-log' },
 ];
 
 class MainNav extends Component {
