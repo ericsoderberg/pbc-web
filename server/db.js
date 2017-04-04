@@ -397,6 +397,7 @@ Library.on('index', () => console.log('Library index ready'));
 const messageSchema = Schema({
   author: String,
   created: Date,
+  color: String,
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   dpId: String,

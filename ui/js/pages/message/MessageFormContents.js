@@ -141,26 +141,48 @@ export default class MessageFormContents extends Component {
       files = message.files.map(this._renderFile);
     }
 
-    let seriesField;
+    let nonSeriesTop;
+    let nonSeriesBottom;
+    let seriesFields;
     if (!message.series) {
-      seriesField = (
-        <FormField name="seriesId" label="In Series" error={errors.seriesId}>
-          <SelectSearch category="messages" clearable={true}
-            options={{ filter: { series: true } }}
-            value={(message.seriesId || {}).name || ''}
-            onChange={this._onChangeSeries} />
-        </FormField>
+      nonSeriesTop = (
+        <fieldset className="form__fields">
+          <FormField label="Author" error={errors.author}>
+            <input name="author" value={message.author || ''}
+              onChange={formState.change('author')} />
+          </FormField>
+          <FormField label="Date" error={errors.date}>
+            <DateInput value={message.date || ''}
+              onChange={formState.change('date')} />
+          </FormField>
+          <FormField label="Verses" help="don't abbreviate"
+            error={errors.verses}>
+            <input name="verses" value={message.verses || ''}
+              onChange={formState.change('verses')} />
+          </FormField>
+        </fieldset>
       );
-    }
 
-    let nonSeriesField;
-    if (!message.seriesId) {
-      nonSeriesField = (
-        <FormField>
-          <input name="series" type="checkbox"
-            checked={message.series || false}
-            onChange={formState.toggle('series')} />
-          <label htmlFor="series">This is a series</label>
+      nonSeriesBottom = (
+        <fieldset className="form__fields">
+          <FormField label="Video URL" error={errors.videoUrl}>
+            <input name="videoUrl" value={message.videoUrl || ''}
+              onChange={formState.change('videoUrl')} />
+          </FormField>
+          {files}
+          <FormFieldAdd>
+            <button type="button" className="button button--secondary"
+              onClick={this._onAddFile}>
+              Add file
+            </button>
+          </FormFieldAdd>
+        </fieldset>
+      );
+    } else {
+      seriesFields = (
+        <FormField label="Background color">
+          <input name="color" value={message.color || ''}
+            onChange={formState.change('color')} />
         </FormField>
       );
     }
@@ -193,43 +215,30 @@ export default class MessageFormContents extends Component {
             <input name="name" value={message.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField label="Author" error={errors.author}>
-            <input name="author" value={message.author || ''}
-              onChange={formState.change('author')} />
-          </FormField>
-          <FormField label="Date" error={errors.date}>
-            <DateInput value={message.date || ''}
-              onChange={formState.change('date')} />
-          </FormField>
-          <FormField label="Verses" help="don't abbreviate"
-            error={errors.verses}>
-            <input name="verses" value={message.verses || ''}
-              onChange={formState.change('verses')} />
+          <FormField>
+            <input name="series" type="checkbox"
+              checked={message.series || false}
+              onChange={formState.toggle('series')} />
+            <label htmlFor="series">This is a series</label>
           </FormField>
         </fieldset>
+
+        {nonSeriesTop}
+
         <fieldset className="form__fields">
           <ImageField label="Image" name="image"
             formState={formState} property="image" />
+          {seriesFields}
           <FormField name="text" label="Text" help={<TextHelp />}
             error={errors.text}>
             <textarea name="text" value={message.text || ''} rows={4}
               onChange={formState.change('text')} />
           </FormField>
-          <FormField label="Video URL" error={errors.videoUrl}>
-            <input name="videoUrl" value={message.videoUrl || ''}
-              onChange={formState.change('videoUrl')} />
-          </FormField>
-          {files}
-          <FormFieldAdd>
-            <button type="button" className="button button--secondary"
-              onClick={this._onAddFile}>
-              Add file
-            </button>
-          </FormFieldAdd>
         </fieldset>
+
+        {nonSeriesBottom}
+
         <fieldset className="form__fields">
-          {seriesField}
-          {nonSeriesField}
           <FormField label="Library" error={errors.libraryId}>
             <select name="libraryId" value={(message.libraryId || {})._id || ''}
               onChange={formState.change('libraryId')}>

@@ -57,6 +57,24 @@ const unsetReferences = (data) => {
   return data;
 };
 
+const updateSeriesDate = (doc) => {
+  if (doc.seriesId) {
+    const Message = mongoose.model('Message');
+    // figure out which message is the latest
+    return Message.find({ seriesId: doc.seriesId })
+    .sort('-date').limit(1).exec()
+    .then((messages) => {
+      const date = messages[0].date;
+      return Message.update(
+        { _id: doc.seriesId },
+        { $set: { date } },
+      ).exec();
+    })
+    .then(() => doc);
+  }
+  return doc;
+};
+
 export default function (router) {
   register(router, {
     category: 'messages',
@@ -77,8 +95,12 @@ export default function (router) {
         return message;
       },
     },
+    post: {
+      transformOut: updateSeriesDate,
+    },
     put: {
       transformIn: unsetReferences,
+      transformOut: updateSeriesDate,
     },
   });
 

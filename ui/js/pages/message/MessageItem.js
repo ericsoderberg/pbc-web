@@ -33,7 +33,11 @@ export default class MessageItem extends Component {
     const date = moment(message.date);
 
     let linkContents;
+    const style = {};
     if (message.series) {
+      if (message.color) {
+        style.backgroundColor = message.color;
+      }
       linkContents = (
         <div className="message-item__series-header">
           <span className="tertiary">Series</span>
@@ -54,7 +58,7 @@ export default class MessageItem extends Component {
     }
 
     const link = (
-      <Link className={classNames.join(' ')}
+      <Link className={classNames.join(' ')} style={style}
         to={`/messages/${message.path || message._id}`}>
         <div className="item message-item">
           {linkContents}
