@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import moment from 'moment';
+// import moment from 'moment';
 import List from '../../components/List';
 import EventTimes from './EventTimes';
 
@@ -33,15 +33,15 @@ Events.defaultProps = {
   ...List.defaultProps,
   category: 'events',
   Item,
-  marker: {
-    property: 'start',
-    value: (new Date()).toISOString(),
-    label: (
-      <div className="marker">
-        <span>Today</span><span>{moment().format('MMM Do YYYY')}</span>
-      </div>
-    ),
-  },
+  // marker: {
+  //   property: 'start',
+  //   value: (new Date()).toISOString(),
+  //   label: (
+  //     <div className="marker">
+  //       <span>Today</span><span>{moment().format('MMM Do YYYY')}</span>
+  //     </div>
+  //   ),
+  // },
   path: '/events',
   sort: '-modified',
   title: 'Events',
