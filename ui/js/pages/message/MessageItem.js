@@ -44,7 +44,7 @@ export default class MessageItem extends Component {
       }
       linkContents = (
         <div className="message-item__series-header">
-          <span className="tertiary">Series</span>
+          <span className="secondary">Series</span>
           <h2>{message.name}</h2>
         </div>
       );
