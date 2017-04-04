@@ -31,6 +31,12 @@ router.get('/dp/:author/:book/:fileName', (req, res) => {
   getDpFile(fileName, res);
 });
 
+// /dp/zeisler/4079.html
+router.get('/dp/:author/:fileName', (req, res) => {
+  const { fileName } = req.params;
+  getDpFile(fileName, res);
+});
+
 // /authors/ray-stedman
 router.get('/authors/:name', (req, res) => {
   let { name } = req.params;
