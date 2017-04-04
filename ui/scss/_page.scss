@@ -350,8 +350,11 @@ a.event-section__text {
   }
 
   .event-section__name {
-    padding-left: $double-unit;
     padding-right: $double-unit;
+
+    .section__container--center & {
+      padding-left: $double-unit;
+    }
   }
 }
 
@@ -641,7 +644,7 @@ a.event-section__text {
 }
 
 .event-times {
-  text-align: center;
+  // text-align: center;
 
   .item &:last-child {
     text-align: right;
