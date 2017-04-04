@@ -12,16 +12,20 @@ const getDpFile = (fileName, res) => {
   const [dpId] = fileName.split('.');
   Message.findOne({ dpId }).exec()
   .then((message) => {
-    let path = `/messages/${message._id}`;
-    // find a file that matches
-    message.files.some((file) => {
-      if (file.name === fileName) {
-        path = `/files/${file._id}/${file.name}`;
-        return true;
-      }
-      return false;
-    });
-    res.redirect(301, path);
+    if (message) {
+      let path = `/messages/${message._id}`;
+      // find a file that matches
+      message.files.some((file) => {
+        if (file.name === fileName) {
+          path = `/files/${file._id}/${file.name}`;
+          return true;
+        }
+        return false;
+      });
+      res.redirect(301, path);
+    } else {
+      res.redirect(301, '/libraries/sermon');
+    }
   });
 };
 
