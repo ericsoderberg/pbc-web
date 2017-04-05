@@ -106,6 +106,9 @@ export default class AuditLog extends Component {
           case 'library':
             path = `/libraries/${item._id}`;
             break;
+          case 'message':
+            path = `/messages/${item._id}`;
+            break;
         }
 
         const modified = moment(item.modified);

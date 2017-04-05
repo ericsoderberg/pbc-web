@@ -91,4 +91,24 @@ router.get('/library/files/html/:fileName', (req, res) => {
   redirectFile(res, fileName);
 });
 
+// /files/messages/10435/exo018.html
+router.get('/files/messages/:oldMessageId/:fileName', (req, res) => {
+  const { fileName, oldMessageId } = req.params;
+  redirectFile(res, fileName, oldMessageId);
+});
+
+// /library/series.html?section=2858&series=6684
+router.get('/library/series.html', (req, res) => {
+  const oldId = req.query.series;
+  const Message = mongoose.model('Message');
+  Message.findOne({ oldId }).exec()
+  .then((message) => {
+    if (message) {
+      res.redirect(301, `/messages/${message._id}`);
+    } else {
+      res.redirect(301, '/libraries/sermon');
+    }
+  });
+});
+
 module.exports = router;

@@ -12,6 +12,7 @@ const TYPES = [
   { type: 'formTemplate', model: 'FormTemplate' },
   { type: 'user', model: 'User' },
   { type: 'library', model: 'Library' },
+  { type: 'message', model: 'Message' },
 ];
 
 export default function (router) {
