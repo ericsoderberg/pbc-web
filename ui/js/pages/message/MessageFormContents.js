@@ -160,6 +160,12 @@ export default class MessageFormContents extends Component {
             <input name="verses" value={message.verses || ''}
               onChange={formState.change('verses')} />
           </FormField>
+          <FormField name="seriesId" label="In Series" error={errors.seriesId}>
+            <SelectSearch category="messages" clearable={true}
+              options={{ filter: { series: true } }}
+              value={(message.seriesId || {}).name || ''}
+              onChange={this._onChangeSeries} />
+          </FormField>
         </fieldset>
       );
 

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
 import register, { addPopulate } from './register';
@@ -64,10 +65,11 @@ const updateSeriesDate = (doc) => {
     return Message.find({ seriesId: doc.seriesId })
     .sort('-date').limit(1).exec()
     .then((messages) => {
-      const date = messages[0].date;
+      // ensure series comes before latest message
+      const date = moment(messages[0].date).add(1, 'second');
       return Message.update(
         { _id: doc.seriesId },
-        { $set: { date } },
+        { $set: { date: date.toISOString() } },
       ).exec();
     })
     .then(() => doc);
