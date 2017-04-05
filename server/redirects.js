@@ -85,4 +85,10 @@ router.get('/system/message_files/:oldMessageId/:fileName', (req, res) => {
   redirectFile(res, fileName, oldMessageId);
 });
 
+// /library/files/html/3527.html
+router.get('/library/files/html/:fileName', (req, res) => {
+  const { fileName } = req.params;
+  redirectFile(res, fileName);
+});
+
 module.exports = router;
