@@ -7,13 +7,13 @@ const router = express.Router();
 
 // map old URLS to appropriate new locations
 
-const getDpFile = (fileName, res) => {
+const redirectFile = (res, fileName, oldMessageId) => {
   const Message = mongoose.model('Message');
-  const [dpId] = fileName.split('.');
-  Message.findOne({ dpId }).exec()
+  // look for a message with the file
+  Message.findOne({ 'files.name': fileName }).exec()
   .then((message) => {
     if (message) {
-      let path = `/messages/${message._id}`;
+      let path;
       // find a file that matches
       message.files.some((file) => {
         if (file.name === fileName) {
@@ -22,7 +22,26 @@ const getDpFile = (fileName, res) => {
         }
         return false;
       });
-      res.redirect(301, path);
+      // if no file matches, at least match the message
+      if (!path && message.oldId === oldMessageId) {
+        path = `/messages/${message._id}`;
+      }
+      if (path) {
+        res.redirect(301, path);
+      } else {
+        // at least send them to the library
+        res.redirect(301, '/libraries/sermon');
+      }
+    } else if (oldMessageId) {
+      // we didn't find a file match, check for old message id
+      Message.findOne({ oldId: oldMessageId }).exec()
+      .then((message2) => {
+        if (message2) {
+          res.redirect(301, `/messages/${message2._id}`);
+        } else {
+          res.redirect(301, '/libraries/sermon');
+        }
+      });
     } else {
       res.redirect(301, '/libraries/sermon');
     }
@@ -32,13 +51,13 @@ const getDpFile = (fileName, res) => {
 // /dp/stedman/romans2/3518.html
 router.get('/dp/:author/:book/:fileName', (req, res) => {
   const { fileName } = req.params;
-  getDpFile(fileName, res);
+  redirectFile(res, fileName);
 });
 
 // /dp/zeisler/4079.html
 router.get('/dp/:author/:fileName', (req, res) => {
   const { fileName } = req.params;
-  getDpFile(fileName, res);
+  redirectFile(res, fileName);
 });
 
 // /authors/ray-stedman
@@ -57,13 +76,13 @@ router.get('/books/:name', (req, res) => {
 // /messages/map_old_file/4714.html
 router.get('/messages/map_old_file/:fileName', (req, res) => {
   const { fileName } = req.params;
-  getDpFile(fileName, res);
+  redirectFile(res, fileName);
 });
 
 // /system/message_files/6485/4539.html
 router.get('/system/message_files/:oldMessageId/:fileName', (req, res) => {
-  const { fileName } = req.params;
-  getDpFile(fileName, res);
+  const { fileName, oldMessageId } = req.params;
+  redirectFile(res, fileName, oldMessageId);
 });
 
 module.exports = router;
