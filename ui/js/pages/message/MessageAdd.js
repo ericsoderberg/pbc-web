@@ -11,7 +11,10 @@ const MessageAdd = (props) => {
   return (
     <Add category="messages" FormContents={MessageFormContents}
       Preview={MessagePreview} showable={true} title="Add Message"
-      default={{ libraryId: query.libraryId }} />
+      default={{
+        libraryId: query.libraryId,
+        date: (new Date()).toISOString(),
+      }} />
   );
 };
 

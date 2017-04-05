@@ -1,10 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
 import { getItems } from '../../actions';
 import List from '../../components/List';
-import UpIcon from '../../icons/Up';
-import DownIcon from '../../icons/Down';
 import MessageItem from './MessageItem';
 
 class MessagesMessageItem extends MessageItem {}
@@ -42,21 +39,11 @@ export default class Messages extends Component {
       allLabel: 'All libraries',
     };
 
-    const marker = {
-      property: 'date',
-      value: moment().startOf('day').toISOString(),
-      label: (
-        <div className="marker">
-          <span>future <UpIcon /></span><span>past <DownIcon /></span>
-        </div>
-      ),
-    };
-
     return (
       <List location={location} homer={true}
         category="messages" title="Messages" path="/messages"
         filters={[filter]} select="name path verses date author" sort="-date"
-        Item={MessagesMessageItem} marker={marker} />
+        Item={MessagesMessageItem} />
     );
   }
 }

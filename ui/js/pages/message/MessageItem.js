@@ -49,10 +49,11 @@ export default class MessageItem extends Component {
         </div>
       );
     } else {
+      const verses = (message.name !== message.verses ? message.verses : undefined);
       linkContents = [
         <div key="1">
           <div className="item__name">{message.name}</div>
-          <div className="secondary">{message.verses}</div>
+          <div className="secondary">{verses}</div>
         </div>,
         <div key="2">
           <div className="tertiary">{date.format('MMM Do YYYY')}</div>

@@ -207,6 +207,9 @@ export default class MessageFormContents extends Component {
       <option key={library._id} label={library.name} value={library._id} />
     ));
     libraryOptions.unshift(<option key={0} />);
+    const libraryId =
+      (message.libraryId && typeof message.libraryId === 'object' ?
+        message.libraryId._id : message.libraryId);
 
     return (
       <div className={className}>
@@ -240,7 +243,7 @@ export default class MessageFormContents extends Component {
 
         <fieldset className="form__fields">
           <FormField label="Library" error={errors.libraryId}>
-            <select name="libraryId" value={(message.libraryId || {})._id || ''}
+            <select name="libraryId" value={libraryId || ''}
               onChange={formState.change('libraryId')}>
               {libraryOptions}
             </select>
