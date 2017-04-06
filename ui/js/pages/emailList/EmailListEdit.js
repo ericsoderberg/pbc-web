@@ -7,6 +7,6 @@ EmailListEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'email-lists',
   FormContents: EmailListFormContents,
-  removeBackLevel: 2,
+  postRemovePath: '/email-lists',
   title: 'Edit Email List',
 };

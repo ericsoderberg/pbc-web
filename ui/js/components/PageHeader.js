@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import { getSite } from '../actions';
+import { connect } from 'react-redux';
 import BackIcon from '../icons/Back';
 import Search from './Search';
 import Button from './Button';
 
-export default class PageHeader extends Component {
+class PageHeader extends Component {
 
   constructor() {
     super();
@@ -12,13 +12,6 @@ export default class PageHeader extends Component {
     this._onBack = this._onBack.bind(this);
     this._toggleMenu = this._toggleMenu.bind(this);
     this.state = {};
-  }
-
-  componentDidMount() {
-    getSite()
-    .then((site) => {
-      this.setState({ site });
-    });
   }
 
   _onHome() {
@@ -43,9 +36,8 @@ export default class PageHeader extends Component {
   render() {
     const {
       title, searchText, onSearch, actions, back, homer,
-      focusOnSearch, responsive,
+      focusOnSearch, responsive, showMenu, site,
     } = this.props;
-    const { showMenu, site } = this.state;
     const classes = ['page-header'];
     if (responsive && actions &&
       (actions.length > 1 || (actions.length === 1 && onSearch))) {
@@ -130,6 +122,7 @@ PageHeader.propTypes = {
   onSearch: PropTypes.func,
   responsive: PropTypes.bool,
   searchText: PropTypes.string,
+  site: PropTypes.object,
   title: PropTypes.string,
 };
 
@@ -141,9 +134,17 @@ PageHeader.defaultProps = {
   onSearch: undefined,
   responsive: true,
   searchText: '',
+  site: undefined,
   title: undefined,
 };
 
 PageHeader.contextTypes = {
   router: PropTypes.any,
 };
+
+const select = state => ({
+  site: state.site,
+  session: state.session,
+});
+
+export default connect(select)(PageHeader);

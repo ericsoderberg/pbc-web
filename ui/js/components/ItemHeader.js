@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { postItem } from '../actions';
 import PageHeader from './PageHeader';
-import Stored from './Stored';
 
 class ItemHeader extends Component {
 
@@ -78,4 +78,4 @@ const select = state => ({
   session: state.session,
 });
 
-export default Stored(ItemHeader, select);
+export default connect(select)(ItemHeader);

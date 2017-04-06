@@ -9,6 +9,7 @@ PageEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'pages',
   FormContents: PageFormContents,
+  postRemovePath: '/pages',
   Preview: PagePreview,
   title: 'Edit Page',
 };

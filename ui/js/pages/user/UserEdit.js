@@ -1,42 +1,50 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getItem } from '../../actions';
+import { loadItem, unloadItem } from '../../actions';
 import Edit from '../../components/Edit';
-import Stored from '../../components/Stored';
 import UserFormContents from './UserFormContents';
 
 class UserEdit extends Component {
 
   componentDidMount() {
-    this._load(this.props);
+    const { user } = this.props;
+    if (!user) {
+      this._load(this.props);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id) {
+    if (nextProps.id !== this.props.id) {
       this._load(nextProps);
     }
+    if (nextProps.user) {
+      document.title = `Edit ${nextProps.user.name}`;
+    }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('users', id));
   }
 
   _load(props) {
-    if (!props.user) {
-      getItem('users', props.match.params.id, { cache: true, populate: true })
-      .catch(error => console.error('!!! UserEdit catch', error));
-    }
+    const { dispatch, id } = props;
+    dispatch(loadItem('users', id, { populate: true }));
   }
 
   render() {
-    const { match, user } = this.props;
-    const id = encodeURIComponent(match.params.id);
+    const { id, user } = this.props;
     const name = encodeURIComponent((user || {}).name);
     const email = encodeURIComponent((user || {}).email);
-    const formsPath = `/forms?userId=${id}&userId-name=${name}`;
+    const formsPath = `/forms?userId=${encodeURIComponent(id)}&userId-name=${name}`;
     const emailListsPath = `/email-lists?addresses.address=${email}&addresses-name=${email}`;
     const actions = [
       <Link key="forms" to={formsPath}>Forms</Link>,
       <Link key="email" to={emailListsPath}>Email lists</Link>,
     ];
     return (
-      <Edit title="Edit Account" category="users" match={match}
+      <Edit title="Edit Account" category="users" id={id} item={user}
         actions={actions} FormContents={UserFormContents}
         onChange={this._onChange} />
     );
@@ -44,28 +52,18 @@ class UserEdit extends Component {
 }
 
 UserEdit.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
   user: PropTypes.object,
 };
 
 UserEdit.defaultProps = {
-  user: undefined,
+  user: {},
 };
 
-UserEdit.contextTypes = {
-  router: PropTypes.any,
-};
+const select = (state, props) => ({
+  id: props.match.params.id,
+  user: state[props.match.params.id],
+});
 
-const select = (state, props) => {
-  let user;
-  if (state.users) {
-    user = state.users[props.match.params.id];
-  }
-  return { user };
-};
-
-export default Stored(UserEdit, select);
+export default connect(select)(UserEdit);

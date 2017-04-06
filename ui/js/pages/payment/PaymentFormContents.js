@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import Markdown from 'markdown-to-jsx';
-import { getItems } from '../../actions';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
-import Stored from '../../components/Stored';
 
 const UserSuggestion = props => (
   <div className="box--between">
@@ -23,18 +23,11 @@ UserSuggestion.propTypes = {
 
 class PaymentFormContents extends Component {
 
-  constructor() {
-    super();
-    this.state = { domains: [] };
-  }
-
   componentDidMount() {
-    const { formState, full, session } = this.props;
+    const { dispatch, formState, full, session } = this.props;
 
     if (full && session.userId.administrator) {
-      getItems('domains', { sort: 'name' })
-      .then(domains => this.setState({ domains }))
-      .catch(error => console.error('PaymentFormContents domains catch', error));
+      dispatch(loadCategory('domains', { sort: 'name' }));
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
@@ -48,20 +41,27 @@ class PaymentFormContents extends Component {
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch, full, session } = this.props;
+    if (full && session.userId.administrator) {
+      dispatch(unloadCategory('domains'));
+      dispatch(unloadCategory('forms'));
+    }
+  }
+
   _loadForms(props) {
-    const { formState, full, session } = props;
+    const { dispatch, formState, full, session } = props;
     const payment = formState.object;
 
     if (full && session.userId.administrator && payment && payment._id) {
-      getItems('forms', { filter: { paymentIds: payment._id } })
-      .then(forms => this.setState({ forms }))
-      .catch(error => console.error('PaymentFormContents forms catch', error));
+      dispatch(loadCategory('forms', { filter: { paymentIds: payment._id } }));
     }
   }
 
   render() {
-    const { className, formState, full, payByCheckInstructions, session } = this.props;
-    const { forms } = this.state;
+    const {
+      className, domains, forms, formState, full, payByCheckInstructions, session,
+    } = this.props;
     const payment = formState.object;
 
     let method;
@@ -115,15 +115,15 @@ class PaymentFormContents extends Component {
 
       let administeredBy;
       if (session.userId.administrator) {
-        const domains = this.state.domains.map(domain => (
+        const options = domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));
-        domains.unshift(<option key={0} />);
+        options.unshift(<option key={0} />);
         administeredBy = (
           <FormField label="Administered by">
             <select name="domainId" value={payment.domainId || ''}
               onChange={formState.change('domainId')}>
-              {domains}
+              {options}
             </select>
           </FormField>
         );
@@ -185,6 +185,9 @@ class PaymentFormContents extends Component {
 
 PaymentFormContents.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  domains: PropTypes.array,
+  forms: PropTypes.array,
   formState: PropTypes.object.isRequired,
   payByCheckInstructions: PropTypes.string,
   full: PropTypes.bool,
@@ -199,12 +202,15 @@ PaymentFormContents.propTypes = {
 
 PaymentFormContents.defaultProps = {
   className: undefined,
+  domains: [],
+  forms: undefined,
   full: true,
   payByCheckInstructions: undefined,
 };
 
 const select = state => ({
+  domains: (state.domains || {}).items,
   session: state.session,
 });
 
-export default Stored(PaymentFormContents, select);
+export default connect(select)(PaymentFormContents);

@@ -1,6 +1,5 @@
-import { haveSession } from './actions';
-import App from './components/App';
 import Home from './pages/home/Home';
+import AuditLog from './pages/auditLog/AuditLog';
 import Calendars from './pages/calendar/Calendars';
 import CalendarAdd from './pages/calendar/CalendarAdd';
 import Calendar from './pages/calendar/Calendar';
@@ -62,81 +61,86 @@ import User from './pages/user/User';
 import UserEdit from './pages/user/UserEdit';
 import SiteEdit from './pages/site/SiteEdit';
 
-const requireSession = (nextState, replace) => {
-  if (!haveSession()) {
-    replace({
-      pathname: '/sign-in',
-      state: { nextPathname: nextState.location.pathname },
-    });
-  }
-};
+export default [
+  { path: '/', component: Home, exact: true },
 
-export default {
-  path: '/',
-  component: App,
-  indexRoute: { component: Home },
-  childRoutes: [
-    { path: 'calendars/add', component: CalendarAdd, onEnter: requireSession },
-    { path: 'calendars/:id', component: Calendar },
-    { path: 'calendars/:id/edit', component: CalendarEdit, onEnter: requireSession },
-    { path: 'calendars', component: Calendars, onEnter: requireSession },
-    { path: 'calendar', component: Calendar },
-    { path: 'sign-up', component: SignUp },
-    { path: 'sign-in', component: SignIn },
-    { path: 'verify-email', component: VerifyEmail },
-    { path: 'users/add', component: UserAdd },
-    { path: 'users/:id', component: User },
-    { path: 'users/:id/edit', component: UserEdit },
-    { path: 'users', component: Users },
-    { path: 'pages/add', component: PageAdd, onEnter: requireSession },
-    { path: 'pages/:id', component: Page },
-    { path: 'pages/:id/edit', component: PageEdit, onEnter: requireSession },
-    { path: 'pages/:id/map', component: PageMap, onEnter: requireSession },
-    { path: 'pages', component: Pages, onEnter: requireSession },
-    { path: 'events/add', component: EventAdd, onEnter: requireSession },
-    { path: 'events/:id', component: Event },
-    { path: 'events/:id/edit', component: EventEdit, onEnter: requireSession },
-    { path: 'events', component: Events, onEnter: requireSession },
-    { path: 'forms/add', component: FormAdd, onEnter: requireSession },
-    { path: 'forms/:id/edit', component: FormEdit, onEnter: requireSession },
-    { path: 'forms', component: Forms, onEnter: requireSession },
-    { path: 'payments/add', component: PaymentAdd, onEnter: requireSession },
-    { path: 'payments/:id/edit', component: PaymentEdit, onEnter: requireSession },
-    { path: 'payments', component: Payments, onEnter: requireSession },
-    { path: 'libraries/add', component: LibraryAdd, onEnter: requireSession },
-    { path: 'libraries/:id', component: Library },
-    { path: 'libraries/:id/edit', component: LibraryEdit, onEnter: requireSession },
-    { path: 'libraries', component: Libraries, onEnter: requireSession },
-    { path: 'messages/add', component: MessageAdd, onEnter: requireSession },
-    { path: 'messages/:id', component: Message },
-    { path: 'messages/:id/edit', component: MessageEdit, onEnter: requireSession },
-    { path: 'messages', component: Messages, onEnter: requireSession },
-    { path: 'search', component: Search },
-    { path: 'form-templates/add', component: FormTemplateAdd, onEnter: requireSession },
-    { path: 'form-templates/:id', component: FormTemplate, onEnter: requireSession },
-    { path: 'form-templates/:id/edit', component: FormTemplateEdit, onEnter: requireSession },
-    { path: 'form-templates', component: FormTemplates, onEnter: requireSession },
-    { path: 'email-lists/add', component: EmailListAdd, onEnter: requireSession },
-    { path: 'email-lists/:id', component: EmailList, onEnter: requireSession },
-    { path: 'email-lists/:id/edit', component: EmailListEdit, onEnter: requireSession },
-    { path: 'email-lists/:name/subscribe', component: EmailListSubscribe },
-    { path: 'email-lists/:name/unsubscribe', component: EmailListUnsubscribe },
-    { path: 'email-lists', component: EmailLists },
-    { path: 'newsletters/add', component: NewsletterAdd, onEnter: requireSession },
-    { path: 'newsletters/:id', component: Newsletter, onEnter: requireSession },
-    { path: 'newsletters/:id/edit', component: NewsletterEdit, onEnter: requireSession },
-    { path: 'newsletters', component: Newsletters, onEnter: requireSession },
-    { path: 'domains/add', component: DomainAdd, onEnter: requireSession },
-    { path: 'domains/:id', component: Domain, onEnter: requireSession },
-    { path: 'domains/:id/edit', component: DomainEdit, onEnter: requireSession },
-    { path: 'domains', component: Domains, onEnter: requireSession },
-    { path: 'resources/add', component: ResourceAdd, onEnter: requireSession },
-    { path: 'resources/calendar', component: ResourcesCalendar, onEnter: requireSession },
-    { path: 'resources/:id', component: Resource, onEnter: requireSession },
-    { path: 'resources/:id/edit', component: ResourceEdit, onEnter: requireSession },
-    { path: 'resources', component: Resources, onEnter: requireSession },
-    { path: 'files', component: Files, onEnter: requireSession },
-    { path: 'site', component: SiteEdit, onEnter: requireSession },
-    { path: ':id', component: Page },
-  ],
-};
+  { path: '/calendars', component: Calendars, exact: true, private: true },
+  { path: '/calendars/add', component: CalendarAdd, private: true },
+  { path: '/calendars/:id', component: Calendar, exact: true },
+  { path: '/calendars/:id/edit', component: CalendarEdit, private: true },
+  { path: '/calendar', component: Calendar },
+
+  { path: '/search', component: Search },
+
+  { path: '/sign-up', component: SignUp },
+  { path: '/sign-in', component: SignIn },
+  { path: '/verify-email', component: VerifyEmail },
+
+  { path: '/users', component: Users, exact: true },
+  { path: '/users/add', component: UserAdd },
+  { path: '/users/:id', component: User, exact: true },
+  { path: '/users/:id/edit', component: UserEdit },
+
+  { path: '/pages', component: Pages, exact: true, private: true },
+  { path: '/pages/add', component: PageAdd, private: true },
+  { path: '/pages/:id', component: Page, exact: true },
+  { path: '/pages/:id/edit', component: PageEdit, private: true },
+  { path: '/pages/:id/map', component: PageMap, private: true },
+
+  { path: '/events', component: Events, exact: true, private: true },
+  { path: '/events/add', component: EventAdd, private: true },
+  { path: '/events/:id', component: Event, exact: true },
+  { path: '/events/:id/edit', component: EventEdit, private: true },
+
+  { path: '/forms', component: Forms, exact: true, private: true },
+  { path: '/forms/add', component: FormAdd, private: true },
+  { path: '/forms/:id/edit', component: FormEdit, private: true },
+
+  { path: '/payments', component: Payments, exact: true, private: true },
+  { path: '/payments/add', component: PaymentAdd, private: true },
+  { path: '/payments/:id/edit', component: PaymentEdit, private: true },
+
+  { path: '/form-templates', component: FormTemplates, exact: true, private: true },
+  { path: '/form-templates/add', component: FormTemplateAdd, private: true },
+  { path: '/form-templates/:id', component: FormTemplate, exact: true, private: true },
+  { path: '/form-templates/:id/edit', component: FormTemplateEdit, private: true },
+
+  { path: '/libraries', component: Libraries, exact: true, private: true },
+  { path: '/libraries/add', component: LibraryAdd, private: true },
+  { path: '/libraries/:id', component: Library, exact: true },
+  { path: '/libraries/:id/edit', component: LibraryEdit, private: true },
+
+  { path: '/messages', component: Messages, exact: true, private: true },
+  { path: '/messages/add', component: MessageAdd, private: true },
+  { path: '/messages/:id', component: Message, exact: true },
+  { path: '/messages/:id/edit', component: MessageEdit, private: true },
+
+  { path: '/email-lists', component: EmailLists, exact: true, private: true },
+  { path: '/email-lists/add', component: EmailListAdd, private: true },
+  { path: '/email-lists/:id', component: EmailList, exact: true, private: true },
+  { path: '/email-lists/:id/edit', component: EmailListEdit, private: true },
+  { path: '/email-lists/:name/subscribe', component: EmailListSubscribe },
+  { path: '/email-lists/:name/unsubscribe', component: EmailListUnsubscribe },
+
+  { path: '/newsletters', component: Newsletters, exact: true, private: true },
+  { path: '/newsletters/add', component: NewsletterAdd, private: true },
+  { path: '/newsletters/:id', component: Newsletter, exact: true, private: true },
+  { path: '/newsletters/:id/edit', component: NewsletterEdit, private: true },
+
+  { path: '/domains', component: Domains, exact: true, private: true },
+  { path: '/domains/add', component: DomainAdd, private: true },
+  { path: '/domains/:id', component: Domain, exact: true, private: true },
+  { path: '/domains/:id/edit', component: DomainEdit, private: true },
+
+  { path: '/resources', component: Resources, exact: true, private: true },
+  { path: '/resources/add', component: ResourceAdd, private: true },
+  { path: '/resources/calendar', component: ResourcesCalendar, private: true },
+  { path: '/resources/:id', component: Resource, exact: true, private: true },
+  { path: '/resources/:id/edit', component: ResourceEdit, private: true },
+
+  { path: '/files', component: Files, private: true },
+  { path: '/site', component: SiteEdit, private: true },
+  { path: '/audit-log', component: AuditLog, private: true },
+
+  { path: '/:id', component: Page },
+];

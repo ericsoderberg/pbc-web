@@ -4,10 +4,9 @@ import FormError from './FormError';
 import FormState from '../utils/FormState';
 import Button from './Button';
 import ConfirmRemove from './ConfirmRemove';
-import Stored from './Stored';
 import Loading from './Loading';
 
-class Form extends Component {
+export default class Form extends Component {
 
   constructor(props) {
     super(props);
@@ -20,7 +19,8 @@ class Form extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.item && nextProps.item._id !== this.props.item._id) {
+    if (nextProps.item &&
+      (!this.props.item || nextProps.item._id !== this.props.item._id)) {
       this.setState({
         formState: new FormState(nextProps.item, this._setItem),
       });
@@ -177,9 +177,3 @@ Form.defaultProps = {
 Form.contextTypes = {
   router: PropTypes.any,
 };
-
-const select = state => ({
-  session: state.session,
-});
-
-export default Stored(Form, select);

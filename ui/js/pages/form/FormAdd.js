@@ -1,6 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { getItem, postItem, haveSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
@@ -66,7 +67,7 @@ class FormAdd extends Component {
 
   _onAdd(event) {
     event.preventDefault();
-    const { linkedForm, onDone } = this.props;
+    const { dispatch, linkedForm, onDone } = this.props;
     const { formTemplate, form } = this.state;
     const { router } = this.context;
     const error = setFormError(formTemplate, form);
@@ -81,7 +82,7 @@ class FormAdd extends Component {
         // remember it.
         if (!haveSession() && response.session) {
           // console.log('!!! FormAdd set session', response);
-          setSession(response.session);
+          dispatch(setSession(response.session));
         }
         return response.form;
       })
@@ -189,6 +190,7 @@ class FormAdd extends Component {
 
 FormAdd.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
   formTemplateId: PropTypes.string,
   full: PropTypes.bool,
   inline: PropTypes.bool,
@@ -223,4 +225,4 @@ const select = state => ({
   session: state.session,
 });
 
-export default Stored(FormAdd, select);
+export default connect(select)(FormAdd);

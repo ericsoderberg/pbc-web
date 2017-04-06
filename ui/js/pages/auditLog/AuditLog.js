@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getAuditLog } from '../../actions';
+import { loadAuditLog, unloadAuditLog } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
 
@@ -24,51 +25,40 @@ Item.defaultProps = {
   children: null,
 };
 
-export default class AuditLog extends Component {
+class AuditLog extends Component {
 
   constructor() {
     super();
-    this._get = this._get.bind(this);
     this._onScroll = this._onScroll.bind(this);
-    this.state = { loading: true };
+    this.state = {};
   }
 
   componentDidMount() {
+    const { dispatch } = this.props;
     document.title = 'Audit Log';
-    this._get();
+    dispatch(loadAuditLog());
     window.addEventListener('scroll', this._onScroll);
   }
 
+  componentWillReceiveProps() {
+    this.setState({ loadingMore: false });
+  }
+
   componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadAuditLog());
     window.removeEventListener('scroll', this._onScroll);
   }
 
-  _get() {
-    getAuditLog()
-    .then(items => this.setState({
-      items, loading: false, mightHaveMore: (items.length === 20),
-    }))
-    .catch(error => console.error('!!! AuditLog catch', error));
-  }
-
   _onMore() {
-    this.setState({ loadingMore: true }, () => {
-      const skip = this.state.items.length;
-      getAuditLog({ skip })
-      .then((response) => {
-        const items = this.state.items.concat(response);
-        this.setState({
-          items,
-          loadingMore: false,
-          mightHaveMore: (response.length === 20),
-        });
-      })
-      .catch(error => console.error('!!! AuditLog more catch', error));
-    });
+    const { dispatch, items } = this.props;
+    this.setState({ loadingMore: true }, () =>
+      dispatch(loadAuditLog({ skip: items.length })));
   }
 
   _onScroll() {
-    const { mightHaveMore, loadingMore } = this.state;
+    const { mightHaveMore } = this.props;
+    const { loadingMore } = this.state;
     if (mightHaveMore && !loadingMore) {
       const more = this._moreRef;
       if (more) {
@@ -81,10 +71,11 @@ export default class AuditLog extends Component {
   }
 
   render() {
-    const { items, loading, loadingMore, mightHaveMore } = this.state;
+    const { items, mightHaveMore } = this.props;
+    const { loadingMore } = this.state;
 
     let contents;
-    if (loading) {
+    if (!items) {
       contents = <Loading />;
     } else {
       const recent = moment().subtract(6, 'days');
@@ -108,6 +99,8 @@ export default class AuditLog extends Component {
             break;
           case 'message':
             path = `/messages/${item._id}`;
+            break;
+          default:
             break;
         }
 
@@ -156,3 +149,24 @@ export default class AuditLog extends Component {
     );
   }
 }
+
+AuditLog.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  items: PropTypes.array,
+  mightHaveMore: PropTypes.bool,
+};
+
+AuditLog.defaultProps = {
+  items: undefined,
+  mightHaveMore: undefined,
+};
+
+const select = (state) => {
+  const auditLog = state.auditLog || {};
+  return {
+    items: auditLog.items,
+    mightHaveMore: auditLog.mightHaveMore,
+  };
+};
+
+export default connect(select)(AuditLog);

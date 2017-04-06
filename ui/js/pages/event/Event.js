@@ -1,11 +1,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getItem } from '../../actions';
+import { loadItem, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
-import Stored from '../../components/Stored';
 import PageContext from '../page/PageContext';
 import EventContents from './EventContents';
 
@@ -14,22 +14,31 @@ const DATE_FORMAT = 'YYYY-MM-DD';
 class Event extends Component {
 
   componentDidMount() {
-    const { event, match } = this.props;
+    const { event } = this.props;
     if (!event) {
-      getItem('events', match.params.id, { cache: true, populate: true })
-      .catch(error => console.error('!!! Event catch', error));
+      this._load(this.props);
+    } else {
+      document.title = event.name;
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id &&
-      !nextProps.event) {
-      getItem('events', nextProps.match.params.id, { cache: true, populate: true })
-      .catch(error => console.error('!!! Event catch', error));
+    if (nextProps.id !== this.props.id && !nextProps.event) {
+      this._load(nextProps);
     }
     if (nextProps.event) {
       document.title = nextProps.event.name;
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('events', id));
+  }
+
+  _load(props) {
+    const { dispatch, id } = props;
+    dispatch(loadItem('events', id, { populate: true }));
   }
 
   render() {
@@ -78,24 +87,25 @@ class Event extends Component {
 }
 
 Event.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   event: PropTypes.object,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  id: PropTypes.string.isRequired,
+  notFound: PropTypes.bool,
 };
 
 Event.defaultProps = {
   event: undefined,
+  notFound: false,
 };
 
 const select = (state, props) => {
-  let event;
-  if (state.events) {
-    event = state.events[props.match.params.id];
-  }
-  return { event };
+  const id = props.match.params.id;
+  return {
+    event: state[id],
+    id,
+    notFound: state.notFound[id],
+    session: state.session,
+  };
 };
 
-export default Stored(Event, select);
+export default connect(select)(Event);

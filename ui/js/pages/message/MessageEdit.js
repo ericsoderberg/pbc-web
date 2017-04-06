@@ -9,6 +9,7 @@ MessageEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'messages',
   FormContents: MessageFormContents,
+  postRemovePath: '/messages',
   Preview: MessagePreview,
   title: 'Edit Message',
 };

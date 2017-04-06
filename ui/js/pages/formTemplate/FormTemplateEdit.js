@@ -9,6 +9,7 @@ FormTemplateEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'form-templates',
   FormContents: FormTemplateFormContents,
+  postRemovePath: '/form-templates',
   Preview: FormPreview,
   title: 'Edit Form Template',
 };

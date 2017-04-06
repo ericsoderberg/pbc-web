@@ -7,6 +7,6 @@ ResourceEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'resources',
   FormContents: ResourceFormContents,
-  removeBackLevel: 1,
+  postRemovePath: '/resources',
   title: 'Edit Resource',
 };

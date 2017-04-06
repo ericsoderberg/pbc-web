@@ -7,6 +7,6 @@ DomainEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'domains',
   FormContents: DomainFormContents,
-  removeBackLevel: 1,
+  postRemovePath: '/domains',
   title: 'Edit Domain',
 };

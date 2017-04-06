@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { deleteSession } from '../actions';
-import Stored from './Stored';
 
 const MAIN_ROUTES = [
   { label: 'Home', path: '/' },
@@ -126,4 +126,4 @@ const select = state => ({
   session: state.session,
 });
 
-export default Stored(MainNav, select);
+export default connect(select, null, null, { pure: false })(MainNav);

@@ -1,49 +1,40 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../../actions';
 import PageItem from './PageItem';
 
-export default class PageContext extends Component {
-
-  constructor() {
-    super();
-    this.state = { pages: [] };
-  }
+class PageContext extends Component {
 
   componentDidMount() {
     this._load(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    this._load(nextProps);
+    if (!nextProps.pages && nextProps.filter) {
+      this._load(nextProps);
+    }
   }
 
   componentWillUnmount() {
-    this._unmounted = true;
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('pages'));
   }
 
   _load(props) {
-    const { filter } = props;
-    this.setState({ pages: [] });
+    const { dispatch, filter } = props;
     if (filter) {
-      getItems('pages', {
+      dispatch(loadCategory('pages', {
         filter: { public: true, ...filter },
         select: 'name path',
-      })
-      .then((pages) => {
-        if (!this._unmounted) {
-          this.setState({ pages });
-        }
-      })
-      .catch(error => console.error('!!! PageContext pages catch', error));
+      }));
     }
   }
 
   render() {
-    const { align } = this.props;
-    const { pages } = this.state;
+    const { align, pages } = this.props;
     let result = null;
-    if (pages.length > 0) {
+    if (pages && pages.length > 0) {
       const pageItems = pages.map(page => (
         <li key={page._id}>
           <PageItem align={align} item={page} />
@@ -61,10 +52,19 @@ export default class PageContext extends Component {
 
 PageContext.propTypes = {
   align: PropTypes.oneOf(['start', 'center', 'end']),
+  dispatch: PropTypes.func.isRequired,
   filter: PropTypes.object,
+  pages: PropTypes.array,
 };
 
 PageContext.defaultProps = {
   align: 'center',
   filter: undefined,
+  pages: undefined,
 };
+
+const select = state => ({
+  pages: (state.pages || {}).items,
+});
+
+export default connect(select)(PageContext);
