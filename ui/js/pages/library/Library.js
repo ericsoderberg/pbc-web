@@ -53,7 +53,8 @@ class Library extends Component {
         </Link>
       ));
       if (session && (session.userId.administrator ||
-        session.userId.administratorDomainId === library.domainId)) {
+        (session.userId.administratorDomainId &&
+        session.userId.administratorDomainId === library.domainId))) {
         controls.push(
           <Link key="edit" to={`/libraries/${library._id}/edit`}>
             Edit
