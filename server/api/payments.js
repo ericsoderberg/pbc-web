@@ -51,7 +51,7 @@ export default function (router) {
       return requireDomainAdministratorOrUser(
         context, payment.domainId, payment.userId);
     })
-    .then(doc => res.status(200).json(doc))
+    .then(context => res.status(200).json(context.payment))
     .catch(error => catcher(error, res));
   });
 
