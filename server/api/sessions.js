@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import moment from 'moment';
-import { authorize } from './auth';
+import { getSession, requireSession } from './auth';
 import { createUser } from './users';
 
 mongoose.Promise = global.Promise;
@@ -62,7 +62,8 @@ export default function (router) {
   });
 
   router.delete('/sessions/:id', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSession)
     .then((session) => {
       const id = req.params.id;
       if (session._id.equals(id)) {

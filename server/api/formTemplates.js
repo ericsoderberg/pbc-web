@@ -2,8 +2,11 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 import json2csv from 'json2csv';
 import register from './register';
-import { authorize, authorizedForDomain } from './auth';
+import {
+  getSession, authorizedForDomain, allowAnyone, requireSomeAdministrator,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -159,7 +162,8 @@ const validate = (data) => {
 
 export default function (router) {
   router.get('/form-templates/:id.csv', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then((session) => {
       const id = req.params.id;
       const FormTemplate = mongoose.model('FormTemplate');
@@ -205,22 +209,21 @@ export default function (router) {
       res.attachment('data.csv');
       res.end(csv);
     })
-    .catch((error) => {
-      console.error('!!! error', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   register(router, {
     category: 'form-templates',
     modelName: 'FormTemplate',
     index: {
-      authorize: authorizedForDomain,
+      authorization: requireSomeAdministrator,
+      filterAuthorized: authorizedForDomain,
       populate: [
         { path: 'linkedFormTemplateId', select: 'name' },
       ],
     },
     get: {
+      authorization: allowAnyone,
       populate: [
         { path: 'linkedFormTemplateId', select: 'name' },
       ],
@@ -232,9 +235,11 @@ export default function (router) {
       },
     },
     post: {
+      authorization: requireSomeAdministrator,
       validate,
     },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: unsetReferences,
       transformOut: (formTemplate) => {
         // update all Forms for this formTemplate to have the same domain
@@ -244,6 +249,9 @@ export default function (router) {
           .then(() => formTemplate);
       },
       validate,
+    },
+    delete: {
+      authorization: requireSomeAdministrator,
     },
   });
 }

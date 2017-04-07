@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize } from './auth';
+import { getSession } from './auth';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -8,7 +9,7 @@ mongoose.Promise = global.Promise;
 
 export default function (router) {
   router.get('/search', (req, res) => {
-    authorize(req, res, false)
+    getSession(req)
     .then((session) => {
       // start with pages
       const Page = mongoose.model('Page');
@@ -95,9 +96,6 @@ export default function (router) {
       const { pages, events, libraries } = context;
       res.status(200).json({ pages, events, libraries });
     })
-    .catch((error) => {
-      console.error('!!!', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 }

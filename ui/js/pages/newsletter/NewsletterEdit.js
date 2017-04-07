@@ -39,7 +39,7 @@ export default class NewsletterEdit extends Component {
       <Button label="Copy" secondary={true} onClick={this._onCopy} />
     );
     return (
-      <Edit title="Edit Newsletter" category="newsletters" params={match.params}
+      <Edit title="Edit Newsletter" category="newsletters" match={match}
         footerActions={copyControl} removeBackLevel={1}
         FormContents={NewsletterFormContents} Preview={NewsletterPreview}
         onChange={this._onChange} />

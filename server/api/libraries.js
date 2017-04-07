@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import register from './register';
-import { authorizedForDomain } from './auth';
+import {
+  authorizedForDomain, allowAnyone, requireAdministrator,
+  requireSomeAdministrator,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
 
 mongoose.Promise = global.Promise;
@@ -47,9 +50,17 @@ export default function (router) {
     category: 'libraries',
     modelName: 'Library',
     index: {
-      authorize: authorizedForDomain,
+      authorization: requireSomeAdministrator,
+      filterAuthorized: authorizedForDomain,
+    },
+    get: {
+      authorization: allowAnyone,
+    },
+    post: {
+      authorization: requireAdministrator,
     },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: prepareLibrary,
       transformOut: (library) => {
         // update all Messages in this library to have the same domain
@@ -58,6 +69,9 @@ export default function (router) {
           { $set: { domainId: library.domainId } }, { multi: true }).exec()
           .then(() => library);
       },
+    },
+    delete: {
+      authorization: requireAdministrator,
     },
   });
 }

@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 import { execFile, spawn } from 'child_process';
-import { authorize, authorizedForDomain } from './auth';
+import {
+  getSession, authorizedForDomain, requireSession,
+  requireSomeAdministrator,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -136,9 +140,11 @@ export default function (router) {
     category: 'email-lists',
     modelName: 'EmailList',
     index: {
-      authorize: authorizedForDomain,
+      authorization: requireSomeAdministrator,
+      filterAuthorized: authorizedForDomain,
     },
     get: {
+      authorization: requireSomeAdministrator,
       populate: [
         { path: 'formTemplateId', select: 'name path' },
       ],
@@ -150,15 +156,18 @@ export default function (router) {
       },
     },
     post: {
+      authorization: requireSomeAdministrator,
       transformOut: emailList => (
         addList(emailList.name)
         .then(() => emailList)
       ),
     },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: prepareEmailList,
     },
     delete: {
+      authorization: requireSomeAdministrator,
       deleteRelated: emailList => (
         removeList(emailList.name)
         .then(() => emailList)
@@ -167,7 +176,8 @@ export default function (router) {
   });
 
   router.post('/email-lists/:id/subscribe', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSession)
     .then(() => {
       const id = req.params.id;
       const EmailList = mongoose.model('EmailList');
@@ -192,14 +202,12 @@ export default function (router) {
     })
     .then(doc => addAddresses(doc.name, req.body))
     .then(() => res.status(200).send())
-    .catch((error) => {
-      console.error('!!!', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   router.post('/email-lists/:id/unsubscribe', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSession)
     .then(() => {
       const id = req.params.id;
       const EmailList = mongoose.model('EmailList');
@@ -220,9 +228,6 @@ export default function (router) {
     })
     .then(doc => removeAddresses(doc.name, req.body))
     .then(() => res.status(200).send())
-    .catch((error) => {
-      console.error('!!!', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 }

@@ -5,7 +5,7 @@ mongoose.Promise = global.Promise;
 const ALLOWED_POST_ORIGINS =
   ['https://www.pbc.org', 'https://test.pbc.org', 'http://localhost:8080'];
 
-export function authorize(req, res, required = true) {
+export function getSession(req) {
   // verify Origin, to avoid CSRF
   const method = req.method;
   const origin = req.headers.origin;
@@ -16,21 +16,45 @@ export function authorize(req, res, required = true) {
     const Session = mongoose.model('Session');
     return Session.findOne({ token })
     .populate('userId', 'email name administrator administratorDomainId')
-    .exec()
-    .then((session) => {
-      if (session || !required) {
-        return session;
-      }
-      // console.log('!!! ! authorized no session', token);
-      res.status(401).json({ error: 'Not authorized' });
-      return Promise.reject();
-    });
-  } else if (!required) {
-    return Promise.resolve(undefined);
+    .exec();
   }
-  // console.log('!!! ! authorized no authorization');
-  res.status(401).json({ error: 'Not authorized' });
-  return Promise.reject();
+  return Promise.resolve(undefined);
+}
+
+export function requireSession(session) {
+  return session ? Promise.resolve(session) : Promise.reject({ status: 403 });
+}
+
+export function requireAdministrator(session) {
+  return (session && session.userId.administrator) ?
+    Promise.resolve(session) : Promise.reject({ status: 403 });
+}
+
+export function requireSomeAdministrator(session) {
+  return (session && (session.userId.administrator ||
+    session.userId.administratorDomainId)) ?
+    Promise.resolve(session) : Promise.reject({ status: 403 });
+}
+
+export function allowAnyone(session) {
+  return session;
+}
+
+export function requireDomainAdministrator(context, domainId) {
+  const { session } = context;
+  return (session && (session.userId.administrator ||
+    (session.userId.administratorDomainId &&
+      session.userId.administratorDomainId.equals(domainId)))) ?
+    Promise.resolve(context) : Promise.reject({ status: 403 });
+}
+
+export function requireDomainAdministratorOrUser(context, domainId, userId) {
+  const { session } = context;
+  return (session && (session.userId.administrator ||
+    (session.userId.administratorDomainId &&
+      session.userId.administratorDomainId.equals(domainId)) ||
+    session.userId._id.equals(userId))) ?
+    Promise.resolve(context) : Promise.reject({ status: 403 });
 }
 
 export function authorizedAdministrator(session) {

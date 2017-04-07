@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import register from './register';
-import { authorize, authorizedAdministrator } from './auth';
+import { getSession, requireAdministrator } from './auth';
 import { splitEvents, sortEvents } from './calendars';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -10,7 +11,8 @@ mongoose.Promise = global.Promise;
 
 export default function (router) {
   router.get('/resources/:id/events', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireAdministrator)
     .then(() => {
       const Event = mongoose.model('Event');
       const id = req.params.id;
@@ -34,11 +36,12 @@ export default function (router) {
       .then(events => sortEvents(events))
       .then(events => res.json(events));
     })
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 
   router.get('/resources/events', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireAdministrator)
     .then(() => {
       const Event = mongoose.model('Event');
       const queryDate = moment(req.query.date || undefined);
@@ -72,20 +75,11 @@ export default function (router) {
       .then(events => sortEvents(events))
       .then(events => res.json(events));
     })
-    .catch((error) => {
-      console.error('!!!', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   register(router, {
     category: 'resources',
     modelName: 'Resource',
-    index: {
-      authorize: authorizedAdministrator,
-    },
-    get: {
-      authorize: authorizedAdministrator,
-    },
   });
 }

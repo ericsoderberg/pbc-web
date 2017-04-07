@@ -1,8 +1,11 @@
 import mongoose from 'mongoose';
 import register from './register';
-import { authorize, authorizedForDomainOrSelf } from './auth';
+import {
+  getSession, authorizedForDomainOrSelf, requireSession,
+  requireDomainAdministratorOrUser,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
-import { getPostData } from './utils';
+import { catcher, getPostData } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -21,28 +24,40 @@ export default function (router) {
   register(router, {
     category: 'payments',
     modelName: 'Payment',
-    omit: ['post', 'put'], // special handling for POST and PUT of form below
+    omit: ['get', 'post', 'put', 'delete'], // special handling below
     index: {
-      authorize: authorizedForDomainOrSelf,
+      filterAuthorized: authorizedForDomainOrSelf,
       populate: [
         { path: 'userId', select: 'name' },
       ],
-    },
-    get: {
-      populate: [
-        { path: 'userId', select: 'name' },
-      ],
-    },
-    put: {
-      transformIn: unsetDomainIfNeeded,
-    },
-    delete: {
-      deleteRelated: deletePaymentRelated,
     },
   });
 
+  router.get('/payments/:id', (req, res) => {
+    getSession(req)
+    .then(requireSession)
+    // get payment
+    .then((session) => {
+      const id = req.params.id;
+      const Payment = mongoose.model('Payment');
+      return Payment.findOne({ _id: id })
+      .populate({ path: 'userId', select: 'name' })
+      .exec()
+      .then(payment => ({ payment, session }));
+    })
+    // authorize
+    .then((context) => {
+      const { payment } = context;
+      return requireDomainAdministratorOrUser(
+        context, payment.domainId, payment.userId);
+    })
+    .then(doc => res.status(200).json(doc))
+    .catch(error => catcher(error, res));
+  });
+
   router.post('/payments', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSession)
     .then(session => getPostData(req).then(data => ({ session, data })))
     .then((context) => {
       const { data } = context;
@@ -72,8 +87,7 @@ export default function (router) {
       const { data, doc } = context;
       // update forms to record payment
       const Form = mongoose.model('Form');
-      // PayPal NVP API doesn't preserve formIds array :(
-      const formIds = data.formIds; // .split(',');
+      const formIds = data.formIds;
       const promises = [];
       formIds.forEach((formId) => {
         promises.push(Form.findOne({ _id: formId }).exec()
@@ -85,36 +99,65 @@ export default function (router) {
       return Promise.all(promises).then(() => doc);
     })
     .then(doc => res.status(200).send(doc))
-    .catch((error) => {
-      console.error('!!! post payment catch', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   router.put('/payments/:id', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSession)
+    // get prior payment
     .then((session) => {
       const id = req.params.id;
       const Payment = mongoose.model('Payment');
       return Payment.findOne({ _id: id }).exec()
-      .then((payment) => {
-        let data = req.body;
-        // Allow an administrator to set the userId. Otherwise, set it to
-        // the current session user
-        if (!data.userId ||
-          !(session.userId.administrator || (payment.domainId &&
-            payment.domainId.equals(session.userId.administratorDomainId)))) {
-          data.userId = session.userId;
-        }
-        data.modified = new Date();
-        data = unsetDomainIfNeeded(data, session);
-        return payment.update(data);
-      });
+      .then(payment => ({ payment, session }));
+    })
+    // authorize
+    .then((context) => {
+      const { payment } = context;
+      return requireDomainAdministratorOrUser(
+        context, payment.domainId, payment.userId);
+    })
+    .then((context) => {
+      const { session, payment } = context;
+      let data = unsetDomainIfNeeded(req.body);
+      // Allow an administrator to set the userId. Otherwise, set it to
+      // the current session user
+      if (!data.userId ||
+        !(session.userId.administrator ||
+          (session.userId.administratorDomainId &&
+          session.userId.administratorDomainId.equals(payment.domainId)))) {
+        data.userId = session.userId;
+      }
+      data.modified = new Date();
+      data = unsetDomainIfNeeded(data, session);
+      return payment.update(data);
     })
     .then(doc => res.status(200).json(doc))
-    .catch((error) => {
-      console.error('!!! post payment catch', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
+  });
+
+  router.delete('/payments/:id', (req, res) => {
+    getSession(req)
+    .then(requireSession)
+    // get prior payment
+    .then((session) => {
+      const id = req.params.id;
+      const Payment = mongoose.model('Payment');
+      return Payment.findOne({ _id: id }).exec()
+      .then(payment => ({ payment, session }));
+    })
+    // authorize
+    .then((context) => {
+      const { payment } = context;
+      return requireDomainAdministratorOrUser(
+        context, payment.domainId, payment.userId);
+    })
+    // remove payment
+    .then(context => context.payment.remove())
+    .then(deletePaymentRelated)
+    // respond
+    .then(() => res.status(200).send())
+    .catch(error => catcher(error, res));
   });
 }

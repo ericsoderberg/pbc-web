@@ -117,6 +117,9 @@ export function getItems(category, options = {}) {
   if (options.filter) {
     params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
   }
+  if (options.adminable) {
+    params.push('adminable=true');
+  }
   if (options.sort) {
     params.push(`sort=${encodeURIComponent(options.sort)}`);
   }

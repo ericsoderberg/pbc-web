@@ -65,12 +65,13 @@ class List extends Component {
   }
 
   _get() {
-    const { category, populate, select, sort } = this.props;
+    const { adminable, category, populate, select, sort } = this.props;
     const { filter, searchText } = this.state;
     // throttle gets when user is typing
     clearTimeout(this._getTimer);
     this._getTimer = setTimeout(() => {
-      getItems(category, { sort, filter, search: searchText, select, populate })
+      getItems(category,
+        { sort, filter, search: searchText, select, populate, adminable })
       .then(response => this.setState({
         items: response, mightHaveMore: response.length >= 20, loading: false,
       }))
@@ -312,6 +313,7 @@ class List extends Component {
 List.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   addIfFilter: PropTypes.string,
+  adminable: PropTypes.bool,
   back: PropTypes.bool,
   category: PropTypes.string.isRequired,
   filters: PropTypes.arrayOf(PropTypes.shape({
@@ -351,6 +353,7 @@ List.propTypes = {
 List.defaultProps = {
   actions: [],
   addIfFilter: undefined,
+  adminable: true,
   back: false,
   filters: undefined,
   homer: false,

@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
-import { authorize, authorizedForDomain } from './auth';
+import { getSession, authorizedForDomain, requireSomeAdministrator } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
 import register from './register';
 import { render as renderNewsletter } from './newsletter';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -74,17 +75,15 @@ const populateNewsletterForRendering = (newsletter) => {
 export default function (router, transporter) {
   router.post('/newsletters/render', (req, res) => {
     const Newsletter = mongoose.model('Newsletter');
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then(() => {
       const newsletter = new Newsletter(req.body);
       return populateNewsletterForRendering(newsletter);
     })
     .then(newsletter => renderNewsletter(newsletter, `${req.headers.origin}`, ''))
     .then(markup => res.send(markup))
-    .catch((error) => {
-      console.error('!!! error', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   router.post('/newsletters/:id/send', (req, res) => {
@@ -92,7 +91,8 @@ export default function (router, transporter) {
     const Site = mongoose.model('Site');
     const id = req.params.id;
     const address = req.body.address;
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then(() => Newsletter.findOne({ _id: id }).exec())
     .then(newsletter => populateNewsletterForRendering(newsletter))
     .then((newsletter) => {
@@ -115,25 +115,31 @@ export default function (router, transporter) {
       });
     })
     .then(() => res.status(200).json({}))
-    .catch((error) => {
-      console.error('!!! error', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   register(router, {
     category: 'newsletters',
     modelName: 'Newsletter',
     index: {
-      authorize: authorizedForDomain,
+      authorization: requireSomeAdministrator,
+      filterAuthorized: authorizedForDomain,
     },
     get: {
+      authorization: requireSomeAdministrator,
       populate: [
         { path: 'eventIds', select: 'name path' },
       ],
     },
+    post: {
+      authorization: requireSomeAdministrator,
+    },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: unsetReferences,
+    },
+    delete: {
+      authorization: requireSomeAdministrator,
     },
   });
 }

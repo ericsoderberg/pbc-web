@@ -63,7 +63,7 @@ class Library extends Component {
       }
 
       result = (
-        <List location={location} homer={true}
+        <List location={location} homer={true} adminiable={false}
           category="messages" title={`${library.name} Library`} path="/messages"
           filter={{ libraryId: library._id }}
           select="name path verses date author series color" sort="-date"
