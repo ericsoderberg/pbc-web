@@ -6,6 +6,7 @@ import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
 import Stored from '../../components/Stored';
+import { searchToObject } from '../../utils/Params';
 
 const TITLE = 'Verify Email';
 const EMAIL_REGEXP = /.+@.+/;
@@ -124,10 +125,11 @@ class VerifyEmail extends Component {
   }
 
   componentDidMount() {
-    const { inline } = this.props;
+    const { inline, location } = this.props;
     if (!inline) {
       document.title = TITLE;
-      const { location: { query: { token, returnPath } } } = this.props;
+      const query = searchToObject(location.search);
+      const { token, returnPath } = query;
       if (token) {
         postSessionViaToken({ token })
         .then(() => this.setState({ state: 'done', returnPath }))
@@ -265,12 +267,7 @@ class VerifyEmail extends Component {
 
 VerifyEmail.propTypes = {
   inline: PropTypes.bool,
-  location: PropTypes.shape({
-    query: PropTypes.shape({
-      returnPath: PropTypes.string,
-      token: PropTypes.string,
-    }),
-  }),
+  location: PropTypes.object.isRequired,
   onCancel: PropTypes.func,
   onSignIn: PropTypes.func,
   onSignUp: PropTypes.func,

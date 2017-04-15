@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import register from './register';
-import { authorize, authorizedForDomain } from './auth';
+import {
+  getSession, allowAnyone, authorizedForDomain, requireAdministrator,
+  requireSomeAdministrator,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -71,7 +75,6 @@ export function sortEvents(events) {
   });
 }
 
-
 // /api/calendars and /api/calendar
 
 const prepareCalendar = (data) => {
@@ -91,9 +94,17 @@ export default function (router) {
     category: 'calendars',
     modelName: 'Calendar',
     index: {
-      authorize: authorizedForDomain,
+      authorization: allowAnyone,
+      filterAuthorized: authorizedForDomain,
+    },
+    get: {
+      authorization: requireSomeAdministrator,
+    },
+    post: {
+      authorization: requireAdministrator,
     },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: prepareCalendar,
       transformOut: (calendar) => {
         // update all Events in this calendar to have the same domain
@@ -103,10 +114,14 @@ export default function (router) {
           .then(() => calendar);
       },
     },
+    delete: {
+      authorization: requireAdministrator,
+    },
   });
 
   router.get('/calendar', (req, res) => {
-    authorize(req, res, false) // don't require session yet
+    getSession(req)
+    .then(allowAnyone)
     // get calendar, if any
     .then((session) => {
       const Calendar = mongoose.model('Calendar');
@@ -221,7 +236,7 @@ export default function (router) {
       const calendar = calendars.length === 1 ? calendars[0].toObject() : {};
       res.status(200).json({ ...calendar, ...dates, weeks });
     })
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 }
 

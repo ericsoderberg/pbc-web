@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize } from './auth';
+import { getSession, requireAdministrator } from './auth';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -17,13 +18,8 @@ const TYPES = [
 
 export default function (router) {
   router.get('/audit-log', (req, res) => {
-    authorize(req, res)
-    .then((session) => {
-      if (!session.userId.administrator) {
-        return Promise.reject({ status: 403 });
-      }
-      return session;
-    })
+    getSession(req)
+    .then(requireAdministrator)
     .then(() => {
       const promises = TYPES.map((type) => {
         const Doc = mongoose.model(type.model);
@@ -58,9 +54,6 @@ export default function (router) {
       items = items.slice(skip, skip + 20);
       res.status(200).json(items);
     })
-    .catch((error) => {
-      console.error('!!!', error);
-      res.status(error.status || 400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 }

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import register from './register';
-import { authorizedAdministrator } from './auth';
 
 mongoose.Promise = global.Promise;
 
@@ -25,9 +24,6 @@ export default function (router) {
     modelName: 'Domain',
     delete: {
       deleteRelated: unsetDomain,
-    },
-    index: {
-      authorize: authorizedAdministrator,
     },
   });
 }

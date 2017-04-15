@@ -174,10 +174,10 @@ ${previousMessageMarkup}
         `;
       }
 
-      case 'pages': return section.pages.map(page =>
+      case 'pages': return section.pages.filter(page => page).map(page =>
         markupPage(page.page, section, urlBase));
 
-      case 'files': return section.files.map(file =>
+      case 'files': return section.files.filter(file => file).map(file =>
         markupFile(file, section, urlBase));
 
       default:

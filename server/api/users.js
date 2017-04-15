@@ -2,10 +2,14 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
-import { authorizedDomainAdministrator } from './auth';
+import {
+  authorizedDomainAdministrator, allowAnyone, requireAdministrator,
+  requireSession,
+} from './auth';
 import { createSession } from './sessions';
 import { compressImage } from './image';
 import { renderNotification } from './email';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -141,16 +145,18 @@ It will sign you in to the ${site.name} web site.`;
       });
     })
     .then(() => res.status(200).send({}))
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 
   register(router, {
     category: 'users',
     modelName: 'User',
     delete: {
+      authorization: requireSession,
       deleteRelated: deleteUserRelated,
     },
     get: {
+      authorization: requireSession,
       populate: { path: 'administratorDomainId', select: 'name' },
       transformOut: (user) => {
         if (user) {
@@ -162,7 +168,8 @@ It will sign you in to the ${site.name} web site.`;
       },
     },
     index: {
-      authorize: authorizedDomainAdministrator,
+      authorization: requireAdministrator,
+      filterAuthorized: authorizedDomainAdministrator,
       searchProperties: ['name', 'email'],
       transformOut: users => (
         users.map((doc) => {
@@ -173,9 +180,11 @@ It will sign you in to the ${site.name} web site.`;
       ),
     },
     post: {
+      authorization: allowAnyone,
       transformIn: prepareUser,
     },
     put: {
+      authorization: requireSession,
       transformIn: prepareUser,
     },
   });

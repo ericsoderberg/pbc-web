@@ -1,6 +1,6 @@
 import Paypal from 'paypal-nvp-api';
-import { authorize } from './auth';
-import { getPostData } from './utils';
+import { getSession, requireSession } from './auth';
+import { catcher, getPostData } from './utils';
 
 // NOTE: This file is deprecated in favor of the all-browser REST API integration
 
@@ -18,7 +18,8 @@ const paypal = Paypal(config);
 export default function (router) {
   // PayPal NVP API integration, until they get the REST API fixed :(
   router.post('/paypal', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSession)
     .then(session => getPostData(req).then(data => ({ session, data })))
     .then((context) => {
       const { data, session } = context;
@@ -42,9 +43,6 @@ export default function (router) {
       return { token: result.TOKEN };
     })
     .then(doc => res.status(200).send(doc))
-    .catch((error) => {
-      console.error('!!! post paypal catch', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 }

@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 import fs from 'fs';
 import rmdir from 'rimraf';
 import mime from 'mime';
-import { authorize } from './auth';
+import { getSession, requireAdministrator, requireSomeAdministrator } from './auth';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -67,7 +68,8 @@ export default function (router) {
   });
 
   router.delete('/files/:id', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then(() => {
       const id = req.params.id;
       rmdir(`${FILES_PATH}/${id}`, (error) => {
@@ -77,11 +79,13 @@ export default function (router) {
           res.status(200).send();
         }
       });
-    });
+    })
+    .catch(error => catcher(error, res));
   });
 
   router.get('/files', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireAdministrator)
     .then(() => {
       fs.readdir(`${FILES_PATH}`, (error, files) => {
         if (error) {
@@ -96,11 +100,13 @@ export default function (router) {
           res.status(200).json(files);
         }
       });
-    });
+    })
+    .catch(error => catcher(error, res));
   });
 
   router.post('/files', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then(() => {
       const id = new mongoose.Types.ObjectId();
       let fstream;
@@ -118,6 +124,7 @@ export default function (router) {
           });
         });
       req.pipe(req.busboy);
-    });
+    })
+    .catch(error => catcher(error, res));
   });
 }

@@ -1,3 +1,9 @@
+
+export const catcher = (error, res) => {
+  console.error(error);
+  res.status(error.status || 400).json(error);
+};
+
 export const getPostData = req =>
   new Promise((resolve, reject) => {
     if (req.readable) {

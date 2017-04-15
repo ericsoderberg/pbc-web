@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize, authorizedForDomain } from './auth';
+import {
+  getSession, allowAnyone, authorizedForDomain, requireSomeAdministrator,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetCalendarIfNeeded } from './calendars';
 import register from './register';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -161,7 +164,8 @@ const unsetReferences = (data) => {
 
 export default function (router) {
   router.post('/events/resources', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     // Get all events that overlap this event.
     .then(() => {
       const Event = mongoose.model('Event');
@@ -173,11 +177,12 @@ export default function (router) {
     // Get all resources and annotate with events.
     .then(resourcesWithEvents)
     .then(resources => res.status(200).json(resources))
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 
   router.post('/events/unavailable-dates', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then(() => {
       const Event = mongoose.model('Event');
       const event = new Event(req.body);
@@ -204,16 +209,18 @@ export default function (router) {
       return unavailableDatesMerged;
     })
     .then(unavailableDates => res.status(200).json(unavailableDates))
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 
   register(router, {
     category: 'events',
     modelName: 'Event',
     index: {
-      authorize: authorizedForDomain,
+      authorization: requireSomeAdministrator,
+      filterAuthorized: authorizedForDomain,
     },
     get: {
+      authorization: allowAnyone,
       populate: [
         { path: 'primaryEventId', select: 'name path' },
         { path: 'calendarId', select: 'name path' },
@@ -244,8 +251,15 @@ export default function (router) {
         return doc;
       },
     },
+    post: {
+      authorization: requireSomeAdministrator,
+    },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: unsetReferences,
+    },
+    delete: {
+      authorization: requireSomeAdministrator,
     },
   });
 }

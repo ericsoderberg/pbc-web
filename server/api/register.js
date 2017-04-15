@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize } from './auth';
+import { getSession, requireAdministrator, authorizedForDomain } from './auth';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -27,30 +28,34 @@ export default (router, options) => {
   if (methods.indexOf('get') >= 0) {
     const getOpts = options.get || {};
     router.get(`/${category}/:id`, (req, res) => {
-      const id = req.params.id;
-      const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
-      const query = Doc.findOne(criteria);
-      if (req.query.select) {
-        query.select(req.query.select);
-      }
-      if (req.query.populate) {
-        const populate = JSON.parse(req.query.populate);
-        if (populate === true) {
-          // populate from options
-          if (getOpts.populate) {
-            addPopulate(query, getOpts.populate);
-          }
-        } else {
-          addPopulate(query, populate);
+      getSession(req)
+      .then(getOpts.authorization || options.authorization || requireAdministrator)
+      .then(() => {
+        const id = req.params.id;
+        const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+        const query = Doc.findOne(criteria);
+        if (req.query.select) {
+          query.select(req.query.select);
         }
-      } else if (getOpts.populate) {
-        addPopulate(query, getOpts.populate);
-      }
-      query.exec()
+        if (req.query.populate) {
+          const populate = JSON.parse(req.query.populate);
+          if (populate === true) {
+            // populate from options
+            if (getOpts.populate) {
+              addPopulate(query, getOpts.populate);
+            }
+          } else {
+            addPopulate(query, populate);
+          }
+        } else if (getOpts.populate) {
+          addPopulate(query, getOpts.populate);
+        }
+        return query.exec();
+      })
       .then((doc) => {
         if (!doc) {
           res.status(404);
-          return Promise.reject(404);
+          return Promise.reject({ status: 404 });
         }
         return doc;
       })
@@ -64,10 +69,7 @@ export default (router, options) => {
         }
         res.json(doc);
       })
-      .catch((error) => {
-        console.error('!!! get error', error);
-        res.status(typeof error === 'number' ? error : 400).json(error);
-      });
+      .catch(error => catcher(error, res));
     });
   }
 
@@ -75,7 +77,8 @@ export default (router, options) => {
     const putOpts = options.put || {};
     router.put(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
-      authorize(req, res)
+      getSession(req)
+      .then(putOpts.authorization || options.authorization || requireAdministrator)
       .then((session) => {
         const data = req.body;
         data.modified = moment.utc();
@@ -91,10 +94,7 @@ export default (router, options) => {
       .then(doc => (putOpts.transformOut ?
         putOpts.transformOut(doc, req) : doc))
       .then(doc => res.status(200).json(doc))
-      .catch((error) => {
-        console.error('!!!', error);
-        res.status(400).json(error);
-      });
+      .catch(error => catcher(error, res));
     });
   }
 
@@ -102,25 +102,27 @@ export default (router, options) => {
     const deleteOpts = options.delete || {};
     router.delete(`/${category}/:id`, (req, res) => {
       const id = req.params.id;
-      authorize(req, res)
+      getSession(req)
+      .then(deleteOpts.authorization || options.authorization || requireAdministrator)
       .then(() => Doc.findById(id).exec())
       .then(doc => doc.remove())
       .then(doc => (deleteOpts.deleteRelated ?
         deleteOpts.deleteRelated(doc, req) : doc))
       .then(() => res.status(200).send())
-      .catch(error => res.status(400).json(error));
+      .catch(error => catcher(error, res));
     });
   }
 
   if (methods.indexOf('index') >= 0) {
     const indexOpts = options.index || {};
     router.get(`/${category}`, (req, res) => {
-      authorize(req, res, false)
+      getSession(req)
+      .then(indexOpts.authorization || options.authorization || requireAdministrator)
       .then((session) => {
         const searchProperties = indexOpts.searchProperties || 'name';
         const query = Doc.find();
-        if (indexOpts.authorize) {
-          query.find(indexOpts.authorize(session));
+        if (indexOpts.filterAuthorized) {
+          query.find(indexOpts.filterAuthorized(session));
         }
         if (req.query.search) {
           if (indexOpts.textSearch) {
@@ -144,6 +146,9 @@ export default (router, options) => {
               query.find(obj);
             }
           }
+        }
+        if (req.query.adminable) {
+          query.find(authorizedForDomain(session));
         }
         if (req.query.filter) {
           let filter = JSON.parse(req.query.filter);
@@ -181,22 +186,23 @@ export default (router, options) => {
         if (req.query.skip) {
           query.skip(parseInt(req.query.skip, 10));
         }
-        query.exec()
-        .then(docs => (indexOpts.transformOut ?
-          indexOpts.transformOut(docs, req) : docs))
-        .then((docs) => {
-          res.setHeader('Cache-Control', 'max-age=0');
-          res.json(docs);
-        })
-        .catch(error => res.status(400).json(error));
-      });
+        return query.exec();
+      })
+      .then(docs => (indexOpts.transformOut ?
+        indexOpts.transformOut(docs, req) : docs))
+      .then((docs) => {
+        res.setHeader('Cache-Control', 'max-age=0');
+        res.json(docs);
+      })
+      .catch(error => catcher(error, res));
     });
   }
 
   if (methods.indexOf('post') >= 0) {
     const postOpts = options.post || {};
     router.post(`/${category}`, (req, res) => {
-      authorize(req, res)
+      getSession(req)
+      .then(postOpts.authorization || options.authorization || requireAdministrator)
       .then((session) => {
         const data = req.body;
         data.created = moment.utc();
@@ -212,10 +218,7 @@ export default (router, options) => {
       .then(doc => (postOpts.transformOut ?
         postOpts.transformOut(doc, req) : doc))
       .then(doc => res.status(200).json(doc))
-      .catch((error) => {
-        console.error(error);
-        res.status(400).json(error);
-      });
+      .catch(error => catcher(error, res));
     });
   }
 };

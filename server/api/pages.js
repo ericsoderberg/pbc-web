@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { authorize, authorizedForDomain } from './auth';
+import {
+  getSession, allowAnyone, authorizedForDomain, requireAdministrator,
+  requireSomeAdministrator,
+} from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -115,7 +119,6 @@ const populatePage = (page) => {
 };
 
 const publicize = (data) => {
-  // console.log('!!! publicize');
   // get site
   const Site = mongoose.model('Site');
   return Site.findOne({})
@@ -200,7 +203,8 @@ const preparePage = (data) => {
 
 export default function (router) {
   router.get('/pages/:id/map', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireSomeAdministrator)
     .then(() => {
       const Page = mongoose.model('Page');
       return Page.find({})
@@ -229,14 +233,12 @@ export default function (router) {
       return map;
     })
     .then(map => res.status(200).json(map))
-    .catch((error) => {
-      console.error('!!!', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   router.post('/pages/publicize', (req, res) => {
-    authorize(req, res, true)
+    getSession(req)
+    .then(requireAdministrator)
     .then(() => publicize())
     .then(() => res.status(200).json({}))
     .catch((error) => {
@@ -249,11 +251,13 @@ export default function (router) {
     category: 'pages',
     modelName: 'Page',
     index: {
-      authorize: session => ({ $or: [
+      authorization: allowAnyone,
+      filterAuthorized: session => ({ $or: [
         { public: true }, authorizedForDomain(session),
       ] }),
     },
     get: {
+      authorization: allowAnyone,
       populate: [
         { path: 'sections.pages.id', select: 'name path', model: 'Page' },
         { path: 'sections.people.id', select: 'name image', model: 'User' },
@@ -276,12 +280,19 @@ export default function (router) {
         return page;
       },
     },
+    post: {
+      authorization: requireSomeAdministrator,
+    },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: preparePage,
       transformOut: (data) => {
         publicize(); // don't wait
         return data;
       },
+    },
+    delete: {
+      authorization: requireSomeAdministrator,
     },
   });
 }

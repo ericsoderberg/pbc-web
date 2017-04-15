@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
-import { authorize } from './auth';
+import { getSession, requireAdministrator } from './auth';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -27,11 +28,12 @@ export default function (router) {
       return site;
     })
     .then(site => res.json(site))
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 
   router.post('/site', (req, res) => {
-    authorize(req, res)
+    getSession(req)
+    .then(requireAdministrator)
     .then((session) => {
       const Doc = mongoose.model('Site');
       const data = req.body;
@@ -66,9 +68,6 @@ export default function (router) {
       return site;
     })
     .then(site => res.status(200).json(site))
-    .catch((error) => {
-      console.error(error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 }

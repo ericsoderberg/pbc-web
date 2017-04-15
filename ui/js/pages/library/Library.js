@@ -66,7 +66,8 @@ class Library extends Component {
         </Link>
       ));
       if (session && (session.userId.administrator ||
-        session.userId.administratorDomainId === library.domainId)) {
+        (session.userId.administratorDomainId &&
+        session.userId.administratorDomainId === library.domainId))) {
         controls.push(
           <Link key="edit" to={`/libraries/${library._id}/edit`}>
             Edit
@@ -75,7 +76,7 @@ class Library extends Component {
       }
 
       result = (
-        <List location={location} homer={true}
+        <List location={location} homer={true} adminiable={false}
           category="messages" title={`${library.name} Library`} path="/messages"
           filter={{ libraryId: library._id }}
           select="name path verses date author series color" sort="-date"

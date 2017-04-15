@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
+import { allowAnyone, requireSomeAdministrator } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
 import register, { addPopulate } from './register';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -82,10 +84,8 @@ export default function (router) {
     category: 'messages',
     modelName: 'Message',
     omit: ['index'],
-    // index: {
-    //   textSearch: true
-    // },
     get: {
+      authorization: allowAnyone,
       populate: [
         { path: 'seriesId', select: 'name path' },
         { path: 'libraryId', select: 'name path' },
@@ -98,11 +98,16 @@ export default function (router) {
       },
     },
     post: {
+      authorization: requireSomeAdministrator,
       transformOut: updateSeriesDate,
     },
     put: {
+      authorization: requireSomeAdministrator,
       transformIn: unsetReferences,
       transformOut: updateSeriesDate,
+    },
+    delete: {
+      authorization: requireSomeAdministrator,
     },
   });
 
@@ -160,6 +165,6 @@ export default function (router) {
       res.setHeader('Cache-Control', 'max-age=0');
       res.json(docs);
     })
-    .catch(error => res.status(400).json(error));
+    .catch(error => catcher(error, res));
   });
 }

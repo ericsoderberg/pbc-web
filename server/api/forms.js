@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
-import { authorize, authorizedForDomainOrSelf } from './auth';
+import {
+  getSession, authorizedForDomainOrSelf, requireSession,
+  requireDomainAdministratorOrUser,
+} from './auth';
 import { useOrCreateSession } from './sessions';
 import { unsetDomainIfNeeded } from './domains';
 import { renderNotification } from './email';
 import register from './register';
+import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -197,40 +201,71 @@ const setUnpaidTotal = form => (
   })
 );
 
+const getFormContext = (session, id, populate = []) => {
+  // Get current form
+  const Form = mongoose.model('Form');
+  const query = Form.findOne({ _id: id });
+  populate.forEach(pop => query.populate(pop));
+  return query.exec()
+  .then(form => ({ session, form }))
+  // Get corresponding form template
+  .then((context) => {
+    const { form } = context;
+    // Get the FormTemplate so we can check the domainId for authorization.
+    const FormTemplate = mongoose.model('FormTemplate');
+    return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
+    .then(formTemplate => ({ ...context, formTemplate }));
+  })
+  // authorize for this form
+  .then((context) => {
+    const { form, formTemplate } = context;
+    return requireDomainAdministratorOrUser(
+      context, formTemplate.domainId, form.userId._id || form.userId);
+  });
+};
+
 export default function (router, transporter) {
   register(router, {
     category: 'forms',
     modelName: 'Form',
-    omit: ['post', 'put'], // special handling for POST and PUT of form below
+    omit: ['get', 'post', 'put', 'delete'], // special handling below
     index: {
-      authorize: authorizedForDomainOrSelf,
+      authorization: requireSession,
+      filterAuthorized: authorizedForDomainOrSelf,
       populate: [
         { path: 'formTemplateId', select: 'name domainId' },
         { path: 'paymentIds', select: 'amount' },
         { path: 'userId', select: 'name' },
       ],
-    },
-    get: {
-      populate: [
-        { path: 'formTemplateId', select: 'name domainId' },
-        { path: 'paymentIds', select: 'amount' },
-        { path: 'userId', select: 'name' },
-      ],
-      transformOut: setUnpaidTotal,
-    },
-    put: {
-      transformIn: unsetDomainIfNeeded,
     },
   });
 
+  router.get('/forms/:id', (req, res) => {
+    getSession(req)
+    .then(requireSession)
+    // get form and template and authorize
+    .then(session => getFormContext(session, req.params.id, [
+      { path: 'formTemplateId', select: 'name domainId' },
+      { path: 'paymentIds', select: 'amount' },
+      { path: 'userId', select: 'name' },
+    ]))
+    // set unpaid total
+    .then(context => setUnpaidTotal(context.form))
+    // respond
+    .then(form => res.status(200).json(form))
+    .catch(error => catcher(error, res));
+  });
+
   router.post('/forms', (req, res) => {
-    authorize(req, res, false) // don't require session yet
+    getSession(req)
+    // get template
     .then((session) => {
       const data = req.body;
       const FormTemplate = mongoose.model('FormTemplate');
       return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
       .then(formTemplate => ({ session, formTemplate }));
     })
+    // authorize
     .then((context) => {
       const { session, formTemplate } = context;
       // AUTH
@@ -242,14 +277,16 @@ export default function (router, transporter) {
       return useOrCreateSession(session, userData)
       .then(session2 => ({ ...context, session: session2 }));
     })
+    // save form
     .then((context) => {
       const { session, formTemplate } = context;
       const Form = mongoose.model('Form');
       const data = req.body;
       data.created = new Date();
       data.modified = data.created;
-      const admin = (session.userId.administrator || (formTemplate.domainId &&
-        formTemplate.domainId.equals(session.userId.administratorDomainId)));
+      const admin = (session.userId.administrator ||
+        (session.userId.administratorDomainId &&
+        session.userId.administratorDomainId.equals(formTemplate.domainId)));
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
       if (!admin || !data.userId) {
@@ -259,7 +296,9 @@ export default function (router, transporter) {
       return form.save()
       .then(formSaved => ({ ...context, form: formSaved }));
     })
+    // send emails
     .then(sendEmails(req, transporter))
+    // respond
     .then((context) => {
       const { form, session } = context;
       if (!session.loginAt) {
@@ -269,50 +308,42 @@ export default function (router, transporter) {
         res.status(200).send({ form });
       }
     })
-    .catch((error) => {
-      console.error('!!! post form catch', error);
-      res.status(400).json(error);
-    });
+    .catch(error => catcher(error, res));
   });
 
   router.put('/forms/:id', (req, res) => {
-    authorize(req, res)
-    .then((session) => {
-      const id = req.params.id;
-      const Form = mongoose.model('Form');
-      return Form.findOne({ _id: id }).exec()
-      .then(form => ({ session, form, req }));
-    })
+    getSession(req)
+    .then(requireSession)
+    // get form and template and authorize
+    .then(session => getFormContext(session, req.params.id))
+    // update form
     .then((context) => {
-      const { form } = context;
-      // Get the FormTemplate so we can validate it hasn't changed and so
-      // we can check the domainId for authorization.
-      const FormTemplate = mongoose.model('FormTemplate');
-      return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
-      .then(formTemplate => ({ ...context, formTemplate }));
-    })
-    .then((context) => {
-      const { session, form, formTemplate } = context;
+      const { form, formTemplate, session } = context;
       let data = req.body;
       if (!formTemplate._id.equals(data.formTemplateId._id)) {
         return Promise.reject({ error: 'Mismatched template' });
-      }
-      // AUTH
-      const admin = (session.userId.administrator || (formTemplate.domainId &&
-        formTemplate.domainId.equals(session.userId.administratorDomainId)));
-      if (!admin && !form.userId.equals(session.userId._id)) {
-        return Promise.reject({ status: 403 });
       }
       data.modified = new Date();
       data = unsetDomainIfNeeded(data, session);
       return form.update(data)
       .then(formUpdated => ({ ...context, form: formUpdated }));
     })
+    // send emails
     .then(sendEmails(req, transporter, true))
+    // respond
     .then(context => res.status(200).json(context.form))
-    .catch((error) => {
-      console.error('!!! post form catch', error);
-      res.status(error.status || 400).json(error);
-    });
+    .catch(error => catcher(error, res));
+  });
+
+  router.delete('/forms/:id', (req, res) => {
+    getSession(req)
+    .then(requireSession)
+    // get form and template and authorize
+    .then(session => getFormContext(session, req.params.id))
+    // remove form
+    .then(context => context.form.remove())
+    // respond
+    .then(() => res.status(200).send())
+    .catch(error => catcher(error, res));
   });
 }

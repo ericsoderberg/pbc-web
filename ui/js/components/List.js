@@ -72,11 +72,11 @@ class List extends Component {
   }
 
   _load() {
-    const { category, dispatch, populate, select, sort } = this.props;
+    const { adminable, category, dispatch, populate, select, sort } = this.props;
     const { filter, searchText } = this.state;
     this.setState({ loading: true }, () =>
       dispatch(loadCategory(category,
-        { sort, filter, search: searchText, select, populate })));
+        { sort, filter, search: searchText, select, populate, adminable })));
   }
 
   _throttleLoad() {
@@ -312,6 +312,7 @@ class List extends Component {
 List.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   addIfFilter: PropTypes.string,
+  adminable: PropTypes.bool,
   back: PropTypes.bool,
   category: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
@@ -354,6 +355,7 @@ List.propTypes = {
 List.defaultProps = {
   actions: [],
   addIfFilter: undefined,
+  adminable: true,
   back: false,
   filters: undefined,
   homer: false,
