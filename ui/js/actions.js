@@ -162,7 +162,9 @@ export const loadCategory = (category, options = {}) =>
     .then(items => dispatch({
       type: CATEGORY_LOAD, payload: { category, items, ...options },
     }))
-    .catch(error => console.error(error));
+    .catch(payload => dispatch({
+      type: CATEGORY_LOAD, error: true, payload,
+    }));
   };
 
 export const unloadCategory = category =>
@@ -256,16 +258,21 @@ export function loadSite() {
     fetch('/api/site', { method: 'GET', headers: _headers })
     .then(response => response.json())
     .then(payload => dispatch({ type: SITE_LOAD, payload }))
-    .catch(error => console.error(error));
+    .catch(payload => dispatch({
+      type: SITE_LOAD, error: true, payload,
+    }));
 }
 
-export function setSite(site) {
+export function postSite(site) {
   return dispatch =>
     fetch('/api/site', {
       method: 'POST', headers: _headers, body: JSON.stringify(site) })
     .then(processStatus)
+    .then(response => response.json())
     .then(payload => dispatch({ type: SITE_LOAD, payload }))
-    .catch(error => console.error(error));
+    .catch(payload => dispatch({
+      type: SITE_LOAD, error: true, payload,
+    }));
 }
 
 // Calendar
@@ -414,7 +421,9 @@ export const loadSearch = searchText =>
       method: 'GET', headers: _headers })
     .then(processStatus)
     .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
-    .catch(error => console.error(error));
+    .catch(payload => dispatch({
+      type: SEARCH_LOAD, error: true, payload,
+    }));
   };
 
 // Audit Log
@@ -436,7 +445,9 @@ export const loadAuditLog = (options = {}) =>
     .then(items => dispatch({
       type: AUDIT_LOG_LOAD, payload: { items, ...options },
     }))
-    .catch(error => console.error(error));
+    .catch(payload => dispatch({
+      type: AUDIT_LOG_LOAD, error: true, payload,
+    }));
   };
 
 export const unloadAuditLog = () => ({ type: AUDIT_LOG_UNLOAD });
