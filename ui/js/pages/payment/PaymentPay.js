@@ -69,7 +69,7 @@ class PaymentPay extends Component {
   // _paypalPayment(resolve, reject) { PayPal NVP
   _paypalPayment() {
     const { site } = this.props;
-    // const { formTemplateName } = this.props;
+    const { formTemplateName } = this.props;
     const { formState } = this.state;
     const payment = formState.object;
 
@@ -91,9 +91,12 @@ class PaymentPay extends Component {
     client[site.paypalEnv] = site.paypalClientId;
     return paypal.rest.payment.create(site.paypalEnv, client,
       {
-        transactions: [{ amount: { total: payment.amount, currency: 'USD' } }],
+        transactions: [{
+          amount: { total: payment.amount, currency: 'USD' },
+          description: formTemplateName,
+        }],
       },
-    );
+      { input_fields: { no_shipping: 1 }, flow_config: { user_action: 'commit' } });
   }
 
   // _onAuthorize(data) { PayPal NVP
@@ -197,7 +200,7 @@ PaymentPay.propTypes = {
   amount: PropTypes.number.isRequired,
   formIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   // formTemplateId: PropTypes.string.isRequired,
-  // formTemplateName: PropTypes.string.isRequired,
+  formTemplateName: PropTypes.string.isRequired,
   onCancel: PropTypes.func.isRequired,
   onDone: PropTypes.func.isRequired,
   payByCheckInstructions: PropTypes.string,
