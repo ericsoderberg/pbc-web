@@ -30,7 +30,7 @@ export default (router, options) => {
     router.get(`/${category}/:id`, (req, res) => {
       getSession(req)
       .then(getOpts.authorization || options.authorization || requireAdministrator)
-      .then(() => {
+      .then((session) => {
         const id = req.params.id;
         const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
         const query = Doc.findOne(criteria);
@@ -50,17 +50,17 @@ export default (router, options) => {
         } else if (getOpts.populate) {
           addPopulate(query, getOpts.populate);
         }
-        return query.exec();
+        return query.exec()
+        .then((doc) => {
+          if (!doc) {
+            res.status(404);
+            return Promise.reject({ status: 404 });
+          }
+          return doc;
+        })
+        .then(doc => (getOpts.transformOut ?
+          getOpts.transformOut(doc, req, session) : doc));
       })
-      .then((doc) => {
-        if (!doc) {
-          res.status(404);
-          return Promise.reject({ status: 404 });
-        }
-        return doc;
-      })
-      .then(doc => (getOpts.transformOut ?
-        getOpts.transformOut(doc, req) : doc))
       .then((doc) => {
         if (doc.modified) {
           res.setHeader('Last-Modified',

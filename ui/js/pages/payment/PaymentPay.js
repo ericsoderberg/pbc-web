@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { postItem } from '../../actions';
-import Stored from '../../components/Stored';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
@@ -217,4 +217,4 @@ const select = state => ({
   site: state.site,
 });
 
-export default Stored(PaymentPay, select);
+export default connect(select)(PaymentPay);

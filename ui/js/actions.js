@@ -64,29 +64,27 @@ export function initialize() {
   return clearSession();
 }
 
-// export function postSession(session) {
-//   return fetch('/api/sessions', {
-//     method: 'POST', headers: _headers, body: JSON.stringify(session) })
-//   .then(processStatus)
-//   .then(response => response.json())
-//   .then(setSession);
-// }
-//
-// export function postSessionViaToken(session) {
-//   return fetch('/api/sessions/token', {
-//     method: 'POST', headers: _headers, body: JSON.stringify(session) })
-//   .then(processStatus)
-//   .then(response => response.json())
-//   .then(setSession);
-// }
-//
-// export function deleteSession() {
-//   return fetch(`/api/sessions/${_sessionId}`, {
-//     method: 'DELETE', headers: _headers })
-//   .then(processStatus)
-//   .then(clearSession)
-//   .catch(clearSession);
-// }
+export function postSession(session) {
+  return fetch('/api/sessions', {
+    method: 'POST', headers: _headers, body: JSON.stringify(session) })
+  .then(processStatus)
+  .then(response => response.json());
+}
+
+export function postSessionViaToken(session) {
+  return fetch('/api/sessions/token', {
+    method: 'POST', headers: _headers, body: JSON.stringify(session) })
+  .then(processStatus)
+  .then(response => response.json());
+}
+
+export function deleteSession() {
+  return fetch(`/api/sessions/${_sessionId}`, {
+    method: 'DELETE', headers: _headers })
+  .then(processStatus)
+  .then(clearSession)
+  .catch(clearSession);
+}
 
 // Generic
 
@@ -188,8 +186,20 @@ export const loadItem = (category, id, options = {}) =>
         `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
       );
     }
-    if (options.totals) {
-      params.push(`totals=${encodeURIComponent(options.totals)}`);
+    if (options.full) {
+      // loads all forms for form template
+      params.push(`full=${encodeURIComponent(options.full)}`);
+    }
+    if (options.new) {
+      // includes a new form
+      params.push(`new=${encodeURIComponent(options.new)}`);
+    }
+    if (options.linkedFormId) {
+      params.push(`linkedFormId=${encodeURIComponent(options.linkedFormId)}`);
+    }
+    if (options.forSession) {
+      // loads all forms for form template
+      params.push(`forSession=${encodeURIComponent(options.forSession)}`);
     }
     const q = params.length > 0 ? `?${params.join('&')}` : '';
     return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
@@ -414,17 +424,23 @@ export function postUnsubscribe(emailList, addresses) {
 
 export const loadSearch = searchText =>
   (dispatch) => {
-    const params = [];
-    params.push(`search=${encodeURIComponent(searchText)}`);
-    const q = params.length > 0 ? `?${params.join('&')}` : '';
-    return fetch(`/api/search${q}`, {
-      method: 'GET', headers: _headers })
-    .then(processStatus)
-    .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
-    .catch(payload => dispatch({
-      type: SEARCH_LOAD, error: true, payload,
-    }));
+    if (searchText) {
+      const params = [];
+      params.push(`search=${encodeURIComponent(searchText)}`);
+      const q = params.length > 0 ? `?${params.join('&')}` : '';
+      return fetch(`/api/search${q}`, {
+        method: 'GET', headers: _headers })
+      .then(processStatus)
+      .then(response => response.json())
+      .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
+      .catch(payload => dispatch({
+        type: SEARCH_LOAD, error: true, payload,
+      }));
+    }
+    return dispatch({ type: SEARCH_LOAD, payload: {} });
   };
+
+export const unloadSearch = () => ({ type: SEARCH_UNLOAD });
 
 // Audit Log
 

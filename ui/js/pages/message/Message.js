@@ -1,32 +1,31 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItem } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
-import Stored from '../../components/Stored';
 import MessageContents from './MessageContents';
 
 class Message extends Component {
 
   componentDidMount() {
-    const { message, match } = this.props;
-    if (!message) {
-      getItem('messages', match.params.id, { cache: true, populate: true })
-      .catch(error => console.error('!!! Message catch', error));
-    }
+    const { dispatch, id } = this.props;
+    dispatch(loadItem('messages', id, { populate: true }));
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id &&
-      !nextProps.message) {
-      getItem('messages', nextProps.match.params.id,
-        { cache: true, populate: true })
-      .catch(error => console.error('!!! Message catch', error));
-    }
-    if (nextProps.message) {
+    const { dispatch, id } = nextProps;
+    if (id !== this.props.id) {
+      dispatch(loadItem('messages', id, { populate: true }));
+    } else if (nextProps.message) {
       document.title = nextProps.message.name;
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('messages', id));
   }
 
   render() {
@@ -54,12 +53,9 @@ class Message extends Component {
 }
 
 Message.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
   message: PropTypes.object,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
 };
 
 Message.defaultProps = {
@@ -67,13 +63,13 @@ Message.defaultProps = {
 };
 
 const select = (state, props) => {
-  let message;
-  if (state.messages) {
-    message = state.messages[props.match.params.id];
-  }
+  const id = props.match.params.id;
   return {
-    message,
+    id,
+    notFound: state.notFound[id],
+    message: state[id],
+    session: state.session,
   };
 };
 
-export default Stored(Message, select);
+export default connect(select)(Message);

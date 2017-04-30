@@ -7,11 +7,16 @@ import PageItem from './PageItem';
 class PageContext extends Component {
 
   componentDidMount() {
-    this._load(this.props);
+    const { filter } = this.props;
+    if (filter) {
+      this._load(this.props);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.pages && nextProps.filter) {
+    const { filter } = nextProps;
+    if (filter && (!this.props.filter ||
+      Object.keys(filter).some(key => this.props.filter[key] !== filter[key]))) {
       this._load(nextProps);
     }
   }
@@ -23,12 +28,10 @@ class PageContext extends Component {
 
   _load(props) {
     const { dispatch, filter } = props;
-    if (filter) {
-      dispatch(loadCategory('pages', {
-        filter: { public: true, ...filter },
-        select: 'name path',
-      }));
-    }
+    dispatch(loadCategory('pages', {
+      filter: { public: true, ...filter },
+      select: 'name path',
+    }));
   }
 
   render() {

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { postSession } from '../../actions';
+import { connect } from 'react-redux';
+import { postSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
@@ -9,7 +10,7 @@ import FormState from '../../utils/FormState';
 
 const TITLE = 'Sign In';
 
-export default class SignIn extends Component {
+class SignIn extends Component {
 
   constructor(props) {
     super(props);
@@ -29,21 +30,21 @@ export default class SignIn extends Component {
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.push('/');
+    const { history } = this.props;
+    history.push('/');
   }
 
   _onSignIn(event) {
-    const { inline } = this.props;
-    const { router } = this.context;
+    const { dispatch, history, inline } = this.props;
     event.preventDefault();
     postSession(this.state.formState.object)
-      .then(() => {
-        if (!inline) {
-          router.history.push('/');
-        }
-      })
-      .catch(error => this.setState({ error }));
+    .then((session) => {
+      dispatch(setSession(session));
+      if (!inline) {
+        history.push('/');
+      }
+    })
+    .catch(error => this.setState({ error }));
   }
 
   _setSession(session) {
@@ -130,6 +131,8 @@ export default class SignIn extends Component {
 }
 
 SignIn.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onSignUp: PropTypes.func,
@@ -143,6 +146,4 @@ SignIn.defaultProps = {
   onVerifyEmail: undefined,
 };
 
-SignIn.contextTypes = {
-  router: PropTypes.any,
-};
+export default connect()(SignIn);

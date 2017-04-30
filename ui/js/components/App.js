@@ -6,7 +6,6 @@ import { loadSite, haveSession } from '../actions';
 import routes from '../routes';
 import Button from './Button';
 import MainNav from './MainNav';
-// import Stored from './Stored';
 
 const PrivateRoute = ({ component, ...rest }) => (
   <Route {...rest} render={props => (
@@ -23,6 +22,11 @@ const PrivateRoute = ({ component, ...rest }) => (
 
 PrivateRoute.propTypes = {
   component: PropTypes.any.isRequired,
+  location: PropTypes.object,
+};
+
+PrivateRoute.defaultProps = {
+  location: undefined,
 };
 
 class App extends Component {

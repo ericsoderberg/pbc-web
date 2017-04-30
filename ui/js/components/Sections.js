@@ -61,7 +61,10 @@ export default class Sections extends Component {
       } else if (section.type === 'video') {
         contents = <Video url={section.url} autoplay={false} />;
       } else if (section.type === 'form') {
-        contents = <FormSection formTemplateId={section.formTemplateId} />;
+        contents = (
+          <FormSection formTemplateId={section.formTemplateId}
+            formTemplate={section.formTemplate} />
+        );
       } else if (section.type === 'files') {
         contents = <FilesSection files={section.files} />;
       } else if (section.type === 'map') {

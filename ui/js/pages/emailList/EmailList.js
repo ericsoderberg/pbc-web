@@ -1,10 +1,10 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItem, postUnsubscribe } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, postUnsubscribe, unloadItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
-import Stored from '../../components/Stored';
 import TrashIcon from '../../icons/Trash';
 import { searchToObject } from '../../utils/Params';
 
@@ -13,22 +13,40 @@ class EmailList extends Component {
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
-    this.state = { addresses: [] };
+    this.state = { addresses: [], searchText: '' };
   }
 
   componentDidMount() {
-    this._setStateFromLocation(this.props);
-    this._loadEmailList();
+    this._load();
   }
 
   componentWillReceiveProps(nextProps) {
     this._setStateFromLocation(nextProps);
+    if (nextProps.emailList) {
+      document.title = nextProps.emailList.name;
+      this._setStateFromLocation(nextProps);
+    }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('email-lists', id));
+  }
+
+  _load() {
+    const { dispatch, id } = this.props;
+    dispatch(loadItem('email-lists', id));
   }
 
   _setStateFromLocation(props) {
-    const { emailList } = this.state;
     const query = searchToObject(props.location.search);
-    const searchText = query.search || '';
+    const searchText = query.q || '';
+    const addresses = this._pruneAddresses(props, searchText);
+    this.setState({ addresses, searchText });
+  }
+
+  _pruneAddresses(props, searchText) {
+    const { emailList } = props;
     let addresses = (emailList || {}).addresses || [];
     if (searchText) {
       const exp = new RegExp(searchText, 'i');
@@ -36,58 +54,33 @@ class EmailList extends Component {
         exp.test(a.address) || (a.userId && exp.test(a.userId.name))
       ));
     }
-    this.setState({ addresses, searchText });
-  }
-
-  _loadEmailList() {
-    const { match } = this.props;
-    const { searchText } = this.state;
-    getItem('email-lists', match.params.id)
-    .then((emailList) => {
-      let addresses = emailList.addresses;
-      if (searchText) {
-        const exp = new RegExp(searchText, 'i');
-        addresses = addresses.filter(a => exp.test(a));
-      }
-      this.setState({ addresses, emailList });
-      document.title = emailList.name;
-    })
-    .catch(error => console.error('!!! EmailList catch', error));
-  }
-
-  _setLocation(options) {
-    const { router } = this.context;
-    const searchParams = [];
-
-    const searchText = options.searchText !== undefined ? options.searchText :
-      (this.state.searchText !== undefined ? this.state.searchText : undefined);
-    if (searchText) {
-      searchParams.push(`search=${encodeURIComponent(searchText)}`);
-    }
-
-    router.history.replace({
-      pathname: window.location.pathname,
-      search: `?${searchParams.join('&')}`,
-    });
+    return addresses;
   }
 
   _onSearch(event) {
+    const { history } = this.props;
     const searchText = event.target.value;
-    this._setLocation({ searchText, loading: true });
+    const addresses = this._pruneAddresses(this.props, searchText);
+    this.setState({ addresses, searchText });
+    // Put the search term in the browser location
+    history.replace({
+      pathname: window.location.pathname,
+      search: `?q=${encodeURIComponent(searchText)}`,
+    });
   }
 
   _unsubscribe(address) {
     return () => {
-      const { emailList } = this.state;
+      const { emailList } = this.props;
       postUnsubscribe(emailList, [address])
-      .then(() => this._loadEmailList())
+      .then(() => this._load())
       .catch(error => this.setState({ error }));
     };
   }
 
   render() {
-    const { session } = this.props;
-    const { addresses, emailList, loading, searchText } = this.state;
+    const { emailList, session } = this.props;
+    const { addresses, loading, searchText } = this.state;
 
     let result;
     if (!emailList) {
@@ -100,7 +93,7 @@ class EmailList extends Component {
           <Link key="add" to={`/email-lists/${emailList.name}/subscribe`}>
             Subscribe
           </Link>,
-          <Link key="edit" to={`/email-lists/${emailList.name}/edit`}>
+          <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
             Edit
           </Link>,
         );
@@ -172,11 +165,10 @@ class EmailList extends Component {
 }
 
 EmailList.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  emailList: PropTypes.object,
+  history: PropTypes.any.isRequired,
+  id: PropTypes.string.isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
@@ -185,12 +177,18 @@ EmailList.propTypes = {
   }).isRequired,
 };
 
-EmailList.contextTypes = {
-  router: PropTypes.any,
+EmailList.defaultProps = {
+  emailList: undefined,
 };
 
-const select = state => ({
-  session: state.session,
-});
+const select = (state, props) => {
+  const id = props.match.params.id;
+  return {
+    id,
+    notFound: state.notFound[id],
+    emailList: state[id],
+    session: state.session,
+  };
+};
 
-export default Stored(EmailList, select);
+export default connect(select)(EmailList);

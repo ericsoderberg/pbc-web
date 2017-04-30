@@ -5,6 +5,7 @@ import {
   CALENDAR_LOAD, CALENDAR_UNLOAD,
   CATEGORY_LOAD, CATEGORY_UNLOAD,
   ITEM_LOAD, ITEM_UNLOAD,
+  SEARCH_LOAD, SEARCH_UNLOAD,
   SESSION_LOAD, SESSION_UNLOAD,
   SITE_LOAD, SITE_UNLOAD,
 } from './actions';
@@ -89,6 +90,9 @@ const handlers = {
     delete nextState.notFound[action.payload.id];
     return nextState;
   },
+
+  [SEARCH_LOAD]: (state, action) => loader('search', state, action),
+  [SEARCH_UNLOAD]: () => ({ search: undefined }),
 
   [SESSION_LOAD]: (state, action) => loader('session', state, action),
   [SESSION_UNLOAD]: () => ({ session: undefined }),

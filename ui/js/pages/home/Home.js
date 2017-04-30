@@ -1,7 +1,8 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getSite, getItem, deleteSession } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, deleteSession } from '../../actions';
 import Sections from '../../components/Sections';
 import Section from '../../components/Section';
 import FacebookIcon from '../../icons/Facebook';
@@ -11,7 +12,6 @@ import VimeoIcon from '../../icons/Vimeo';
 import YouTubeIcon from '../../icons/YouTube';
 import SearchIcon from '../../icons/Search';
 import Button from '../../components/Button';
-import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
 import Logo from '../../components/Logo';
 import { isDarkBackground } from '../../utils/Color';
@@ -23,7 +23,6 @@ class Home extends Component {
     this._onResize = this._onResize.bind(this);
     this._layout = this._layout.bind(this);
     this._signOut = this._signOut.bind(this);
-    this._siteReady = this._siteReady.bind(this);
     this._showMenu = this._showMenu.bind(this);
     this._hideMenu = this._hideMenu.bind(this);
     this._onSearch = this._onSearch.bind(this);
@@ -31,14 +30,10 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    const { site } = this.props;
-    if (!site) {
-      getSite()
-      .then(this._siteReady)
-      .catch(error => console.error('!!! Home catch', error));
-    } else {
-      this._siteReady(site)
-      .catch(error => console.error('!!! Home re-catch', error));
+    const { dispatch, page, site } = this.props;
+    if (site && !page) {
+      document.title = site.name;
+      dispatch(loadItem('pages', site.homePageId._id, { populate: true }));
     }
     window.addEventListener('resize', this._onResize);
     // delay readiness of menu to avoid initial style animation on mobile
@@ -46,7 +41,11 @@ class Home extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.page && !this.props.page) {
+    const { dispatch, page, site } = nextProps;
+    if (site && !page) {
+      document.title = site.name;
+      dispatch(loadItem('pages', site.homePageId._id, { populate: true }));
+    } else if (page && !this.props.page) {
       this._layoutNeeded = true;
     }
   }
@@ -59,28 +58,16 @@ class Home extends Component {
   }
 
   componentWillUnmount() {
+    // don't unload the home page
     window.removeEventListener('resize', this._onResize);
     clearTimeout(this._resizeTimer);
     clearTimeout(this._readyTimer);
   }
 
-  _siteReady(site) {
-    const { page } = this.props;
-    document.title = site.name;
-    this._layout();
-    if (page) {
-      return Promise.resolve();
-    } else if (!page && site.homePageId) {
-      return getItem('pages', site.homePageId._id,
-        { cache: true, populate: true });
-    }
-    return Promise.reject('No home page');
-  }
-
   _signOut() {
-    const { router } = this.context;
+    const { history } = this.props;
     deleteSession()
-    .then(() => router.history.go('/'))
+    .then(() => history.go('/'))
     .catch(error => console.error('!!! Home _signOut catch', error));
   }
 
@@ -107,10 +94,10 @@ class Home extends Component {
   }
 
   _onSearch(event) {
+    const { history } = this.props;
     const { searchText } = this.state;
-    const { router } = this.context;
     event.preventDefault();
-    router.history.push(`/search?q=${searchText}`);
+    history.push(`/search?q=${searchText}`);
   }
 
   _renderSession() {
@@ -354,6 +341,8 @@ class Home extends Component {
 }
 
 Home.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   page: PropTypes.object,
   session: PropTypes.shape({
     token: PropTypes.any,
@@ -373,8 +362,8 @@ Home.contextTypes = {
 
 const select = (state) => {
   let page;
-  if (state.site && state.pages) {
-    page = state.pages[state.site.homePageId._id];
+  if (state.site) {
+    page = state[state.site.homePageId._id];
   }
   return {
     page,
@@ -383,4 +372,4 @@ const select = (state) => {
   };
 };
 
-export default Stored(Home, select);
+export default connect(select)(Home);

@@ -1,11 +1,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItem, putItem, deleteItem } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, putItem, deleteItem, unloadItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
-import Stored from '../../components/Stored';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
@@ -17,13 +17,7 @@ class FormEdit extends Component {
     this._onCancel = this._onCancel.bind(this);
     this._onRemove = this._onRemove.bind(this);
     this._onChange = this._onChange.bind(this);
-    this.state = {
-      form: {
-        fields: [],
-        formTemplateId: props.formTemplateId || (props.formTemplate || {})._id,
-      },
-      formTemplate: props.formTemplate || {},
-    };
+    this.state = {};
   }
 
   componentDidMount() {
@@ -31,41 +25,63 @@ class FormEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.id !== this.props.id ||
-      (nextProps.match && this.props.match &&
-        nextProps.match.params && this.props.match.params &&
-        nextProps.match.params.id !== this.props.match.params.id)) {
+    const {
+      dispatch, form, formTemplateId, formTemplate, id, linkedFormId, linkedForm,
+    } = nextProps;
+    if (id !== this.props.id) {
+      this.setState({
+        form: undefined, formTemplate: undefined, linkedForm: undefined,
+      });
       this._load(nextProps);
+    } else if (form && !this.state.form) {
+      this.setState({ form: { ...form } });
+      if (formTemplateId && !formTemplate) {
+        dispatch(loadItem('form-templates', formTemplateId));
+      }
+      if (linkedFormId && !linkedForm) {
+        dispatch(loadItem('forms', linkedFormId));
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, formTemplateId, id, linkedFormId } = this.props;
+    dispatch(unloadItem('forms', id));
+    if (formTemplateId) {
+      dispatch(unloadItem('form-templates', formTemplateId));
+    }
+    if (linkedFormId) {
+      dispatch(unloadItem('forms', linkedFormId));
     }
   }
 
   _load(props) {
-    getItem('forms', props.id || props.match.params.id)
-    .then((form) => {
-      this.setState({ form, formTemplate: undefined, linkedForm: undefined });
-      if (form.linkedFormId) {
-        return getItem('forms', form.linkedFormId)
-        .then(linkedForm => this.setState({ linkedForm }))
-        // .then(() => form)
-        .catch(error => console.error('!!! FormEdit linked catch', error))
-        .then(() => form);
-      }
-      return form;
-    })
-    .then(form => getItem('form-templates', form.formTemplateId._id,
-      { totals: true }))
-    .then((formTemplate) => {
-      this.setState({ formTemplate });
-      document.title = formTemplate.name;
-    })
-    .catch(error => console.error('!!! FormEdit catch', error));
+    const { dispatch, id } = props;
+    dispatch(loadItem('forms', id));
+    // .then((form) => {
+    //   this.setState({ form, formTemplate: undefined, linkedForm: undefined });
+    //   if (form.linkedFormId) {
+    //     return getItem('forms', form.linkedFormId)
+    //     .then(linkedForm => this.setState({ linkedForm }))
+    //     // .then(() => form)
+    //     .catch(error => console.error('!!! FormEdit linked catch', error))
+    //     .then(() => form);
+    //   }
+    //   return form;
+    // })
+    // .then(form => getItem('form-templates', form.formTemplateId._id,
+    //   { totals: true }))
+    // .then((formTemplate) => {
+    //   this.setState({ formTemplate });
+    //   document.title = formTemplate.name;
+    // })
+    // .catch(error => console.error('!!! FormEdit catch', error));
   }
 
   _onUpdate(event) {
     event.preventDefault();
-    const { onDone } = this.props;
-    const { formTemplate, form, linkedForm } = this.state;
-    const { router } = this.context;
+    const { formTemplate, history, linkedForm, onDone } = this.props;
+    const { form } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
@@ -73,27 +89,25 @@ class FormEdit extends Component {
     } else {
       finalizeForm(formTemplate, form, linkedForm);
       putItem('forms', this.state.form)
-      .then(formSaved => (onDone ? onDone(formSaved) : router.history.goBack()))
+      .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
       .catch(error2 => this.setState({ error2 }));
     }
   }
 
   _onCancel() {
-    const { onCancel } = this.props;
-    const { router } = this.context;
+    const { history, onCancel } = this.props;
     if (onCancel) {
       onCancel();
     } else {
-      router.history.goBack();
+      history.goBack();
     }
   }
 
   _onRemove(event) {
-    const { onDone } = this.props;
-    const { router } = this.context;
+    const { onDone, history, id } = this.props;
     event.preventDefault();
-    deleteItem('forms', this.props.id || this.props.match.params.id)
-    .then(() => (onDone ? onDone() : router.history.goBack()))
+    deleteItem('forms', id)
+    .then(() => (onDone ? onDone() : history.goBack()))
     .catch((error) => {
       console.error('!!!', error);
       this.setState({ error });
@@ -101,15 +115,17 @@ class FormEdit extends Component {
   }
 
   _onChange(form) {
-    const { formTemplate } = this.state;
+    const { formTemplate } = this.props;
     // clear any error for fields that have changed
     const error = clearFormError(formTemplate, form, this.state.error);
     this.setState({ form, error });
   }
 
   render() {
-    const { className, full, inline, onLinkedForm } = this.props;
-    const { error, form, formTemplate, linkedForm } = this.state;
+    const {
+      className, formTemplate, full, inline, linkedForm, onLinkedForm,
+    } = this.props;
+    const { form, error } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -186,40 +202,50 @@ class FormEdit extends Component {
 
 FormEdit.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  form: PropTypes.object,
   formTemplate: PropTypes.object,
   formTemplateId: PropTypes.string,
   full: PropTypes.bool,
-  id: PropTypes.string,
+  history: PropTypes.any.isRequired,
+  id: PropTypes.string.isRequired,
   inline: PropTypes.bool,
+  linkedForm: PropTypes.object,
+  linkedFormId: PropTypes.string,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   onLinkedForm: PropTypes.func,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string,
-    }),
-  }),
 };
 
 FormEdit.defaultProps = {
   className: undefined,
+  form: undefined,
   formTemplate: undefined,
   formTemplateId: undefined,
   full: true,
-  id: undefined,
   inline: false,
+  linkedForm: undefined,
+  linkedFormId: undefined,
   onCancel: undefined,
   onDone: undefined,
   onLinkedForm: undefined,
-  match: {},
 };
 
-FormEdit.contextTypes = {
-  router: PropTypes.any,
+const select = (state, props) => {
+  const id = props.match.params.id;
+  const form = state[id];
+  const formTemplateId = form ? form.formTemplateId._id : undefined;
+  const linkedFormId = form ? form.linkedFormId : undefined;
+  return {
+    id,
+    form,
+    formTemplateId,
+    formTemplate: formTemplateId ? state[formTemplateId] : undefined,
+    linkedFormId,
+    linkedForm: linkedFormId ? state[linkedFormId] : undefined,
+    notFound: state.notFound[id],
+    session: state.session,
+  };
 };
 
-const select = state => ({
-  session: state.session,
-});
-
-export default Stored(FormEdit, select);
+export default connect(select)(FormEdit);

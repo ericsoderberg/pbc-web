@@ -4,6 +4,7 @@ import {
   getSession, allowAnyone, authorizedForDomain, requireAdministrator,
   requireSomeAdministrator,
 } from './auth';
+import { addForms, addNewForm } from './formTemplates';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 import { catcher } from './utils';
@@ -36,9 +37,10 @@ function addChildren(page, pages) {
 const PAGE_MESSAGE_FIELDS =
   'path name verses author date image series seriesId';
 
-const populatePage = (page) => {
+const populatePage = (page, session) => {
   const Message = mongoose.model('Message');
   const Event = mongoose.model('Event');
+  const FormTemplate = mongoose.model('FormTemplate');
   const date = moment().subtract(1, 'day');
 
   const promises = [Promise.resolve(page)];
@@ -100,6 +102,23 @@ const populatePage = (page) => {
     );
   });
 
+  // FormTemplate
+  page.sections.filter(section => section.type === 'form')
+  .forEach((section) => {
+    section.formTemplateId = section.formTemplateId._id; // un-populate
+    promises.push(
+      FormTemplate.findOne({ _id: section.formTemplateId })
+      .exec()
+      .then((formTemplate) => {
+        if (formTemplate) {
+          formTemplate = addNewForm(formTemplate, session);
+          return addForms(formTemplate, session);
+        }
+        return formTemplate;
+      }),
+    );
+  });
+
   return Promise.all(promises)
   .then((docs) => {
     let docsIndex = 0;
@@ -113,6 +132,11 @@ const populatePage = (page) => {
     .forEach((section) => {
       docsIndex += 1;
       section.events = docs[docsIndex];
+    });
+    pageData.sections.filter(section => section.type === 'form')
+    .forEach((section) => {
+      docsIndex += 1;
+      section.formTemplate = docs[docsIndex];
     });
     return pageData;
   });
@@ -273,9 +297,9 @@ export default function (router) {
           select: 'name',
           model: 'FormTemplate' },
       ],
-      transformOut: (page, req) => {
+      transformOut: (page, req, session) => {
         if (page && req.query.populate) {
-          return populatePage(page);
+          return populatePage(page, session);
         }
         return page;
       },
