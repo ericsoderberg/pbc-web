@@ -6,7 +6,7 @@ import MessageFormContents from './MessageFormContents';
 import MessagePreview from './MessagePreview';
 
 const MessageAdd = (props) => {
-  const { location } = props;
+  const { history, location } = props;
   const query = searchToObject(location.search);
   return (
     <Add category="messages" FormContents={MessageFormContents}
@@ -14,11 +14,13 @@ const MessageAdd = (props) => {
       default={{
         libraryId: query.libraryId,
         date: (new Date()).toISOString(),
-      }} />
+      }}
+      history={history} />
   );
 };
 
 MessageAdd.propTypes = {
+  history: PropTypes.any.isRequired,
   location: PropTypes.object.isRequired,
 };
 

@@ -1,22 +1,22 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
 import SectionEdit from '../../components/SectionEdit';
 
-export default class LibrarySectionEdit extends Component {
+class LibrarySectionEdit extends Component {
 
   constructor(props) {
     super(props);
     const { section, onChange } = props;
-    this.state = { formState: new FormState(section, onChange), libraries: [] };
+    this.state = { formState: new FormState(section, onChange) };
   }
 
   componentDidMount() {
-    getItems('libraries', { sort: 'name' })
-    .then(response => this.setState({ libraries: response }))
-    .catch(error => console.error('LibrarySectionEdit catch', error));
+    const { dispatch } = this.props;
+    dispatch(loadCategory('libraries', { sort: 'name' }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -25,11 +25,17 @@ export default class LibrarySectionEdit extends Component {
     });
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('libraries'));
+  }
+
   render() {
+    const { libraries } = this.props;
     const { formState } = this.state;
     const section = formState.object;
 
-    const libraryOptions = this.state.libraries.map(library => (
+    const options = libraries.map(library => (
       <option key={library._id} label={library.name} value={library._id} />
     ));
 
@@ -47,7 +53,7 @@ export default class LibrarySectionEdit extends Component {
         <FormField label="Library">
           <select name="libraryId" value={value}
             onChange={formState.change('libraryId')}>
-            {libraryOptions}
+            {options}
           </select>
         </FormField>
       </SectionEdit>
@@ -56,6 +62,18 @@ export default class LibrarySectionEdit extends Component {
 }
 
 LibrarySectionEdit.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  libraries: PropTypes.array,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
 };
+
+LibrarySectionEdit.defaultProps = {
+  libraries: [],
+};
+
+const select = state => ({
+  libraries: (state.libraries || {}).items || [],
+});
+
+export default connect(select)(LibrarySectionEdit);

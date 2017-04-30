@@ -37,11 +37,12 @@ function addChildren(page, pages) {
 const PAGE_MESSAGE_FIELDS =
   'path name verses author date image series seriesId';
 
-const populatePage = (page, session) => {
+const populatePage = (data, session) => {
   const Message = mongoose.model('Message');
   const Event = mongoose.model('Event');
   const FormTemplate = mongoose.model('FormTemplate');
   const date = moment().subtract(1, 'day');
+  const page = data.toObject();
 
   const promises = [Promise.resolve(page)];
 
@@ -70,6 +71,10 @@ const populatePage = (page, session) => {
   // Calendar
   page.sections.filter(section => section.type === 'calendar')
   .forEach((section) => {
+    // un-populate
+    section.calendar = section.calendarId;
+    section.calendarId = section.calendarId._id;
+
     const start = moment(date);
     const end = moment(start).add(2, 'month');
     const filter = {
@@ -122,23 +127,23 @@ const populatePage = (page, session) => {
   return Promise.all(promises)
   .then((docs) => {
     let docsIndex = 0;
-    const pageData = docs[docsIndex].toObject();
-    pageData.sections.filter(section => section.type === 'library')
+    // const pageData = docs[docsIndex].toObject();
+    page.sections.filter(section => section.type === 'library')
     .forEach((section) => {
       docsIndex += 1;
       section.message = docs[docsIndex];
     });
-    pageData.sections.filter(section => section.type === 'calendar')
+    page.sections.filter(section => section.type === 'calendar')
     .forEach((section) => {
       docsIndex += 1;
       section.events = docs[docsIndex];
     });
-    pageData.sections.filter(section => section.type === 'form')
+    page.sections.filter(section => section.type === 'form')
     .forEach((section) => {
       docsIndex += 1;
       section.formTemplate = docs[docsIndex];
     });
-    return pageData;
+    return page;
   });
 };
 

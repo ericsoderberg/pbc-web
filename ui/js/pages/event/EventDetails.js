@@ -1,7 +1,8 @@
 
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getItems } from '../../actions';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import Button from '../../components/Button';
@@ -27,14 +28,14 @@ Suggestion.propTypes = {
   }).isRequired,
 };
 
-export default class EventDetails extends Component {
+class EventDetails extends Component {
 
   constructor() {
     super();
     this._onToggle = this._onToggle.bind(this);
     this._otherTimeChange = this._otherTimeChange.bind(this);
     this._onChangePrimaryEvent = this._onChangePrimaryEvent.bind(this);
-    this.state = { active: false, domains: [], calendars: [] };
+    this.state = { active: false };
   }
 
   componentDidMount() {
@@ -48,18 +49,18 @@ export default class EventDetails extends Component {
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('domains'));
+    dispatch(unloadCategory('calendars'));
+  }
+
   _get() {
-    const { session } = this.props;
-
+    const { dispatch, session } = this.props;
+    dispatch(loadCategory('calendars', { sort: 'name' }));
     if (session.userId.administrator) {
-      getItems('domains', { sort: 'name' })
-      .then(domains => this.setState({ domains }))
-      .catch(error => console.error('EventDetails catch', error));
+      dispatch(loadCategory('domains', { sort: 'name' }));
     }
-
-    getItems('calendars', { sort: 'name' })
-    .then(calendars => this.setState({ calendars }))
-    .catch(error => console.error('EventDetails calendars catch', error));
   }
 
   _onToggle() {
@@ -93,8 +94,8 @@ export default class EventDetails extends Component {
   }
 
   render() {
-    const { errors, formState, session } = this.props;
-    const { active, calendars, domains } = this.state;
+    const { calendars, domains, errors, formState, session } = this.props;
+    const { active } = this.state;
     const event = formState.object;
 
     let contents;
@@ -211,11 +212,23 @@ export default class EventDetails extends Component {
 }
 
 EventDetails.propTypes = {
+  calendars: PropTypes.array,
+  dispatch: PropTypes.func.isRequired,
+  domains: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 EventDetails.defaultProps = {
+  calendars: [],
+  domains: [],
   errors: {},
 };
+
+const select = state => ({
+  domains: (state.domains || {}).items || [],
+  session: state.session,
+});
+
+export default connect(select)(EventDetails);

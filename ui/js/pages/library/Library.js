@@ -54,7 +54,7 @@ class Library extends Component {
   }
 
   render() {
-    const { library, location, pages, session } = this.props;
+    const { history, library, location, pages, session } = this.props;
 
     let result;
     if (!library) {
@@ -81,7 +81,8 @@ class Library extends Component {
           filter={{ libraryId: library._id }}
           select="name path verses date author series color" sort="-date"
           Item={LibraryMessageItem}
-          addIfFilter="libraryId" actions={controls} />
+          addIfFilter="libraryId" actions={controls}
+          history={history} />
       );
     }
     return result;
@@ -90,9 +91,10 @@ class Library extends Component {
 
 Library.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
+  id: PropTypes.string.isRequired,
   library: PropTypes.object,
   location: PropTypes.object.isRequired,
-  id: PropTypes.string.isRequired,
   pages: PropTypes.array,
   session: PropTypes.shape({
     userId: PropTypes.shape({

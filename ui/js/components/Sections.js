@@ -31,8 +31,8 @@ export default class Sections extends Component {
           .map(s => s.eventId._id || s.eventId);
         contents = (
           <CalendarSection key={section._id || section.id}
-            id={section.calendarId} events={section.events}
-            excludeEventIds={excludeEventIds}
+            id={section.calendarId} calendar={section.calendar}
+            events={section.events} excludeEventIds={excludeEventIds}
             omitRecurring={section.omitRecurring} />
         );
       } else if (section.type === 'event') {

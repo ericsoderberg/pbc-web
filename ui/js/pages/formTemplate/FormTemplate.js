@@ -95,69 +95,7 @@ class FormTemplate extends Component {
       optionMap,
       // totals: formTemplate.totals,
     });
-    // // TODO: refactor to put linked form/field stuff on server side
-    // .then((context) => {
-    //   const { formTemplate } = context;
-    //   if (formTemplate.linkedFormTemplateId) {
-    //     // get linked forms
-    //     return getItems('forms', {
-    //       filter: { formTemplateId: formTemplate.linkedFormTemplateId._id },
-    //       populate: true,
-    //       limit: 1000, // no limit, really need to move this server side
-    //     })
-    //     .then((forms) => {
-    //       const linkedForms = {};
-    //       forms.forEach((form) => {
-    //         linkedForms[form._id] = form;
-    //       });
-    //       this.setState({ linkedForms });
-    //       return context;
-    //     });
-    //   }
-    //   return context;
-    // })
-    // .then(() => getItems('forms', {
-    //   filter: { formTemplateId: match.params.id },
-    //   populate: true,
-    //   sort: '-modified',
-    // })
-    // .then((forms) => {
-    //   this.setState({ forms, mightHaveMore: forms.length >= 20 });
-    // }))
-    // .catch(error => console.error('!!! FormTemplate catch', error));
   }
-
-  // _onMore() {
-  //   const { match } = this.props;
-  //   this.setState({ loadingMore: true });
-  //   const skip = this.state.forms.length;
-  //   getItems('forms', {
-  //     filter: { formTemplateId: match.params.id },
-  //     populate: true,
-  //     skip,
-  //     sort: '-modified',
-  //   })
-  //   .then((response) => {
-  //     const forms = this.state.forms.concat(response);
-  //     this.setState({
-  //       forms, loadingMore: false, mightHaveMore: response.length >= 20,
-  //     });
-  //   })
-  //   .catch(error => console.error('!!! FormTemplate more catch', error));
-  // }
-
-  // _onScroll() {
-  //   const { mightHaveMore, loadingMore } = this.state;
-  //   if (mightHaveMore && !loadingMore) {
-  //     const more = this._moreRef;
-  //     if (more) {
-  //       const rect = more.getBoundingClientRect();
-  //       if (rect.top <= window.innerHeight) {
-  //         this._onMore();
-  //       }
-  //     }
-  //   }
-  // }
 
   _onDownload(event) {
     const { id } = this.props;

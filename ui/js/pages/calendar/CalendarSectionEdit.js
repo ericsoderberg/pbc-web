@@ -1,20 +1,20 @@
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
 
-export default class CalendarSectionEdit extends Component {
+class CalendarSectionEdit extends Component {
 
   constructor(props) {
     super(props);
     const { section, onChange } = props;
-    this.state = { formState: new FormState(section, onChange), calendars: [] };
+    this.state = { formState: new FormState(section, onChange) };
   }
 
   componentDidMount() {
-    getItems('calendars', { sort: 'name' })
-    .then(calendars => this.setState({ calendars }))
-    .catch(error => console.error('CalendarSectionEdit catch', error));
+    const { dispatch } = this.props;
+    dispatch(loadCategory('calendars', { sort: 'name' }));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -23,11 +23,17 @@ export default class CalendarSectionEdit extends Component {
     });
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('calendars'));
+  }
+
   render() {
+    const { calendars } = this.props;
     const { formState } = this.state;
     const section = formState.object;
 
-    const calendarOptions = this.state.calendars.map(calendar => (
+    const options = calendars.map(calendar => (
       <option key={calendar._id} label={calendar.name} value={calendar._id} />
     ));
 
@@ -45,7 +51,7 @@ export default class CalendarSectionEdit extends Component {
         <FormField label="Calendar">
           <select name="calendarId" value={value}
             onChange={formState.change('calendarId')}>
-            {calendarOptions}
+            {options}
           </select>
         </FormField>
         <FormField>
@@ -60,6 +66,18 @@ export default class CalendarSectionEdit extends Component {
 }
 
 CalendarSectionEdit.propTypes = {
+  calendars: PropTypes.array,
+  dispatch: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
 };
+
+CalendarSectionEdit.defaultProps = {
+  calendars: [],
+};
+
+const select = state => ({
+  calendars: (state.calendars || {}).items || [],
+});
+
+export default connect(select)(CalendarSectionEdit);
