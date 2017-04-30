@@ -177,8 +177,8 @@ class FormTemplate extends Component {
 
   _editForm(id) {
     return () => {
-      const { router } = this.context;
-      router.history.push(`/forms/${id}/edit`);
+      const { history } = this.props;
+      history.push(`/forms/${id}/edit`);
     };
   }
 
@@ -526,16 +526,13 @@ class FormTemplate extends Component {
 
 FormTemplate.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   id: PropTypes.string.isRequired,
   formTemplate: PropTypes.object,
 };
 
 FormTemplate.defaultProps = {
   formTemplate: undefined,
-};
-
-FormTemplate.contextTypes = {
-  router: PropTypes.any,
 };
 
 const select = (state, props) => {

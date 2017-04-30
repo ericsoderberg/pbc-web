@@ -86,9 +86,8 @@ class List extends Component {
   }
 
   _setLocation(options) {
-    const { filters, location } = this.props;
+    const { filters, history, location } = this.props;
     const { filterNames } = this.state;
-    const { router } = this.context;
     const query = searchToObject(location.search);
     const searchParams = [];
 
@@ -129,7 +128,7 @@ class List extends Component {
       });
     }
 
-    router.history.replace({
+    history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
@@ -188,8 +187,8 @@ class List extends Component {
   }
 
   _removeFilter() {
-    const { router } = this.context;
-    router.history.replace({
+    const { history } = this.props;
+    history.replace({
       pathname: window.location.pathname,
     });
   }
@@ -328,6 +327,7 @@ List.propTypes = {
     ])),
     property: PropTypes.string.isRequired,
   })),
+  history: PropTypes.any.isRequired,
   homer: PropTypes.bool,
   Item: PropTypes.func.isRequired,
   items: PropTypes.array,
@@ -367,10 +367,6 @@ List.defaultProps = {
   select: undefined,
   session: undefined,
   sort: 'name',
-};
-
-List.contextTypes = {
-  router: PropTypes.any,
 };
 
 const select = (state, props) => {

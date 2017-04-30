@@ -24,8 +24,7 @@ class Add extends Component {
   }
 
   _onAdd(item) {
-    const { category, createSession, dispatch, showable } = this.props;
-    const { router } = this.context;
+    const { category, createSession, dispatch, history, showable } = this.props;
     postItem(category, item)
     .then((response) => {
       if (createSession) {
@@ -37,17 +36,17 @@ class Add extends Component {
         }
       }
       if (showable) {
-        router.history.push(`/${category}/${response._id}`);
+        history.push(`/${category}/${response._id}`);
       } else {
-        router.history.goBack();
+        history.goBack();
       }
     })
     .catch(error => this.setState({ error, item }));
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.goBack();
+    const { history } = this.props;
+    history.goBack();
   }
 
   render() {
@@ -72,6 +71,7 @@ Add.propTypes = {
   default: PropTypes.object,
   dispatch: PropTypes.func.isRequired,
   FormContents: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   onChange: PropTypes.func,
   Preview: PropTypes.func,
   session: PropTypes.object,
@@ -86,10 +86,6 @@ Add.defaultProps = {
   Preview: undefined,
   session: undefined,
   showable: false,
-};
-
-Add.contextTypes = {
-  router: PropTypes.any,
 };
 
 const select = state => ({

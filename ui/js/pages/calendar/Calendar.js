@@ -120,7 +120,7 @@ class Calendar extends Component {
   }
 
   _setLocation() {
-    const { router } = this.context;
+    const { history } = this.props;
     const { date, focus, searchText } = this.state;
 
     // update browser location
@@ -135,7 +135,7 @@ class Calendar extends Component {
       searchParams.push(`date=${encodeURIComponent(date.format(DATE_FORMAT))}`);
     }
 
-    router.history.replace({
+    history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
@@ -176,10 +176,10 @@ class Calendar extends Component {
   }
 
   _onFilter(event) {
-    const { router } = this.context;
+    const { history } = this.props;
     const value = event.target.value;
     const search = (value && value !== 'All') ? `?name=${value}` : undefined;
-    router.history.replace({ pathname: '/calendar', search });
+    history.replace({ pathname: '/calendar', search });
   }
 
   _onMore() {
@@ -456,6 +456,7 @@ Calendar.propTypes = {
   calendar: PropTypes.object,
   calendars: PropTypes.array,
   dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   location: PropTypes.object.isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
@@ -474,10 +475,6 @@ Calendar.defaultProps = {
   calendar: undefined,
   calendars: undefined,
   session: undefined,
-};
-
-Calendar.contextTypes = {
-  router: PropTypes.any,
 };
 
 const select = state => ({

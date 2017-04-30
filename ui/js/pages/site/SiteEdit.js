@@ -22,10 +22,10 @@ class SiteEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { router } = this.context;
+    const { history } = nextProps;
     if (this.state.updating) {
       if (!nextProps.error) {
-        router.history.goBack();
+        history.goBack();
       } else {
         this.setState({ updating: false });
       }
@@ -41,8 +41,8 @@ class SiteEdit extends Component {
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.goBack();
+    const { history } = this.props;
+    history.goBack();
   }
 
   render() {
@@ -60,6 +60,7 @@ class SiteEdit extends Component {
 SiteEdit.propTypes = {
   dispatch: PropTypes.func.isRequired,
   error: PropTypes.object,
+  history: PropTypes.any.isRequired,
   session: PropTypes.object.isRequired,
   site: PropTypes.object,
 };
@@ -67,10 +68,6 @@ SiteEdit.propTypes = {
 SiteEdit.defaultProps = {
   error: undefined,
   site: undefined,
-};
-
-SiteEdit.contextTypes = {
-  router: PropTypes.any,
 };
 
 const select = state => ({
