@@ -23,7 +23,7 @@ class FormTemplate extends Component {
     this._layout = this._layout.bind(this);
     // this._onScroll = this._onScroll.bind(this);
     this._onDownload = this._onDownload.bind(this);
-    this.state = { linkedForms: {}, sortReverse: false };
+    this.state = { sortReverse: false };
   }
 
   componentDidMount() {
@@ -68,7 +68,7 @@ class FormTemplate extends Component {
   _setupColumns(formTemplate) {
     const columns = [];
     const templateFieldMap = {};
-    // const linkedFieldMap = {};
+    const linkedTemplateFieldIdMap = {};
     const optionMap = {};
     formTemplate.sections.forEach((section) => {
       section.fields.forEach((field) => {
@@ -77,9 +77,9 @@ class FormTemplate extends Component {
         if (field.type !== 'instructions') {
           columns.push(field._id);
         }
-        // if (field.linkedFieldId) {
-        //   linkedFieldMap[field._id] = field.linkedFieldId;
-        // }
+        if (field.linkedFieldId) {
+          linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
+        }
       });
     });
 
@@ -88,10 +88,19 @@ class FormTemplate extends Component {
       columns.push(field.name);
     });
 
+    if (formTemplate.linkedFormTemplate) {
+      formTemplate.linkedFormTemplate.sections.forEach((section) => {
+        section.fields.forEach((field) => {
+          templateFieldMap[field._id] = field;
+          field.options.forEach((option) => { optionMap[option._id] = option; });
+        });
+      });
+    }
+
     this.setState({
       columns,
       templateFieldMap,
-      // linkedFieldMap,
+      linkedTemplateFieldIdMap,
       optionMap,
       // totals: formTemplate.totals,
     });
@@ -271,23 +280,37 @@ class FormTemplate extends Component {
 
   _renderCells(form, linkedForm) {
     const {
-      columns, templateFieldMap, linkedFieldMap, sortFieldId,
+      columns, templateFieldMap, linkedTemplateFieldIdMap, sortFieldId,
     } = this.state;
 
     const cellMap = {};
     form.fields.forEach((field) => {
       const templateFieldId = field.templateFieldId;
       const templateField = templateFieldMap[templateFieldId] || {};
-      cellMap[templateFieldId] = this._fieldContents(field, templateField);
+      if (linkedForm && templateField.linkedFieldId) {
+        linkedForm.fields.some((linkedField) => {
+          if (linkedField.templateFieldId === templateField.linkedFieldId) {
+            const linkedTemplateField = templateFieldMap[linkedField.templateFieldId] || {};
+            cellMap[templateFieldId] = this._fieldContents(linkedField, linkedTemplateField);
+            return true;
+          }
+          return false;
+        });
+      } else {
+        cellMap[templateFieldId] = this._fieldContents(field, templateField);
+      }
     });
 
     if (linkedForm) {
       // look for linked fields
-      Object.keys(linkedFieldMap).forEach((templateFieldId) => {
-        linkedForm.fields.some((field) => {
-          if (field.templateFieldId === linkedFieldMap[templateFieldId]) {
-            const templateField = templateFieldMap[templateFieldId] || {};
-            cellMap[templateFieldId] = this._fieldContents(field, templateField);
+      Object.keys(linkedTemplateFieldIdMap).forEach((templateFieldId) => {
+        linkedForm.fields.some((linkedField) => {
+          if (linkedField.templateFieldId ===
+            linkedTemplateFieldIdMap[templateFieldId]) {
+            const linkedTemplateField =
+              templateFieldMap[linkedField.templateFieldId];
+            cellMap[templateFieldId] =
+              this._fieldContents(linkedField, linkedTemplateField);
             return true;
           }
           return false;
@@ -316,8 +339,13 @@ class FormTemplate extends Component {
   }
 
   _renderRows() {
-    const { formTemplate: { forms } } = this.props;
-    const { filteredForms, linkedForms } = this.state;
+    const { formTemplate } = this.props;
+    const { filteredForms } = this.state;
+    const forms = formTemplate.forms;
+    const linkedForms = {};
+    ((formTemplate.linkedFormTemplate || {}).forms || []).forEach((form) => {
+      linkedForms[form._id] = form;
+    });
     const fixedRows = [];
     const flexedRows = [];
     (filteredForms || forms || []).forEach((form) => {
