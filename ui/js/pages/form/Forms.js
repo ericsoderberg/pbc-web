@@ -33,14 +33,14 @@ Item.defaultProps = {
 };
 
 const Forms = (props) => {
-  const { location } = props;
+  const { history, location } = props;
   const populate = [
     { path: 'formTemplateId', select: 'name' },
     { path: 'userId', select: 'name' },
   ];
 
   return (
-    <List location={location}
+    <List history={history} location={location}
       category="forms" title="Forms" path="/forms"
       filters={[{
         property: 'formTemplateId',
@@ -56,6 +56,7 @@ const Forms = (props) => {
 };
 
 Forms.propTypes = {
+  history: PropTypes.any.isRequired,
   location: PropTypes.object.isRequired,
 };
 

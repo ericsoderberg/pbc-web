@@ -186,18 +186,25 @@ export const addFormTotals = (formTemplate, form) => {
   form.paidAmount = paidAmount;
 };
 
-const setUnpaidTotal = form => (
+const addFullness = context =>
   Promise.resolve()
   .then(() => {
-    const FormTemplate = mongoose.model('FormTemplate');
-    return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
-    .then((formTemplate) => {
-      form = form.toObject();
-      addFormTotals(formTemplate, form);
-      return form;
-    });
-  })
-);
+    const { formTemplate } = context;
+    let { form } = context;
+    form = form.toObject();
+    addFormTotals(formTemplate, form);
+    if (form.linkedFormId) {
+      const Form = mongoose.model('Form');
+      return Form.findOne({ _id: form.linkedFormId })
+      .populate({ path: 'formTemplateId', select: 'name domainId' })
+      .exec()
+      .then((linkedForm) => {
+        form.linkedForm = linkedForm;
+        return form;
+      });
+    }
+    return form;
+  });
 
 const getFormContext = (session, id, populate = []) => {
   // Get current form
@@ -249,7 +256,12 @@ export default function (router, transporter) {
       { path: 'userId', select: 'name' },
     ]))
     // set unpaid total
-    .then(context => setUnpaidTotal(context.form))
+    .then((context) => {
+      if (req.query.full) {
+        return addFullness(context);
+      }
+      return context.form;
+    })
     // respond
     .then(form => res.status(200).json(form))
     .catch(error => catcher(error, res));

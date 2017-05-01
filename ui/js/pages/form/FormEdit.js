@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loadItem, putItem, deleteItem, unloadItem } from '../../actions';
+import { loadItem, putItem, deleteItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
@@ -17,47 +17,54 @@ class FormEdit extends Component {
     this._onCancel = this._onCancel.bind(this);
     this._onRemove = this._onRemove.bind(this);
     this._onChange = this._onChange.bind(this);
-    this.state = {};
+    const state = {};
+    if (props.form) {
+      state.form = { ...props.form };
+    }
+    this.state = state;
   }
 
   componentDidMount() {
-    this._load(this.props);
+    const { form } = this.props;
+    if (!form) {
+      this._load(this.props);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     const {
-      dispatch, form, formTemplateId, formTemplate, id, linkedFormId, linkedForm,
+      dispatch, form, formTemplate, id, linkedForm, linkedFormTemplate,
     } = nextProps;
-    if (id !== this.props.id) {
-      this.setState({
-        form: undefined, formTemplate: undefined, linkedForm: undefined,
-      });
+    if (id && id !== this.props.id && !form) {
+      this.setState({ form: undefined });
       this._load(nextProps);
-    } else if (form && !this.state.form) {
-      this.setState({ form: { ...form } });
-      if (formTemplateId && !formTemplate) {
-        dispatch(loadItem('form-templates', formTemplateId));
+    } else if (form && (!this.state.form || form._id !== this.props.form._id)) {
+      this.setState({ form: { ...form }, loadedLinkedTemplate: false });
+      if (!formTemplate) {
+        dispatch(loadItem('form-templates', form.formTemplateId._id));
       }
-      if (linkedFormId && !linkedForm) {
-        dispatch(loadItem('forms', linkedFormId));
+      if (form.linkedFormId && !linkedForm) {
+        dispatch(loadItem('forms', form.linkedFormId));
       }
+    } else if (linkedForm && !linkedFormTemplate &&
+      !this.state.loadedLinkedTemplate) {
+      this.setState({ loadedLinkedTemplate: true });
+      dispatch(loadItem('form-templates', linkedForm.formTemplateId._id));
     }
   }
 
-  componentWillUnmount() {
-    const { dispatch, formTemplateId, id, linkedFormId } = this.props;
-    dispatch(unloadItem('forms', id));
-    if (formTemplateId) {
-      dispatch(unloadItem('form-templates', formTemplateId));
-    }
-    if (linkedFormId) {
-      dispatch(unloadItem('forms', linkedFormId));
-    }
-  }
+  // removed since we need to preserve those from FormSection
+  // componentWillUnmount() {
+  //   const { dispatch, formTemplate, id } = this.props;
+  //   dispatch(unloadItem('forms', id));
+  //   if (formTemplate) {
+  //     dispatch(unloadItem('form-templates', formTemplate._id));
+  //   }
+  // }
 
   _load(props) {
     const { dispatch, id } = props;
-    dispatch(loadItem('forms', id));
+    dispatch(loadItem('forms', id, { full: true }));
   }
 
   _onUpdate(event) {
@@ -105,7 +112,8 @@ class FormEdit extends Component {
 
   render() {
     const {
-      className, formTemplate, full, inline, linkedForm, onLinkedForm,
+      className, formTemplate, full, inline, linkedForm, linkedFormTemplate,
+      onLinkedForm,
     } = this.props;
     const { form, error } = this.state;
     const classNames = ['form'];
@@ -134,20 +142,20 @@ class FormEdit extends Component {
       }
 
       let linkedFormControl;
-      if (linkedForm) {
+      if (linkedForm && linkedFormTemplate) {
         if (!inline) {
           linkedFormControl = (
             <span className="form__link">
               from <Link to={`/forms/${linkedForm._id}/edit`}>
-                {linkedForm.formTemplateId.name}
+                {linkedFormTemplate.name}
               </Link>
             </span>
           );
         } else {
           linkedFormControl = (
             <span className="form__link">
-              from <a onClick={() => onLinkedForm(linkedForm._id)}>
-                {linkedForm.formTemplateId.name}
+              from <a onClick={() => onLinkedForm(linkedForm)}>
+                {linkedFormTemplate.name}
               </a>
             </span>
           );
@@ -187,13 +195,12 @@ FormEdit.propTypes = {
   dispatch: PropTypes.func.isRequired,
   form: PropTypes.object,
   formTemplate: PropTypes.object,
-  formTemplateId: PropTypes.string,
   full: PropTypes.bool,
-  history: PropTypes.any.isRequired,
-  id: PropTypes.string.isRequired,
+  history: PropTypes.any,
+  id: PropTypes.string,
   inline: PropTypes.bool,
   linkedForm: PropTypes.object,
-  linkedFormId: PropTypes.string,
+  linkedFormTemplate: PropTypes.object,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   onLinkedForm: PropTypes.func,
@@ -203,29 +210,33 @@ FormEdit.defaultProps = {
   className: undefined,
   form: undefined,
   formTemplate: undefined,
-  formTemplateId: undefined,
   full: true,
+  history: undefined,
+  id: undefined,
   inline: false,
   linkedForm: undefined,
-  linkedFormId: undefined,
+  linkedFormTemplate: undefined,
   onCancel: undefined,
   onDone: undefined,
   onLinkedForm: undefined,
 };
 
 const select = (state, props) => {
-  const id = props.match.params.id;
-  const form = state[id];
-  const formTemplateId = form ? form.formTemplateId._id : undefined;
-  const linkedFormId = form ? form.linkedFormId : undefined;
+  const id = props.match ? props.match.params.id : undefined;
+  const form = props.form || state[id];
+  let linkedForm = props.linkedForm;
+  if (!linkedForm && form && (form.linkedForm || form.linkedFormId)) {
+    linkedForm = form.linkedForm || state[form.linkedFormId];
+  }
   return {
     id,
     form,
-    formTemplateId,
-    formTemplate: formTemplateId ? state[formTemplateId] : undefined,
-    linkedFormId,
-    linkedForm: linkedFormId ? state[linkedFormId] : undefined,
-    notFound: state.notFound[id],
+    formTemplate: props.formTemplate ||
+      (form ? state[form.formTemplateId._id] : undefined),
+    linkedForm,
+    linkedFormTemplate: props.linkedFormTemplate ||
+      (linkedForm ? state[linkedForm.formTemplateId._id] : undefined),
+    notFound: id ? state.notFound[id] : undefined,
     session: state.session,
   };
 };

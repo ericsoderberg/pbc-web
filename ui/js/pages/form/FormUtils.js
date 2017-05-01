@@ -100,6 +100,9 @@ export function finalizeForm(formTemplate, form, linkedForm) {
     })
   ));
   form.domainId = formTemplate.domainId;
+  if (linkedForm) {
+    form.linkedFormId = linkedForm._id;
+  }
 }
 
 export function calculateTotal(formTemplate, form) {

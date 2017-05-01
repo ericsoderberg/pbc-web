@@ -80,20 +80,6 @@ FormItem.defaultProps = {
   verb: undefined,
 };
 
-const _bestForm = (form, formTemplate) => {
-  let result = form;
-  // Object.keys(forms).some(key =>
-  //   forms[key].some((form2) => {
-  //     if (form2.linkedFormId === form._id) {
-  //       result = _bestForm(form2, forms);
-  //       return true;
-  //     }
-  //     return false;
-  //   }),
-  // );
-  return result;
-};
-
 class FormSection extends Component {
 
   constructor(props) {
@@ -170,20 +156,37 @@ class FormSection extends Component {
   _add(linkedForm) {
     return () => {
       let { formTemplate } = this.props;
-      while (formTemplate.linkedFormTemplate &&
-        (!linkedForm ||
-          linkedForm.formTemplateId._id !== formTemplate.linkedFormTemplate._id)) {
+      const linkedFormTemplate = linkedForm ? formTemplate.linkedFormTemplate : undefined;
+      while (formTemplate.linkedFormTemplate && !linkedForm) {
         formTemplate = formTemplate.linkedFormTemplate;
       }
       this.setState({
-        state: ADDING, activeFormTemplateId: formTemplate._id, linkedForm,
+        state: ADDING,
+        activeFormTemplate: formTemplate,
+        linkedForm,
+        linkedFormTemplate,
       });
     };
   }
 
   _edit(form) {
     return () => {
-      this.setState({ editForm: form, state: EDITING });
+      const { formTemplate } = this.props;
+      let linkedForm;
+      let linkedFormTemplate;
+      if (form.linkedFormId) {
+        linkedFormTemplate = formTemplate.linkedFormTemplate;
+        linkedFormTemplate.forms.some((form2) => {
+          if (form2._id === form.linkedFormId) {
+            linkedForm = form2;
+            return true;
+          }
+          return false;
+        });
+      }
+      this.setState({
+        editForm: form, linkedForm, linkedFormTemplate, state: EDITING,
+      });
     };
   }
 
@@ -210,11 +213,27 @@ class FormSection extends Component {
 
   render() {
     const { className, formTemplate, formTemplateId, session } = this.props;
-    const { activeFormTemplate, editForm, linkedForm, state } = this.state;
+    const {
+      activeFormTemplate, editForm, linkedForm, linkedFormTemplate, state,
+    } = this.state;
 
     // determine which set of forms to show
-    const bestForms = ((formTemplate || {}).forms || []).map(form =>
-      _bestForm(form, formTemplate));
+    let forms = [];
+    if (formTemplate && formTemplate.linkedFormTemplate) {
+      forms = formTemplate.linkedFormTemplate.forms.map((form2) => {
+        let bestForm = form2;
+        formTemplate.forms.some((form) => {
+          if (form.linkedFormId === form2._id) {
+            bestForm = form;
+            return true;
+          }
+          return false;
+        });
+        return bestForm;
+      });
+    } else if (formTemplate) {
+      forms = formTemplate.forms;
+    }
 
     const classes = ['form-summary__container'];
     if (className) {
@@ -266,16 +285,20 @@ class FormSection extends Component {
       }
 
       case ADDING: {
-        const onCancel = bestForms.length > 0 ? this._nextState(SUMMARY) : undefined;
+        const onCancel = forms.length > 0 ? this._nextState(SUMMARY) : undefined;
         contents = (
           <FormAdd full={false} inline={true}
             formTemplate={activeFormTemplate}
-            formTemplateId={activeFormTemplate._id} linkedForm={linkedForm}
+            formTemplateId={activeFormTemplate._id}
+            linkedForm={linkedForm}
+            linkedFormTemplate={linkedFormTemplate}
             onDone={this._onDone} onCancel={onCancel}
-            onLinkedForm={id => this.setState({
-              activeFormTemplate: activeFormTemplate.linkedFormTemplate,
-              state: EDITING,
-              editForm: id })}
+            onLinkedForm={() => this.setState({
+              activeFormTemplate: linkedFormTemplate,
+              editForm: linkedForm,
+              linkedForm: undefined,
+              linkedFormTemplate: undefined,
+              state: EDITING })}
             signInControl={<Button label="Sign In" secondary={true}
               onClick={this._nextState(SESSION)} />} />
         );
@@ -284,12 +307,17 @@ class FormSection extends Component {
 
       case EDITING: {
         contents = (
-          <FormEdit id={editForm._id} form={editForm} full={false} inline={true}
+          <FormEdit id={editForm._id} full={false} inline={true}
+            form={editForm}
+            formTemplate={activeFormTemplate}
+            linkedForm={linkedForm}
+            linkedFormTemplate={linkedFormTemplate}
             onDone={this._onDone} onCancel={this._nextState(SUMMARY)}
-            onLinkedForm={id => this.setState({
-              activeFormTemplate: activeFormTemplate.linkedFormTemplate,
-              editForm: activeFormTemplate.linkedFormTemplate
-                .forms.filter(f => f._id === id)[0] })} />
+            onLinkedForm={() => this.setState({
+              activeFormTemplate: linkedFormTemplate,
+              editForm: linkedForm,
+              linkedForm: undefined,
+              linkedFormTemplate: undefined })} />
         );
         break;
       }
@@ -309,9 +337,9 @@ class FormSection extends Component {
 
       case SUMMARY: {
         let anyPending = false;
-        const items = bestForms.map((form) => {
+        const items = forms.map((form) => {
           let itemContents;
-          if (form.formTemplateId._id === formTemplateId) {
+          if (form.formTemplateId === formTemplateId) {
             const label = (formTemplate.anotherLabel ?
               LABEL_MULTIPLE[formTemplate.submitLabel] : undefined) ||
               LABEL[formTemplate.submitLabel] ||
@@ -319,7 +347,7 @@ class FormSection extends Component {
             itemContents = (
               <FormItem item={form} onClick={this._edit(form)}
                 verb={label}
-                distinguish={bestForms.length > 1 ||
+                distinguish={forms.length > 1 ||
                   formTemplate.anotherLabel !== undefined} />
             );
           } else {
