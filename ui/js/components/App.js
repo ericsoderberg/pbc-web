@@ -29,6 +29,8 @@ PrivateRoute.defaultProps = {
   location: undefined,
 };
 
+let lastPath;
+
 class App extends Component {
 
   constructor(props) {
@@ -49,7 +51,10 @@ class App extends Component {
 
   componentDidUpdate() {
     // this._hideNavControl();
-    window.scrollTo(0, 0);
+    if (window.location.pathname !== lastPath) {
+      lastPath = window.location.pathname;
+      window.scrollTo(0, 0);
+    }
   }
 
   _stateFromProps(props) {

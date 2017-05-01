@@ -16,7 +16,7 @@ class PageContext extends Component {
   componentWillReceiveProps(nextProps) {
     const { filter } = nextProps;
     if (filter && (!this.props.filter ||
-      Object.keys(filter).some(key => this.props.filter[key] !== filter[key]))) {
+      JSON.stringify(filter) !== JSON.stringify(this.props.filter))) {
       this._load(nextProps);
     }
   }
