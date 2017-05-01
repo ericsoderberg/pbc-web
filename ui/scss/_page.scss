@@ -86,6 +86,7 @@
   position: relative;
   display: block;
   max-width: $page-width;
+  min-height: round($unit * 10); // so they each hold their own
   margin: 0 auto;
   padding: $double-unit 0;
   z-index: 1;
