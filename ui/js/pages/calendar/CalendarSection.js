@@ -29,7 +29,7 @@ class CalendarSection extends Component {
     const { calendar, dispatch, events, id, omitRecurring } = props;
     if (id) {
       if (!calendar) {
-        dispatch(loadItem('calendars', props.id));
+        dispatch(loadItem('calendars', id));
       } else if (!events) {
         const start = moment().startOf('day');
         const end = moment(start).add(2, 'month');

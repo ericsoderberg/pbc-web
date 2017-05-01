@@ -1,12 +1,12 @@
-
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getItem } from '../../actions';
+import { loadItem, unloadItem } from '../../actions';
 import { isDarkBackground } from '../../utils/Color';
 import MessageContents from './MessageContents';
 
-export default class MessageItem extends Component {
+class MessageItem extends Component {
 
   constructor(props) {
     super(props);
@@ -14,19 +14,19 @@ export default class MessageItem extends Component {
   }
 
   componentDidMount() {
-    const { detailsForMostRecent, item: message } = this.props;
-    const date = moment(message.date);
-    const now = moment().startOf('day').subtract(1, 'minute');
-    if (detailsForMostRecent && !message.series &&
-      date.isBetween(moment(now).subtract(7, 'days'), now, 'day')) {
-      getItem('messages', message._id)
-      .then(messageResponse => this.setState({ message: messageResponse }))
-      .catch(error => console.error('!!! MessageItem catch', error));
+    const { details, dispatch, item: message } = this.props;
+    if (details) {
+      dispatch(loadItem('messages', message._id));
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch, item: message } = this.props;
+    dispatch(unloadItem('messages', message._id));
+  }
+
   render() {
-    const { className, item: message } = this.props;
+    const { className, details, item: message } = this.props;
     const classNames = ['item__container'];
     if (className) {
       classNames.push(className);
@@ -72,11 +72,11 @@ export default class MessageItem extends Component {
     );
 
     let contents = link;
-    if (this.state.message) {
+    if (details) {
       contents = (
         <div className="item--primary">
           {link}
-          <MessageContents item={this.state.message} attributes={false} />
+          <MessageContents item={message} attributes={false} />
         </div>
       );
     }
@@ -87,11 +87,31 @@ export default class MessageItem extends Component {
 
 MessageItem.propTypes = {
   className: PropTypes.string,
-  detailsForMostRecent: PropTypes.bool,
+  dispatch: PropTypes.func.isRequired,
+  details: PropTypes.bool,
+  // detailsForMostRecent: PropTypes.bool,
   item: PropTypes.object.isRequired,
 };
 
 MessageItem.defaultProps = {
   className: undefined,
+  details: false,
   detailsForMostRecent: false,
 };
+
+const select = (state, props) => {
+  const message = props.item;
+  const id = message._id;
+  const date = moment(message.date);
+  const now = moment().startOf('day').subtract(1, 'minute');
+  const details = (props.detailsForMostRecent && !message.series &&
+    date.isBetween(moment(now).subtract(7, 'days'), now, 'day'));
+  return {
+    details,
+    item: state[id] || props.item,
+    notFound: state.notFound[id],
+    session: state.session,
+  };
+};
+
+export default connect(select)(MessageItem);

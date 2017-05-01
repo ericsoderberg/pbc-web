@@ -26,7 +26,7 @@ export default class PaymentAdd extends Component {
   }
 
   _onAdd(payment) {
-    const { history, onDone } = this.props;
+    const { history } = this.props;
     const { form, error } = this.state;
 
     if (error) {
@@ -38,22 +38,18 @@ export default class PaymentAdd extends Component {
         form.paymentIds.push(form._id);
         return putItem('forms', form);
       })
-      .then(() => (onDone ? onDone() : history.goBack()))
+      .then(() => history.goBack())
       .catch(error2 => this.setState({ error: error2 }));
     }
   }
 
   _onCancel() {
-    const { history, onCancel } = this.props;
-    if (onCancel) {
-      onCancel();
-    } else {
-      history.goBack();
-    }
+    const { history } = this.props;
+    history.goBack();
   }
 
   render() {
-    const { formId, formTemplateId, inline } = this.props;
+    const { formId, formTemplateId } = this.props;
     const { form, error, payment } = this.state;
 
     let result;
@@ -61,7 +57,7 @@ export default class PaymentAdd extends Component {
       const FormContents = PaymentFormContents;
         // inline ? PaymentFormContentsInline : PaymentFormContents;
       result = (
-        <Form title="Payment" submitLabel="Submit" inline={inline}
+        <Form title="Payment" submitLabel="Submit"
           action="/api/payments"
           contentsProps={{ formId, formTemplateId }}
           FormContents={FormContents} item={payment}
@@ -79,9 +75,6 @@ PaymentAdd.propTypes = {
   formId: PropTypes.string.isRequired,
   formTemplateId: PropTypes.string.isRequired,
   history: PropTypes.any.isRequired,
-  inline: PropTypes.bool,
-  onCancel: PropTypes.func.isRequired,
-  onDone: PropTypes.func.isRequired,
 };
 
 PaymentAdd.defaultProps = {

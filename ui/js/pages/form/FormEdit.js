@@ -58,24 +58,6 @@ class FormEdit extends Component {
   _load(props) {
     const { dispatch, id } = props;
     dispatch(loadItem('forms', id));
-    // .then((form) => {
-    //   this.setState({ form, formTemplate: undefined, linkedForm: undefined });
-    //   if (form.linkedFormId) {
-    //     return getItem('forms', form.linkedFormId)
-    //     .then(linkedForm => this.setState({ linkedForm }))
-    //     // .then(() => form)
-    //     .catch(error => console.error('!!! FormEdit linked catch', error))
-    //     .then(() => form);
-    //   }
-    //   return form;
-    // })
-    // .then(form => getItem('form-templates', form.formTemplateId._id,
-    //   { totals: true }))
-    // .then((formTemplate) => {
-    //   this.setState({ formTemplate });
-    //   document.title = formTemplate.name;
-    // })
-    // .catch(error => console.error('!!! FormEdit catch', error));
   }
 
   _onUpdate(event) {

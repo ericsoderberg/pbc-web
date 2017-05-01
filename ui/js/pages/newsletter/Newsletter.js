@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getItem, postNewsletterSend } from '../../actions';
+import { loadItem, unloadItem, postNewsletterSend } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
@@ -10,7 +11,7 @@ const READY = 'ready';
 const SENT = 'sent';
 const ERROR = 'error';
 
-export default class Newsletter extends Component {
+class Newsletter extends Component {
 
   constructor() {
     super();
@@ -19,34 +20,36 @@ export default class Newsletter extends Component {
   }
 
   componentDidMount() {
-    this._load(this.props.match.params.id);
+    const { dispatch, id } = this.props;
+    dispatch(loadItem('newsletters', id, { populate: true }));
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id) {
-      this._load(nextProps.match.params.id);
+    const { dispatch, id, newsletter } = nextProps;
+    if (id !== this.props.id) {
+      dispatch(loadItem('newsletters', id, { populate: true }));
+    } else if (newsletter) {
+      document.title = newsletter.name;
     }
   }
 
-  _load(id) {
-    getItem('newsletters', id, { populate: true })
-    .then((newsletter) => {
-      document.title = `${newsletter.name} - ${moment(newsletter.date).format('MMMM Do YYYY')}`;
-      this.setState({ newsletter });
-    })
-    .catch(error => console.error('!!! Newsletter catch', error));
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('newsletters', id));
   }
 
   _onSend(event) {
+    const { id } = this.props;
     const { address } = this.state;
     event.preventDefault();
-    postNewsletterSend(this.props.match.params.id, address)
+    postNewsletterSend(id, address)
     .then(() => this.setState({ sendState: SENT }))
     .catch(() => this.setState({ sendState: ERROR }));
   }
 
   render() {
-    const { newsletter, sendState } = this.state;
+    const { newsletter } = this.props;
+    const { sendState } = this.state;
     let title;
     let sendControl;
     let contents;
@@ -88,9 +91,23 @@ export default class Newsletter extends Component {
 }
 
 Newsletter.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  newsletter: PropTypes.object,
 };
+
+Newsletter.defaultProps = {
+  newsletter: undefined,
+};
+
+const select = (state, props) => {
+  const id = props.match.params.id;
+  return {
+    id,
+    notFound: state.notFound[id],
+    newsletter: state[id],
+    session: state.session,
+  };
+};
+
+export default connect(select)(Newsletter);

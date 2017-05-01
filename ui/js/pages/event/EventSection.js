@@ -1,18 +1,14 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getItem } from '../../actions';
+import { loadItem, unloadItem } from '../../actions';
 import EventTimes from './EventTimes';
 import Map from '../../components/Map';
 import RightIcon from '../../icons/Right';
 // import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 
-export default class EventSection extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = { event: (typeof props.id === 'string' ? props.id : {}) };
-  }
+class EventSection extends Component {
 
   componentDidMount() {
     this._load(this.props);
@@ -24,20 +20,20 @@ export default class EventSection extends Component {
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('events', id));
+  }
+
   _load(props) {
-    const { id } = props;
-    if (typeof id === 'object') {
-      this.setState({ event: id });
-    } else if (typeof id === 'string') {
-      getItem('events', id)
-      .then(event => this.setState({ event }))
-      .catch(error => console.error('!!! EventSummary catch', error));
+    const { dispatch, event, id } = props;
+    if (id && !event) {
+      dispatch(loadItem('events', id));
     }
   }
 
   render() {
-    const { className, color, includeMap, navigable } = this.props;
-    const { event } = this.state;
+    const { className, color, event, includeMap, navigable } = this.props;
 
     const classes = ['event-section'];
     if (className) {
@@ -109,7 +105,9 @@ export default class EventSection extends Component {
 EventSection.propTypes = {
   className: PropTypes.string,
   color: PropTypes.string,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  dispatch: PropTypes.func.isRequired,
+  event: PropTypes.object,
+  id: PropTypes.string,
   includeMap: PropTypes.bool,
   navigable: PropTypes.bool,
 };
@@ -117,7 +115,31 @@ EventSection.propTypes = {
 EventSection.defaultProps = {
   className: undefined,
   color: undefined,
+  event: undefined,
   id: undefined,
   includeMap: false,
   navigable: true,
 };
+
+const select = (state, props) => {
+  let id;
+  let event;
+  let notFound;
+  if (props.id) {
+    if (typeof props.id === 'object') {
+      id = props.id._id;
+      event = props.id;
+    } else {
+      id = props.id;
+      event = props.event || state[id];
+      notFound = state.notFound[id];
+    }
+  }
+  return {
+    event,
+    id,
+    notFound,
+  };
+};
+
+export default connect(select)(EventSection);

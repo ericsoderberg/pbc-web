@@ -15,11 +15,11 @@ class Message extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch, id } = nextProps;
+    const { dispatch, id, message } = nextProps;
     if (id !== this.props.id) {
       dispatch(loadItem('messages', id, { populate: true }));
-    } else if (nextProps.message) {
-      document.title = nextProps.message.name;
+    } else if (message) {
+      document.title = message.name;
     }
   }
 
