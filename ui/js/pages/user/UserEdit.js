@@ -45,8 +45,7 @@ class UserEdit extends Component {
     ];
     return (
       <Edit title="Edit Account" category="users" id={id} item={user}
-        actions={actions} FormContents={UserFormContents}
-        onChange={this._onChange} />
+        actions={actions} FormContents={UserFormContents} />
     );
   }
 }

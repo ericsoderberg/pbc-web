@@ -17,7 +17,6 @@ class NewsletterFormContents extends Component {
     this._onAddEvent = this._onAddEvent.bind(this);
     this._changeEvent = this._changeEvent.bind(this);
     this._removeEvent = this._removeEvent.bind(this);
-    this.state = { domains: [] };
   }
 
   componentDidMount() {
