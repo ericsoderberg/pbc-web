@@ -73,6 +73,33 @@ const fieldContents = (field, templateField, optionMap) => {
   return contents;
 };
 
+export const addNewForm = (data, session, linkedFormId) => {
+  const formTemplate = data.toObject ? data.toObject() : data;
+  const form = {
+    fields: [],
+    formTemplateId: formTemplate._id,
+    linkedFormId,
+  };
+  formTemplate.sections.forEach((section) => {
+    section.fields.forEach((field) => {
+      if (session && field.linkToUserProperty) {
+        // pre-fill out fields from session user
+        form.fields.push({
+          templateFieldId: field._id,
+          value: session.userId[field.linkToUserProperty],
+        });
+      }
+
+      // pre-fill out fields with a minimum value
+      if (field.min) {
+        form.fields.push({ templateFieldId: field._id, value: field.min });
+      }
+    });
+  });
+  formTemplate.newForm = form;
+  return formTemplate;
+};
+
 const initializeTotals = (formTemplate) => {
   // initialize maps for fields and options and their totals and remains
   const templateFieldMap = {};
@@ -156,6 +183,7 @@ export const addForms = (data, forSession) => {
   const criteria = { formTemplateId: formTemplate._id };
   if (forSession) {
     criteria.userId = forSession.userId._id;
+    addNewForm(formTemplate, forSession);
   }
   return Form.find(criteria)
   .populate({ path: 'paymentIds', select: 'amount' })
@@ -164,7 +192,9 @@ export const addForms = (data, forSession) => {
   .then(forms => addTotals(formTemplate, forms))
   .then(() => {
     if (formTemplate.linkedFormTemplateId) {
-      return FormTemplate.findOne({ _id: formTemplate.linkedFormTemplateId._id })
+      const linkedId =
+        formTemplate.linkedFormTemplateId._id || formTemplate.linkedFormTemplateId;
+      return FormTemplate.findOne({ _id: linkedId })
       .exec()
       .then(linkedData => addForms(linkedData, forSession))
       .then((linkedFormTemplate) => {
@@ -174,33 +204,6 @@ export const addForms = (data, forSession) => {
     }
     return formTemplate;
   });
-};
-
-export const addNewForm = (data, session, linkedFormId) => {
-  const formTemplate = data.toObject ? data.toObject() : data;
-  const form = {
-    fields: [],
-    formTemplateId: formTemplate._id,
-    linkedFormId,
-  };
-  formTemplate.sections.forEach((section) => {
-    section.fields.forEach((field) => {
-      if (session && field.linkToUserProperty) {
-        // pre-fill out fields from session user
-        form.fields.push({
-          templateFieldId: field._id,
-          value: session.userId[field.linkToUserProperty],
-        });
-      }
-
-      // pre-fill out fields with a minimum value
-      if (field.min) {
-        form.fields.push({ templateFieldId: field._id, value: field.min });
-      }
-    });
-  });
-  formTemplate.newForm = form;
-  return formTemplate;
 };
 
 const validate = (data) => {

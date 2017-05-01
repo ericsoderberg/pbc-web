@@ -234,7 +234,8 @@ class FormSection extends Component {
       );
     }
 
-    const unpaidAmount = formTemplate.totalCost - formTemplate.paidAmount;
+    const unpaidAmount =
+      formTemplate ? formTemplate.totalCost - formTemplate.paidAmount : 0;
 
     let contents;
     switch (state) {
