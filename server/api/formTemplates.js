@@ -161,14 +161,15 @@ export const addForms = (data, forSession) => {
   .populate({ path: 'paymentIds', select: 'amount' })
   .populate({ path: 'userId', select: 'name' })
   .exec()
-  .then((forms) => {
-    addTotals(formTemplate, forms);
-  })
+  .then(forms => addTotals(formTemplate, forms))
   .then(() => {
     if (formTemplate.linkedFormTemplateId) {
-      return FormTemplate.find({ _id: formTemplate.linkedFormTemplateId._id }).exec()
-      .then((linkedData) => {
-        formTemplate.linkedFormTemplate = addForms(linkedData, forSession);
+      return FormTemplate.findOne({ _id: formTemplate.linkedFormTemplateId._id })
+      .exec()
+      .then(linkedData => addForms(linkedData, forSession))
+      .then((linkedFormTemplate) => {
+        formTemplate.linkedFormTemplate = linkedFormTemplate;
+        return formTemplate;
       });
     }
     return formTemplate;
@@ -290,12 +291,11 @@ export default function (router) {
       ],
       transformOut: (formTemplate, req, session) => {
         // only add forms and totals if there is a session
-        if (req.query.full && session) {
-          formTemplate =
-            addForms(formTemplate, req.query.forSession ? session : undefined);
-        }
         if (req.query.new) {
           formTemplate = addNewForm(formTemplate, session, req.query.linkedFormId);
+        }
+        if (req.query.full && session) {
+          return addForms(formTemplate, req.query.forSession ? session : undefined);
         }
         return formTemplate;
       },
