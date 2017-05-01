@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { Provider } from 'react-redux';
 import reduxThunk from 'redux-thunk';
-import reduxLogger from 'redux-logger';
+// import reduxLogger from 'redux-logger';
 import { createStore, applyMiddleware } from 'redux';
 import reducers from './reducers';
 import { initialize } from './actions';
@@ -15,7 +15,7 @@ require('leaflet/dist/leaflet.css');
 
 const history = createBrowserHistory();
 
-const store = createStore(reducers, applyMiddleware(reduxThunk, reduxLogger));
+const store = createStore(reducers, applyMiddleware(reduxThunk)); //, reduxLogger));
 store.dispatch(initialize());
 
 const main = (
