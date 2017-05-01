@@ -92,7 +92,7 @@ class FormSection extends Component {
 
   componentDidMount() {
     this._load(this.props);
-    this._resetState();
+    this._resetState(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -101,7 +101,7 @@ class FormSection extends Component {
       (!nextProps.session && this.props.session)) {
       this._load(nextProps);
     } else {
-      this._resetState();
+      this._resetState(nextProps);
     }
   }
 
@@ -122,9 +122,9 @@ class FormSection extends Component {
     }
   }
 
-  _resetState(state) {
-    const { session, formTemplate } = this.props;
-    const { editForm, editId } = { ...this.state, ...state };
+  _resetState(props) {
+    const { session, formTemplate } = props;
+    const { editForm, editId } = this.state;
 
     let nextState;
     let activeFormTemplate = formTemplate;
@@ -150,7 +150,7 @@ class FormSection extends Component {
       nextState = SUMMARY;
     }
 
-    this.setState({ ...state, activeFormTemplate, state: nextState });
+    this.setState({ activeFormTemplate, state: nextState });
   }
 
   _add(linkedForm) {
@@ -445,9 +445,20 @@ FormSection.defaultProps = {
   session: undefined,
 };
 
-const select = (state, props) => ({
-  formTemplate: props.formTemplate || state[props.formTemplateId],
-  session: state.session,
-});
+const select = (state, props) => {
+  let formTemplateId;
+  if (props.formTemplateId) {
+    if (typeof props.formTemplateId === 'object') {
+      formTemplateId = props.formTemplateId._id;
+    } else {
+      formTemplateId = props.formTemplateId;
+    }
+  }
+  return {
+    formTemplateId,
+    formTemplate: props.formTemplate || state[formTemplateId],
+    session: state.session,
+  };
+};
 
 export default connect(select)(FormSection);
