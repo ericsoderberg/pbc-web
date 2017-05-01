@@ -276,7 +276,9 @@ export default function (router) {
         section.fields.filter(field => field.type !== 'instructions')
         .forEach((field) => {
           templateFieldMap[field._id] = field;
-          field.options.forEach((option) => { optionMap[option._id] = option; });
+          field.options.forEach((option) => {
+            optionMap[option._id] = option;
+          });
           fields.push(`${field._id}`);
           fieldNames.push(field.name || section.name);
           if (field.linkedFieldId) {
@@ -293,17 +295,21 @@ export default function (router) {
         linkedFormTemplate.sections.forEach(section =>
           section.fields.forEach((field) => {
             templateFieldMap[field._id] = field;
-            field.options.forEach((option) => { optionMap[option._id] = option; });
+            field.options.forEach((option) => {
+              optionMap[option._id] = option;
+            });
           }));
       }
 
       const data = forms.map((form) => {
         const item = { created: form.created, modified: form.modified };
-        const linkedForm = form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
+        const linkedForm =
+          form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
 
         form.fields.forEach((field) => {
+          const templateField = templateFieldMap[field.templateFieldId];
           item[field.templateFieldId] =
-            fieldContents(field, templateFieldMap, optionMap);
+            fieldContents(field, templateField, optionMap);
         });
 
         if (linkedForm) {
@@ -312,8 +318,10 @@ export default function (router) {
             linkedForm.fields.some((linkedField) => {
               if (linkedField.templateFieldId.equals(
                 linkedTemplateFieldIdMap[templateFieldId])) {
+                const templateField =
+                  templateFieldMap[linkedField.templateFieldId];
                 item[templateFieldId] =
-                  fieldContents(linkedField, templateFieldMap, optionMap);
+                  fieldContents(linkedField, templateField, optionMap);
                 return true;
               }
               return false;
