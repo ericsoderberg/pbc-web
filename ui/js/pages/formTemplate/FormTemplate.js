@@ -203,7 +203,8 @@ class FormTemplate extends Component {
 
   _sortForms(templateFieldId) {
     return () => {
-      const { forms, sortFieldId, sortReverse } = this.state;
+      const { formTemplate: { forms } } = this.props;
+      const { sortFieldId, sortReverse } = this.state;
       const nextSortReverse = (templateFieldId === sortFieldId ?
         !sortReverse : false);
 
@@ -341,7 +342,7 @@ class FormTemplate extends Component {
   _renderRows() {
     const { formTemplate } = this.props;
     const { filteredForms } = this.state;
-    const forms = formTemplate.forms;
+    const forms = this.state.forms || formTemplate.forms;
     const linkedForms = {};
     ((formTemplate.linkedFormTemplate || {}).forms || []).forEach((form) => {
       linkedForms[form._id] = form;

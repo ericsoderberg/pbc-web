@@ -188,6 +188,7 @@ export const addForms = (data, forSession) => {
   return Form.find(criteria)
   .populate({ path: 'paymentIds', select: 'amount' })
   .populate({ path: 'userId', select: 'name' })
+  .sort('-modified')
   .exec()
   .then(forms => addTotals(formTemplate, forms))
   .then(() => {
