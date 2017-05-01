@@ -1,12 +1,13 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getItems, getItem } from '../../actions';
+import { loadItem, unloadItem, loadCategory, unloadCategory } from '../../actions';
 import RightIcon from '../../icons/Right';
 import MessageItem from '../message/MessageItem';
 
-export default class LibrarySection extends Component {
+class LibrarySection extends Component {
 
   constructor(props) {
     super(props);
@@ -27,49 +28,33 @@ export default class LibrarySection extends Component {
     }
   }
 
-  _load(props) {
-    let libraryId;
-    if (props.id) {
-      if (typeof props.id === 'object') {
-        libraryId = props.id._id;
-        this.setState({ library: props.id });
-      } else {
-        libraryId = props.id;
-        getItem('libraries', props.id)
-        .then(library => this.setState({ library }))
-        .catch(error => console.error('!!! LibrarySummary library catch', error));
-      }
-    }
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('libraries', id));
+    dispatch(unloadCategory('messages'));
+  }
 
-    if (props.message) {
-      this.setState({ message: props.message });
-    } else if (libraryId) {
-      const date = moment().add(1, 'day');
-      getItems('messages', {
-        filter: {
-          libraryId,
-          date: { $lt: date.toString() },
-        },
-        sort: '-date',
-        limit: 1,
-      })
-      .then((messages) => {
-        const message = messages[0];
-        // if (message && message.seriesId) {
-        //   return getItem('messages', message.seriesId);
-        // } else {
-        this.setState({ message });
-        //   return undefined;
-        // }
-      })
-      // .then(series => this.setState({ series: series }))
-      .catch(error => console.error('!!! LibrarySummary messages catch', error));
+  _load(props) {
+    const { dispatch, id, library, message } = props;
+    if (id) {
+      if (!library) {
+        dispatch(loadItem('libraries', props.id));
+      } else if (!message) {
+        const date = moment().add(1, 'day');
+        dispatch(loadCategory('messages', {
+          filter: {
+            libraryId: id,
+            date: { $lt: date.toString() },
+          },
+          sort: '-date',
+          limit: 1,
+        }));
+      }
     }
   }
 
   render() {
-    const { className } = this.props;
-    const { library, message } = this.state;
+    const { className, library, message } = this.props;
 
     const classes = ['library-summary'];
     if (className) {
@@ -108,12 +93,43 @@ export default class LibrarySection extends Component {
 
 LibrarySection.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  library: PropTypes.object,
   message: PropTypes.object,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };
 
 LibrarySection.defaultProps = {
   className: undefined,
+  library: {},
   message: undefined,
   id: undefined,
 };
+
+const select = (state, props) => {
+  let id;
+  let library;
+  let notFound;
+  let message = props.message;
+  if (props.id) {
+    if (typeof props.id === 'object') {
+      id = props.id._id;
+      library = props.id;
+    } else {
+      id = props.id;
+      library = props.library || state[id];
+      notFound = state.notFound[id];
+    }
+    if (!message && state.messages) {
+      message = state.messages.items[0];
+    }
+  }
+  return {
+    id,
+    library,
+    message,
+    notFound,
+  };
+};
+
+export default connect(select)(LibrarySection);

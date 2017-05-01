@@ -10,6 +10,7 @@ import api from './api';
 import rss from './rss';
 import file from './file';
 import redirects from './redirects';
+// import isomorphic from './isomorphic';
 
 const PORT = process.env.PORT || 8091;
 const app = express();
@@ -27,6 +28,7 @@ app.set('etag', false)
 .use('/', redirects)
 .use('/', rss)
 .use('/', express.static(path.join(__dirname, '/../dist')))
+// .use('/', isomorphic);
 .get('/*', (req, res) => {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 });

@@ -1,30 +1,27 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItem } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
-import Stored from '../../components/Stored';
 import Sections from '../../components/Sections';
 import PageContext from './PageContext';
 
 class Page extends Component {
 
-  constructor() {
-    super();
-    this.state = {};
-  }
-
   componentDidMount() {
-    if (!this.props.page) {
+    const { page } = this.props;
+    if (!page) {
       this._load(this.props);
+    } else {
+      document.title = page.name;
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id &&
-      !nextProps.page) {
+    if (nextProps.id !== this.props.id && !nextProps.page) {
       this._load(nextProps);
     }
     if (nextProps.page) {
@@ -32,17 +29,18 @@ class Page extends Component {
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('pages', id));
+  }
+
   _load(props) {
-    getItem('pages', props.match.params.id, { cache: true, populate: true })
-    .catch((error) => {
-      console.error('!!! Page catch', error);
-      this.setState({ error });
-    });
+    const { dispatch, id } = props;
+    dispatch(loadItem('pages', id, { populate: true }));
   }
 
   render() {
-    const { page, session } = this.props;
-    const { error } = this.state;
+    const { notFound, page, session } = this.props;
 
     let actions;
     let contents;
@@ -54,7 +52,7 @@ class Page extends Component {
           <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>,
         ];
       }
-    } else if (error) {
+    } else if (notFound) {
       contents = <NotFound />;
     } else {
       contents = <Loading />;
@@ -72,12 +70,10 @@ class Page extends Component {
 }
 
 Page.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   page: PropTypes.object,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  id: PropTypes.string.isRequired,
+  notFound: PropTypes.bool,
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
@@ -87,16 +83,19 @@ Page.propTypes = {
 };
 
 Page.defaultProps = {
+  notFound: undefined,
   page: undefined,
   session: undefined,
 };
 
 const select = (state, props) => {
-  let page;
-  if (state.pages) {
-    page = state.pages[props.match.params.id];
-  }
-  return { page, session: state.session };
+  const id = props.match.params.id;
+  return {
+    id,
+    notFound: state.notFound[id],
+    page: state[id],
+    session: state.session,
+  };
 };
 
-export default Stored(Page, select);
+export default connect(select)(Page);

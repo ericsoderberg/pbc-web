@@ -9,6 +9,7 @@ EventEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'events',
   FormContents: EventFormContents,
+  postRemovePath: '/events',
   Preview: EventPreview,
   title: 'Edit Event',
 };

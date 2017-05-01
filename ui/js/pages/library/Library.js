@@ -1,11 +1,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItem, getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, loadItem, unloadCategory, unloadItem } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
 import MessageItem from '../message/MessageItem';
-import Stored from '../../components/Stored';
 
 class LibraryMessageItem extends MessageItem {}
 
@@ -15,39 +15,52 @@ LibraryMessageItem.defaultProps = {
 
 class Library extends Component {
 
-  constructor() {
-    super();
-    this.state = {};
-  }
-
   componentDidMount() {
-    this._loadLibrary();
+    const { library } = this.props;
+    if (!library) {
+      this._load(this.props);
+    } else {
+      document.title = library.name;
+    }
   }
 
-  _loadLibrary() {
-    const { match } = this.props;
-    getItem('libraries', match.params.id)
-    .then((library) => {
-      this.setState({ library });
-      getItems('pages', {
-        filter: { 'sections.libraryId': library._id },
-        select: 'name',
-      })
-      .then(pages => this.setState({ pages }))
-      .catch(error => console.error('!!! Library pages catch', error));
-    })
-    .catch(error => console.error('!!! Library catch', error));
+  componentWillReceiveProps(nextProps) {
+    const { dispatch } = nextProps;
+    if (nextProps.id !== this.props.id && !nextProps.library) {
+      this._load(nextProps);
+    }
+    if (nextProps.library) {
+      document.title = nextProps.library.name;
+
+      // need real id, not path from library
+      if (!nextProps.pages) {
+        dispatch(loadCategory('pages', {
+          filter: { 'sections.libraryId': nextProps.library.id },
+          select: 'name',
+        }));
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('libraries', id));
+    dispatch(unloadCategory('pages'));
+  }
+
+  _load(props) {
+    const { dispatch, id } = props;
+    dispatch(loadItem('libraries', id));
   }
 
   render() {
-    const { location, session } = this.props;
-    const { library, pages } = this.state;
+    const { history, library, location, pages, session } = this.props;
 
     let result;
     if (!library) {
       result = <Loading />;
     } else {
-      const controls = (pages || []).map(page => (
+      const controls = pages.map(page => (
         <Link key={page.name} to={page.path || `/pages/${page._id}`}>
           {page.name}
         </Link>
@@ -68,7 +81,8 @@ class Library extends Component {
           filter={{ libraryId: library._id }}
           select="name path verses date author series color" sort="-date"
           Item={LibraryMessageItem}
-          addIfFilter="libraryId" actions={controls} />
+          addIfFilter="libraryId" actions={controls}
+          history={history} />
       );
     }
     return result;
@@ -76,12 +90,12 @@ class Library extends Component {
 }
 
 Library.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
+  id: PropTypes.string.isRequired,
+  library: PropTypes.object,
   location: PropTypes.object.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  pages: PropTypes.array,
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
@@ -91,11 +105,19 @@ Library.propTypes = {
 };
 
 Library.defaultProps = {
+  library: undefined,
+  pages: [],
   session: undefined,
 };
 
-const select = state => ({
-  session: state.session,
-});
+const select = (state, props) => {
+  const id = props.match.params.id;
+  return {
+    id,
+    library: state[id],
+    pages: state.pages,
+    session: state.session,
+  };
+};
 
-export default Stored(Library, select);
+export default connect(select)(Library);

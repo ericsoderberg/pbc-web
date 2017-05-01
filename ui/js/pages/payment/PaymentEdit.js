@@ -7,6 +7,6 @@ PaymentEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'payments',
   FormContents: PaymentFormContents,
-  removeBackLevel: 1,
+  postRemovePath: '/payments',
   title: 'Edit Payment',
 };

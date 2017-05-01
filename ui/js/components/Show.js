@@ -1,14 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import { getItem } from '../actions';
+import { connect } from 'react-redux';
+import { loadItem, unloadItem } from '../actions';
 import ItemHeader from './ItemHeader';
 import Loading from './Loading';
 
-export default class Show extends Component {
-
-  constructor() {
-    super();
-    this.state = {};
-  }
+class Show extends Component {
 
   componentDidMount() {
     this._load(this.props);
@@ -16,30 +12,30 @@ export default class Show extends Component {
 
   componentWillReceiveProps(nextProps) {
     if ((nextProps.category !== this.props.category ||
-      nextProps.match.params.id !== this.props.match.params.id)) {
+      nextProps.id !== this.props.id)) {
       this._load(nextProps);
+    }
+    if (nextProps.item) {
+      document.title = nextProps.item.name;
     }
   }
 
+  componentWillUnmount() {
+    const { category, dispatch, id } = this.props;
+    dispatch(unloadItem(category, id));
+  }
+
   _load(props) {
-    const { category, item, match } = props;
+    const { category, dispatch, id, item } = props;
     if (item) {
       document.title = item.name;
-      this.setState({ item });
     } else {
-      this.setState({ item: undefined });
-      getItem(category, match.params.id)
-      .then((itemLoaded) => {
-        document.title = itemLoaded.name;
-        this.setState({ item: itemLoaded });
-      })
-      .catch(error => console.error('!!! Show catch', error));
+      dispatch(loadItem(category, id));
     }
   }
 
   render() {
-    const { actions, category, Contents, title } = this.props;
-    const { item } = this.state;
+    const { actions, category, Contents, item, title } = this.props;
 
     let contents;
     if (item) {
@@ -62,19 +58,26 @@ Show.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
   Contents: PropTypes.func.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  item: PropTypes.object,
   title: PropTypes.string,
 };
 
 Show.defaultProps = {
   actions: [],
+  item: undefined,
   title: undefined,
 };
 
 Show.contextTypes = {
   router: PropTypes.any,
 };
+
+const select = (state, props) => ({
+  id: props.match.params.id,
+  item: state[props.match.params.id],
+  session: state.session,
+});
+
+export default connect(select)(Show);

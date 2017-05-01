@@ -5,6 +5,7 @@ import register from './register';
 import {
   getSession, authorizedForDomain, allowAnyone, requireSomeAdministrator,
 } from './auth';
+import { addFormTotals } from './forms';
 import { unsetDomainIfNeeded } from './domains';
 import { catcher } from './utils';
 
@@ -72,73 +73,133 @@ const fieldContents = (field, templateField, optionMap) => {
   return contents;
 };
 
-const calculateTotals = (data) => {
-  const Form = mongoose.model('Form');
-  return Form.find({ formTemplateId: data._id }).exec()
-  .then((forms) => {
-    const formTemplate = data.toObject();
-    const templateFieldMap = {};
-    const optionMap = {};
-    const totals = {};
-    const remains = {};
-    formTemplate.sections.forEach((section) => {
-      section.fields.forEach((field) => {
-        templateFieldMap[field._id] = field;
-        field.options.forEach((option) => { optionMap[option._id] = option; });
-        if (field.type === 'count' || field.type === 'number'
-          || field.monetary) {
-          totals[field._id] = 0;
+const initializeTotals = (formTemplate) => {
+  // initialize maps for fields and options and their totals and remains
+  const templateFieldMap = {};
+  const optionMap = {};
+
+  formTemplate.sections.forEach((section) => {
+    section.fields.forEach((field) => {
+      // build maps so we can hash using ids
+      templateFieldMap[field._id] = field;
+      field.options.forEach((option) => { optionMap[option._id] = option; });
+
+      if (field.type === 'count' || field.type === 'number'
+        || field.monetary) {
+        field.total = 0;
+      }
+      if (field.limit) {
+        field.remaining = parseFloat(field.limit, 10);
+      } else {
+        field.options.forEach((option) => {
+          if (option.limit !== undefined && option.limit !== null) {
+            option.remaining = parseFloat(option.limit, 10);
+          }
+        });
+      }
+    });
+  });
+
+  return { templateFieldMap, optionMap };
+};
+
+const addTotals = (formTemplate, forms) => {
+  const { templateFieldMap, optionMap } = initializeTotals(formTemplate);
+  let totalCost = 0;
+  let paidAmount = 0;
+
+  forms.map(form => form.toObject()).forEach((form) => {
+    addFormTotals(formTemplate, form);
+    totalCost += form.totalCost;
+    paidAmount += form.paidAmount;
+
+    form.fields.forEach((field) => {
+      const templateField = templateFieldMap[field.templateFieldId];
+      if (templateField.total >= 0) {
+        const value = parseFloat(
+          fieldValue(field, templateFieldMap, optionMap), 10);
+        if (value) {
+          templateField.total += value;
         }
-        if (field.limit) {
-          remains[field._id] = parseFloat(field.limit, 10);
+      }
+
+      if (templateField.remaining !== undefined) {
+        if (templateField.type === 'number' || templateField.type === 'count') {
+          templateField.remaining -= parseFloat(field.value, 10);
         } else {
-          field.options.forEach((option) => {
-            if (option.limit !== undefined && option.limit !== null) {
-              if (!remains[field._id]) {
-                remains[field._id] = {};
-              }
-              remains[field._id][option._id] = parseFloat(option.limit, 10);
+          templateField.remaining -= 1;
+        }
+      }
+
+      if (templateField.options) {
+        templateField.options.map(o => o.remaining !== undefined)
+        .forEach((option) => {
+          (field.optionIds || []).forEach((optionId) => {
+            if (option._id === optionId) {
+              option.remaining -= 1;
             }
           });
-        }
-      });
+        });
+      }
     });
+  });
 
-    forms.forEach((form) => {
-      form.fields.forEach((field) => {
-        const total = totals[field.templateFieldId];
-        if (total >= 0) {
-          const value = parseFloat(
-            fieldValue(field, templateFieldMap, optionMap), 10);
-          if (value) {
-            totals[field.templateFieldId] += value;
-          }
-        }
+  formTemplate.forms = forms;
+  formTemplate.totalCost = totalCost;
+  formTemplate.paidAmount = paidAmount;
+};
 
-        const remaining = remains[field.templateFieldId];
-        if (remaining !== undefined) {
-          if (typeof remaining === 'object') {
-            // options
-            (field.optionIds || []).forEach((optionId) => {
-              if (remaining[optionId] >= 0) {
-                remaining[optionId] -= 1;
-              }
-            });
-          } else {
-            const templateField = templateFieldMap[field.templateFieldId];
-            if (templateField.type === 'number' || templateField.type === 'count') {
-              remains[field.templateFieldId] -= parseFloat(field.value, 10);
-            } else {
-              remains[field.templateFieldId] -= 1;
-            }
-          }
-        }
+export const addForms = (data, forSession) => {
+  const Form = mongoose.model('Form');
+  const FormTemplate = mongoose.model('FormTemplate');
+  const formTemplate = data.toObject ? data.toObject() : data;
+  const criteria = { formTemplateId: formTemplate._id };
+  if (forSession) {
+    criteria.userId = forSession.userId._id;
+  }
+  return Form.find(criteria)
+  .populate({ path: 'paymentIds', select: 'amount' })
+  .populate({ path: 'userId', select: 'name' })
+  .exec()
+  .then((forms) => {
+    addTotals(formTemplate, forms);
+  })
+  .then(() => {
+    if (formTemplate.linkedFormTemplateId) {
+      return FormTemplate.find({ _id: formTemplate.linkedFormTemplateId._id }).exec()
+      .then((linkedData) => {
+        formTemplate.linkedFormTemplate = addForms(linkedData, forSession);
       });
-    });
-    formTemplate.totals = totals;
-    formTemplate.remains = remains;
+    }
     return formTemplate;
   });
+};
+
+export const addNewForm = (data, session, linkedFormId) => {
+  const formTemplate = data.toObject ? data.toObject() : data;
+  const form = {
+    fields: [],
+    formTemplateId: formTemplate._id,
+    linkedFormId,
+  };
+  formTemplate.sections.forEach((section) => {
+    section.fields.forEach((field) => {
+      if (session && field.linkToUserProperty) {
+        // pre-fill out fields from session user
+        form.fields.push({
+          templateFieldId: field._id,
+          value: session.userId[field.linkToUserProperty],
+        });
+      }
+
+      // pre-fill out fields with a minimum value
+      if (field.min) {
+        form.fields.push({ templateFieldId: field._id, value: field.min });
+      }
+    });
+  });
+  formTemplate.newForm = form;
+  return formTemplate;
 };
 
 const validate = (data) => {
@@ -227,9 +288,14 @@ export default function (router) {
       populate: [
         { path: 'linkedFormTemplateId', select: 'name' },
       ],
-      transformOut: (formTemplate, req) => {
-        if (formTemplate && req.query.totals) {
-          return calculateTotals(formTemplate);
+      transformOut: (formTemplate, req, session) => {
+        // only add forms and totals if there is a session
+        if (req.query.full && session) {
+          formTemplate =
+            addForms(formTemplate, req.query.forSession ? session : undefined);
+        }
+        if (req.query.new) {
+          formTemplate = addNewForm(formTemplate, session, req.query.linkedFormId);
         }
         return formTemplate;
       },
@@ -254,4 +320,36 @@ export default function (router) {
       authorization: requireSomeAdministrator,
     },
   });
+
+  // router.get('/form-templates/:id', (req, res) => {
+  //   getSession(req)
+  //   .then(allowAnyone)
+  //   .then((session) => {
+  //     const id = req.params.id;
+  //     const FormTemplate = mongoose.model('FormTemplate');
+  //     return FormTemplate.findOne({ _id: id })
+  //     .populate({ path: 'linkedFormTemplateId', select: 'name' })
+  //     .exec()
+  //     .then((formTemplate) => {
+  //       if (!formTemplate) {
+  //         res.status(404);
+  //         return Promise.reject({ status: 404 });
+  //       }
+  //       return { session, formTemplate };
+  //     });
+  //   })
+  //   // add forms and totals, if requested
+  //   .then((context) => {
+  //     const { session } = context;
+  //     let { formTemplate } = context;
+  //     // only add forms and totals if there is a session
+  //     if (req.query.full && session) {
+  //       formTemplate = addForms(formTemplate, req.query.forSession ? session : undefined);
+  //     }
+  //     return formTemplate;
+  //   })
+  //   // respond
+  //   .then(formTemplate => res.status(200).json(formTemplate))
+  //   .catch(error => catcher(error, res));
+  // });
 }

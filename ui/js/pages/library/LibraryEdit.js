@@ -8,5 +8,6 @@ LibraryEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'libraries',
   FormContents: LibraryFormContents,
+  postRemovePath: '/libraries',
   title: 'Edit Library',
 };

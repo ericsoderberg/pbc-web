@@ -1,11 +1,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItem, postItem, haveSession, setSession } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, postItem, unloadItem, haveSession, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
-import Stored from '../../components/Stored';
 import { searchToObject } from '../../utils/Params';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
@@ -17,6 +17,9 @@ class FormAdd extends Component {
     this._onAdd = this._onAdd.bind(this);
     this._onChange = this._onChange.bind(this);
     this.state = {};
+    if (props.formTemplate) {
+      this.state.form = { ...props.formTemplate.newForm };
+    }
   }
 
   componentDidMount() {
@@ -24,51 +27,37 @@ class FormAdd extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { formTemplateId } = nextProps;
+    const { formTemplateId, formTemplate } = nextProps;
     if (formTemplateId !== this.props.formTemplateId) {
+      this.setState({ form: undefined });
       this._load(nextProps);
+    } else if (formTemplate && !this.state.form) {
+      this.setState({ form: { ...formTemplate.newForm } });
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch, formTemplateId } = this.props;
+    dispatch(unloadItem('form-templates', formTemplateId));
+  }
+
   _load(props) {
-    const { session, linkedForm } = props;
-    const { router } = this.context;
-    const query = searchToObject(router.route.location.search);
-    const formTemplateId = props.formTemplateId || query.formTemplateId;
-    getItem('form-templates', formTemplateId, { totals: true })
-    .then((formTemplate) => {
-      const form = {
-        fields: [],
-        formTemplateId: formTemplate._id,
-        linkedFormId: (linkedForm ? linkedForm._id : undefined),
-      };
-      formTemplate.sections.forEach((section) => {
-        section.fields.forEach((field) => {
-          if (session && field.linkToUserProperty) {
-            // pre-fill out fields from session user
-            form.fields.push({
-              templateFieldId: field._id,
-              value: session.userId[field.linkToUserProperty],
-            });
-          }
-
-          // pre-fill out fields with a minimum value
-          if (field.min) {
-            form.fields.push({ templateFieldId: field._id, value: field.min });
-          }
-        });
-      });
-
-      this.setState({ form, formTemplate });
-    })
-    .catch(error => console.error('!!! FormAdd catch', error));
+    const { dispatch, formTemplate, formTemplateId, linkedForm } = props;
+    if (!formTemplate) {
+      const options = { new: true };
+      if (linkedForm) {
+        options.linkedFormId = linkedForm._id;
+      }
+      dispatch(loadItem('form-templates', formTemplateId, options));
+    } else if (formTemplate.newForm) {
+      this.setState({ form: { ...formTemplate.newForm } });
+    }
   }
 
   _onAdd(event) {
     event.preventDefault();
-    const { linkedForm, onDone } = this.props;
-    const { formTemplate, form } = this.state;
-    const { router } = this.context;
+    const { dispatch, formTemplate, history, linkedForm, onDone } = this.props;
+    const { form } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
@@ -81,11 +70,11 @@ class FormAdd extends Component {
         // remember it.
         if (!haveSession() && response.session) {
           // console.log('!!! FormAdd set session', response);
-          setSession(response.session);
+          dispatch(setSession(response.session));
         }
         return response.form;
       })
-      .then(formSaved => (onDone ? onDone(formSaved) : router.history.goBack()))
+      .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
       .catch((error2) => {
         console.error('!!! FormAdd post error', error2);
         this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
@@ -95,7 +84,7 @@ class FormAdd extends Component {
   }
 
   _onChange(form) {
-    const { formTemplate } = this.state;
+    const { formTemplate } = this.props;
     // clear any error for fields that have changed
     const error = clearFormError(formTemplate, form, this.state.error);
     this.setState({ form, error });
@@ -103,11 +92,10 @@ class FormAdd extends Component {
 
   render() {
     const {
-      className, onCancel, full, inline, linkedForm, location,
-      onLinkedForm, signInControl,
+      className, onCancel, formTemplate, formTemplateId, full, history, inline,
+      linkedForm, onLinkedForm, signInControl,
     } = this.props;
-    const { error, form, formTemplate, showSignIn } = this.state;
-    const { router } = this.context;
+    const { error, form, showSignIn } = this.state;
     const classNames = ['form'];
     if (className) {
       classNames.push(className);
@@ -115,11 +103,10 @@ class FormAdd extends Component {
 
     let result;
     if (formTemplate && form) {
-      const query = searchToObject(router.route.location.search);
       let cancelControl;
       let headerCancelControl;
-      if (onCancel || (location && query.formTemplateId)) {
-        const cancelFunc = onCancel || (() => router.history.goBack());
+      if (onCancel || formTemplateId) {
+        const cancelFunc = onCancel || (() => history.goBack());
         cancelControl = (
           <Button secondary={true} label="Cancel" onClick={cancelFunc} />
         );
@@ -189,8 +176,11 @@ class FormAdd extends Component {
 
 FormAdd.propTypes = {
   className: PropTypes.string,
-  formTemplateId: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  formTemplateId: PropTypes.string.isRequired,
+  formTemplate: PropTypes.object,
   full: PropTypes.bool,
+  history: PropTypes.any,
   inline: PropTypes.bool,
   linkedForm: PropTypes.object,
   location: PropTypes.object,
@@ -203,8 +193,9 @@ FormAdd.propTypes = {
 
 FormAdd.defaultProps = {
   className: undefined,
-  formTemplateId: undefined,
+  formTemplate: undefined,
   full: true,
+  history: undefined,
   inline: false,
   linkedForm: undefined,
   location: undefined,
@@ -215,12 +206,15 @@ FormAdd.defaultProps = {
   signInControl: undefined,
 };
 
-FormAdd.contextTypes = {
-  router: PropTypes.any,
+const select = (state, props) => {
+  const query = props.location ? searchToObject(props.location.search) : {};
+  const formTemplateId = props.formTemplateId || query.formTemplateId;
+  return {
+    formTemplateId,
+    formTemplate: props.formTemplate || state[formTemplateId],
+    notFound: state.notFound[formTemplateId],
+    session: state.session,
+  };
 };
 
-const select = state => ({
-  session: state.session,
-});
-
-export default Stored(FormAdd, select);
+export default connect(select)(FormAdd);

@@ -1,11 +1,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
 import FormError from '../../components/FormError';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
-import Stored from '../../components/Stored';
 import FormTotal from './FormTotal';
 import FormContentsSection from './FormContentsSection';
 import { isFieldSet } from './FormUtils';
@@ -198,4 +198,4 @@ const select = state => ({
   session: state.session,
 });
 
-export default Stored(FormContents, select);
+export default connect(select)(FormContents);

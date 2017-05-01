@@ -1,6 +1,4 @@
-
 import React, { Component, PropTypes } from 'react';
-import { getItem } from '../../actions';
 import Audio from '../../components/Audio';
 import RightIcon from '../../icons/Right';
 
@@ -8,31 +6,7 @@ export default class FilesSection extends Component {
 
   constructor() {
     super();
-    this.state = { files: [] };
-  }
-
-  componentDidMount() {
-    this._load(this.props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this._load(nextProps);
-  }
-
-  _load(props) {
-    // When editing, we only have ids, get the rest
-    (props.files || []).forEach((file) => {
-      if (typeof file.id === 'string' && !file.name &&
-        !this.state.files[file.id]) {
-        getItem('files', file.id)
-        .then((fileResponse) => {
-          const files = { ...this.state.files };
-          files[file.id] = fileResponse;
-          this.setState({ files });
-        })
-        .catch(error => console.error('!!! FilesSummary catch', error));
-      }
-    });
+    this.state = {};
   }
 
   render() {
@@ -58,10 +32,6 @@ export default class FilesSection extends Component {
     });
 
     const items = (files || []).filter(file => file.name).map((file, index) => {
-      if (!file._id) {
-        // populated via _load
-        file = this.state.files[file.id] || {};
-      }
       const key = file._id || index;
       const path = `/files/${file._id}/${file.name}`;
       if (file.type && file.type.match(/audio/)) {

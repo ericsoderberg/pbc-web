@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-import { getItems, postSubscribe } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory, postSubscribe } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
 
-export default class EmailListSubscribe extends Component {
+class EmailListSubscribe extends Component {
 
   constructor(props) {
     super(props);
@@ -18,29 +19,33 @@ export default class EmailListSubscribe extends Component {
     this._loadEmailList();
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('email-lists'));
+  }
+
   _loadEmailList() {
-    const { match } = this.props;
-    getItems('email-lists', { filter: { name: match.params.name } })
-    .then(emailLists => this.setState({ emailList: emailLists[0] }))
-    .catch(error => console.error('!!! EmailListSubscribe catch', error));
+    const { dispatch, name } = this.props;
+    dispatch(loadCategory('email-lists', { filter: { name } }));
   }
 
   _onSubscribe(event) {
     event.preventDefault();
-    const { addresses, emailList } = this.state;
-    const { router } = this.context;
+    const { emailList, history } = this.props;
+    const { addresses } = this.state;
     postSubscribe(emailList, addresses.split('\n'))
-    .then(() => router.history.goBack())
+    .then(() => history.goBack())
     .catch(error => this.setState({ error }));
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.goBack();
+    const { history } = this.props;
+    history.goBack();
   }
 
   render() {
-    const { addresses, emailList } = this.state;
+    const { emailList } = this.props;
+    const { addresses } = this.state;
 
     let result;
     if (!emailList) {
@@ -85,13 +90,23 @@ export default class EmailListSubscribe extends Component {
 }
 
 EmailListSubscribe.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  emailList: PropTypes.object,
+  history: PropTypes.any.isRequired,
+  name: PropTypes.string.isRequired,
 };
 
-EmailListSubscribe.contextTypes = {
-  router: PropTypes.any,
+EmailListSubscribe.defaultProps = {
+  emailList: undefined,
 };
+
+const select = (state, props) => {
+  const name = props.match.params.name;
+  const emailList = ((state['email-lists'] || {}).items || [])[0];
+  return {
+    name,
+    emailList,
+  };
+};
+
+export default connect(select)(EmailListSubscribe);

@@ -1,48 +1,79 @@
 import React, { Component, PropTypes } from 'react';
-import { getSite, postSite } from '../../actions';
+import { connect } from 'react-redux';
+import { loadSite, postSite } from '../../actions';
 import Form from '../../components/Form';
 import SiteFormContents from './SiteFormContents';
 
-export default class SiteEdit extends Component {
+class SiteEdit extends Component {
 
   constructor(props) {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
     this._onCancel = this._onCancel.bind(this);
-    this.state = { site: {} };
+    this.state = { site: props.site || {} };
   }
 
   componentDidMount() {
+    const { dispatch, site } = this.props;
     document.title = 'Site';
-    getSite()
-    // allow for no site existing yet
-    .then(site => this.setState({ site: site || {} }))
-    .catch(error => console.error('!!! SiteEdit catch', error));
+    if (!site) {
+      dispatch(loadSite());
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { history } = nextProps;
+    if (this.state.updating) {
+      if (!nextProps.error) {
+        history.goBack();
+      } else {
+        this.setState({ updating: false });
+      }
+    } else {
+      this.setState({ site: nextProps.site || {} });
+    }
   }
 
   _onUpdate(site) {
-    const { router } = this.context;
-    postSite(site)
-    .then(() => router.history.goBack())
-    .catch(error => this.setState({ error }));
+    const { dispatch } = this.props;
+    this.setState({ updating: true });
+    dispatch(postSite(site));
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.goBack();
+    const { history } = this.props;
+    history.goBack();
   }
 
   render() {
-    const { site, error } = this.state;
+    const { error, session } = this.props;
+    const { site } = this.state;
 
     return (
       <Form title="Edit Site" submitLabel="Update" action="/api/site"
-        FormContents={SiteFormContents} item={site}
+        FormContents={SiteFormContents} item={site} session={session}
         onSubmit={this._onUpdate} error={error} onCancel={this._onCancel} />
     );
   }
 }
 
-SiteEdit.contextTypes = {
-  router: PropTypes.any,
+SiteEdit.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  error: PropTypes.object,
+  history: PropTypes.any.isRequired,
+  session: PropTypes.object.isRequired,
+  site: PropTypes.object,
 };
+
+SiteEdit.defaultProps = {
+  error: undefined,
+  site: undefined,
+};
+
+const select = state => ({
+  error: state.error,
+  session: state.session,
+  site: state.site,
+});
+
+export default connect(select)(SiteEdit);

@@ -1,6 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import SectionsFormContents from '../../components/SectionsFormContents';
 import DateInput from '../../components/DateInput';
@@ -9,7 +10,7 @@ const SECTION_TYPES = [
   'text', 'image', 'event', 'library', 'pages', 'files',
 ];
 
-export default class NewsletterFormContents extends Component {
+class NewsletterFormContents extends Component {
 
   constructor() {
     super();
@@ -20,16 +21,18 @@ export default class NewsletterFormContents extends Component {
   }
 
   componentDidMount() {
-    const { formState, session } = this.props;
+    const { dispatch, formState, session } = this.props;
 
     if (session.userId.administrator) {
-      getItems('domains', { sort: 'name' })
-      .then(domains => this.setState({ domains }))
-      .catch(error => console.error('NewsletterFormContents domains catch',
-        error));
+      dispatch(loadCategory('domains', { sort: 'name' }));
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('domains'));
   }
 
   _onAddEvent() {
@@ -58,21 +61,20 @@ export default class NewsletterFormContents extends Component {
   }
 
   render() {
-    const { className, formState, session } = this.props;
-    const { domains } = this.state;
+    const { className, domains, formState, session } = this.props;
     const newsletter = formState.object;
 
     let administeredBy;
     if (session.userId.administrator) {
-      const domainOptions = domains.map(domain => (
+      const options = domains.map(domain => (
         <option key={domain._id} label={domain.name} value={domain._id} />
       ));
-      domainOptions.unshift(<option key={0} />);
+      options.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by">
           <select name="domainId" value={newsletter.domainId || ''}
             onChange={formState.change('domainId')}>
-            {domainOptions}
+            {options}
           </select>
         </FormField>
       );
@@ -101,10 +103,20 @@ export default class NewsletterFormContents extends Component {
 
 NewsletterFormContents.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  domains: PropTypes.array,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 NewsletterFormContents.defaultProps = {
   className: undefined,
+  domains: [],
 };
+
+const select = state => ({
+  domains: (state.domains || {}).items || [],
+  session: state.session,
+});
+
+export default connect(select)(NewsletterFormContents);

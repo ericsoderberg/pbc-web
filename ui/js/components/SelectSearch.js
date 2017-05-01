@@ -1,14 +1,15 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../actions';
 import Button from './Button';
 import KeyboardAccelerators from '../utils/KeyboardAccelerators';
 import DownIcon from '../icons/Down';
 import UpIcon from '../icons/Up';
 import CloseIcon from '../icons/Close';
 
-export default class SelectSearch extends Component {
+class SelectSearch extends Component {
 
   constructor(props) {
     super(props);
@@ -27,6 +28,15 @@ export default class SelectSearch extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { exclude, items } = nextProps;
+    if (items) {
+      const suggestions = items
+      .filter(item => !(exclude || []).some(item2 => item._id === item2._id));
+      this.setState({ suggestions });
+    }
+  }
+
   componentDidUpdate(prevProps, prevState) {
     // Set up keyboard listeners appropriate to the current state.
     if (prevState.active !== this.state.active) {
@@ -35,6 +45,8 @@ export default class SelectSearch extends Component {
   }
 
   componentWillUnmount() {
+    const { category, dispatch } = this.props;
+    dispatch(unloadCategory(category));
     this._activation(false);
   }
 
@@ -74,17 +86,11 @@ export default class SelectSearch extends Component {
   }
 
   _onSearch(event) {
+    const { category, dispatch, options } = this.props;
     const searchText = event.target.value;
     this.setState({ searchText });
-    const { category, exclude, options } = this.props;
-    getItems(category,
-      { select: 'name', sort: 'name', ...options, search: searchText })
-    .then((response) => {
-      const suggestions = response
-      .filter(item => !(exclude || []).some(item2 => item._id === item2._id));
-      this.setState({ suggestions });
-    })
-    .catch(error => console.error('!!! SelectSearch catch', error));
+    dispatch(loadCategory(category,
+      { select: 'name', sort: 'name', ...options, search: searchText }));
   }
 
   _activation(active) {
@@ -170,9 +176,11 @@ SelectSearch.propTypes = {
   category: PropTypes.string.isRequired,
   className: PropTypes.string,
   clearable: PropTypes.bool,
+  dispatch: PropTypes.func.isRequired,
   exclude: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string,
   })),
+  items: PropTypes.array,
   onChange: PropTypes.func.isRequired,
   options: PropTypes.object,
   placeholder: PropTypes.string,
@@ -190,8 +198,15 @@ SelectSearch.defaultProps = {
   className: undefined,
   clearable: false,
   exclude: [],
+  items: [],
   options: {},
   placeholder: undefined,
   Suggestion: undefined,
   value: '',
 };
+
+const select = (state, props) => ({
+  items: (state[props.category] || {}).items || [],
+});
+
+export default connect(select)(SelectSearch);

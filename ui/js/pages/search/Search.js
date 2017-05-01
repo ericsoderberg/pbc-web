@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getSearch } from '../../actions';
+import { connect } from 'react-redux';
+import { loadSearch, unloadSearch } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Text from '../../components/Text';
 import EventTimes from '../event/EventTimes';
@@ -28,12 +29,12 @@ Item.defaultProps = {
   children: null,
 };
 
-export default class Search extends Component {
+class Search extends Component {
 
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
-    this._get = this._get.bind(this);
+    this._load = this._load.bind(this);
     this.state = { categories: {}, searchText: '' };
   }
 
@@ -41,30 +42,43 @@ export default class Search extends Component {
     document.title = 'Search';
     const params = getLocationParams();
     if (params.q) {
-      this.setState({ searchText: params.q || '' }, this._get);
+      this.setState({ searchText: params.q || '' }, this._load);
     }
   }
 
-  _get() {
+  componentWillReceiveProps() {
+    this.setState({ loading: false });
+  }
+
+  componentDidUpdate() {
     const { searchText } = this.state;
     if (searchText) {
       document.title = `Search - ${searchText}`;
-      getSearch(searchText)
-      .then(categories => this.setState({ categories, loading: false }))
-      .catch(error => console.error('!!! Search catch', error));
     } else {
       document.title = 'Search';
-      this.setState({ categories: {}, loading: false });
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadSearch());
+  }
+
+  _load() {
+    const { dispatch } = this.props;
+    const { searchText } = this.state;
+    this.setState({ loading: true }, () => {
+      dispatch(loadSearch(searchText));
+    });
   }
 
   _onSearch(event) {
     const { history } = this.props;
     const searchText = event.target.value;
-    this.setState({ searchText, loading: true });
+    this.setState({ searchText });
     // debounce typing
     clearTimeout(this._searchTimer);
-    this._searchTimer = setTimeout(this._get, 100);
+    this._searchTimer = setTimeout(this._load, 100);
     // Put the search term in the browser location
     history.replace({
       pathname: '/search',
@@ -73,7 +87,8 @@ export default class Search extends Component {
   }
 
   render() {
-    const { categories, loading, searchText } = this.state;
+    const { search: categories } = this.props;
+    const { loading, searchText } = this.state;
 
     let contents = [];
     (categories.pages || []).forEach((page) => {
@@ -130,5 +145,20 @@ export default class Search extends Component {
 }
 
 Search.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.any.isRequired,
+  search: PropTypes.shape({
+    categories: PropTypes.object,
+  }),
 };
+
+Search.defaultProps = {
+  search: {},
+};
+
+const select = state => ({
+  search: state.search || {},
+  session: state.session,
+});
+
+export default connect(select)(Search);

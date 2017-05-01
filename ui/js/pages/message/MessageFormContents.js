@@ -1,6 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems, postFile, deleteFile } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory, postFile, deleteFile } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import ImageField from '../../components/ImageField';
@@ -9,7 +10,7 @@ import SelectSearch from '../../components/SelectSearch';
 import TextHelp from '../../components/TextHelp';
 import TrashIcon from '../../icons/Trash';
 
-export default class MessageFormContents extends Component {
+class MessageFormContents extends Component {
 
   constructor() {
     super();
@@ -17,23 +18,22 @@ export default class MessageFormContents extends Component {
     this._renderFile = this._renderFile.bind(this);
     this._changeFileProperty = this._changeFileProperty.bind(this);
     this._onChangeSeries = this._onChangeSeries.bind(this);
-    this.state = { domains: [], libraries: [] };
   }
 
   componentDidMount() {
-    const { formState, session } = this.props;
-
+    const { dispatch, formState, session } = this.props;
+    dispatch(loadCategory('libraries', { sort: 'name' }));
     if (session.userId.administrator) {
-      getItems('domains', { sort: 'name' })
-      .then(domains => this.setState({ domains }))
-      .catch(error => console.error('MessageFormContents domains catch', error));
+      dispatch(loadCategory('domains', { sort: 'name' }));
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
+  }
 
-    getItems('libraries', { sort: 'name' })
-    .then(libraries => this.setState({ libraries }))
-    .catch(error => console.error('MessageFormContents libraries catch', error));
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('domains'));
+    dispatch(unloadCategory('libraries'));
   }
 
   _onAddFile() {
@@ -132,8 +132,9 @@ export default class MessageFormContents extends Component {
   }
 
   render() {
-    const { className, errors, formState, session } = this.props;
-    const { domains, libraries } = this.state;
+    const {
+      className, domains, errors, formState, libraries, session,
+    } = this.props;
     const message = formState.object;
 
     let files;
@@ -268,12 +269,25 @@ export default class MessageFormContents extends Component {
 
 MessageFormContents.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  domains: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
+  libraries: PropTypes.array,
   session: PropTypes.object.isRequired,
 };
 
 MessageFormContents.defaultProps = {
   className: undefined,
+  domains: [],
   errors: {},
+  libraries: [],
 };
+
+const select = state => ({
+  domains: (state.domains || {}).items || [],
+  libraries: (state.libraries || {}).items || [],
+  session: state.session,
+});
+
+export default connect(select)(MessageFormContents);

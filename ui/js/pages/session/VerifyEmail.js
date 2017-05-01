@@ -1,11 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { postVerifyEmail, postSessionViaToken } from '../../actions';
+import { connect } from 'react-redux';
+import { postVerifyEmail, postSessionViaToken, setSession } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
 import Button from '../../components/Button';
-import Stored from '../../components/Stored';
+import Loading from '../../components/Loading';
 import { searchToObject } from '../../utils/Params';
 
 const TITLE = 'Verify Email';
@@ -44,27 +45,35 @@ const Verified = (props) => {
   if (!inline) {
     homeControl = <Button path={returnPath} secondary={true}>Proceed</Button>;
   }
-  return (
-    <Wrapper inline={inline}>
-      <div className="form__contents">
-        <fieldset className="form__fields">
-          <div className="form__text">
-            Thanks for verifying your email {session.userId.name}.
-            You can set a password for your account or just proceed to where
-            you left off.
-          </div>
-        </fieldset>
-      </div>
-      <div className="form__footer-container">
-        <footer className="form__footer">
-          <Button path={`/users/${session.userId._id}/edit`} secondary={true}>
-            Edit Account
-          </Button>
-          {homeControl}
-        </footer>
-      </div>
-    </Wrapper>
-  );
+
+  let contents;
+  if (!session) {
+    contents = <Loading />;
+  } else {
+    contents = (
+      <Wrapper inline={inline}>
+        <div className="form__contents">
+          <fieldset className="form__fields">
+            <div className="form__text">
+              Thanks for verifying your email {session.userId.name}.
+              You can set a password for your account or just proceed to where
+              you left off.
+            </div>
+          </fieldset>
+        </div>
+        <div className="form__footer-container">
+          <footer className="form__footer">
+            <Button path={`/users/${session.userId._id}/edit`} secondary={true}>
+              Edit Account
+            </Button>
+            {homeControl}
+          </footer>
+        </div>
+      </Wrapper>
+    );
+  }
+
+  return contents;
 };
 
 Verified.propTypes = {
@@ -73,7 +82,7 @@ Verified.propTypes = {
   session: PropTypes.shape({
     name: PropTypes.string,
     userId: PropTypes.string,
-  }).isRequired,
+  }),
 };
 
 Verified.defaultProps = {
@@ -125,14 +134,17 @@ class VerifyEmail extends Component {
   }
 
   componentDidMount() {
-    const { inline, location } = this.props;
+    const { dispatch, inline, location } = this.props;
     if (!inline) {
       document.title = TITLE;
       const query = searchToObject(location.search);
       const { token, returnPath } = query;
       if (token) {
         postSessionViaToken({ token })
-        .then(() => this.setState({ state: 'done', returnPath }))
+        .then((session) => {
+          this.setState({ state: 'done', returnPath });
+          dispatch(setSession(session));
+        })
         .catch((error) => {
           console.error('!!! Reset catch', error);
           this.setState({ state: 'prompt', errorMessage: error });
@@ -144,9 +156,8 @@ class VerifyEmail extends Component {
   }
 
   _onCancel() {
-    const { returnPath } = this.props;
-    const { router } = this.context;
-    router.history.push(returnPath);
+    const { history, returnPath } = this.props;
+    history.push(returnPath);
   }
 
   _onSendLink(event) {
@@ -266,6 +277,8 @@ class VerifyEmail extends Component {
 }
 
 VerifyEmail.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   inline: PropTypes.bool,
   location: PropTypes.object.isRequired,
   onCancel: PropTypes.func,
@@ -285,12 +298,8 @@ VerifyEmail.defaultProps = {
   session: undefined,
 };
 
-VerifyEmail.contextTypes = {
-  router: PropTypes.any,
-};
-
 const select = state => ({
   session: state.session,
 });
 
-export default Stored(VerifyEmail, select);
+export default connect(select)(VerifyEmail);

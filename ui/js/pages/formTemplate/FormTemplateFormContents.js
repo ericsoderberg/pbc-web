@@ -1,6 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems, getItem } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory, loadItem, unloadItem } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';
 import SelectSearch from '../../components/SelectSearch';
@@ -12,24 +13,23 @@ import BlankIcon from '../../icons/Blank';
 import TrashIcon from '../../icons/Trash';
 import FormTemplateSectionEdit from './FormTemplateSectionEdit';
 
-export default class FormTemplateFormContents extends Component {
+let linkedToFormTemplateId; // hack for now
+
+class FormTemplateFormContents extends Component {
 
   constructor() {
     super();
     this._changeLinkedFormTemplateId = this._changeLinkedFormTemplateId.bind(this);
     this.state = {
-      domains: [],
       expandedSections: {}, // _id or id
       newSectionId: 1,
     };
   }
 
   componentDidMount() {
-    const { formState, session } = this.props;
+    const { dispatch, formState, session } = this.props;
     if (session.userId.administrator) {
-      getItems('domains', { sort: 'name' })
-      .then(response => this.setState({ domains: response }))
-      .catch(error => console.error('FormTemplateFormContents catch', error));
+      dispatch(loadCategory('domains', { sort: 'name' }));
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
@@ -44,16 +44,20 @@ export default class FormTemplateFormContents extends Component {
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('domains'));
+  }
+
   _loadDependency(props) {
-    const { formState: { object: formTemplate } } = props;
+    const { dispatch, formState: { object: formTemplate } } = props;
     if (formTemplate.linkedFormTemplateId) {
       // load linked form to get fields we might link to
-      getItem('form-templates', formTemplate.linkedFormTemplateId._id)
-      .then(linkedToFormTemplate => this.setState({ linkedToFormTemplate }))
-      .catch(error => console.error(
-        'FormTemplateFormContents linkedToFormTemplate catch', error));
-    } else {
-      this.setState({ linkedToFormTemplate: undefined });
+      linkedToFormTemplateId = formTemplate.linkedFormTemplateId._id;
+      dispatch(loadItem('form-templates', formTemplate.linkedFormTemplateId._id));
+    } else if (linkedToFormTemplateId) {
+      dispatch(unloadItem('form-templates', linkedToFormTemplateId));
+      linkedToFormTemplateId = undefined;
     }
   }
 
@@ -96,8 +100,10 @@ export default class FormTemplateFormContents extends Component {
   }
 
   render() {
-    const { className, errors, formState, session } = this.props;
-    const { expandedSections, detailsActive, linkedToFormTemplate } = this.state;
+    const {
+      className, domains, errors, formState, linkedToFormTemplate, session,
+    } = this.props;
+    const { expandedSections, detailsActive } = this.state;
     const formTemplate = formState.object;
 
     const sections = (formTemplate.sections || []).map((section, index) => {
@@ -249,15 +255,15 @@ export default class FormTemplateFormContents extends Component {
       );
 
       if (session.userId.administrator) {
-        const domains = this.state.domains.map(domain => (
+        const options = domains.map(domain => (
           <option key={domain._id} label={domain.name} value={domain._id} />
         ));
-        domains.unshift(<option key={0} />);
+        options.unshift(<option key={0} />);
         details.push(
           <FormField key="admin" label="Administered by" error={errors.domainId}>
             <select name="domainId" value={formTemplate.domainId || ''}
               onChange={formState.change('domainId')}>
-              {domains}
+              {options}
             </select>
           </FormField>,
         );
@@ -292,12 +298,26 @@ export default class FormTemplateFormContents extends Component {
 
 FormTemplateFormContents.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  domains: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
+  linkedToFormTemplate: PropTypes.object,
   session: PropTypes.object.isRequired,
 };
 
 FormTemplateFormContents.defaultProps = {
   className: undefined,
+  domains: [],
   errors: undefined,
+  linkedToFormTemplate: undefined,
 };
+
+const select = state => ({
+  domains: (state.domains || {}).items || [],
+  linkedToFormTemplate:
+    linkedToFormTemplateId ? state[linkedToFormTemplateId] : undefined,
+  session: state.session,
+});
+
+export default connect(select)(FormTemplateFormContents);

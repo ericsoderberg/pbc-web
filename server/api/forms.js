@@ -136,28 +136,28 @@ const sendEmails = (req, transporter, update = false) => (
   )
 );
 
-// duplicated in FormUtils
-function calculateTotal(formTemplate, form) {
-  let total = 0;
+// duplicated in FormUtils, TODO: remove from UI and rely on server entirely
+export const addFormTotals = (formTemplate, form) => {
+  let totalCost = 0;
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
       if (templateField.monetary) {
         // see if we have it
         form.fields.some((field) => {
           if (field.templateFieldId.equals(templateField._id)) {
-            if (templateField.type === 'count') {
-              total += (parseInt(templateField.value, 10) *
+            if (templateField.type === 'count' || templateField.type === 'number') {
+              totalCost += (parseInt(templateField.value, 10) *
                 parseInt(field.value, 10));
             } else if (templateField.type === 'line') {
               if (templateField.discount) {
-                total -= parseInt(field.value, 10);
+                totalCost -= parseInt(field.value, 10);
               } else {
-                total += parseInt(field.value, 10);
+                totalCost += parseInt(field.value, 10);
               }
             } else if (templateField.type === 'choice') {
               templateField.options.forEach((option) => {
                 if (option.value && field.optionId === option._id) {
-                  total += parseInt(option.value, 10);
+                  totalCost += parseInt(option.value, 10);
                 }
               });
             } else if (templateField.type === 'choices') {
@@ -165,7 +165,7 @@ function calculateTotal(formTemplate, form) {
               templateField.options.forEach((option) => {
                 if (option.value &&
                   optionIds.some(optionId => optionId.equals(option._id))) {
-                  total += parseInt(option.value, 10);
+                  totalCost += parseInt(option.value, 10);
                 }
               });
             }
@@ -176,16 +176,15 @@ function calculateTotal(formTemplate, form) {
       }
     });
   });
-  return Math.max(0, total);
-}
 
-function calculatePaymentsTotal(form) {
-  let total = 0;
+  let paidAmount = 0;
   (form.paymentIds || []).forEach((payment) => {
-    total += payment.amount;
+    paidAmount += payment.amount;
   });
-  return total;
-}
+
+  form.totalCost = Math.max(0, totalCost);
+  form.paidAmount = paidAmount;
+};
 
 const setUnpaidTotal = form => (
   Promise.resolve()
@@ -194,8 +193,7 @@ const setUnpaidTotal = form => (
     return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
     .then((formTemplate) => {
       form = form.toObject();
-      form.unpaidTotal =
-        calculateTotal(formTemplate, form) - calculatePaymentsTotal(form);
+      addFormTotals(formTemplate, form);
       return form;
     });
   })

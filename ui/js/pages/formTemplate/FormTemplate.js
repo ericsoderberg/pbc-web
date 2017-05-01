@@ -2,8 +2,9 @@
 import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getItem, getItems, getFormTemplateDownload } from '../../actions';
+import { loadItem, getFormTemplateDownload, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Button from '../../components/Button';
 import DateInput from '../../components/DateInput';
@@ -15,30 +16,43 @@ const FIXED_FIELDS = [
   { name: 'modified', label: 'Updated' },
 ];
 
-export default class FormTemplate extends Component {
+class FormTemplate extends Component {
 
   constructor() {
     super();
     this._layout = this._layout.bind(this);
-    this._onScroll = this._onScroll.bind(this);
+    // this._onScroll = this._onScroll.bind(this);
     this._onDownload = this._onDownload.bind(this);
     this.state = { linkedForms: {}, sortReverse: false };
   }
 
   componentDidMount() {
-    this._load();
-    window.addEventListener('scroll', this._onScroll);
+    const { dispatch, id } = this.props;
+    dispatch(loadItem('form-templates', id, { full: true }));
+    // window.addEventListener('scroll', this._onScroll);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { dispatch, id } = nextProps;
+    if (id !== this.props.id) {
+      dispatch(loadItem('form-templates', id, { full: true }));
+    } else if (nextProps.formTemplate) {
+      document.title = nextProps.formTemplate.name;
+      this._setupColumns(nextProps.formTemplate);
+    }
   }
 
   componentDidUpdate() {
     setTimeout(() => {
       this._layout();
-      this._onScroll();
+      // this._onScroll();
     }, 20);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('scroll', this._onScroll);
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('form-templates', id));
+    // window.removeEventListener('scroll', this._onScroll);
   }
 
   _layout() {
@@ -51,112 +65,42 @@ export default class FormTemplate extends Component {
     }
   }
 
-  _load() {
-    const { match } = this.props;
-    getItem('form-templates', match.params.id, { totals: true })
-    .then((formTemplate) => {
-      document.title = formTemplate.name;
-
-      const columns = [];
-      const templateFieldMap = {};
-      const linkedFieldMap = {};
-      const optionMap = {};
-      formTemplate.sections.forEach((section) => {
-        section.fields.forEach((field) => {
-          templateFieldMap[field._id] = field;
-          field.options.forEach((option) => { optionMap[option._id] = option; });
-          if (field.type !== 'instructions') {
-            columns.push(field._id);
-          }
-          if (field.linkedFieldId) {
-            linkedFieldMap[field._id] = field.linkedFieldId;
-          }
-        });
-      });
-
-      FIXED_FIELDS.forEach((field) => {
-        templateFieldMap[field.name] = field;
-        columns.push(field.name);
-      });
-
-      this.setState({
-        columns,
-        formTemplate,
-        templateFieldMap,
-        linkedFieldMap,
-        optionMap,
-        totals: formTemplate.totals,
-      });
-      return { formTemplate };
-    })
-    // TODO: refactor to put linked form/field stuff on server side
-    .then((context) => {
-      const { formTemplate } = context;
-      if (formTemplate.linkedFormTemplateId) {
-        // get linked forms
-        return getItems('forms', {
-          filter: { formTemplateId: formTemplate.linkedFormTemplateId._id },
-          populate: true,
-          limit: 1000, // no limit, really need to move this server side
-        })
-        .then((forms) => {
-          const linkedForms = {};
-          forms.forEach((form) => {
-            linkedForms[form._id] = form;
-          });
-          this.setState({ linkedForms });
-          return context;
-        });
-      }
-      return context;
-    })
-    .then(() => getItems('forms', {
-      filter: { formTemplateId: match.params.id },
-      populate: true,
-      sort: '-modified',
-    })
-    .then((forms) => {
-      this.setState({ forms, mightHaveMore: forms.length >= 20 });
-    }))
-    .catch(error => console.error('!!! FormTemplate catch', error));
-  }
-
-  _onMore() {
-    const { match } = this.props;
-    this.setState({ loadingMore: true });
-    const skip = this.state.forms.length;
-    getItems('forms', {
-      filter: { formTemplateId: match.params.id },
-      populate: true,
-      skip,
-      sort: '-modified',
-    })
-    .then((response) => {
-      const forms = this.state.forms.concat(response);
-      this.setState({
-        forms, loadingMore: false, mightHaveMore: response.length >= 20,
-      });
-    })
-    .catch(error => console.error('!!! FormTemplate more catch', error));
-  }
-
-  _onScroll() {
-    const { mightHaveMore, loadingMore } = this.state;
-    if (mightHaveMore && !loadingMore) {
-      const more = this._moreRef;
-      if (more) {
-        const rect = more.getBoundingClientRect();
-        if (rect.top <= window.innerHeight) {
-          this._onMore();
+  _setupColumns(formTemplate) {
+    const columns = [];
+    const templateFieldMap = {};
+    // const linkedFieldMap = {};
+    const optionMap = {};
+    formTemplate.sections.forEach((section) => {
+      section.fields.forEach((field) => {
+        templateFieldMap[field._id] = field;
+        field.options.forEach((option) => { optionMap[option._id] = option; });
+        if (field.type !== 'instructions') {
+          columns.push(field._id);
         }
-      }
-    }
+        // if (field.linkedFieldId) {
+        //   linkedFieldMap[field._id] = field.linkedFieldId;
+        // }
+      });
+    });
+
+    FIXED_FIELDS.forEach((field) => {
+      templateFieldMap[field.name] = field;
+      columns.push(field.name);
+    });
+
+    this.setState({
+      columns,
+      templateFieldMap,
+      // linkedFieldMap,
+      optionMap,
+      // totals: formTemplate.totals,
+    });
   }
 
   _onDownload(event) {
-    const { match } = this.props;
+    const { id } = this.props;
     event.preventDefault();
-    getFormTemplateDownload(match.params.id);
+    getFormTemplateDownload(id);
   }
 
   _filterForms() {
@@ -171,8 +115,8 @@ export default class FormTemplate extends Component {
 
   _editForm(id) {
     return () => {
-      const { router } = this.context;
-      router.history.push(`/forms/${id}/edit`);
+      const { history } = this.props;
+      history.push(`/forms/${id}/edit`);
     };
   }
 
@@ -277,7 +221,6 @@ export default class FormTemplate extends Component {
   _renderHeaderCells() {
     const {
       columns, mightHaveMore, templateFieldMap, sortFieldId, sortReverse,
-      totals,
     } = this.state;
     const cells = columns.map((fieldId) => {
       const field = templateFieldMap[fieldId];
@@ -291,7 +234,7 @@ export default class FormTemplate extends Component {
           classes.push('sort--reverse');
         }
       }
-      if (totals[fieldId] >= 0) {
+      if (field.total >= 0) {
         classes.push('numeric');
       }
       let onClick;
@@ -310,10 +253,10 @@ export default class FormTemplate extends Component {
   }
 
   _renderFooterCells() {
-    const { columns, templateFieldMap, sortFieldId, totals } = this.state;
+    const { columns, templateFieldMap, sortFieldId } = this.state;
     return columns.map((fieldId) => {
       const field = templateFieldMap[fieldId];
-      const total = totals[fieldId];
+      const total = field.total;
       let classes = (total >= 0 ? 'total' : '');
       if (fieldId === sortFieldId) {
         classes += ' sort';
@@ -328,7 +271,7 @@ export default class FormTemplate extends Component {
 
   _renderCells(form, linkedForm) {
     const {
-      columns, templateFieldMap, linkedFieldMap, sortFieldId, totals,
+      columns, templateFieldMap, linkedFieldMap, sortFieldId,
     } = this.state;
 
     const cellMap = {};
@@ -360,8 +303,9 @@ export default class FormTemplate extends Component {
     }
 
     const cells = columns.map((templateFieldId) => {
+      const templateField = templateFieldMap[templateFieldId] || {};
       let classes = (templateFieldId === sortFieldId ? 'sort' : '');
-      if (totals[templateFieldId] >= 0) {
+      if (templateField.total >= 0) {
         classes += ' numeric';
       }
       const contents = cellMap[templateFieldId] || <span>&nbsp;</span>;
@@ -372,10 +316,11 @@ export default class FormTemplate extends Component {
   }
 
   _renderRows() {
-    const { filteredForms, forms, linkedForms } = this.state;
+    const { formTemplate: { forms } } = this.props;
+    const { filteredForms, linkedForms } = this.state;
     const fixedRows = [];
     const flexedRows = [];
-    (filteredForms || forms).forEach((form) => {
+    (filteredForms || forms || []).forEach((form) => {
       const linkedForm = linkedForms[form.linkedFormId];
       const cells = this._renderCells(form, linkedForm);
       fixedRows.push(
@@ -455,10 +400,8 @@ export default class FormTemplate extends Component {
   }
 
   render() {
-    const { match } = this.props;
-    const {
-      filterActive, formTemplate, forms, loadingMore, mightHaveMore,
-    } = this.state;
+    const { formTemplate, id } = this.props;
+    const { filterActive, loadingMore, mightHaveMore } = this.state;
 
     let filter;
     if (filterActive) {
@@ -476,7 +419,7 @@ export default class FormTemplate extends Component {
     );
 
     actions.push(
-      <a key="download" href={`/api/form-templates/${match.params.id}.csv`}
+      <a key="download" href={`/api/form-templates/${id}.csv`}
         onClick={this._onDownload}>
         Download
       </a>,
@@ -484,7 +427,7 @@ export default class FormTemplate extends Component {
 
     actions.push(
       <Link key="add"
-        to={`/forms/add?formTemplateId=${encodeURIComponent(match.params.id)}`}>
+        to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}>
         Add
       </Link>,
     );
@@ -493,9 +436,7 @@ export default class FormTemplate extends Component {
     let contents;
     if (formTemplate) {
       title = formTemplate.name;
-      if (forms) {
-        contents = this._renderTable();
-      }
+      contents = this._renderTable();
     } else {
       contents = <Loading />;
     }
@@ -505,8 +446,8 @@ export default class FormTemplate extends Component {
       more = <Loading />;
     } else if (mightHaveMore) {
       more = <div ref={(ref) => { this._moreRef = ref; }} />;
-    } else if (forms && forms.length > 20) {
-      more = <div className="list__count">{forms.length}</div>;
+    } else if (formTemplate && formTemplate.forms.length > 20) {
+      more = <div className="list__count">{formTemplate.forms.length}</div>;
     }
 
     return (
@@ -515,21 +456,31 @@ export default class FormTemplate extends Component {
           title={title} actions={actions} />
         {contents}
         {more}
-        <PageContext filter={match.params.id ?
-          { 'sections.formTemplateId': match.params.id } : undefined} />
+        <PageContext filter={{ 'sections.formTemplateId': id }} />
       </main>
     );
   }
 }
 
 FormTemplate.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
+  id: PropTypes.string.isRequired,
+  formTemplate: PropTypes.object,
 };
 
-FormTemplate.contextTypes = {
-  router: PropTypes.any,
+FormTemplate.defaultProps = {
+  formTemplate: undefined,
 };
+
+const select = (state, props) => {
+  const id = props.match.params.id;
+  return {
+    id,
+    notFound: state.notFound[id],
+    formTemplate: state[id],
+    session: state.session,
+  };
+};
+
+export default connect(select)(FormTemplate);

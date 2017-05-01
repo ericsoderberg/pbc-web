@@ -1,5 +1,18 @@
 
-import { dispatch } from './store';
+export const AUDIT_LOG_LOAD = 'AUDIT_LOG_LOAD';
+export const AUDIT_LOG_UNLOAD = 'AUDIT_LOG_UNLOAD';
+export const CALENDAR_LOAD = 'CALENDAR_LOAD';
+export const CALENDAR_UNLOAD = 'CALENDAR_UNLOAD';
+export const CATEGORY_LOAD = 'CATEGORY_LOAD';
+export const CATEGORY_UNLOAD = 'CATEGORY_UNLOAD';
+export const ITEM_LOAD = 'ITEM_LOAD';
+export const ITEM_UNLOAD = 'ITEM_UNLOAD';
+export const SEARCH_LOAD = 'SEARCH_LOAD';
+export const SEARCH_UNLOAD = 'SEARCH_UNLOAD';
+export const SESSION_LOAD = 'SESSION_LOAD';
+export const SESSION_UNLOAD = 'SESSION_UNLOAD';
+export const SITE_LOAD = 'SITE_LOAD';
+export const SITE_UNLOAD = 'SITE_UNLOAD';
 
 const _headers = {
   Accept: 'application/json',
@@ -25,46 +38,44 @@ const processStatus = (response) => {
 
 // Session
 export function haveSession() {
-  return _sessionId ? true : false;
+  return _sessionId;
 }
 
 export function setSession(session) {
   _sessionId = session._id;
   _headers.Authorization = `Token token=${session.token}`;
-  dispatch(state => ({ ...state, session }));
   localStorage.session = JSON.stringify(session);
-  return session;
+  return { type: SESSION_LOAD, payload: session };
 }
 
-export function clearSession(object) {
+export function clearSession() {
   _sessionId = undefined;
   delete _headers.Authorization;
-  dispatch(() => ({ session: undefined }));
   localStorage.removeItem('session');
-  return object;
+  return { type: SESSION_UNLOAD, payload: undefined };
 }
 
 export function initialize() {
+  let session;
   if (localStorage.session) {
-    const session = JSON.parse(localStorage.session);
-    setSession(session);
+    session = JSON.parse(localStorage.session);
+    return setSession(session);
   }
+  return clearSession();
 }
 
 export function postSession(session) {
   return fetch('/api/sessions', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
   .then(processStatus)
-  .then(response => response.json())
-  .then(setSession);
+  .then(response => response.json());
 }
 
 export function postSessionViaToken(session) {
   return fetch('/api/sessions/token', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
   .then(processStatus)
-  .then(response => response.json())
-  .then(setSession);
+  .then(response => response.json());
 }
 
 export function deleteSession() {
@@ -77,75 +88,85 @@ export function deleteSession() {
 
 // Generic
 
-function cacheAdd(category, item) {
-  dispatch((state) => {
-    const cache = { ...(state[category] || {}) };
-    // also store the id -> path mapping so we can remove cached paths
-    // when we only have an id
-    const paths = { ...(state[`${category}-paths`] || {}) };
-    cache[item._id] = item;
-    if (item.path) {
-      cache[item.path] = item;
-      paths[item._id] = item.path;
+// function cacheAdd(category, item) {
+//   dispatch((state) => {
+//     const cache = { ...(state[category] || {}) };
+//     // also store the id -> path mapping so we can remove cached paths
+//     // when we only have an id
+//     const paths = { ...(state[`${category}-paths`] || {}) };
+//     cache[item._id] = item;
+//     if (item.path) {
+//       cache[item.path] = item;
+//       paths[item._id] = item.path;
+//     }
+//     const nextState = { ...state };
+//     nextState[category] = cache;
+//     nextState[`${category}-paths`] = paths;
+//     return nextState;
+//   });
+// }
+//
+// function cacheRemove(category, item) {
+//   dispatch((state) => {
+//     const cache = { ...(state[category] || {}) };
+//     const paths = { ...(state[`${category}-paths`] || {}) };
+//     delete cache[item.path];
+//     delete cache[item._id];
+//     delete paths[item._id];
+//     const nextState = { ...state };
+//     nextState[category] = cache;
+//     nextState[`${category}-paths`] = paths;
+//     return nextState;
+//   });
+// }
+
+export const loadCategory = (category, options = {}) =>
+  (dispatch) => {
+    const params = [];
+    if (options.search) {
+      params.push(`search=${encodeURIComponent(options.search)}`);
     }
-    const nextState = { ...state };
-    nextState[category] = cache;
-    nextState[`${category}-paths`] = paths;
-    return nextState;
-  });
-}
+    if (options.filter) {
+      params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
+    }
+    if (options.adminable) {
+      params.push('adminable=true');
+    }
+    if (options.sort) {
+      params.push(`sort=${encodeURIComponent(options.sort)}`);
+    }
+    if (options.select) {
+      params.push(`select=${encodeURIComponent(options.select)}`);
+    }
+    if (options.distinct) {
+      params.push(`distinct=${encodeURIComponent(options.distinct)}`);
+    }
+    if (options.populate) {
+      params.push(
+        `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
+      );
+    }
+    if (options.limit) {
+      params.push(`limit=${encodeURIComponent(options.limit)}`);
+    }
+    if (options.skip) {
+      params.push(`skip=${encodeURIComponent(options.skip)}`);
+    }
+    const q = params.length > 0 ? `?${params.join('&')}` : '';
+    return fetch(`/api/${category}${q}`, {
+      method: 'GET', headers: _headers })
+    .then(processStatus)
+    .then(response => response.json())
+    .then(items => dispatch({
+      type: CATEGORY_LOAD, payload: { category, items, ...options },
+    }))
+    .catch(payload => dispatch({
+      type: CATEGORY_LOAD, error: true, payload,
+    }));
+  };
 
-function cacheRemove(category, item) {
-  dispatch((state) => {
-    const cache = { ...(state[category] || {}) };
-    const paths = { ...(state[`${category}-paths`] || {}) };
-    delete cache[item.path];
-    delete cache[item._id];
-    delete paths[item._id];
-    const nextState = { ...state };
-    nextState[category] = cache;
-    nextState[`${category}-paths`] = paths;
-    return nextState;
-  });
-}
-
-export function getItems(category, options = {}) {
-  const params = [];
-  if (options.search) {
-    params.push(`search=${encodeURIComponent(options.search)}`);
-  }
-  if (options.filter) {
-    params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
-  }
-  if (options.adminable) {
-    params.push('adminable=true');
-  }
-  if (options.sort) {
-    params.push(`sort=${encodeURIComponent(options.sort)}`);
-  }
-  if (options.select) {
-    params.push(`select=${encodeURIComponent(options.select)}`);
-  }
-  if (options.distinct) {
-    params.push(`distinct=${encodeURIComponent(options.distinct)}`);
-  }
-  if (options.populate) {
-    params.push(
-      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
-    );
-  }
-  if (options.limit) {
-    params.push(`limit=${encodeURIComponent(options.limit)}`);
-  }
-  if (options.skip) {
-    params.push(`skip=${encodeURIComponent(options.skip)}`);
-  }
-  const q = params.length > 0 ? `?${params.join('&')}` : '';
-  return fetch(`/api/${category}${q}`, {
-    method: 'GET', headers: _headers })
-  .then(processStatus)
-  .then(response => response.json());
-}
+export const unloadCategory = category =>
+  ({ type: CATEGORY_UNLOAD, payload: { category } });
 
 export function postItem(category, item) {
   return fetch(`/api/${category}`, {
@@ -154,51 +175,57 @@ export function postItem(category, item) {
   .then(response => response.json());
 }
 
-export function getItem(category, id, options = {}) {
-  const params = [];
-  if (options.select) {
-    params.push(`select=${encodeURIComponent(options.select)}`);
-  }
-  if (options.populate) {
-    params.push(
-      `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
-    );
-  }
-  if (options.totals) {
-    params.push(`totals=${encodeURIComponent(options.totals)}`);
-  }
-  const q = params.length > 0 ? `?${params.join('&')}` : '';
-  return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
-    method: 'GET', headers: _headers })
-  .then(processStatus)
-  .then(response => response.json())
-  .then((item) => {
-    if (options.cache) {
-      cacheAdd(category, item);
+export const loadItem = (category, id, options = {}) =>
+  (dispatch) => {
+    const params = [];
+    if (options.select) {
+      params.push(`select=${encodeURIComponent(options.select)}`);
     }
-    return item;
-  });
-}
+    if (options.populate) {
+      params.push(
+        `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
+      );
+    }
+    if (options.full) {
+      // loads all forms for form template
+      params.push(`full=${encodeURIComponent(options.full)}`);
+    }
+    if (options.new) {
+      // includes a new form
+      params.push(`new=${encodeURIComponent(options.new)}`);
+    }
+    if (options.linkedFormId) {
+      params.push(`linkedFormId=${encodeURIComponent(options.linkedFormId)}`);
+    }
+    if (options.forSession) {
+      // loads all forms for form template
+      params.push(`forSession=${encodeURIComponent(options.forSession)}`);
+    }
+    const q = params.length > 0 ? `?${params.join('&')}` : '';
+    return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
+      method: 'GET', headers: _headers })
+    .then(processStatus)
+    .then(response => response.json())
+    .then(item => dispatch({
+      type: ITEM_LOAD, payload: { category, id, item, ...options } }))
+    .catch(error => dispatch({
+      type: ITEM_LOAD, error: true, payload: { id, error } }));
+  };
+
+export const unloadItem = (category, id) =>
+  ({ type: ITEM_UNLOAD, payload: { category, id } });
 
 export function putItem(category, item) {
   return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
     method: 'PUT', headers: _headers, body: JSON.stringify(item) })
   .then(processStatus)
-  .then(response => response.json())
-  .then((itemResponse) => {
-    cacheRemove(category, itemResponse);
-    return itemResponse;
-  });
+  .then(response => response.json());
 }
 
 export function deleteItem(category, id) {
   return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
     method: 'DELETE', headers: _headers })
-  .then(processStatus)
-  .then((response) => {
-    cacheRemove(category, { _id: id });
-    return response;
-  });
+  .then(processStatus);
 }
 
 // Page
@@ -236,47 +263,59 @@ export function postVerifyEmail(email, returnPath) {
 
 // Site
 
-export function getSite() {
-  return fetch('/api/site', { method: 'GET', headers: _headers })
-  .then(response => response.json())
-  .then((site) => {
-    dispatch(state => ({ ...state, site }));
-    return site;
-  });
+export function loadSite() {
+  return dispatch =>
+    fetch('/api/site', { method: 'GET', headers: _headers })
+    .then(response => response.json())
+    .then(payload => dispatch({ type: SITE_LOAD, payload }))
+    .catch(payload => dispatch({
+      type: SITE_LOAD, error: true, payload,
+    }));
 }
 
 export function postSite(site) {
-  return fetch('/api/site', {
-    method: 'POST', headers: _headers, body: JSON.stringify(site) })
-  .then(processStatus)
-  .then(response => response.json());
+  return dispatch =>
+    fetch('/api/site', {
+      method: 'POST', headers: _headers, body: JSON.stringify(site) })
+    .then(processStatus)
+    .then(response => response.json())
+    .then(payload => dispatch({ type: SITE_LOAD, payload }))
+    .catch(payload => dispatch({
+      type: SITE_LOAD, error: true, payload,
+    }));
 }
 
 // Calendar
 
-export function getCalendar(options = {}) {
-  const params = [];
-  if (options.searchText) {
-    params.push(`search=${encodeURIComponent(options.searchText)}`);
-  }
-  if (options.date) {
-    params.push(`date=${encodeURIComponent(options.date.toISOString())}`);
-  }
-  if (options.months) {
-    params.push(`months=${encodeURIComponent(options.months)}`);
-  }
-  if (options.id) {
-    params.push(`id=${encodeURIComponent(options.id)}`);
-  }
-  if (options.ids) {
-    options.ids.forEach((id) => {
-      params.push(`id=${encodeURIComponent(id)}`);
-    });
-  }
-  const q = params.length > 0 ? `?${params.join('&')}` : '';
-  return fetch(`/api/calendar${q}`, {
-    method: 'GET', headers: _headers })
-  .then(response => response.json());
+export const loadCalendar = (options = {}) =>
+  (dispatch) => {
+    const params = [];
+    if (options.searchText) {
+      params.push(`search=${encodeURIComponent(options.searchText)}`);
+    }
+    if (options.date) {
+      params.push(`date=${encodeURIComponent(options.date.toISOString())}`);
+    }
+    if (options.months) {
+      params.push(`months=${encodeURIComponent(options.months)}`);
+    }
+    if (options.id) {
+      params.push(`id=${encodeURIComponent(options.id)}`);
+    }
+    if (options.ids) {
+      options.ids.forEach((id) => {
+        params.push(`id=${encodeURIComponent(id)}`);
+      });
+    }
+    const q = params.length > 0 ? `?${params.join('&')}` : '';
+    return fetch(`/api/calendar${q}`, {
+      method: 'GET', headers: _headers })
+    .then(response => response.json())
+    .then(payload => dispatch({ type: CALENDAR_LOAD, payload }));
+  };
+
+export function unloadCalendar() {
+  return { type: CALENDAR_UNLOAD };
 }
 
 // Events
@@ -383,29 +422,48 @@ export function postUnsubscribe(emailList, addresses) {
 
 // Search
 
-export function getSearch(searchText) {
-  const params = [];
-  params.push(`search=${encodeURIComponent(searchText)}`);
-  const q = params.length > 0 ? `?${params.join('&')}` : '';
-  return fetch(`/api/search${q}`, {
-    method: 'GET', headers: _headers })
-  .then(processStatus)
-  .then(response => response.json());
-}
+export const loadSearch = searchText =>
+  (dispatch) => {
+    if (searchText) {
+      const params = [];
+      params.push(`search=${encodeURIComponent(searchText)}`);
+      const q = params.length > 0 ? `?${params.join('&')}` : '';
+      return fetch(`/api/search${q}`, {
+        method: 'GET', headers: _headers })
+      .then(processStatus)
+      .then(response => response.json())
+      .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
+      .catch(payload => dispatch({
+        type: SEARCH_LOAD, error: true, payload,
+      }));
+    }
+    return dispatch({ type: SEARCH_LOAD, payload: {} });
+  };
+
+export const unloadSearch = () => ({ type: SEARCH_UNLOAD });
 
 // Audit Log
 
-export function getAuditLog(options = {}) {
-  const params = [];
-  if (options.limit) {
-    params.push(`limit=${encodeURIComponent(options.limit)}`);
-  }
-  if (options.skip) {
-    params.push(`skip=${encodeURIComponent(options.skip)}`);
-  }
-  const q = params.length > 0 ? `?${params.join('&')}` : '';
-  return fetch(`/api/audit-log${q}`, {
-    method: 'GET', headers: _headers })
-  .then(processStatus)
-  .then(response => response.json());
-}
+export const loadAuditLog = (options = {}) =>
+  (dispatch) => {
+    const params = [];
+    if (options.limit) {
+      params.push(`limit=${encodeURIComponent(options.limit)}`);
+    }
+    if (options.skip) {
+      params.push(`skip=${encodeURIComponent(options.skip)}`);
+    }
+    const q = params.length > 0 ? `?${params.join('&')}` : '';
+    fetch(`/api/audit-log${q}`, {
+      method: 'GET', headers: _headers })
+    .then(processStatus)
+    .then(response => response.json())
+    .then(items => dispatch({
+      type: AUDIT_LOG_LOAD, payload: { items, ...options },
+    }))
+    .catch(payload => dispatch({
+      type: AUDIT_LOG_LOAD, error: true, payload,
+    }));
+  };
+
+export const unloadAuditLog = () => ({ type: AUDIT_LOG_UNLOAD });

@@ -1,14 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment';
-import { getCalendar, getItems } from '../../actions';
+import {
+  loadCalendar, loadCategory, unloadCalendar, unloadCategory,
+} from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
 import PageContext from '../page/PageContext';
-import Stored from '../../components/Stored';
 import { searchToObject } from '../../utils/Params';
 
 const LEFT_KEY = 37;
@@ -19,6 +21,7 @@ class Calendar extends Component {
 
   constructor() {
     super();
+    this._load = this._load.bind(this);
     this._changeDate = this._changeDate.bind(this);
     this._onChangeMonth = this._onChangeMonth.bind(this);
     this._onChangeYear = this._onChangeYear.bind(this);
@@ -30,32 +33,34 @@ class Calendar extends Component {
       activeCalendars: {},
       days: {},
       calendars: [],
-      loading: true,
       searchText: '',
     };
   }
 
   componentDidMount() {
-    const { location } = this.props;
-    document.title = 'Calendar';
+    const { calendar, dispatch } = this.props;
+    if (calendar && calendar.name) {
+      document.title = `${calendar.name} Calendar`;
+    } else {
+      document.title = 'Calendar';
+    }
 
-    // use any query parameters
-    const locationState = this._stateFromLocation(location);
-    this.setState(locationState, this._throttledLoad);
+    this.setState(this._stateFromProps(this.props), this._load);
 
     // Load the possible calendars
-    getItems('calendars', { select: 'name', sort: 'name' })
-    .then(calendars => this.setState({ calendars }))
-    .catch(error => console.error('!!! Calendar calendars catch', error));
+    dispatch(loadCategory('calendars', { select: 'name', sort: 'name' }));
 
     window.addEventListener('keydown', this._onKeyDown);
   }
 
   componentWillReceiveProps(nextProps) {
+    this.setState({ loading: false, loadingMore: false });
     if (nextProps.match.params.id !== this.props.match.params.id ||
       nextProps.location.search !== this.props.location.search) {
-      const locationState = this._stateFromLocation(nextProps.location);
-      this.setState(locationState, this._throttledLoad);
+      this.setState(this._stateFromProps(nextProps), this._load);
+    }
+    if (nextProps.calendar && nextProps.calendar.name) {
+      document.title = `${nextProps.calendar.name} Calendar`;
     }
   }
 
@@ -68,10 +73,14 @@ class Calendar extends Component {
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCalendar());
+    dispatch(unloadCategory('calendars'));
     window.removeEventListener('keydown', this._onKeyDown);
   }
 
-  _stateFromLocation(location) {
+  _stateFromProps(props) {
+    const { location } = props;
     const query = searchToObject(location.search);
     let focus;
     if (query.focus) {
@@ -101,28 +110,18 @@ class Calendar extends Component {
     return state;
   }
 
-  _load(props) {
-    const { match: { params: { id } } } = props;
+  _load() {
+    const { dispatch, match: { params: { id } } } = this.props;
     const { activeCalendars, date, months, searchText } = this.state;
-    this.setState({ loading: true });
-    const ids = Object.keys(activeCalendars);
-    getCalendar({ date, searchText, id, ids, months })
-    .then((calendar) => {
-      if (calendar.name) {
-        document.title = `${calendar.name} Calendar`;
-      }
-      this.setState({ calendar, loading: false, loadingMore: false });
-    })
-    .catch(error => console.error('!!! Calendar get catch', error));
+    this.setState({ loading: true }, () => {
+      const ids = Object.keys(activeCalendars);
+      dispatch(loadCalendar({ date, searchText, id, ids, months }));
+    });
   }
 
-  _throttledLoad() {
-    const { router } = this.context;
+  _setLocation() {
+    const { history } = this.props;
     const { date, focus, searchText } = this.state;
-
-    // throttle gets when user is typing
-    clearTimeout(this._getTimer);
-    this._getTimer = setTimeout(this._load.bind(this, this.props), 100);
 
     // update browser location
     const searchParams = [];
@@ -136,7 +135,7 @@ class Calendar extends Component {
       searchParams.push(`date=${encodeURIComponent(date.format(DATE_FORMAT))}`);
     }
 
-    router.history.replace({
+    history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
@@ -152,36 +151,39 @@ class Calendar extends Component {
 
   _changeDate(date) {
     return () => {
-      this.setState({ date, focus: undefined }, this._throttledLoad);
+      this.setState({ date, focus: undefined }, this._load);
     };
   }
 
   _onChangeMonth(event) {
     const date = moment(this.state.date);
     date.month(event.target.value);
-    this.setState({ date, focus: undefined }, this._throttledLoad);
+    this.setState({ date, focus: undefined }, this._load);
   }
 
   _onChangeYear(event) {
     const date = moment(this.state.date);
     date.year(event.target.value);
-    this.setState({ date, focus: undefined }, this._throttledLoad);
+    this.setState({ date, focus: undefined }, this._load);
   }
 
   _onSearch(event) {
     const searchText = event.target.value;
-    this.setState({ searchText }, this._throttledLoad);
+    this.setState({ searchText });
+    // throttle when user is typing
+    clearTimeout(this._getTimer);
+    this._getTimer = setTimeout(() => this._setLocation({ searchText }), 100);
   }
 
   _onFilter(event) {
-    const { router } = this.context;
+    const { history } = this.props;
     const value = event.target.value;
     const search = (value && value !== 'All') ? `?name=${value}` : undefined;
-    router.history.replace({ pathname: '/calendar', search });
+    history.replace({ pathname: '/calendar', search });
   }
 
   _onMore() {
-    this.setState({ months: 3, loadingMore: true }, this._throttledLoad);
+    this.setState({ months: 3, loadingMore: true }, this._load);
   }
 
   _onKeyDown(event) {
@@ -203,14 +205,14 @@ class Calendar extends Component {
         nextActiveCalendars[id] = true;
       }
       this.setState({ activeCalendars: nextActiveCalendars },
-        this._throttledLoad);
+        this._load);
     };
   }
 
   _renderDaysOfWeek() {
-    const { calendar: { start } } = this.state;
+    const { calendar } = this.props;
     const result = [];
-    let date = moment(start);
+    let date = moment(calendar.start);
     while (result.length < 7) {
       const name = date.format('dddd');
       result.push(<div key={name} className="calendar__day">{name}</div>);
@@ -233,7 +235,8 @@ class Calendar extends Component {
   }
 
   _renderDay(day) {
-    const { calendar, date: referenceDate, focus } = this.state;
+    const { calendar } = this.props;
+    const { date: referenceDate, focus } = this.state;
     const { events } = day;
     const date = moment(day.date);
 
@@ -278,7 +281,8 @@ class Calendar extends Component {
   }
 
   _renderWeeks() {
-    const { calendar, focus } = this.state;
+    const { calendar } = this.props;
+    const { focus } = this.state;
     const weeks = calendar.weeks;
 
     return weeks.map((week) => {
@@ -301,7 +305,8 @@ class Calendar extends Component {
   }
 
   _renderFilter() {
-    const { activeCalendars, calendars } = this.state;
+    const { calendars } = this.props;
+    const { activeCalendars } = this.state;
     const controls = calendars.map(calendar => (
       <div key={calendar._id} className="filter-item box--row box--static">
         <input id={calendar._id} name={calendar._id} type="checkbox"
@@ -315,7 +320,7 @@ class Calendar extends Component {
         <input id="all-calendars" name="all-calendars" type="checkbox"
           checked={Object.keys(activeCalendars).length === 0}
           onChange={() => this.setState({ activeCalendars: {} },
-            this._throttledLoad)} />
+            this._load)} />
         <label htmlFor="all-calendars">All</label>
       </div>,
     );
@@ -327,8 +332,8 @@ class Calendar extends Component {
   }
 
   render() {
-    const { match: { params: { id } }, session } = this.props;
-    const { calendar, filterActive, loadingMore, searchText, loading } = this.state;
+    const { calendar, match: { params: { id } }, session } = this.props;
+    const { filterActive, loadingMore, searchText, loading } = this.state;
 
     let contents;
     if (calendar) {
@@ -405,7 +410,7 @@ class Calendar extends Component {
 
       contents = (
         <main>
-          <PageHeader title={calendar.name || 'Calendar'}
+          <PageHeader title={(calendar || {}).name || 'Calendar'}
             homer={true}
             searchText={searchText} onSearch={this._onSearch}
             actions={actions} />
@@ -448,6 +453,10 @@ class Calendar extends Component {
 }
 
 Calendar.propTypes = {
+  calendar: PropTypes.object,
+  calendars: PropTypes.array,
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   location: PropTypes.object.isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
@@ -463,15 +472,15 @@ Calendar.propTypes = {
 };
 
 Calendar.defaultProps = {
+  calendar: undefined,
+  calendars: undefined,
   session: undefined,
 };
 
-Calendar.contextTypes = {
-  router: PropTypes.any,
-};
-
 const select = state => ({
+  calendar: state.calendar,
+  calendars: (state.calendars || {}).items,
   session: state.session,
 });
 
-export default Stored(Calendar, select);
+export default connect(select)(Calendar);

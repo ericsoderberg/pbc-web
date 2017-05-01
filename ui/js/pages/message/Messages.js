@@ -1,6 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../../actions';
 import List from '../../components/List';
 import MessageItem from './MessageItem';
 
@@ -10,7 +11,7 @@ MessagesMessageItem.defaultProps = {
   detailsForMostRecent: true,
 };
 
-export default class Messages extends Component {
+class Messages extends Component {
 
   constructor() {
     super();
@@ -18,19 +19,30 @@ export default class Messages extends Component {
   }
 
   componentDidMount() {
-    getItems('libraries', { select: 'name' })
-    .then(response => this.setState({
-      // convert to options format with label and value
-      filterOptions: response.map(library => ({
-        label: library.name,
-        value: library._id,
-      })),
-    }))
-    .catch(error => console.error('!!! Messages catch', error));
+    const { dispatch } = this.props;
+    dispatch(loadCategory('libraries', { sort: 'name' }));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { libraries } = nextProps;
+    if (libraries) {
+      this.setState({
+        // convert to options format with label and value
+        filterOptions: libraries.map(library => ({
+          label: library.name,
+          value: library._id,
+        })),
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('libraries'));
   }
 
   render() {
-    const { location } = this.props;
+    const { history, location } = this.props;
     const { filterOptions } = this.state;
 
     const filter = {
@@ -43,11 +55,26 @@ export default class Messages extends Component {
       <List location={location} homer={true}
         category="messages" title="Messages" path="/messages"
         filters={[filter]} select="name path verses date author" sort="-date"
-        Item={MessagesMessageItem} />
+        Item={MessagesMessageItem}
+        history={history} />
     );
   }
 }
 
 Messages.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
+  libraries: PropTypes.array,
   location: PropTypes.object.isRequired,
 };
+
+Messages.defaultProps = {
+  libraries: [],
+};
+
+const select = state => ({
+  libraries: (state.libraries || {}).items || [],
+  session: state.session,
+});
+
+export default connect(select)(Messages);

@@ -1,6 +1,7 @@
 import webpack from 'webpack';
 import path from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const mode = process.env.NODE_ENV || 'production';
 const PRODUCTION = (mode === 'production');
@@ -14,7 +15,7 @@ const plugins = [
   }),
   new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor',
-    minChunks: (module) => (
+    minChunks: module => (
       // this assumes your vendor imports exist in the node_modules directory
       module.context && module.context.indexOf('node_modules') !== -1
     ),
@@ -34,9 +35,15 @@ if (PRODUCTION) {
   plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
+const extractSass = new ExtractTextPlugin({
+  filename: '[name].css',
+  disable: process.env.NODE_ENV === 'development',
+});
+plugins.push(extractSass);
+
 const config = {
   entry: {
-    app: './ui/js/index',
+    app: ['./ui/scss/index.scss', './ui/js/index.js'],
     vendor: ['react-dom', 'react', 'moment', 'leaflet'],
   },
 
@@ -92,7 +99,12 @@ const config = {
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: extractSass.extract({
+          use: [{ loader: 'css-loader' }, { loader: 'sass-loader' }],
+          // use style-loader in development
+          fallback: 'style-loader',
+        }),
+        // use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
         test: /\.css$/,
@@ -105,7 +117,7 @@ const config = {
 
   resolve: {
     extensions:
-      ['.js', '.json', '.html', '.html', '.scss', '.md', '.svg']
+      ['.js', '.json', '.html', '.html', '.scss', '.md', '.svg'],
   },
 
 };

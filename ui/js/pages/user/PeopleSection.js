@@ -1,40 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
-import { getItem } from '../../actions';
 import Image from '../../components/Image';
 import UserIcon from '../../icons/User';
 
 export default class PeopleSection extends Component {
-
-  constructor() {
-    super();
-    this.state = { users: [] };
-  }
-
-  componentDidMount() {
-    this._load(this.props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this._load(nextProps);
-  }
-
-  _load(props) {
-    // When editing, we only have ids, get the rest
-    (props.people || []).forEach((person) => {
-      if (typeof person.id === 'string' && !person.image &&
-        !this.state.users[person.id]) {
-        getItem('users', person.id)
-        .then((user) => {
-          const users = { ...this.state.users };
-          users[person.id] = user;
-          this.setState({ users });
-        })
-        .catch(error => console.error('!!! PeopleSummary catch', error));
-      }
-    });
-  }
 
   render() {
     const { className, people } = this.props;
@@ -45,17 +15,10 @@ export default class PeopleSection extends Component {
     }
 
     const links = (people || []).map((person) => {
-      let user;
-      if (typeof person.id === 'object') {
-       // populated on server
-        user = person.id;
-      } else {
-        // populated via _load
-        user = this.state.users[person.id];
-      }
+      const user = person.id;
       return { person, user };
     })
-    .filter(context => context.user)
+    .filter(context => typeof context.user === 'object')
     .map((context) => {
       const { person, user } = context;
       let image;

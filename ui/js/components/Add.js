@@ -1,9 +1,10 @@
 
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { postItem, haveSession, setSession } from '../actions';
 import Form from './Form';
 
-export default class Add extends Component {
+class Add extends Component {
 
   constructor(props) {
     super(props);
@@ -23,8 +24,7 @@ export default class Add extends Component {
   }
 
   _onAdd(item) {
-    const { category, createSession, showable } = this.props;
-    const { router } = this.context;
+    const { category, createSession, dispatch, history, showable } = this.props;
     postItem(category, item)
     .then((response) => {
       if (createSession) {
@@ -32,29 +32,31 @@ export default class Add extends Component {
         // remember it.
         if (!haveSession() && response.token) {
           // console.log('!!! Add set session', response);
-          setSession(response);
+          dispatch(setSession(response));
         }
       }
       if (showable) {
-        router.history.push(`/${category}/${response._id}`);
+        history.push(`/${category}/${response._id}`);
       } else {
-        router.history.goBack();
+        history.goBack();
       }
     })
     .catch(error => this.setState({ error, item }));
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.goBack();
+    const { history } = this.props;
+    history.goBack();
   }
 
   render() {
-    const { category, FormContents, onChange, Preview, title } = this.props;
+    const {
+      category, FormContents, onChange, Preview, session, title,
+    } = this.props;
     const { item, error } = this.state;
     return (
       <Form title={title} submitLabel="Add"
-        action={`/api/${category}`}
+        action={`/api/${category}`} session={session}
         FormContents={FormContents} Preview={Preview} item={item}
         onChange={onChange}
         onSubmit={this._onAdd} error={error}
@@ -67,9 +69,12 @@ Add.propTypes = {
   category: PropTypes.string.isRequired,
   createSession: PropTypes.bool,
   default: PropTypes.object,
+  dispatch: PropTypes.func.isRequired,
   FormContents: PropTypes.func.isRequired,
+  history: PropTypes.any.isRequired,
   onChange: PropTypes.func,
   Preview: PropTypes.func,
+  session: PropTypes.object,
   showable: PropTypes.bool,
   title: PropTypes.string.isRequired,
 };
@@ -79,9 +84,12 @@ Add.defaultProps = {
   default: {},
   onChange: undefined,
   Preview: undefined,
+  session: undefined,
   showable: false,
 };
 
-Add.contextTypes = {
-  router: PropTypes.any,
-};
+const select = state => ({
+  session: state.session,
+});
+
+export default connect(select)(Add);

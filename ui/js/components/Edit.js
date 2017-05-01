@@ -1,40 +1,44 @@
 import React, { Component, PropTypes } from 'react';
-import { getItem, putItem, deleteItem } from '../actions';
+import { connect } from 'react-redux';
+import { loadItem, putItem, deleteItem, unloadItem } from '../actions';
 import Form from './Form';
 
-export default class Edit extends Component {
+class Edit extends Component {
 
   constructor(props) {
     super(props);
     this._onUpdate = this._onUpdate.bind(this);
     this._onRemove = this._onRemove.bind(this);
     this._onCancel = this._onCancel.bind(this);
-    this.state = { item: {} };
+    this.state = {}; // for error
   }
 
   componentDidMount() {
-    this._load(this.props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id) {
-      this._load(nextProps);
+    const { item, title } = this.props;
+    document.title = title;
+    if (!item) {
+      this._load(this.props);
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { onChange } = nextProps;
+    if (nextProps.id !== this.props.id) {
+      this._load(nextProps);
+    } else if (nextProps.item && onChange) {
+      onChange(nextProps.item);
+    }
+  }
+
+  componentWillUnmount() {
+    const { category, dispatch, id } = this.props;
+    dispatch(unloadItem(category, id));
+  }
+
   _load(props) {
-    const { category, match, title } = props;
+    const { category, dispatch, id, title } = props;
     document.title = title;
-    this.setState({ loading: true });
-    getItem(category, match.params.id)
-    .then((item) => {
-      const { onChange } = props;
-      this.setState({ item, loading: false });
-      if (onChange) {
-        onChange(item);
-      }
-    })
-    .catch(error => console.error('!!! Edit catch', error));
+    dispatch(loadItem(category, id));
   }
 
   _onUpdate(item) {
@@ -52,10 +56,16 @@ export default class Edit extends Component {
   }
 
   _onRemove() {
-    const { category, match, removeBackLevel } = this.props;
+    const { category, id, postRemovePath } = this.props;
     const { router } = this.context;
-    deleteItem(category, match.params.id)
-    .then(() => router.history.go(-(removeBackLevel)))
+    deleteItem(category, id)
+    .then(() => {
+      if (postRemovePath) {
+        router.history.push(postRemovePath);
+      } else {
+        router.history.go(-1);
+      }
+    })
     .catch(error => this.setState({ error }));
   }
 
@@ -66,14 +76,14 @@ export default class Edit extends Component {
 
   render() {
     const {
-      actions, category, match, footerActions, FormContents,
-      onChange, Preview, submitLabel, title,
+      actions, category, footerActions, FormContents, id, item,
+      onChange, Preview, session, submitLabel, title,
     } = this.props;
-    const { item, error, loading } = this.state;
+    const { error } = this.state;
     return (
       <Form title={title} actions={actions} footerActions={footerActions}
-        submitLabel={submitLabel} loading={loading}
-        action={`/api/${category}/${match.params.id}`}
+        submitLabel={submitLabel} session={session} loading={!item}
+        action={`/api/${category}/${id}`}
         FormContents={FormContents} Preview={Preview} item={item}
         onChange={onChange}
         onSubmit={this._onUpdate} onRemove={this._onRemove}
@@ -85,17 +95,16 @@ export default class Edit extends Component {
 Edit.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
   FormContents: PropTypes.func.isRequired,
   footerActions: PropTypes.node,
+  id: PropTypes.string.isRequired,
+  item: PropTypes.object,
   onChange: PropTypes.func,
   onUpdate: PropTypes.func,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
   Preview: PropTypes.func,
-  removeBackLevel: PropTypes.number,
+  postRemovePath: PropTypes.string,
+  session: PropTypes.object,
   submitLabel: PropTypes.string,
   title: PropTypes.string.isRequired,
 };
@@ -103,13 +112,26 @@ Edit.propTypes = {
 Edit.defaultProps = {
   actions: undefined,
   footerActions: undefined,
+  item: undefined,
   onChange: undefined,
   onUpdate: undefined,
   Preview: undefined,
-  removeBackLevel: 2,
+  postRemovePath: undefined,
+  session: undefined,
   submitLabel: 'Update',
 };
 
 Edit.contextTypes = {
   router: PropTypes.any,
 };
+
+const select = (state, props) => {
+  const id = props.id || props.match.params.id;
+  return {
+    id,
+    item: state[id],
+    session: state.session,
+  };
+};
+
+export default connect(select)(Edit);

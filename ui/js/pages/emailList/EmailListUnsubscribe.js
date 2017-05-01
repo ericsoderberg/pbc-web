@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import { getItems, postUnsubscribe } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, postUnsubscribe, unloadCategory } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import SessionSection from '../session/SessionSection';
 import Button from '../../components/Button';
-import Stored from '../../components/Stored';
 import Loading from '../../components/Loading';
 
 const LOADING = 'loading';
@@ -32,37 +32,40 @@ class EmailListUnsubscribe extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.name !== this.props.match.params.name) {
+    const { emailList, name, session } = nextProps;
+    if (name !== this.props.name) {
       this._loadEmailList();
+    } else if (emailList) {
+      this.setState({ state: session ? READY : AUTHENTICATION_NEEDED });
     }
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(unloadCategory('email-lists'));
+  }
+
   _loadEmailList() {
-    const { match } = this.props;
-    getItems('email-lists', { filter: { name: match.params.name } })
-    .then(emailLists => this.setState({ emailList: emailLists[0], state: READY }))
-    .catch(error => console.error('!!! EmailListUnsubscribe catch', error));
+    const { dispatch, name } = this.props;
+    dispatch(loadCategory('email-lists', { filter: { name } }));
   }
 
   _onUnsubscribe(event) {
-    const { session } = this.props;
+    const { emailList, session } = this.props;
     event.preventDefault();
-    const { emailList } = this.state;
     postUnsubscribe(emailList, [session.userId.email])
     .then(() => this.setState({ state: DONE }))
     .catch(error => this.setState({ error }));
   }
 
   _onCancel() {
-    const { router } = this.context;
-    router.history.replace('/');
+    const { history } = this.props;
+    history.replace('/');
   }
 
   render() {
-    const { match, session } = this.props;
-    const { emailList, state } = this.state;
-    const { router } = this.context;
-    const name = match.params.name;
+    const { emailList, history, name, session } = this.props;
+    const { state } = this.state;
 
     let contents;
     switch (state) {
@@ -94,7 +97,8 @@ class EmailListUnsubscribe extends Component {
 
       case SESSION: {
         contents = (
-          <SessionSection onCancel={() => this.setState({ state: AUTHENTICATION_NEEDED })}
+          <SessionSection onCancel={() =>
+              this.setState({ state: AUTHENTICATION_NEEDED })}
             returnPath={window.location.pathname} />
         );
         break;
@@ -106,10 +110,12 @@ class EmailListUnsubscribe extends Component {
             <form className="form"
               action={`/api/email-lists/${emailList._id}/unsubscribe`}
               onSubmit={this._onUnsubscribe}>
-              <PageHeader homer={true} title={`Unsubscribe from ${emailList.name}`} />
+              <PageHeader homer={true}
+                title={`Unsubscribe from ${emailList.name}`} />
               <fieldset className="form__fields">
                 <FormField label="Address">
-                  <input type="text" value={session.userId.email} disabled={true} />
+                  <input type="text" value={session.userId.email}
+                    disabled={true} />
                 </FormField>
               </fieldset>
               <footer className="form__footer">
@@ -136,7 +142,7 @@ class EmailListUnsubscribe extends Component {
               </fieldset>
               <footer className="form__footer">
                 <Button label="Home"
-                  onClick={() => router.history.replace('/')} />
+                  onClick={() => history.replace('/')} />
               </footer>
             </div>
           </div>
@@ -153,24 +159,26 @@ class EmailListUnsubscribe extends Component {
 }
 
 EmailListUnsubscribe.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  emailList: PropTypes.object,
+  history: PropTypes.any.isRequired,
+  name: PropTypes.string.isRequired,
   session: PropTypes.object,
 };
 
 EmailListUnsubscribe.defaultProps = {
+  emailList: undefined,
   session: undefined,
 };
 
-EmailListUnsubscribe.contextTypes = {
-  router: PropTypes.any,
+const select = (state, props) => {
+  const name = props.match.params.name;
+  const emailList = ((state['email-lists'] || {}).items || [])[0];
+  return {
+    emailList,
+    name,
+    session: state.session,
+  };
 };
 
-const select = state => ({
-  session: state.session,
-});
-
-export default Stored(EmailListUnsubscribe, select);
+export default connect(select)(EmailListUnsubscribe);

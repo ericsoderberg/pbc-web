@@ -7,5 +7,6 @@ CalendarEdit.defaultProps = {
   ...Edit.defaultProps,
   category: 'calendars',
   FormContents: CalendarFormContents,
+  postRemovePath: '/calendars',
   title: 'Edit Calendar',
 };

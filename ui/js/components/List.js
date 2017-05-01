@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { getItems } from '../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../actions';
 import { searchToObject } from '../utils/Params';
 import PageHeader from './PageHeader';
 import Filter from './Filter';
 import SelectSearch from './SelectSearch';
-import Stored from './Stored';
 import Loading from './Loading';
 
 const UNSET = '$unset';
@@ -14,20 +14,24 @@ class List extends Component {
 
   constructor(props) {
     super(props);
+    this._load = this._load.bind(this);
     this._onSearch = this._onSearch.bind(this);
     this._onScroll = this._onScroll.bind(this);
     this._removeFilter = this._removeFilter.bind(this);
-    this.state = { loading: true, searchText: '' };
+    this.state = { searchText: '' };
   }
 
   componentDidMount() {
     document.title = this.props.title;
-    this._setStateFromLocation(this.props);
+    this.setState(this._stateFromProps(this.props), this._load);
     window.addEventListener('scroll', this._onScroll);
   }
 
   componentWillReceiveProps(nextProps) {
-    this._setStateFromLocation(nextProps);
+    this.setState({ loadingMore: false });
+    if (nextProps.location.search !== this.props.location.search) {
+      this.setState(this._stateFromProps(nextProps), this._load);
+    }
   }
 
   componentDidUpdate() {
@@ -35,13 +39,16 @@ class List extends Component {
   }
 
   componentWillUnmount() {
+    const { category, dispatch } = this.props;
+    dispatch(unloadCategory(category));
     window.removeEventListener('scroll', this._onScroll);
   }
 
-  _setStateFromLocation(props) {
+  _stateFromProps(props) {
+    const { location } = props;
+    const query = searchToObject(location.search);
     let filter;
     let filterNames;
-    const query = searchToObject(props.location.search);
     if (query.filter) {
       filter = query.filter;
     } else if (props.filter) {
@@ -61,28 +68,26 @@ class List extends Component {
       });
     }
     const searchText = query.search || '';
-    this.setState({ filter, filterNames, searchText }, this._get);
+    return { filter, filterNames, searchText };
   }
 
-  _get() {
-    const { adminable, category, populate, select, sort } = this.props;
+  _load() {
+    const { adminable, category, dispatch, populate, select, sort } = this.props;
     const { filter, searchText } = this.state;
-    // throttle gets when user is typing
+    this.setState({ loading: true }, () =>
+      dispatch(loadCategory(category,
+        { sort, filter, search: searchText, select, populate, adminable })));
+  }
+
+  _throttleLoad() {
+    // throttle when user is typing
     clearTimeout(this._getTimer);
-    this._getTimer = setTimeout(() => {
-      getItems(category,
-        { sort, filter, search: searchText, select, populate, adminable })
-      .then(response => this.setState({
-        items: response, mightHaveMore: response.length >= 20, loading: false,
-      }))
-      .catch(error => console.error('!!! List catch', error));
-    }, 100);
+    this._getTimer = setTimeout(this._load, 100);
   }
 
   _setLocation(options) {
-    const { filters, location } = this.props;
+    const { filters, history, location } = this.props;
     const { filterNames } = this.state;
-    const { router } = this.context;
     const query = searchToObject(location.search);
     const searchParams = [];
 
@@ -123,33 +128,25 @@ class List extends Component {
       });
     }
 
-    router.history.replace({
+    history.replace({
       pathname: window.location.pathname,
       search: `?${searchParams.join('&')}`,
     });
   }
 
   _onMore() {
-    const { category, populate, select, sort } = this.props;
+    const { category, dispatch, items, populate, select, sort } = this.props;
     const { filter, searchText } = this.state;
     this.setState({ loadingMore: true }, () => {
-      const skip = this.state.items.length;
-      getItems(category, {
-        sort, filter, search: searchText, select, populate, skip })
-      .then((response) => {
-        const items = this.state.items.concat(response);
-        this.setState({
-          items,
-          loadingMore: false,
-          mightHaveMore: (response.length === 20),
-        });
-      })
-      .catch(error => console.error('!!! List more catch', error));
+      dispatch(loadCategory(category, {
+        sort, filter, search: searchText, select, populate, skip: items.length,
+      }));
     });
   }
 
   _onScroll() {
-    const { mightHaveMore, loadingMore } = this.state;
+    const { mightHaveMore } = this.props;
+    const { loadingMore } = this.state;
     if (mightHaveMore && !loadingMore) {
       const more = this._moreRef;
       if (more) {
@@ -163,7 +160,10 @@ class List extends Component {
 
   _onSearch(event) {
     const searchText = event.target.value;
-    this._setLocation({ searchText, loading: true });
+    this.setState({ searchText });
+    // throttle when user is typing
+    clearTimeout(this._getTimer);
+    this._getTimer = setTimeout(() => this._setLocation({ searchText }), 100);
   }
 
   _filter(property) {
@@ -187,25 +187,23 @@ class List extends Component {
   }
 
   _removeFilter() {
-    const { router } = this.context;
-    router.history.replace({
+    const { history } = this.props;
+    history.replace({
       pathname: window.location.pathname,
     });
   }
 
   render() {
     const {
-      addIfFilter, back, Item, path, title, marker, sort, session,
-      filters, search, homer,
+      addIfFilter, back, Item, items, path, title, marker, mightHaveMore,
+      sort, session, filters, search, homer,
     } = this.props;
     let { actions } = this.props;
-    const {
-      searchText, filter, filterNames, mightHaveMore, loading, loadingMore,
-    } = this.state;
+    const { searchText, filter, filterNames, loading, loadingMore } = this.state;
 
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
-    const items = (this.state.items || []).map((item, index) => {
+    const contents = (items || []).map((item, index) => {
       if (marker && markerIndex === -1) {
         const value = item[marker.property];
         if ((descending && value < marker.value) ||
@@ -215,14 +213,14 @@ class List extends Component {
       }
 
       return (
-        <li key={item._id} >
+        <li key={item._id}>
           <Item item={item} />
         </li>
       );
     });
 
     if (markerIndex !== -1) {
-      items.splice(markerIndex, 0, (
+      contents.splice(markerIndex, 0, (
         <li key="marker">
           <div className="list__marker">
             {marker.label}
@@ -276,7 +274,7 @@ class List extends Component {
       more = <Loading />;
     } else if (mightHaveMore) {
       more = <div ref={(ref) => { this._moreRef = ref; }} />;
-    } else if (items.length > 20) {
+    } else if (items && items.length > 20) {
       more = <div className="list__count">{items.length}</div>;
     }
 
@@ -301,7 +299,7 @@ class List extends Component {
           {filterItems}
         </div>
         <ul className="list">
-          {items}
+          {contents}
         </ul>
         {message}
         {more}
@@ -316,6 +314,7 @@ List.propTypes = {
   adminable: PropTypes.bool,
   back: PropTypes.bool,
   category: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
   filters: PropTypes.arrayOf(PropTypes.shape({
     allLabel: PropTypes.string.isRequired,
     category: PropTypes.string,
@@ -328,14 +327,17 @@ List.propTypes = {
     ])),
     property: PropTypes.string.isRequired,
   })),
+  history: PropTypes.any.isRequired,
   homer: PropTypes.bool,
   Item: PropTypes.func.isRequired,
+  items: PropTypes.array,
   location: PropTypes.object.isRequired,
   marker: PropTypes.shape({
     label: PropTypes.node,
     property: PropTypes.string,
     value: PropTypes.any,
   }),
+  mightHaveMore: PropTypes.bool,
   path: PropTypes.string.isRequired,
   populate: PropTypes.any,
   search: PropTypes.bool,
@@ -357,7 +359,9 @@ List.defaultProps = {
   back: false,
   filters: undefined,
   homer: false,
+  items: undefined,
   marker: undefined,
+  mightHaveMore: false,
   populate: undefined,
   search: true,
   select: undefined,
@@ -365,12 +369,13 @@ List.defaultProps = {
   sort: 'name',
 };
 
-List.contextTypes = {
-  router: PropTypes.any,
+const select = (state, props) => {
+  const categoryState = state[props.category] || {};
+  return {
+    items: categoryState.items,
+    mightHaveMore: categoryState.mightHaveMore,
+    session: state.session,
+  };
 };
 
-const select = state => ({
-  session: state.session,
-});
-
-export default Stored(List, select);
+export default connect(select)(List);

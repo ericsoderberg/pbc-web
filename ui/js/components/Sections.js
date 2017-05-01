@@ -31,8 +31,8 @@ export default class Sections extends Component {
           .map(s => s.eventId._id || s.eventId);
         contents = (
           <CalendarSection key={section._id || section.id}
-            id={section.calendarId} events={section.events}
-            excludeEventIds={excludeEventIds}
+            id={section.calendarId} calendar={section.calendar}
+            events={section.events} excludeEventIds={excludeEventIds}
             omitRecurring={section.omitRecurring} />
         );
       } else if (section.type === 'event') {
@@ -61,7 +61,10 @@ export default class Sections extends Component {
       } else if (section.type === 'video') {
         contents = <Video url={section.url} autoplay={false} />;
       } else if (section.type === 'form') {
-        contents = <FormSection formTemplateId={section.formTemplateId} />;
+        contents = (
+          <FormSection formTemplateId={section.formTemplateId}
+            formTemplate={section.formTemplate} />
+        );
       } else if (section.type === 'files') {
         contents = <FilesSection files={section.files} />;
       } else if (section.type === 'map') {

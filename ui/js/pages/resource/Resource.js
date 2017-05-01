@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-import { getItem } from '../../actions';
+import { connect } from 'react-redux';
+import { loadItem, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import ResourceContents from './ResourceContents';
 
-export default class Resource extends Component {
+class Resource extends Component {
 
   constructor() {
     super();
@@ -12,26 +13,30 @@ export default class Resource extends Component {
   }
 
   componentDidMount() {
-    this._load(this.props.match.params.id);
+    this._load(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id) {
-      this._load(nextProps.match.params.id);
+    if (nextProps.id !== this.props.id) {
+      this._load(nextProps);
+    }
+    if (nextProps.resource) {
+      document.title = nextProps.resource.name;
     }
   }
 
-  _load(id) {
-    getItem('resources', id, { populate: true })
-    .then((resource) => {
-      document.title = resource.name;
-      this.setState({ resource });
-    })
-    .catch(error => console.error('!!! Resource catch', error));
+  componentWillUnmount() {
+    const { dispatch, id } = this.props;
+    dispatch(unloadItem('resources', id));
+  }
+
+  _load(props) {
+    const { dispatch, id } = props;
+    dispatch(loadItem('resources', id, { populate: true }));
   }
 
   render() {
-    const { resource } = this.state;
+    const { resource } = this.props;
     let contents;
     let actions;
     if (resource) {
@@ -51,9 +56,19 @@ export default class Resource extends Component {
 }
 
 Resource.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  resource: PropTypes.object,
 };
+
+Resource.defaultProps = {
+  resource: undefined,
+};
+
+const select = (state, props) => ({
+  id: props.match.params.id,
+  resource: state[props.match.params.id],
+  session: state.session,
+});
+
+export default connect(select)(Resource);

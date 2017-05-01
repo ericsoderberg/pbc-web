@@ -40,7 +40,7 @@ export default class NewsletterEdit extends Component {
     );
     return (
       <Edit title="Edit Newsletter" category="newsletters" match={match}
-        footerActions={copyControl} removeBackLevel={1}
+        footerActions={copyControl} postRemovePath="/newsletters"
         FormContents={NewsletterFormContents} Preview={NewsletterPreview}
         onChange={this._onChange} />
     );

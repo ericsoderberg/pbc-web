@@ -1,32 +1,28 @@
 import React, { Component, PropTypes } from 'react';
-import { getItems } from '../../actions';
+import { connect } from 'react-redux';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import TextHelp from '../../components/TextHelp';
 
-export default class UserFormContents extends Component {
-
-  constructor() {
-    super();
-    this.state = { domains: [] };
-  }
+class UserFormContents extends Component {
 
   componentDidMount() {
-    const { session } = this.props;
+    const { dispatch, session } = this.props;
     if (session.userId.administrator || session.userId.administratorDomainId) {
-      this._getDomains();
+      dispatch(loadCategory('domains', { sort: 'name' }));
     }
   }
 
-  _getDomains() {
-    getItems('domains', { sort: 'name' })
-    .then(response => this.setState({ domains: response }))
-    .catch(error => console.error('UserFormContents domains catch', error));
+  componentWillUnmount() {
+    const { dispatch, session } = this.props;
+    if (session.userId.administrator) {
+      dispatch(unloadCategory('domains'));
+    }
   }
 
   render() {
-    const { className, formState, session } = this.props;
-    const { domains } = this.state;
+    const { className, domains, formState, session } = this.props;
     const user = formState.object;
 
     let adminFields;
@@ -105,6 +101,8 @@ export default class UserFormContents extends Component {
 
 UserFormContents.propTypes = {
   className: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+  domains: PropTypes.array,
   formState: PropTypes.object.isRequired,
   session: PropTypes.shape({
     userId: PropTypes.shape({
@@ -117,4 +115,11 @@ UserFormContents.propTypes = {
 
 UserFormContents.defaultProps = {
   className: undefined,
+  domains: [],
 };
+
+const select = state => ({
+  domains: (state.domains || {}).items,
+});
+
+export default connect(select)(UserFormContents);
