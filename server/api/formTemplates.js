@@ -228,25 +228,50 @@ const validate = (data) => {
 
 export default function (router) {
   router.get('/form-templates/:id.csv', (req, res) => {
+    const FormTemplate = mongoose.model('FormTemplate');
+    const Form = mongoose.model('Form');
     getSession(req)
     .then(requireSomeAdministrator)
     .then((session) => {
       const id = req.params.id;
-      const FormTemplate = mongoose.model('FormTemplate');
-      return FormTemplate.findOne({ _id: id, ...authorizedForDomain(session) }).exec();
-    })
-    .then((formTemplate) => {
-      const Form = mongoose.model('Form');
-      return Form.find({ formTemplateId: formTemplate._id }).exec()
-      .then(forms => ({ forms, formTemplate }));
+      return FormTemplate.findOne({ _id: id, ...authorizedForDomain(session) })
+      .exec()
+      .then(formTemplate => ({ formTemplate, session }));
     })
     .then((context) => {
-      const { forms, formTemplate } = context;
+      const { formTemplate, session } = context;
+      if (formTemplate.linkedFormTemplateId) {
+        return FormTemplate.findOne({
+          _id: formTemplate.linkedFormTemplateId,
+          ...authorizedForDomain(session),
+        }).exec()
+        .then(linkedFormTemplate => ({ formTemplate, linkedFormTemplate }));
+      }
+      return context;
+    })
+    .then((context) => {
+      const { formTemplate } = context;
+      return Form.find({ formTemplateId: formTemplate._id }).exec()
+      .then(forms => ({ ...context, forms }));
+    })
+    .then((context) => {
+      const { linkedFormTemplate } = context;
+      return Form.find({ formTemplateId: linkedFormTemplate._id }).exec()
+      .then((forms) => {
+        const linkedForms = {};
+        forms.forEach((form) => { linkedForms[form._id] = form; });
+        return { ...context, linkedForms };
+      });
+    })
+    .then((context) => {
+      const { forms, formTemplate, linkedFormTemplate, linkedForms } = context;
 
       const fields = [];
       const fieldNames = [];
       const templateFieldMap = {};
+      const linkedTemplateFieldIdMap = {};
       const optionMap = {};
+
       formTemplate.sections.forEach(section =>
         section.fields.filter(field => field.type !== 'instructions')
         .forEach((field) => {
@@ -254,20 +279,51 @@ export default function (router) {
           field.options.forEach((option) => { optionMap[option._id] = option; });
           fields.push(`${field._id}`);
           fieldNames.push(field.name || section.name);
+          if (field.linkedFieldId) {
+            linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
+          }
         }));
+
       fields.push('created');
       fieldNames.push('created');
       fields.push('modified');
       fieldNames.push('modified');
 
+      if (linkedFormTemplate) {
+        linkedFormTemplate.sections.forEach(section =>
+          section.fields.forEach((field) => {
+            templateFieldMap[field._id] = field;
+            field.options.forEach((option) => { optionMap[option._id] = option; });
+          }));
+      }
+
       const data = forms.map((form) => {
         const item = { created: form.created, modified: form.modified };
+        const linkedForm = form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
+
         form.fields.forEach((field) => {
           item[field.templateFieldId] =
             fieldContents(field, templateFieldMap, optionMap);
         });
+
+        if (linkedForm) {
+          // look for linked fields
+          Object.keys(linkedTemplateFieldIdMap).forEach((templateFieldId) => {
+            linkedForm.fields.some((linkedField) => {
+              if (linkedField.templateFieldId.equals(
+                linkedTemplateFieldIdMap[templateFieldId])) {
+                item[templateFieldId] =
+                  fieldContents(linkedField, templateFieldMap, optionMap);
+                return true;
+              }
+              return false;
+            });
+          });
+        }
+
         return item;
       });
+
       // console.log('!!!', fields, fieldNames);
 
       const csv = json2csv({ data, fields, fieldNames });

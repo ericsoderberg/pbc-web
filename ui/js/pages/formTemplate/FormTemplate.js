@@ -71,12 +71,10 @@ class FormTemplate extends Component {
     const linkedTemplateFieldIdMap = {};
     const optionMap = {};
     formTemplate.sections.forEach((section) => {
-      section.fields.forEach((field) => {
+      section.fields.filter(f => f.type !== 'instructions').forEach((field) => {
         templateFieldMap[field._id] = field;
         field.options.forEach((option) => { optionMap[option._id] = option; });
-        if (field.type !== 'instructions') {
-          columns.push(field._id);
-        }
+        columns.push(field._id);
         if (field.linkedFieldId) {
           linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
         }
