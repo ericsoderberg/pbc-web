@@ -116,8 +116,6 @@ class FormSection extends Component {
       if (!formTemplate) {
         dispatch(loadItem('form-templates', formTemplateId,
           { full: true, forSession: true }));
-      // } else {
-      //   this._resetState();
       }
     }
   }
@@ -139,7 +137,7 @@ class FormSection extends Component {
       } else {
         nextState = SUMMARY;
       }
-    } else if (formTemplate.forms.length === 0) {
+    } else if (!formTemplate.forms || formTemplate.forms.length === 0) {
       nextState = ADDING;
     } else if (editId || editForm) {
       nextState = EDITING;
@@ -232,7 +230,7 @@ class FormSection extends Component {
         return bestForm;
       });
     } else if (formTemplate) {
-      forms = formTemplate.forms;
+      forms = formTemplate.forms || [];
     }
 
     const classes = ['form-summary__container'];
@@ -454,6 +452,7 @@ const select = (state, props) => {
       formTemplateId = props.formTemplateId;
     }
   }
+
   return {
     formTemplateId,
     formTemplate: props.formTemplate || state[formTemplateId],

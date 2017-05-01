@@ -116,8 +116,10 @@ const populatePage = (data, session) => {
       .exec()
       .then((formTemplate) => {
         if (formTemplate) {
-          // formTemplate = addNewForm(formTemplate, session);
-          return addForms(formTemplate, session);
+          formTemplate = addNewForm(formTemplate, session);
+          if (session) {
+            return addForms(formTemplate, session);
+          }
         }
         return formTemplate;
       }),

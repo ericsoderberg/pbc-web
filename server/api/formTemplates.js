@@ -183,8 +183,8 @@ export const addForms = (data, forSession) => {
   const criteria = { formTemplateId: formTemplate._id };
   if (forSession) {
     criteria.userId = forSession.userId._id;
-    addNewForm(formTemplate, forSession);
   }
+  addNewForm(formTemplate, forSession);
   return Form.find(criteria)
   .populate({ path: 'paymentIds', select: 'amount' })
   .populate({ path: 'userId', select: 'name' })
