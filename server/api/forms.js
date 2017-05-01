@@ -218,7 +218,8 @@ const getFormContext = (session, id, populate = []) => {
   .then((context) => {
     const { form, formTemplate } = context;
     return requireDomainAdministratorOrUser(
-      context, formTemplate.domainId, form.userId._id || form.userId);
+      context, formTemplate.domainId,
+      form.userId ? form.userId._id || form.userId : undefined);
   });
 };
 
