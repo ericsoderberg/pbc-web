@@ -256,12 +256,15 @@ export default function (router) {
     })
     .then((context) => {
       const { linkedFormTemplate } = context;
-      return Form.find({ formTemplateId: linkedFormTemplate._id }).exec()
-      .then((forms) => {
-        const linkedForms = {};
-        forms.forEach((form) => { linkedForms[form._id] = form; });
-        return { ...context, linkedForms };
-      });
+      if (linkedFormTemplate) {
+        return Form.find({ formTemplateId: linkedFormTemplate._id }).exec()
+        .then((forms) => {
+          const linkedForms = {};
+          forms.forEach((form) => { linkedForms[form._id] = form; });
+          return { ...context, linkedForms };
+        });
+      }
+      return context;
     })
     .then((context) => {
       const { forms, formTemplate, linkedFormTemplate, linkedForms } = context;
