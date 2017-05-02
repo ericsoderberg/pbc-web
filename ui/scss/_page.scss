@@ -8,6 +8,10 @@
   position: relative;
   padding: 0 $unit;
   overflow: hidden;
+  min-height: round($unit * 10); // so they each hold their own
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   @media all and (min-width: 700px) {
     opacity: 0;
@@ -22,6 +26,7 @@
 }
 
 .section__container--center {
+  align-items: center;
   text-align: center;
 
   .section.text {
@@ -51,6 +56,7 @@
 }
 
 .section__container--start {
+  align-items: flex-start;
   text-align: left;
 
   form.form {
@@ -70,6 +76,7 @@
 }
 
 .section__container--end {
+  align-items: flex-end;
   text-align: right;
 }
 
@@ -85,8 +92,8 @@
 .section {
   position: relative;
   display: block;
-  max-width: $page-width;
-  min-height: round($unit * 10); // so they each hold their own
+  width: $page-width;
+  max-width: 100%;
   margin: 0 auto;
   padding: $double-unit 0;
   z-index: 1;
@@ -103,7 +110,7 @@
 
   &.list {
     font-size: 1.25rem;
-    max-width: $page-width + $double-unit;
+    width: $page-width + $double-unit;
 
     .item {
       @media all and (min-width: 700px) {
@@ -195,8 +202,8 @@
 }
 
 .text {
-  max-width: $page-width;
-  margin: 0 auto;
+  // max-width: $page-width;
+  // margin: 0 auto;
   // text-align: center;
   @include section-content;
 
