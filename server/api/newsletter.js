@@ -2,7 +2,7 @@ import moment from 'moment';
 import { markdown } from 'markdown';
 
 function markupText(text, section) {
-  let contents = markdown.toHTML(text);
+  let contents = markdown.toHTML(text || '');
   if (section.color) {
     contents = `
 <div style="padding: 1px 24px; margin: 24px 0px; background-color: ${section.color}">
@@ -158,7 +158,11 @@ export function render(newsletter, urlBase, address) {
 
       case 'event': {
         const event = section.eventId;
-        return markupEvent({ ...event.toObject(), nextDates: nextDates(event) }, urlBase);
+        if (event) {
+          return markupEvent({ ...event.toObject(), nextDates: nextDates(event) },
+            urlBase);
+        }
+        return '';
       }
 
       case 'library': {
@@ -175,10 +179,10 @@ ${previousMessageMarkup}
       }
 
       case 'pages': return section.pages.filter(page => page).map(page =>
-        markupPage(page.page, section, urlBase));
+        (page.page ? markupPage(page.page, section, urlBase) : ''));
 
       case 'files': return section.files.filter(file => file).map(file =>
-        markupFile(file, section, urlBase));
+        (file ? markupFile(file, section, urlBase) : ''));
 
       default:
         return '<span>TBD</span>';
