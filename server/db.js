@@ -328,6 +328,7 @@ const paymentSchema = Schema({
   amount: Number,
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  name: String, // derived from user name at time of submittal
   notes: String,
   method: String, // check | paypal
   modified: Date,

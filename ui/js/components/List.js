@@ -28,7 +28,7 @@ class List extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ loadingMore: false });
+    this.setState({ loading: false, loadingMore: false });
     if (nextProps.location.search !== this.props.location.search) {
       this.setState(this._stateFromProps(nextProps), this._load);
     }

@@ -20,6 +20,11 @@ const deletePaymentRelated = (doc) => {
   .then(() => doc);
 };
 
+const canAdmin = (session, payment = {}) => (
+  session.userId.administrator || (payment.domainId &&
+    payment.domainId.equals(session.userId.administratorDomainId))
+);
+
 export default function (router) {
   register(router, {
     category: 'payments',
@@ -59,14 +64,23 @@ export default function (router) {
     getSession(req)
     .then(requireSession)
     .then(session => getPostData(req).then(data => ({ session, data })))
+    // .then((context) => {
+    //   const { data } = context;
+    //   const FormTemplate = mongoose.model('FormTemplate');
+    //   return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
+    //   .then(formTemplate => ({ formTemplate, ...context }));
+    // })
     .then((context) => {
-      const { data } = context;
-      const FormTemplate = mongoose.model('FormTemplate');
-      return FormTemplate.findOne({ _id: data.formTemplateId }).exec()
-      .then(formTemplate => ({ formTemplate, ...context }));
+      const { data, session } = context;
+      if (canAdmin(session) && data.userId) {
+        const User = mongoose.model('User');
+        return User.findOne({ _id: data.userId }).exec()
+        .then(user => ({ user, ...context }));
+      }
+      return context;
     })
     .then((context) => {
-      const { data, formTemplate, session } = context;
+      const { data, session, user } = context;
       const Payment = mongoose.model('Payment');
       data.created = new Date();
       data.modified = data.created;
@@ -75,11 +89,11 @@ export default function (router) {
       }
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
-      if (!data.userId ||
-        !(session.userId.administrator || (formTemplate.domainId &&
-          formTemplate.domainId.equals(session.userId.administratorDomainId)))) {
+      if (!data.userId || !canAdmin(session)) {
         data.userId = session.userId;
       }
+      const useUser = user || session;
+      data.name = useUser.name || useUser.email;
       const payment = new Payment(data);
       return payment.save().then(doc => ({ doc, ...context }));
     })
@@ -119,16 +133,24 @@ export default function (router) {
         context, payment.domainId, payment.userId);
     })
     .then((context) => {
-      const { session, payment } = context;
+      const { payment, session } = context;
+      if (canAdmin(session, payment) && payment.userId) {
+        const User = mongoose.model('User');
+        return User.findOne({ _id: payment.userId }).exec()
+        .then(user => ({ user, ...context }));
+      }
+      return context;
+    })
+    .then((context) => {
+      const { session, payment, user } = context;
       let data = unsetDomainIfNeeded(req.body);
       // Allow an administrator to set the userId. Otherwise, set it to
       // the current session user
-      if (!data.userId ||
-        !(session.userId.administrator ||
-          (session.userId.administratorDomainId &&
-          session.userId.administratorDomainId.equals(payment.domainId)))) {
+      if (!data.userId || !canAdmin(session, payment)) {
         data.userId = session.userId;
       }
+      const useUser = user || session;
+      data.name = useUser.name || useUser.email;
       data.modified = new Date();
       data = unsetDomainIfNeeded(data, session);
       return payment.update(data);
