@@ -246,7 +246,8 @@ class FormTemplateFormContents extends Component {
 
       details.push(
         <FormField key="notify" label="Notify email addresses"
-          help="Whom to notify when people submit filled out forms."
+          help={`Whom to notify when people submit filled out forms.
+            Separate multiple addresses with commas.`}
           error={errors.notify}>
           <input name="notify"
             value={formTemplate.notify || ''}
