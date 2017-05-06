@@ -142,7 +142,7 @@ const addTotals = (formTemplate, forms) => {
 
     form.fields.forEach((field) => {
       const templateField = templateFieldMap[field.templateFieldId];
-      if (templateField.total >= 0) {
+      if (templateField && templateField.total >= 0) {
         const value = parseFloat(
           fieldValue(field, templateFieldMap, optionMap), 10);
         if (value) {
@@ -150,7 +150,7 @@ const addTotals = (formTemplate, forms) => {
         }
       }
 
-      if (templateField.remaining !== undefined) {
+      if (templateField && templateField.remaining !== undefined) {
         if (templateField.type === 'number' || templateField.type === 'count') {
           templateField.remaining -= parseFloat(field.value, 10);
         } else {
@@ -158,7 +158,7 @@ const addTotals = (formTemplate, forms) => {
         }
       }
 
-      if (templateField.options) {
+      if (templateField && templateField.options) {
         templateField.options.map(o => o.remaining !== undefined)
         .forEach((option) => {
           (field.optionIds || []).forEach((optionId) => {
