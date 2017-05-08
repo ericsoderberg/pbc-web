@@ -92,7 +92,7 @@ export default function (router) {
       if (!data.userId || !canAdmin(session)) {
         data.userId = session.userId;
       }
-      const useUser = user || session;
+      const useUser = user || session.userId;
       data.name = useUser.name || useUser.email;
       const payment = new Payment(data);
       return payment.save().then(doc => ({ doc, ...context }));
@@ -149,7 +149,7 @@ export default function (router) {
       if (!data.userId || !canAdmin(session, payment)) {
         data.userId = session.userId;
       }
-      const useUser = user || session;
+      const useUser = user || session.userId;
       data.name = useUser.name || useUser.email;
       data.modified = new Date();
       return payment.update(unsetDomainIfNeeded(data, session));
