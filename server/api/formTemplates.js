@@ -135,7 +135,8 @@ const addTotals = (formTemplate, forms) => {
   let totalCost = 0;
   let paidAmount = 0;
 
-  forms.map(form => form.toObject()).forEach((form) => {
+  formTemplate.forms = forms.map(form => form.toObject());
+  formTemplate.forms.forEach((form) => {
     addFormTotals(formTemplate, form);
     totalCost += form.totalCost;
     paidAmount += form.paidAmount;
@@ -171,7 +172,6 @@ const addTotals = (formTemplate, forms) => {
     });
   });
 
-  formTemplate.forms = forms;
   formTemplate.totalCost = totalCost;
   formTemplate.paidAmount = paidAmount;
 };

@@ -455,7 +455,7 @@ const select = (state, props) => {
 
   return {
     formTemplateId,
-    formTemplate: props.formTemplate || state[formTemplateId],
+    formTemplate: state[formTemplateId] || props.formTemplate,
     session: state.session,
   };
 };
