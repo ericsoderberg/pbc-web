@@ -5,6 +5,7 @@ import {
 } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetCalendarIfNeeded } from './calendars';
+import { addForms, addNewForm } from './formTemplates';
 import register from './register';
 import { catcher } from './utils';
 
@@ -162,6 +163,81 @@ const unsetReferences = (data) => {
   return data;
 };
 
+const PAGE_MESSAGE_FIELDS =
+  'path name verses author date image series seriesId';
+
+const populateEvent = (data, session) => {
+  const Message = mongoose.model('Message');
+  const FormTemplate = mongoose.model('FormTemplate');
+  const date = moment().subtract(1, 'day');
+  const page = data.toObject();
+
+  const promises = [Promise.resolve(page)];
+
+  // Library
+  page.sections.filter(section => section.type === 'library')
+  .forEach((section) => {
+    promises.push(
+      Message.findOne({
+        libraryId: section.libraryId,
+        date: { $lt: date.toString() },
+        // series: { $ne: true }
+      })
+      .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
+      .then((message) => {
+        if (message && message.seriesId) {
+          // get series also
+          return Message.findOne({ _id: message.seriesId })
+          .select(PAGE_MESSAGE_FIELDS).exec()
+          .then(series => ({ message, series }));
+        }
+        return message;
+      }),
+    );
+  });
+
+  // FormTemplate
+  page.sections.filter(section => section.type === 'form')
+  .forEach((section) => {
+    section.formTemplateId = section.formTemplateId._id; // un-populate
+    promises.push(
+      FormTemplate.findOne({ _id: section.formTemplateId })
+      .exec()
+      .then((formTemplate) => {
+        if (formTemplate) {
+          formTemplate = addNewForm(formTemplate, session);
+          if (session) {
+            return addForms(formTemplate, session);
+          }
+        }
+        return formTemplate;
+      }),
+    );
+  });
+
+  return Promise.all(promises)
+  .then((docs) => {
+    let docsIndex = 0;
+    // const pageData = docs[docsIndex].toObject();
+    page.sections.filter(section => section.type === 'library')
+    .forEach((section) => {
+      docsIndex += 1;
+      section.message = docs[docsIndex];
+    });
+    page.sections.filter(section => section.type === 'calendar')
+    .forEach((section) => {
+      docsIndex += 1;
+      section.events = docs[docsIndex];
+    });
+    page.sections.filter(section => section.type === 'form')
+    .forEach((section) => {
+      docsIndex += 1;
+      section.formTemplate = docs[docsIndex];
+    });
+    return page;
+  });
+};
+
 export default function (router) {
   router.post('/events/resources', (req, res) => {
     getSession(req)
@@ -232,23 +308,11 @@ export default function (router) {
           model: 'Library' },
         { path: 'sections.people.id', select: 'name image', model: 'User' },
       ],
-      transformOut: (doc) => {
-        // convert deprecated text property to a section
-        doc = doc.toObject();
-        if (doc.text !== undefined) {
-          if (doc.text && doc.sections.length === 0) {
-            doc.sections.push({ type: 'text', text: doc.text });
-          }
-          delete doc.text;
+      transformOut: (event, req, session) => {
+        if (event && req.query.populate) {
+          return populateEvent(event, session);
         }
-        // convert deprecated address property to a map
-        if (doc.address !== undefined) {
-          if (doc.address && doc.sections.length === 0) {
-            doc.sections.push({ type: 'map', address: doc.address });
-          }
-          delete doc.address;
-        }
-        return doc;
+        return event;
       },
     },
     post: {
