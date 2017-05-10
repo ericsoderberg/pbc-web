@@ -365,8 +365,12 @@ export default function (router) {
         if (req.query.new) {
           formTemplate = addNewForm(formTemplate, session, req.query.linkedFormId);
         }
+        const admin = (session && (session.userId.administrator ||
+          (session.userId.administratorDomainId &&
+          session.userId.administratorDomainId.equals(formTemplate.domainId))));
         if (req.query.full && session) {
-          return addForms(formTemplate, req.query.forSession ? session : undefined);
+          return addForms(formTemplate,
+            (req.query.forSession || !admin) ? session : undefined);
         }
         return formTemplate;
       },

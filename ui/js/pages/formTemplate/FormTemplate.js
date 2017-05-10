@@ -473,7 +473,8 @@ class FormTemplate extends Component {
       more = <Loading />;
     } else if (mightHaveMore) {
       more = <div ref={(ref) => { this._moreRef = ref; }} />;
-    } else if (formTemplate && formTemplate.forms.length > 20) {
+    } else if (formTemplate && formTemplate.forms &&
+      formTemplate.forms.length > 20) {
       more = <div className="list__count">{formTemplate.forms.length}</div>;
     }
 
