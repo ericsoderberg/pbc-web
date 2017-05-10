@@ -23,7 +23,7 @@ class FormTemplate extends Component {
     this._layout = this._layout.bind(this);
     // this._onScroll = this._onScroll.bind(this);
     this._onDownload = this._onDownload.bind(this);
-    this.state = { sortReverse: false };
+    this.state = { columns: [], sortReverse: false };
   }
 
   componentDidMount() {

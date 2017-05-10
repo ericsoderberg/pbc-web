@@ -37,8 +37,10 @@ class FormAdd extends Component {
   }
 
   componentWillUnmount() {
-    const { dispatch, formTemplateId } = this.props;
-    dispatch(unloadItem('form-templates', formTemplateId));
+    const { dispatch, formTemplateId, inline } = this.props;
+    if (!inline) {
+      dispatch(unloadItem('form-templates', formTemplateId));
+    }
   }
 
   _load(props) {
@@ -105,7 +107,7 @@ class FormAdd extends Component {
     if (formTemplate && form) {
       let cancelControl;
       let headerCancelControl;
-      if (onCancel || formTemplateId) {
+      if (onCancel || (formTemplateId && !inline)) {
         const cancelFunc = onCancel || (() => history.goBack());
         cancelControl = (
           <Button secondary={true} label="Cancel" onClick={cancelFunc} />

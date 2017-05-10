@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loadItem, putItem, deleteItem } from '../../actions';
+import { loadItem, putItem, deleteItem, unloadItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
@@ -54,13 +54,15 @@ class FormEdit extends Component {
   }
 
   // removed since we need to preserve those from FormSection
-  // componentWillUnmount() {
-  //   const { dispatch, formTemplate, id } = this.props;
-  //   dispatch(unloadItem('forms', id));
-  //   if (formTemplate) {
-  //     dispatch(unloadItem('form-templates', formTemplate._id));
-  //   }
-  // }
+  componentWillUnmount() {
+    const { dispatch, formTemplate, id, inline } = this.props;
+    if (!inline) {
+      dispatch(unloadItem('forms', id));
+      if (formTemplate) {
+        dispatch(unloadItem('form-templates', formTemplate._id));
+      }
+    }
+  }
 
   _load(props) {
     const { dispatch, id } = props;
@@ -222,7 +224,7 @@ FormEdit.defaultProps = {
 };
 
 const select = (state, props) => {
-  const id = props.match ? props.match.params.id : undefined;
+  const id = props.match ? props.match.params.id : props.id;
   const form = props.form || state[id];
   let linkedForm = props.linkedForm;
   if (!linkedForm && form && (form.linkedForm || form.linkedFormId)) {
