@@ -369,6 +369,8 @@ export default function (router) {
           (session.userId.administratorDomainId &&
           session.userId.administratorDomainId.equals(formTemplate.domainId))));
         if (req.query.full && session) {
+          // reset modified time to now to avoid caching issues when deleting forms
+          formTemplate.modified = moment.utc();
           return addForms(formTemplate,
             (req.query.forSession || !admin) ? session : undefined);
         }
