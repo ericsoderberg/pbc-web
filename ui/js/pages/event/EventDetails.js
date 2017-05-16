@@ -64,7 +64,7 @@ class EventDetails extends Component {
   }
 
   _onToggle() {
-    const { calendars } = this.state;
+    const { calendars } = this.props;
     const active = !this.state.active;
     if (active && calendars.length === 0) {
       this._get();
@@ -227,6 +227,7 @@ EventDetails.defaultProps = {
 };
 
 const select = state => ({
+  calendars: (state.calendars || {}).items || [],
   domains: (state.domains || {}).items || [],
   session: state.session,
 });
