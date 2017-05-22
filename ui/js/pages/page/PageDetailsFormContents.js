@@ -61,6 +61,12 @@ class PageDetailsFormContents extends Component {
           <input name="path" value={page.path || ''}
             onChange={formState.change('path')} />
         </FormField>,
+        <FormField key="pathAlias" name="pathAlias"
+          label="Url alias" help="alternate url name"
+          error={errors.pathAlias}>
+          <input name="pathAlias" value={page.pathAlias || ''}
+            onChange={formState.change('pathAlias')} />
+        </FormField>,
       ];
 
       let administeredBy;

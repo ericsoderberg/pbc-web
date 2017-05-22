@@ -288,6 +288,7 @@ export default function (router) {
       ] }),
     },
     get: {
+      pathAlias: true,
       authorization: allowAnyone,
       populate: [
         { path: 'sections.pages.id', select: 'name path', model: 'Page' },

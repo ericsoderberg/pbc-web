@@ -138,6 +138,7 @@ const pageSchema = Schema({
   name: String,
   oldId: Number,
   path: PATH_TYPE,
+  pathAlias: PATH_TYPE,
   public: Boolean,
   sections: [pageSectionSchema],
   // sections: [Schema(sectionDef, {

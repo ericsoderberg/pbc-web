@@ -32,7 +32,14 @@ export default (router, options) => {
       .then(getOpts.authorization || options.authorization || requireAdministrator)
       .then((session) => {
         const id = req.params.id;
-        const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
+        let criteria;
+        if (ID_REGEXP.test(id)) {
+          criteria = { _id: id };
+        } else if (getOpts.pathAlias) {
+          criteria = { $or: [{ path: id }, { pathAlias: id }] };
+        } else {
+          criteria = { path: id };
+        }
         const query = Doc.findOne(criteria);
         if (req.query.select) {
           query.select(req.query.select);

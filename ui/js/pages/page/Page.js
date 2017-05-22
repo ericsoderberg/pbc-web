@@ -26,6 +26,9 @@ class Page extends Component {
     }
     if (nextProps.page) {
       document.title = nextProps.page.name;
+      if (nextProps.page.pathAlias === nextProps.id) {
+        nextProps.history.replace(`/${nextProps.page.path}`);
+      }
     }
   }
 
@@ -72,6 +75,7 @@ class Page extends Component {
 Page.propTypes = {
   dispatch: PropTypes.func.isRequired,
   page: PropTypes.object,
+  history: PropTypes.any.isRequired,
   id: PropTypes.string.isRequired,
   notFound: PropTypes.bool,
   session: PropTypes.shape({
