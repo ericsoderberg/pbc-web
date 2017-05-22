@@ -36,8 +36,9 @@ class PageHeader extends Component {
   render() {
     const {
       title, searchText, onSearch, actions, back, homer,
-      focusOnSearch, responsive, showMenu, site,
+      focusOnSearch, responsive, site,
     } = this.props;
+    const { showMenu } = this.state;
     const classes = ['page-header'];
     if (responsive && actions &&
       (actions.length > 1 || (actions.length === 1 && onSearch))) {
