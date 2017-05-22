@@ -148,13 +148,15 @@
 .section__container--full {
   padding: 0;
 
-  .section.image,
-  .section.video,
-  .section.map,
-  .footer {
-    max-width: none;
-    margin: 0;
-    padding: 0;
+  @media all and (min-width: 700px) {
+    .section.image,
+    .section.video,
+    .section.map,
+    .footer {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
   }
 
   .section {
