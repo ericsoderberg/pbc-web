@@ -42,7 +42,7 @@ class UserFormContents extends Component {
           </FormField>
           <FormField label="Administrator for">
             <select name="administratorDomainId"
-              value={(user.administratorDomainId || {})._id || ''}
+              value={user.administratorDomainId || ''}
               onChange={formState.change('administratorDomainId')}>
               {domainOptions}
             </select>

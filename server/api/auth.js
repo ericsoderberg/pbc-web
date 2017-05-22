@@ -73,10 +73,15 @@ export function authorizedDomainAdministrator(session) {
 }
 
 export function authorizedForDomain(session) {
-  if (session && session.userId.administrator) {
-    return {};
-  } else if (session && session.userId.administratorDomainId) {
-    return { domainId: session.userId.administratorDomainId };
+  if (session) {
+    if (session.userId.administrator) {
+      return {};
+    } else if (session.userId.administratorDomainId) {
+      return { $or: [
+        { domainId: session.userId.administratorDomainId },
+        { administratorDomainId: session.userId.administratorDomainId },
+      ] };
+    }
   }
   return { name: false };
 }

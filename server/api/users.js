@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import hat from 'hat';
 import register from './register';
 import {
-  authorizedDomainAdministrator, allowAnyone, requireAdministrator,
+  authorizedDomainAdministrator, allowAnyone, requireSomeAdministrator,
   requireSession,
 } from './auth';
 import { createSession } from './sessions';
@@ -157,7 +157,7 @@ It will sign you in to the ${site.name} web site.`;
     },
     get: {
       authorization: requireSession,
-      populate: { path: 'administratorDomainId', select: 'name' },
+      // populate: { path: 'administratorDomainId', select: 'name' },
       transformOut: (user) => {
         if (user) {
           user = user.toObject();
@@ -168,7 +168,7 @@ It will sign you in to the ${site.name} web site.`;
       },
     },
     index: {
-      authorization: requireAdministrator,
+      authorization: requireSomeAdministrator,
       filterAuthorized: authorizedDomainAdministrator,
       searchProperties: ['name', 'email'],
       transformOut: users => (
