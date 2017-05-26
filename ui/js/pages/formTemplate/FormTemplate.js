@@ -478,12 +478,23 @@ class FormTemplate extends Component {
       more = <div className="list__count">{formTemplate.forms.length}</div>;
     }
 
+    let linkedForm;
+    if (formTemplate && formTemplate.linkedFormTemplateId) {
+      linkedForm = (
+        <Link className="linked-form-link"
+          to={`/form-templates/${formTemplate.linkedFormTemplateId._id}`}>
+          {formTemplate.linkedFormTemplateId.name}
+        </Link>
+      );
+    }
+
     return (
       <main>
         <ItemHeader category="form-templates" item={formTemplate}
           title={title} actions={actions} />
         {contents}
         {more}
+        {linkedForm}
         <PageContext filter={{ 'sections.formTemplateId': id }} />
       </main>
     );
