@@ -151,7 +151,8 @@ class List extends Component {
       const more = this._moreRef;
       if (more) {
         const rect = more.getBoundingClientRect();
-        if (rect.top <= window.innerHeight) {
+        // start loading just before they get there
+        if (rect.top <= (window.innerHeight + 200)) {
           this._onMore();
         }
       }
