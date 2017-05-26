@@ -184,7 +184,8 @@ class FormTemplate extends Component {
       })
       .join(', ');
     } else if (templateField.type === 'date') {
-      contents = moment(contents).format('YYYY-MM-DD');
+      const date = moment(contents);
+      contents = `${date.format('YYYY-MM-DD')} (${date.fromNow(true)})`;
     } else if (templateField.monetary) {
       contents = <span><span className="secondary">$ </span>{contents}</span>;
     }

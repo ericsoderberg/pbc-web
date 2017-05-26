@@ -996,7 +996,7 @@
   tbody {
     td {
       border-top: 1px solid $border-color;
-      max-width: round($unit * 8);
+      max-width: round($unit * 10);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
