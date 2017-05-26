@@ -139,8 +139,17 @@ const addTotals = (formTemplate, forms) => {
   let paidAmount = 0;
 
   formTemplate.forms = forms.map(form => form.toObject());
+  // unify all payments
+  const payments = {};
   formTemplate.forms.forEach((form) => {
-    addFormTotals(formTemplate, form);
+    (form.paymentIds || []).forEach((payment) => {
+      payment.allocated = 0;
+      payments[payment._id] = payment;
+    });
+  });
+
+  formTemplate.forms.forEach((form) => {
+    addFormTotals(formTemplate, form, payments);
     totalCost += form.totalCost;
     paidAmount += form.paidAmount;
 
@@ -368,7 +377,10 @@ export default function (router) {
         }
 
         if (formTemplate.payable) {
-          item.balance = `$${form.totalCost - form.paidAmount}`;
+          const balance = form.totalCost - form.paidAmount;
+          if (balance && balance < 100) {
+            item.balance = `$${balance}`;
+          }
         }
 
         return item;

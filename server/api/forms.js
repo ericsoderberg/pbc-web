@@ -137,7 +137,7 @@ const sendEmails = (req, transporter, update = false) => (
 );
 
 // duplicated in FormUtils, TODO: remove from UI and rely on server entirely
-export const addFormTotals = (formTemplate, form) => {
+export const addFormTotals = (formTemplate, form, payments = {}) => {
   let totalCost = 0;
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
@@ -179,7 +179,14 @@ export const addFormTotals = (formTemplate, form) => {
 
   let paidAmount = 0;
   (form.paymentIds || []).forEach((payment) => {
-    paidAmount += payment.amount;
+    const payment2 = payments[payment._id]; // consolidated, so we can track allocated
+    if (payment2) {
+      const amount = Math.min(payment2.amount - payment2.allocated, totalCost);
+      payment2.allocated += amount;
+      paidAmount += amount;
+    } else {
+      paidAmount += payment.amount;
+    }
   });
 
   form.totalCost = Math.max(0, totalCost);
