@@ -1,3 +1,4 @@
+import FileSaver from 'file-saver';
 
 export const AUDIT_LOG_LOAD = 'AUDIT_LOG_LOAD';
 export const AUDIT_LOG_UNLOAD = 'AUDIT_LOG_UNLOAD';
@@ -352,14 +353,14 @@ export function getFormTemplateDownload(id) {
   return fetch(`/api/form-templates/${id}.csv`, {
     method: 'GET', headers: _headers })
     .then((response) => {
-      // const cd = response.headers.get('Content-Disposition');
-      // const name = cd && cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)[1];
+      const cd = response.headers.get('Content-Disposition');
+      const name = cd && cd.match(/filename="([^"]+)"/)[1];
       response.blob()
-      // .then(blob => window.saveAs(blob, name));
-      .then((blob) => {
-        const blobUrl = URL.createObjectURL(blob);
-        window.location.replace(blobUrl);
-      });
+      .then(blob => FileSaver.saveAs(blob, name));
+      // .then((blob) => {
+      //   const blobUrl = URL.createObjectURL(blob);
+      //   window.location.replace(blobUrl);
+      // });
     });
 }
 

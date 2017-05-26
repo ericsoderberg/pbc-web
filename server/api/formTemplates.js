@@ -378,7 +378,7 @@ export default function (router) {
 
       const csv = json2csv({ data, fields, fieldNames });
 
-      res.attachment('data.csv');
+      res.attachment(`${formTemplate.name}.csv`);
       res.end(csv);
     })
     .catch(error => catcher(error, res));
