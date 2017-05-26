@@ -292,6 +292,14 @@ export default function (router) {
           }
         }));
 
+      let forms2 = forms;
+      if (formTemplate.payable) {
+        fields.push('balance');
+        fieldNames.push('Balance');
+        addTotals(formTemplate, forms);
+        forms2 = formTemplate.forms;
+      }
+
       fields.push('created');
       fieldNames.push('created');
       fields.push('modified');
@@ -309,7 +317,7 @@ export default function (router) {
           }));
       }
 
-      const data = forms.map((form) => {
+      const data = forms2.map((form) => {
         const item = { created: form.created, modified: form.modified };
         const linkedForm =
           form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
@@ -341,6 +349,10 @@ export default function (router) {
             item[field.templateFieldId] =
               fieldContents(field, templateField, optionMap);
           });
+        }
+
+        if (formTemplate.payable) {
+          item.balance = `$${form.totalCost - form.paidAmount}`;
         }
 
         return item;
