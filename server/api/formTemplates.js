@@ -66,7 +66,10 @@ const fieldContents = (field, templateField, optionMap) => {
     })
     .join(', ');
   } else if (templateField.type === 'date') {
-    contents = moment(contents).format('YYYY-MM-DD');
+    const date = moment(contents);
+    if (date.isValid()) {
+      contents = date.format('YYYY-MM-DD');
+    }
   } else if (templateField.monetary) {
     contents = `$${contents}`;
   }
@@ -301,6 +304,8 @@ export default function (router) {
             field.options.forEach((option) => {
               optionMap[option._id] = option;
             });
+            fields.push(`${field._id}`);
+            fieldNames.push(field.name || section.name);
           }));
       }
 
@@ -329,6 +334,12 @@ export default function (router) {
               }
               return false;
             });
+          });
+
+          linkedForm.fields.forEach((field) => {
+            const templateField = templateFieldMap[field.templateFieldId];
+            item[field.templateFieldId] =
+              fieldContents(field, templateField, optionMap);
           });
         }
 
