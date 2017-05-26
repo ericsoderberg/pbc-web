@@ -85,6 +85,15 @@ class FormTemplate extends Component {
       templateFieldMap[field.name] = field;
       columns.push(field.name);
     });
+    if (formTemplate.payable) {
+      templateFieldMap.balance = {
+        name: 'balance',
+        label: 'Balance',
+        monetary: true,
+        total: (formTemplate.totalCost - formTemplate.paidAmount),
+      };
+      columns.push('balance');
+    }
 
     if (formTemplate.linkedFormTemplate) {
       formTemplate.linkedFormTemplate.sections.forEach((section) => {
@@ -252,7 +261,7 @@ class FormTemplate extends Component {
       return (
         <th key={fieldId} className={classes.join(' ')}
           onClick={onClick}>
-          {field.name}
+          {field.label || field.name}
         </th>
       );
     });
@@ -323,12 +332,23 @@ class FormTemplate extends Component {
     if (!modified.isSame(created, 'day')) {
       cellMap.modified = modified.format('MMM Do YYYY');
     }
+    let unpaid;
+    if (form.totalCost) {
+      const balance = form.totalCost - form.paidAmount;
+      if (balance) {
+        cellMap.balance = `$ ${balance}`;
+        unpaid = true;
+      }
+    }
 
     const cells = columns.map((templateFieldId) => {
       const templateField = templateFieldMap[templateFieldId] || {};
       let classes = (templateFieldId === sortFieldId ? 'sort' : '');
       if (templateField.total >= 0) {
         classes += ' numeric';
+      }
+      if (templateFieldId === 'balance' && unpaid) {
+        classes += ' error';
       }
       const contents = cellMap[templateFieldId] || <span>&nbsp;</span>;
       return <td key={templateFieldId} className={classes}>{contents}</td>;
