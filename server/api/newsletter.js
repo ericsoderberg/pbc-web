@@ -13,52 +13,120 @@ ${contents}
   return contents;
 }
 
-function nextDates(event) {
-  const start = moment(event.start);
-  const yesterday = moment().subtract(1, 'day');
+// TODO: combine with code in EventTimes
 
-  const dates = [];
+const formatDate = (date, dayOfWeek = true) =>
+  date.format(
+    `${dayOfWeek ? 'dddd ' : ''}MMMM Do${date.isSame(moment().startOf('day'), 'year') ? '' : ' YYYY'}`);
+
+const formatTime = (date, ampm = true) =>
+  date.format(`${date.minute() === 0 ? 'h' : 'h:mm'}${ampm ? ' a' : ''}`);
+
+const formatTimes = (date1, date2) => {
+  const noon = moment(date1).startOf('day').add(12, 'hours');
+  const sameAmpm = ((date1.isBefore(noon) && date2.isBefore(noon)) ||
+    (date1.isAfter(noon) && date2.isAfter(noon)));
+  return `${formatTime(date1, !sameAmpm)} - ${formatTime(date2)}`;
+};
+
+function renderDates(event) {
+  const start = moment(event.start);
+  const end = moment(event.end);
+  const now = moment().startOf('day');
+
+  let result;
   if (event.dates && event.dates.length > 0) {
-    // distinguish multiple days in the same week from the same day across weeks
-    if (moment(event.dates[0]).day() === start.day()) {
-      // find the next date
+    // Recurring event
+
+    // make into moments
+    const dates = event.dates.slice(0).map(date => moment(date));
+    // merge start
+    if (!dates.some(date => date.isSame(start, 'day'))) {
+      dates.push(start);
+    }
+    // sort
+    dates.sort((date1, date2) => {
+      if (date1.isBefore(date2)) return -1;
+      if (date1.isAfter(date2)) return 1;
+      return 0;
+    });
+
+    // We consider four kinds of recurrence:
+    // 1) multiple consecutive days, such as VBS
+    // 2) weekly, such as HS Sundays
+    // 3) infrequent but always the same day of the week, such as elders meetings
+    // 3) irregular
+    // Figure out which kind we have.
+
+    let consecutive = true;
+    let weekly = true;
+    let sameDayOfWeek = true;
+    let previousDate;
+    dates.forEach((date) => {
+      if (previousDate) {
+        if (!moment(date).subtract(1, 'day').isSame(previousDate, 'day')) {
+          consecutive = false;
+        }
+        if (!moment(date).subtract(1, 'week').isSame(previousDate, 'day')) {
+          weekly = false;
+        }
+        if (date.day() !== previousDate.day()) {
+          sameDayOfWeek = false;
+        }
+      }
+      previousDate = date;
+    });
+
+    if (consecutive) {
+      const first = dates[0];
+      const last = dates[dates.length - 1];
+      result =
+        `${formatDate(first)} - ${formatDate(last)} @ ${formatTimes(start, end)}`;
+    } else if (weekly) {
+      if (event.times && event.times.length > 0) {
+        // multiple times
+        const secondTime = event.times[0];
+        result = `${start.format('dddd[s]')} @ ${formatTimes(start, end)} ` +
+          `& ${formatTimes(moment(secondTime.start), moment(secondTime.end))}`;
+      } else {
+        // single time
+        result = `${start.format('dddd[s]')} @ ${formatTimes(start, end)}`;
+      }
+    } else if (sameDayOfWeek && dates.length > 4) {
+      // not weekly, but regular enough
+      // pick the next date in the future
       let nextDate;
-      event.dates.forEach((date) => {
-        date = moment(date);
-        if (!nextDate ||
-          (nextDate.isBefore(yesterday) && date.isAfter(nextDate)) ||
-          (date.isAfter(yesterday) && date.isBefore(nextDate))) {
+      dates.some((date) => {
+        if (date.isSameOrAfter(now)) {
           nextDate = date;
         }
+        return nextDate;
       });
-      if (nextDate) {
-        dates.push(nextDate); // .format('MMMM Do');
+      if (!nextDate) {
+        nextDate = dates[dates.length - 1];
       }
+      result = `${formatDate(nextDate)} @ ${formatTimes(start, end)}`;
     } else {
-      dates.push(start);
-      const end = moment(event.dates[event.dates.length - 1]);
-      dates.push(end);
-      // result = `${start.format('MMMM Do')} - ${end.format('MMMM Do')}`;
+      // irreguler
+      const datesString = dates.filter(date => date.isSameOrAfter(now))
+      .slice(0, 4)
+      .map(date => formatDate(date, false)).join(', ');
+      result = `${datesString} @ ${formatTimes(start, end)}`;
     }
+  } else if (!start.isSame(end, 'day')) {
+    // multi-day, non-recurring
+    result = `${formatDate(start)} @ ${formatTime(start)} to ` +
+      `${formatDate(end)} ${formatTime(end)}`;
   } else {
-    dates.push(start); // .format('MMMM Do YYYY');
+    // single day, non-recurring
+    result = `${formatDate(start)} @ ${formatTimes(start, end)}`;
   }
 
-  const times = [];
-  if (dates.length > 0) {
-    times.push(start); // .format(' @ h:mm a');
-    if (event.times && event.times.length > 0) {
-      event.times.forEach((time) => {
-        times.push(moment(time.start));
-        // result += ` & ${moment(time.start).format('h:mm a')}`;
-      });
-    }
-  }
-  return { dates, times };
+  return result;
 }
 
 function markupEvent(event, urlBase) {
-  const { nextDates: { dates, times } } = event;
+  const dates = renderDates(event);
   const url = `${urlBase}/events/${event.path || event._id}`;
   let image = '';
   if (event.image) {
@@ -67,11 +135,7 @@ function markupEvent(event, urlBase) {
 src="${event.image.data}" /></a>
   `;
   }
-  let at = dates.map(d => d.format('MMMM Do')).join(' - ');
-  if (dates.length <= 1) {
-    at += ` @ ${times.map(t => t.format('h:mm a')).join(' & ')}`;
-  }
-  at = `<div style="padding-bottom: 6px;">${at}</div>`;
+  const at = `<div style="padding-bottom: 6px;">${dates}</div>`;
   let location = '';
   if (event.location) {
     location = `<div style="color: #999999;">${event.location}</div>`;
@@ -159,8 +223,7 @@ export function render(newsletter, urlBase, address) {
       case 'event': {
         const event = section.eventId;
         if (event) {
-          return markupEvent({ ...event.toObject(), nextDates: nextDates(event) },
-            urlBase);
+          return markupEvent(event.toObject(), urlBase);
         }
         return '';
       }
