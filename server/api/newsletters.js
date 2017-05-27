@@ -118,6 +118,30 @@ export default function (router, transporter) {
     .catch(error => catcher(error, res));
   });
 
+  router.get('/newsletters/:id/:imageName', (req, res) => {
+    const Newsletter = mongoose.model('Newsletter');
+    const id = req.params.id;
+    const imageName = req.params.imageName;
+    Newsletter.findOne({ _id: id }).exec()
+    .then((newsletter) => {
+      // look for the image requested
+      const section = newsletter.sections.filter(s =>
+        (s.type === 'image' && s.image.name === imageName))[0];
+      if (section) {
+        const matches = section.image.data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+        const img = new Buffer(matches[2], 'base64');
+        res.writeHead(200, {
+          'Content-Type': section.image.type,
+          'Content-Length': img.length,
+        });
+        res.end(img);
+      } else {
+        res.status(404);
+      }
+    })
+    .catch(error => catcher(error, res));
+  });
+
   register(router, {
     category: 'newsletters',
     modelName: 'Newsletter',

@@ -218,7 +218,8 @@ export function render(newsletter, urlBase, address) {
         return markupText(section.text, section);
 
       case 'image':
-        return `<img style="max-width: 432px;" src="${section.image.data}" />`;
+        return '<img style="max-width: 432px;" ' +
+          `src="/api/newsletters/${newsletter._id}/${section.image.name}" />`;
 
       case 'event': {
         const event = section.eventId;
