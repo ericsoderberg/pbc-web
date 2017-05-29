@@ -309,17 +309,17 @@ export default class FormTemplateFieldEdit extends Component {
       const sectionOptions = [];
       formTemplate.sections.forEach(section2 =>
         sectionOptions.push(
-          <option key={section2._id}
+          <option key={section2._id || section2.id}
             label={section2.name}
-            value={section2._id} />,
+            value={section2._id || section2.id} />,
         ),
       );
       inSection = (
         <FormField label="Section">
           <select name="inSection"
-            value={section._id}
+            value={section._id || section.id}
             onChange={event =>
-              onMove(field._id, section._id, event.target.value)
+              onMove(field._id, section._id || section.id, event.target.value)
             }>
             {sectionOptions}
           </select>

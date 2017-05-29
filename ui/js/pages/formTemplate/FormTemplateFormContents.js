@@ -71,7 +71,7 @@ class FormTemplateFormContents extends Component {
         expandedSections,
         newSectionId: this.state.newSectionId + 1,
       });
-      return { id };
+      return { id: `${id}`, fields: [] };
     });
   }
 
@@ -103,18 +103,24 @@ class FormTemplateFormContents extends Component {
   _onMove(fieldId, oldSectionId, newSectionId) {
     const { formState } = this.props;
     const sections = formState.object.sections.slice(0);
-    // remove field from old section
+    let newSection;
     let field;
-    const oldSection = sections.filter(s => s._id === oldSectionId)[0];
-    oldSection.fields = oldSection.fields.filter((f) => {
-      if (f._id === fieldId) {
-        field = f;
-        return false;
+    sections.forEach((section) => {
+      if (section._id === newSectionId || section.id === newSectionId) {
+        // remember new section
+        newSection = section;
+      } else if (section._id === oldSectionId || section.id === oldSectionId) {
+        // remove field from old section
+        section.fields = section.fields.filter((f) => {
+          if (f._id === fieldId) {
+            field = f;
+            return false;
+          }
+          return true;
+        });
       }
-      return true;
     });
     // add field to new section
-    const newSection = sections.filter(s => s._id === newSectionId)[0];
     newSection.fields.push(field);
     formState.set('sections', sections);
   }
