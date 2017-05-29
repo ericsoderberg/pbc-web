@@ -57,9 +57,7 @@ export default class FormTemplateSectionEdit extends Component {
   }
 
   render() {
-    const {
-      formTemplate, linkedToFormTemplate, payable,
-    } = this.props;
+    const { formTemplate, linkedToFormTemplate, onMove } = this.props;
     const { detailsActive, formState, expandedFields } = this.state;
     const section = formState.object;
 
@@ -70,20 +68,23 @@ export default class FormTemplateSectionEdit extends Component {
       if (detailsActive) {
         const dependsOnOptions = dependableFields(formTemplate, section)
         .map(dependableField => (
-          <option key={dependableField.id} label={dependableField.name}
+          <option key={dependableField.id}
+            label={dependableField.name}
             value={dependableField.id} />
         ));
         dependsOnOptions.unshift(<option key={0} />);
 
         details = [
           <FormField label="Depends on">
-            <select name="dependsOnId" value={section.dependsOnId || ''}
+            <select name="dependsOnId"
+              value={section.dependsOnId || ''}
               onChange={formState.change('dependsOnId')}>
               {dependsOnOptions}
             </select>
           </FormField>,
           <FormField>
-            <input name="administrative" type="checkbox"
+            <input name="administrative"
+              type="checkbox"
               checked={section.administrative || false}
               onChange={formState.toggle('administrative')} />
             <label htmlFor="administrative">administrative</label>
@@ -99,7 +100,8 @@ export default class FormTemplateSectionEdit extends Component {
       sectionFields = (
         <fieldset className="form__fields">
           <FormField label="Section name">
-            <input name="name" value={section.name || ''}
+            <input name="name"
+              value={section.name || ''}
               onChange={formState.change('name')} />
           </FormField>
           {details}
@@ -111,7 +113,8 @@ export default class FormTemplateSectionEdit extends Component {
       let raise;
       if (index !== 0) {
         raise = (
-          <button type="button" className="button-icon"
+          <button type="button"
+            className="button-icon"
             onClick={formState.swapWith('fields', index, index - 1)}>
             <UpIcon />
           </button>
@@ -120,7 +123,8 @@ export default class FormTemplateSectionEdit extends Component {
       let lower;
       if (index < (section.fields.length - 1)) {
         lower = (
-          <button type="button" className="button-icon"
+          <button type="button"
+            className="button-icon"
             onClick={formState.swapWith('fields', index, index + 1)}>
             <DownIcon />
           </button>
@@ -137,23 +141,27 @@ export default class FormTemplateSectionEdit extends Component {
       if (expandedFields[field._id] || expandedFields[field.id]) {
         edit = (
           <FormTemplateFieldEdit field={field}
+            section={section}
             formTemplate={formTemplate}
             linkedToFormTemplate={linkedToFormTemplate}
-            onChange={formState.changeAt('fields', index)} />
+            onChange={formState.changeAt('fields', index)}
+            onMove={onMove} />
         );
       }
 
       return (
         <div key={field._id || field.id}>
           <div className="form-item form-item__controls">
-            <button type="button" className="button-plain form-item__control"
+            <button type="button"
+              className="button-plain form-item__control"
               onClick={this._toggleField(field._id || field.id)}>
               <h4>{field.name || field.type}</h4>
             </button>
             <div className="box--row box--static">
               {raise}
               {lower}
-              <button type="button" className="button-icon"
+              <button type="button"
+                className="button-icon"
                 onClick={formState.removeAt('fields', index)}>
                 <TrashIcon />
               </button>
@@ -165,7 +173,9 @@ export default class FormTemplateSectionEdit extends Component {
     });
 
     const addControls = FIELD_TYPES.map(type => (
-      <Button key={type} label={`Add ${type}`} secondary={true}
+      <Button key={type}
+        label={`Add ${type}`}
+        secondary={true}
         onClick={this._addField(type)} />
     ));
 
@@ -185,6 +195,7 @@ FormTemplateSectionEdit.propTypes = {
   formTemplate: PropTypes.object.isRequired,
   linkedToFormTemplate: PropTypes.object,
   onChange: PropTypes.func.isRequired,
+  onMove: PropTypes.func.isRequired,
   section: PropTypes.object.isRequired,
 };
 

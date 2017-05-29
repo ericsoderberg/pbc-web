@@ -20,6 +20,7 @@ class FormTemplateFormContents extends Component {
   constructor() {
     super();
     this._changeLinkedFormTemplateId = this._changeLinkedFormTemplateId.bind(this);
+    this._onMove = this._onMove.bind(this);
     this.state = {
       expandedSections: {}, // _id or id
       newSectionId: 1,
@@ -99,6 +100,25 @@ class FormTemplateFormContents extends Component {
     formState.set('linkedFormTemplateId', linkedFormTemplateId);
   }
 
+  _onMove(fieldId, oldSectionId, newSectionId) {
+    const { formState } = this.props;
+    const sections = formState.object.sections.slice(0);
+    // remove field from old section
+    let field;
+    const oldSection = sections.filter(s => s._id === oldSectionId)[0];
+    oldSection.fields = oldSection.fields.filter((f) => {
+      if (f._id === fieldId) {
+        field = f;
+        return false;
+      }
+      return true;
+    });
+    // add field to new section
+    const newSection = sections.filter(s => s._id === newSectionId)[0];
+    newSection.fields.push(field);
+    formState.set('sections', sections);
+  }
+
   render() {
     const {
       className, domains, errors, formState, linkedToFormTemplate, session,
@@ -112,7 +132,8 @@ class FormTemplateFormContents extends Component {
       let raise;
       if (index !== 0) {
         raise = (
-          <button type="button" className="button-icon"
+          <button type="button"
+            className="button-icon"
             onClick={formState.swapWith('sections', index, index - 1)}>
             <UpIcon />
           </button>
@@ -121,7 +142,8 @@ class FormTemplateFormContents extends Component {
       let lower;
       if (index < (formTemplate.sections.length - 1)) {
         lower = (
-          <button type="button" className="button-icon"
+          <button type="button"
+            className="button-icon"
             onClick={formState.swapWith('sections', index, index + 1)}>
             <DownIcon />
           </button>
@@ -139,14 +161,16 @@ class FormTemplateFormContents extends Component {
         sectionClassName = 'form-section';
         header = (
           <div className="form-item form-item__controls">
-            <button type="button" className="button-plain form-item__control"
+            <button type="button"
+              className="button-plain form-item__control"
               onClick={this._toggleSection(section._id || section.id)}>
               <h4>{section.name || `Section ${index + 1}`}</h4>
             </button>
             <div className="box--row box--static">
               {raise}
               {lower}
-              <button type="button" className="button-icon"
+              <button type="button"
+                className="button-icon"
                 onClick={formState.removeAt('sections', index)}>
                 <TrashIcon />
               </button>
@@ -162,7 +186,8 @@ class FormTemplateFormContents extends Component {
           <FormTemplateSectionEdit section={section}
             formTemplate={formTemplate}
             linkedToFormTemplate={linkedToFormTemplate}
-            onChange={formState.changeAt('sections', index)} />
+            onChange={formState.changeAt('sections', index)}
+            onMove={this._onMove} />
         );
       }
 
@@ -177,41 +202,50 @@ class FormTemplateFormContents extends Component {
     let details;
     if (detailsActive) {
       details = [
-        <FormField key="submit" label="Submit button label"
+        <FormField key="submit"
+          label="Submit button label"
           error={errors.submitLabel}>
           <input name="submitLabel"
             value={formTemplate.submitLabel || 'Submit'}
             onChange={formState.change('submitLabel')} />
         </FormField>,
-        <FormField key="message" label="Post submit message"
-          help={<TextHelp />} error={errors.postSubmitMessage}>
-          <textarea name="postSubmitMessage" rows={2}
+        <FormField key="message"
+          label="Post submit message"
+          help={<TextHelp />}
+          error={errors.postSubmitMessage}>
+          <textarea name="postSubmitMessage"
+            rows={2}
             value={formTemplate.postSubmitMessage || ''}
             onChange={formState.change('postSubmitMessage')} />
         </FormField>,
-        <FormField key="another" label="Another button label"
+        <FormField key="another"
+          label="Another button label"
           help="if multiple are expected per user"
           error={errors.anotherLabel}>
           <input name="anotherLabel"
             value={formTemplate.anotherLabel || ''}
             onChange={formState.change('anotherLabel')} />
         </FormField>,
-        <FormField key="ack" error={errors.acknowledge}
+        <FormField key="ack"
+          error={errors.acknowledge}
           help={`After a form is submitted, the submitter will be sent a
             standardized email indicating that we received it`}>
-          <input name="acknowledge" type="checkbox"
+          <input name="acknowledge"
+            type="checkbox"
             checked={formTemplate.acknowledge || false}
             onChange={formState.toggle('acknowledge')} />
           <label htmlFor="acknowledge">acknowledge via email</label>
         </FormField>,
         <FormField key="auth" error={errors.authenticate}>
-          <input name="authenticate" type="checkbox"
+          <input name="authenticate"
+            type="checkbox"
             checked={formTemplate.authenticate || false}
             onChange={formState.toggle('authenticate')} />
           <label htmlFor="authenticate">authenticate</label>
         </FormField>,
         <FormField key="pay" error={errors.payable}>
-          <input name="payable" type="checkbox"
+          <input name="payable"
+            type="checkbox"
             checked={formTemplate.payable || false}
             onChange={formState.toggle('payable')} />
           <label htmlFor="payable">accept payment</label>
@@ -220,7 +254,8 @@ class FormTemplateFormContents extends Component {
 
       if (formTemplate.payable) {
         details.push(
-          <FormField key="check" label="Check instructions"
+          <FormField key="check"
+            label="Check instructions"
             help="Leave blank to not allow checks"
             error={errors.payByCheckInstructions}>
             <textarea name="payByCheckInstructions"
@@ -232,11 +267,13 @@ class FormTemplateFormContents extends Component {
 
       if (formTemplate.authenticate) {
         details.push(
-          <FormField key="linkedTo" label="Linked to"
+          <FormField key="linkedTo"
+            label="Linked to"
             help={`Another form that must be filled out first.
               This only works for authenticated forms.`}
             error={errors.linkedFormTemplateId}>
-            <SelectSearch category="form-templates" clearable={true}
+            <SelectSearch category="form-templates"
+              clearable={true}
               options={{ filter: { authenticate: true } }}
               value={(formTemplate.linkedFormTemplateId || {}).name || ''}
               onChange={this._changeLinkedFormTemplateId} />
@@ -245,7 +282,8 @@ class FormTemplateFormContents extends Component {
       }
 
       details.push(
-        <FormField key="notify" label="Notify email addresses"
+        <FormField key="notify"
+          label="Notify email addresses"
           help={`Whom to notify when people submit filled out forms.
             Separate multiple addresses with commas.`}
           error={errors.notify}>
@@ -262,7 +300,8 @@ class FormTemplateFormContents extends Component {
         options.unshift(<option key={0} />);
         details.push(
           <FormField key="admin" label="Administered by" error={errors.domainId}>
-            <select name="domainId" value={formTemplate.domainId || ''}
+            <select name="domainId"
+              value={formTemplate.domainId || ''}
               onChange={formState.change('domainId')}>
               {options}
             </select>
@@ -280,7 +319,8 @@ class FormTemplateFormContents extends Component {
       <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Form name" error={errors.name}>
-            <input name="name" value={formTemplate.name || ''}
+            <input name="name"
+              value={formTemplate.name || ''}
               onChange={formState.change('name')} />
           </FormField>
           {details}
@@ -288,7 +328,8 @@ class FormTemplateFormContents extends Component {
         {sections}
         <fieldset className="form__fields">
           <FormFieldAdd>
-            <Button label="Add section" secondary={true}
+            <Button label="Add section"
+              secondary={true}
               onClick={this._addSection()} />
           </FormFieldAdd>
         </fieldset>
