@@ -96,7 +96,8 @@ class Search extends Component {
         <Text key={section._id}>{section.text}</Text>
       ));
       contents.push([page.score, (
-        <Item key={page._id} item={page}
+        <Item key={page._id}
+          item={page}
           path={page.path || `/pages/${page._id}`}>
           {content}
         </Item>
@@ -106,7 +107,8 @@ class Search extends Component {
     (categories.libraries || []).forEach((library) => {
       library.name = `${library.name} Library`;
       contents.push([library.score, (
-        <Item key={library._id} item={library}
+        <Item key={library._id}
+          item={library}
           path={`/libraries/${library.path || library._id}`}>
           <Text text={library.text} />
         </Item>
@@ -115,7 +117,8 @@ class Search extends Component {
 
     (categories.events || []).forEach((event) => {
       contents.push([event.score, (
-        <Item key={event._id} item={event}
+        <Item key={event._id}
+          item={event}
           path={`/events/${event.path || event._id}`}>
           <EventTimes event={event} />
           <Text text={event.text} />
@@ -134,10 +137,18 @@ class Search extends Component {
       contents = contents.sort((c1, c2) => c2[0] - c1[0]).map(c => c[1]);
     }
 
+    const actions =
+      [<Link key="lib" to="/libraries/sermon">Search sermon library</Link>];
+
     return (
       <main className="search-page">
-        <PageHeader homer={true} responsive={false} focusOnSearch={true}
-          searchText={searchText} onSearch={this._onSearch} />
+        <PageHeader homer={true}
+          responsive={false}
+          focusOnSearch={true}
+          actions={actions}
+          searchPlaceholder="Search pages and events"
+          searchText={searchText}
+          onSearch={this._onSearch} />
         {contents}
       </main>
     );

@@ -13,6 +13,7 @@
   border-width: 2px;
   border-color: transparent;
   border-style: solid none;
+  background-color: transparent;
 
   &:focus {
     border-bottom-color: $brand-color;
@@ -50,7 +51,7 @@
   padding: 0 $half-unit;
   height: $double-unit;
   background-color: transparent;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
 
   .search__control {
     display: none;

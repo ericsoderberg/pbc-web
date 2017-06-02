@@ -134,9 +134,9 @@
     line-height: $double-unit;
   }
 
-  @media all and (max-width: 699px) {
-    padding: $half-unit;
-  }
+  // @media all and (max-width: 699px) {
+  //   padding: $half-unit;
+  // }
 
   &:hover {
     background-color: $control-hover-background;
@@ -286,7 +286,7 @@
   }
 
   @media all and (max-width: 699px) {
-    margin: 0 $half-unit;
+    margin: 0;
     font-size: 1.25em;
   }
 }
@@ -327,19 +327,15 @@
   }
 }
 
-.page-header__search {
-  position: relative;
-  z-index: 1;
-  flex: 1 0 auto;
-  margin: 0;
-  padding: 0 $half-unit;
-  height: $double-unit;
-  border: none;
-  border-width: 1px;
-  border-color: $header-background-color;
-  border-left-style: solid;
-  background-color: transparent;
-  font-size: 1.4rem;
+.page-header__secondary {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: $header-background-color;
+
+  .search {
+    max-width: $page-width + $double-unit;
+  }
 }
 
 .page-header__dropper {

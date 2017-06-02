@@ -35,7 +35,7 @@ class PageHeader extends Component {
 
   render() {
     const {
-      title, searchText, onSearch, actions, back, homer,
+      title, searchText, searchPlaceholder, onSearch, actions, back, homer,
       focusOnSearch, responsive, site,
     } = this.props;
     const { showMenu } = this.state;
@@ -80,38 +80,47 @@ class PageHeader extends Component {
     }
 
     let menu;
-    if (actions || onSearch) {
+    if (actions) {
       const menuClasses = ['page-header__menu'];
       if (showMenu) {
         menuClasses.push('page-header__menu--active');
       }
-      let search;
-      if (onSearch) {
-        search = (
-          <Search responsive={false}
-            value={searchText} onChange={onSearch}
-            focusOnMount={focusOnSearch} />
-        );
-      }
       menu = (
         <div className={menuClasses.join(' ')}>
-          <Button className="page-header__menu-control" label="menu"
+          <Button className="page-header__menu-control"
+            label="menu"
             onClick={this._toggleMenu} />
           <nav className="page-header__actions">
-            {search}
             {actions}
           </nav>
         </div>
       );
     }
 
-    return (
+    let contents = (
       <header className={classes.join(' ')}>
         {navControl}
         {titleElement}
         {menu}
       </header>
     );
+
+    if (onSearch) {
+      contents = (
+        <div>
+          {contents}
+          <div className="page-header__secondary">
+            <Search responsive={false}
+              placeholder={searchPlaceholder}
+              value={searchText}
+              onChange={onSearch}
+              focusOnMount={focusOnSearch} />
+          </div>
+        </div>
+      );
+    }
+
+    return contents;
   }
 }
 
@@ -122,6 +131,7 @@ PageHeader.propTypes = {
   homer: PropTypes.bool,
   onSearch: PropTypes.func,
   responsive: PropTypes.bool,
+  searchPlaceholder: PropTypes.string,
   searchText: PropTypes.string,
   site: PropTypes.object,
   title: PropTypes.string,
@@ -134,6 +144,7 @@ PageHeader.defaultProps = {
   homer: false,
   onSearch: undefined,
   responsive: true,
+  searchPlaceholder: undefined,
   searchText: '',
   site: undefined,
   title: undefined,

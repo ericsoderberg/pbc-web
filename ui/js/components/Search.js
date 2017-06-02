@@ -36,7 +36,7 @@ export default class Search extends Component {
   }
 
   render() {
-    const { onChange, responsive, value } = this.props;
+    const { className, onChange, placeholder, responsive, value } = this.props;
     const { active } = this.state;
     const classNames = ['search'];
     if (responsive) {
@@ -45,12 +45,18 @@ export default class Search extends Component {
     if (active) {
       classNames.push('search--active');
     }
+    if (className) {
+      classNames.push(className);
+    }
 
     return (
       <div className={classNames.join(' ')}>
         <input ref={(ref) => { this._inputRef = ref; }}
-          className="search__input" placeholder="Search"
-          value={value || ''} onChange={onChange} onBlur={this._onBlur} />
+          className="search__input"
+          placeholder={placeholder}
+          value={value || ''}
+          onChange={onChange}
+          onBlur={this._onBlur} />
         <button className="search__control button-icon"
           onClick={!active ? this._onActivate : undefined}>
           <SearchIcon />
@@ -61,14 +67,18 @@ export default class Search extends Component {
 }
 
 Search.propTypes = {
+  className: PropTypes.string,
   focusOnMount: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
   responsive: PropTypes.bool,
   value: PropTypes.string,
 };
 
 Search.defaultProps = {
+  className: undefined,
   focusOnMount: false,
+  placeholder: 'Search',
   responsive: false,
   value: '',
 };
