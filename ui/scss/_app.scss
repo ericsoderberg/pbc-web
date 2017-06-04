@@ -165,7 +165,7 @@
   }
 
   @media all and (max-width: 699px) {
-    min-height: $double-unit;
+    min-height: $triple-unit;
 
     .button-icon {
       padding: $third-unit;
@@ -203,14 +203,19 @@
 
   .page-header__menu--active {
     @media screen and (max-width: 699px) {
+      position: absolute;
+      z-index: 100;
+      right: 0;
+      width: 100vw;
+      background-color: $secondary-background-color;
+
+      .page-header__menu-control {
+        text-align: right;
+        width: 100%;
+      }
+
       .page-header__actions {
-        position: absolute;
-        z-index: 100;
-        top: $double-unit;
-        right: 0;
-        width: 100vw;
         display: flex;
-        background-color: $secondary-background-color;
         padding: $half-unit 0;
         border-bottom: 1px solid $border-color;
 
