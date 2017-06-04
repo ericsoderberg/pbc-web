@@ -42,7 +42,7 @@ class EventSection extends Component {
 
     let contents;
     let map;
-    if (event && event.name) {
+    if (event) {
       let location;
       if (event.location) {
         location = (
@@ -67,7 +67,8 @@ class EventSection extends Component {
       } else {
         contents = (
           <div className="event-section__text-container">
-            <Link className="event-section__text" style={style}
+            <Link className="event-section__text"
+              style={style}
               to={`/events/${event.path || event._id}`}>
               <div className="event-section__name">
                 <h2>{event.name}</h2>

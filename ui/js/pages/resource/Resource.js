@@ -47,8 +47,10 @@ class Resource extends Component {
 
     return (
       <main>
-        <ItemHeader category="resources" title={(resource || {}).name}
-          item={resource} actions={actions} />
+        <ItemHeader category="resources"
+          title={(resource || {}).name}
+          item={resource}
+          actions={actions} />
         {contents}
       </main>
     );

@@ -3,7 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { loadItem, getFormTemplateDownload, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Button from '../../components/Button';

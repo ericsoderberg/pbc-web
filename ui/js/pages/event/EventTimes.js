@@ -1,6 +1,6 @@
 
 import React, { PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { formatDate, formatTime, formatTimes } from '../../utils/Time';
 
 const TimesSet = (props) => {
@@ -26,7 +26,7 @@ const EventTimes = (props) => {
   const { event, size } = props;
   const start = moment(event.start);
   const end = moment(event.end);
-  const now = moment().startOf('day');
+  const today = moment().startOf('day');
   // const yesterday = moment(now).subtract(1, 'day');
 
   const classes = ['event-times'];
@@ -123,7 +123,7 @@ const EventTimes = (props) => {
       // pick the next date in the future
       let nextDate;
       dates.some((date) => {
-        if (date.isSameOrAfter(now)) {
+        if (date.isSameOrAfter(today)) {
           nextDate = date;
         }
         return nextDate;
@@ -142,7 +142,7 @@ const EventTimes = (props) => {
       ];
     } else {
       // irreguler
-      const datesString = dates.filter(date => date.isSameOrAfter(now))
+      const datesString = dates.filter(date => date.isSameOrAfter(today))
       .slice(0, 4)
       .map(date => formatDate(date, false)).join(', ');
 

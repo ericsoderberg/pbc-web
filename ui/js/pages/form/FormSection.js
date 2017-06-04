@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Markdown from 'markdown-to-jsx';
 import { loadItem, unloadItem } from '../../actions';
 import Loading from '../../components/Loading';

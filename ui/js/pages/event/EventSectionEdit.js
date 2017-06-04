@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';

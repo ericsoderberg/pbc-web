@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export const formatDate = (date, dayOfWeek = true) =>
   date.format(
@@ -13,3 +13,21 @@ export const formatTimes = (date1, date2) => {
     (date1.isAfter(noon) && date2.isAfter(noon)));
   return `${formatTime(date1, !sameAmpm)} - ${formatTime(date2)}`;
 };
+
+let timezone = 'America/Los_Angeles';
+moment.tz.setDefault(timezone);
+
+export const setTimezone = (zone) => {
+  timezone = zone || timezone;
+  moment.tz.setDefault(timezone);
+};
+
+if (!moment.homeZone) {
+  moment.homeZone = (...args) => moment.tz(args, timezone);
+}
+
+if (!moment.fn.homeZone) {
+  moment.fn.homeZone = function homeZone() {
+    return this.tz(timezone);
+  };
+}

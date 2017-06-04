@@ -456,6 +456,7 @@ const siteSchema = Schema({
   shortcutIcon: image,
   slogan: String,
   socialUrls: [String],
+  timezone: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { loadItem, unloadItem, loadCategory, unloadCategory } from '../../actions';
 import Section from '../../components/Section';
 import Button from '../../components/Button';

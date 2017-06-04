@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { getUnavailableDates } from '../../actions';
 import Button from '../../components/Button';
 

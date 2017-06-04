@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import json2csv from 'json2csv';
 import register from './register';
 import {

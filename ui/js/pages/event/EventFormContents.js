@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import FormField from '../../components/FormField';
 import DateTimeInput from '../../components/DateTimeInput';
 import SectionsFormContents from '../../components/SectionsFormContents';
@@ -41,7 +41,8 @@ export default class EventFormContents extends Component {
 
         <fieldset className="form__fields">
           <FormField label="Name" error={errors.name}>
-            <input name="name" value={event.name || ''}
+            <input name="name"
+              value={event.name || ''}
               onChange={formState.change('name')} />
           </FormField>
           <FormField label="Starts" error={errors.start}>
@@ -53,14 +54,16 @@ export default class EventFormContents extends Component {
               onChange={formState.change('end')} />
           </FormField>
           <FormField label="Location" error={errors.location}>
-            <input name="location" value={event.location || ''}
+            <input name="location"
+              value={event.location || ''}
               onChange={formState.change('location')} />
           </FormField>
         </fieldset>
 
         <SectionsFormContents formState={formState} types={SECTION_TYPES} />
 
-        <EventDetails formState={formState} session={session}
+        <EventDetails formState={formState}
+          session={session}
           errors={errors} />
         <EventResources formState={formState} session={session} />
         <EventDates formState={formState} session={session} />

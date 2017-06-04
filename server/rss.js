@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import escape from 'escape-html';
 import fs from 'fs';
 import { FILES_PATH } from './api/files';

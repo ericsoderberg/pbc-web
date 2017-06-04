@@ -1,7 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import FormFieldAdd from '../../components/FormFieldAdd';

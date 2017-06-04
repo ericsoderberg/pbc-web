@@ -1,6 +1,6 @@
 
 import React, { PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Section from '../../components/Section';
 import Text from '../../components/Text';
 import Sections from '../../components/Sections';
@@ -20,9 +20,9 @@ const EventContents = (props) => {
   }
 
   let upcoming;
-  const now = moment();
+  const today = moment().startOf('day');
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
-  .filter(date => date.isAfter(now)).slice(1, 4) // skip next one
+  .filter(date => date.isAfter(today)).slice(0, 3)
   .map(date => (
     <li key={date} className={`item item--${align}`}>
       {date.format('MMMM Do YYYY')}
@@ -48,8 +48,10 @@ const EventContents = (props) => {
 
   return (
     <div>
-      <Section full={false} align={event.align || 'center'}
-        backgroundImage={event.image} color={event.color}>
+      <Section full={false}
+        align={event.align || 'center'}
+        backgroundImage={event.image}
+        color={event.color}>
         <EventSection id={event} navigable={false} color={innerColor} />
       </Section>
       <Sections align={align} sections={event.sections} />

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 const WEEK_DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 

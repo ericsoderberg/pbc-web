@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { allowAnyone, requireSomeAdministrator } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';

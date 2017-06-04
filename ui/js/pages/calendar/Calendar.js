@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import {
   loadCalendar, loadCategory, unloadCalendar, unloadCategory,
 } from '../../actions';
@@ -98,7 +98,7 @@ class Calendar extends Component {
         }
       }
       if (!date) {
-        date = moment();
+        date = moment().startOf('day');
       }
     }
     const state = {
@@ -309,7 +309,9 @@ class Calendar extends Component {
     const { activeCalendars } = this.state;
     const controls = calendars.map(calendar => (
       <div key={calendar._id} className="filter-item box--row box--static">
-        <input id={calendar._id} name={calendar._id} type="checkbox"
+        <input id={calendar._id}
+          name={calendar._id}
+          type="checkbox"
           checked={activeCalendars[calendar._id] || false}
           onChange={this._toggleCalendar(calendar._id)} />
         <label htmlFor={calendar._id}>{calendar.name}</label>
@@ -317,7 +319,9 @@ class Calendar extends Component {
     ));
     controls.unshift(
       <div key="all" className="filter-item box--row box--static">
-        <input id="all-calendars" name="all-calendars" type="checkbox"
+        <input id="all-calendars"
+          name="all-calendars"
+          type="checkbox"
           checked={Object.keys(activeCalendars).length === 0}
           onChange={() => this.setState({ activeCalendars: {} },
             this._load)} />
@@ -397,7 +401,8 @@ class Calendar extends Component {
       let more;
       if (loadingMore) {
         more = <Loading />;
-      } else if (session && session.userId.administrator && weeks && weeks.length < 7) {
+      } else if (session && session.userId.administrator &&
+        weeks && weeks.length < 7) {
         more = <Button plain={true} onClick={this._onMore}>more</Button>;
       }
 
@@ -412,11 +417,13 @@ class Calendar extends Component {
         <main>
           <PageHeader title={(calendar || {}).name || 'Calendar'}
             homer={true}
-            searchText={searchText} onSearch={this._onSearch}
+            searchText={searchText}
+            onSearch={this._onSearch}
             actions={actions} />
           <div className="calendar">
             <div className="calendar__header">
-              <button type="button" className="button-icon"
+              <button type="button"
+                className="button-icon"
                 onClick={this._changeDate(moment(calendar.previous))}>
                 <LeftIcon className="button__indicator" />
               </button>
@@ -430,7 +437,8 @@ class Calendar extends Component {
                   {years}
                 </select>
               </span>
-              <button type="button" className="button-icon"
+              <button type="button"
+                className="button-icon"
                 onClick={this._changeDate(moment(calendar.next))}>
                 <RightIcon className="button__indicator" />
               </button>

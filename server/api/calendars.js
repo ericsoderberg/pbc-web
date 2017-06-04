@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import register from './register';
 import {
   getSession, allowAnyone, authorizedForDomain, requireAdministrator,
@@ -34,24 +34,21 @@ export function splitEvents(events, start, end, includeResources = false) {
     }
 
     if (event.dates && event.dates.length > 0) {
-      const times = [[
-        moment(event.start).format('HH:mm:ss'),
-        moment(event.end).format('HH:mm:ss'),
-      ]];
+      const times = [[moment(event.start), moment(event.end)]];
       if (event.times) {
         event.times.forEach((time) => {
-          times.push([
-            moment(time.start).format('HH:mm:ss'),
-            moment(time.end).format('HH:mm:ss'),
-          ]);
+          times.push([moment(time.start), moment(time.end)]);
         });
       }
 
       event.dates.map(d => moment(d)).forEach((date, index) => {
         if (date.isBetween(start, end)) {
           times.forEach((time, index2) => {
-            const start2 = moment(`${date.format('YYYY-MM-DD')}T${time[0]}`);
-            const end2 = moment(`${date.format('YYYY-MM-DD')}T${time[1]}`);
+            const [timeStart, timeEnd] = time;
+            const start2 =
+              moment(date).hour(timeStart.hour()).minute(timeStart.minute());
+            const end2 =
+              moment(date).hour(timeEnd.hour()).minute(timeEnd.minute());
             result.push({
               ...base,
               id: `${event._id}-${index}-${index2}`,
@@ -73,6 +70,36 @@ export function sortEvents(events) {
     }
     return 1;
   });
+}
+
+export function eventsToCalendarWeeks(events, start, end) {
+  const weeks = [];
+  const date = moment(start).startOf('day');
+  const endDate = moment(end).endOf('day');
+  let startOfWeek = moment(date);
+  let days = [];
+
+  while (date.isSameOrBefore(endDate)) {
+    if (startOfWeek.isBefore(date, 'week')) {
+      weeks.push({ start: startOfWeek, days });
+      startOfWeek = moment(date);
+      days = [];
+    }
+
+    const eventsForDay = [];
+    while (events.length > 0 &&
+      moment(events[0].start).isSameOrBefore(date, 'day')) {
+      eventsForDay.push(events.shift());
+    }
+    days.push({ date: date.toISOString(), events: eventsForDay });
+
+    date.add(1, 'day');
+  }
+  if (startOfWeek.isBefore(date, 'week')) {
+    weeks.push({ startOfWeek, days });
+  }
+
+  return weeks;
 }
 
 // /api/calendars and /api/calendar
@@ -122,8 +149,16 @@ export default function (router) {
   router.get('/calendar', (req, res) => {
     getSession(req)
     .then(allowAnyone)
-    // get calendar, if any
+    // get site so we can set the timezone
     .then((session) => {
+      const Site = mongoose.model('Site');
+      return Site.findOne({}).exec()
+      .then(site =>
+        moment.tz.setDefault(site.timezone || 'America/Los_Angeles'))
+      .then(() => ({ session }));
+    })
+    // get calendar, if any
+    .then((context) => {
       const Calendar = mongoose.model('Calendar');
       const id = req.query.id;
 
@@ -137,9 +172,9 @@ export default function (router) {
           criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
         }
         promise = Calendar.find(criteria).exec()
-        .then(calendars => ({ session, calendars }));
+        .then(calendars => ({ ...context, calendars }));
       } else {
-        promise = Promise.resolve({ session, calendars: [] });
+        promise = Promise.resolve({ ...context, calendars: [] });
       }
       return promise;
     })
@@ -184,7 +219,7 @@ export default function (router) {
 
       return query.sort('start').exec()
       .then(events => ({
-        calendars, events, session, dates: { date, start, end, previous, next },
+        ...context, events, dates: { date, start, end, previous, next },
       }));
     })
     // split events out
@@ -200,35 +235,9 @@ export default function (router) {
     })
     // structure by weeks and days
     .then((context) => {
-      const { calendars, dates, events } = context;
-
-      const weeks = [];
-      const date = moment(dates.start).startOf('day');
-      const end = moment(dates.end);
-      let startOfWeek = moment(date);
-      let days = [];
-
-      while (date.isSameOrBefore(end)) {
-        if (startOfWeek.isBefore(date, 'week')) {
-          weeks.push({ start: startOfWeek, days });
-          startOfWeek = moment(date);
-          days = [];
-        }
-
-        const eventsForDay = [];
-        while (events.length > 0 &&
-          moment(events[0].start).isSameOrBefore(date, 'day')) {
-          eventsForDay.push(events.shift());
-        }
-        days.push({ date: date.toISOString(), events: eventsForDay });
-
-        date.add(1, 'day');
-      }
-      if (startOfWeek.isBefore(date, 'week')) {
-        weeks.push({ startOfWeek, days });
-      }
-
-      return { calendars, dates, weeks };
+      const { dates, events } = context;
+      const weeks = eventsToCalendarWeeks(events, dates.start, dates.end);
+      return { ...context, weeks };
     })
     // build response
     .then((context) => {

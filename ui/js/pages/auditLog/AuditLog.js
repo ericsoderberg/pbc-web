@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { loadAuditLog, unloadAuditLog } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';

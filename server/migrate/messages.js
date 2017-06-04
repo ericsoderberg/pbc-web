@@ -1,7 +1,7 @@
 "use strict";
 import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
-import moment from 'moment';
+import moment from 'moment-timezone';
 import '../db';
 import { imageData, loadCategoryObject, loadCategoryArray, copyFile }
   from './utils';

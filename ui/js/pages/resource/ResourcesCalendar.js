@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { getResourcesEvents } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
@@ -44,7 +44,8 @@ export default class ResourcesCalendar extends Component {
         }
 
         const resources = event.resourceIds.map(resource => (
-          <Link key={resource._id} className="resource-event__resource"
+          <Link key={resource._id}
+            className="resource-event__resource"
             to={`/resources/${resource._id}`}>{resource.name}</Link>
         ));
         items.push(
@@ -52,7 +53,10 @@ export default class ResourcesCalendar extends Component {
             <span className="resource-event__time tertiary">
               {formatTimes(start, end)}
             </span>
-            <Link className="resource-event__name" to={`/events/${event.path || event._id}`}>{event.name}</Link>
+            <Link className="resource-event__name"
+              to={`/events/${event.path || event._id}`}>
+              {event.name}
+            </Link>
             <span className="resource-event__resources">
               {resources}
             </span>

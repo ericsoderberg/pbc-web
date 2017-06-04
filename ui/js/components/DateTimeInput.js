@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import DateSelector from './DateSelector';
 import TimeSelector from './TimeSelector';
 
@@ -175,13 +175,17 @@ export default class DateTimeInput extends Component {
       <div ref={(ref) => { this._componentRef = ref; }}
         className={classes.join(' ')}>
         <input ref={(ref) => { this._dateInputRef = ref; }}
-          className={'date-time-input__input'} type="date"
+          className={'date-time-input__input'}
+          type="date"
           value={dateValue}
-          onChange={this._onDateChange} onFocus={this._onOpen} />
+          onChange={this._onDateChange}
+          onFocus={this._onOpen} />
         <input ref={(ref) => { this._timeInputRef = ref; }}
-          className={'date-time-input__input'} type="time"
+          className={'date-time-input__input'}
+          type="time"
           value={timeValue}
-          onChange={this._onTimeChange} onFocus={this._onOpen} />
+          onChange={this._onTimeChange}
+          onFocus={this._onOpen} />
         {selector}
       </div>
     );

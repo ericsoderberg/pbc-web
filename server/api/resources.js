@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import register from './register';
 import { getSession, requireAdministrator } from './auth';
-import { splitEvents, sortEvents } from './calendars';
+import { splitEvents, sortEvents, eventsToCalendarWeeks } from './calendars';
 import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
@@ -35,6 +35,44 @@ export default function (router) {
       // sort by dates
       .then(events => sortEvents(events))
       .then(events => res.json(events));
+    })
+    .catch(error => catcher(error, res));
+  });
+
+  router.get('/resources/:id/calendar', (req, res) => {
+    getSession(req)
+    .then(requireAdministrator)
+    // get site so we can get timezone
+    .then((session) => {
+      const Site = mongoose.model('Site');
+      return Site.findOne({}).exec()
+      .then(site => ({ session, site }));
+    })
+    .then((context) => {
+      const { site } = context;
+      const Event = mongoose.model('Event');
+      const id = req.params.id;
+      const queryDate = moment(req.query.date || undefined);
+      const start = moment(queryDate).startOf('week');
+      const end = moment(queryDate).add(1, 'month');
+
+      const query = Event.find();
+
+      // find events withing the time window
+      const dateCriteria = [
+        { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+        { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+      ];
+      query.find({ resourceIds: id, $or: dateCriteria });
+
+      return query.exec()
+      // separate by dates and times within the range
+      .then(events => splitEvents(events, start, end))
+      // sort by dates
+      .then(events => sortEvents(events))
+      // arrange into weeks
+      .then(events => eventsToCalendarWeeks(events, start, end, site.timezone))
+      .then(weeks => res.json({ weeks }));
     })
     .catch(error => catcher(error, res));
   });

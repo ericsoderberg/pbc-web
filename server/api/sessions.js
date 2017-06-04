@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import hat from 'hat';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { getSession, requireSession } from './auth';
 import { createUser } from './users';
 

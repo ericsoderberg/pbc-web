@@ -2,7 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import FormError from '../../components/FormError';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';

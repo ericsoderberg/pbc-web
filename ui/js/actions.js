@@ -1,4 +1,5 @@
 import FileSaver from 'file-saver';
+import { setTimezone } from './utils/Time';
 
 export const AUDIT_LOG_LOAD = 'AUDIT_LOG_LOAD';
 export const AUDIT_LOG_UNLOAD = 'AUDIT_LOG_UNLOAD';
@@ -268,6 +269,10 @@ export function loadSite() {
   return dispatch =>
     fetch('/api/site', { method: 'GET', headers: _headers })
     .then(response => response.json())
+    .then((site) => {
+      setTimezone(site.timezone);
+      return site;
+    })
     .then(payload => dispatch({ type: SITE_LOAD, payload }))
     .catch(payload => dispatch({
       type: SITE_LOAD, error: true, payload,
@@ -334,6 +339,12 @@ export function getUnavailableDates(event) {
 }
 
 // Resources
+
+export function getResourceCalendar(resource) {
+  return fetch(`/api/resources/${resource._id}/calendar`, {
+    method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
 
 export function getResourceEvents(resource) {
   return fetch(`/api/resources/${resource._id}/events`, {

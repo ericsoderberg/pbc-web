@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 function pad(num, size) {
   let s = `${num}`;

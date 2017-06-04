@@ -1,7 +1,7 @@
 
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import List from '../../components/List';
 
 const Item = (props) => {
