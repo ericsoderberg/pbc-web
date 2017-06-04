@@ -156,7 +156,7 @@ It will sign you in to the ${site.name} web site.`;
       deleteRelated: deleteUserRelated,
     },
     get: {
-      authorization: requireSession,
+      authorization: allowAnyone,
       // populate: { path: 'administratorDomainId', select: 'name' },
       transformOut: (user) => {
         if (user) {
