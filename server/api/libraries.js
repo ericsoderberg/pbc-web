@@ -22,6 +22,18 @@ const prepareLibrary = (data) => {
   return data;
 };
 
+const populateLibrary = (data) => {
+  const Message = mongoose.model('Message');
+  const library = data.toObject();
+  const criteria = { libraryId: library._id };
+  const query = Message.distinct('author', criteria);
+  return query.exec()
+  .then((authors) => {
+    library.authors = authors.sort();
+    return library;
+  });
+};
+
 export default function (router) {
   // podcast image
   router.get('/libraries/:id/:imageName', (req, res) => {
@@ -55,6 +67,12 @@ export default function (router) {
     },
     get: {
       authorization: allowAnyone,
+      transformOut: (library, req) => {
+        if (library && req.query.populate) {
+          return populateLibrary(library);
+        }
+        return library;
+      },
     },
     post: {
       authorization: requireAdministrator,

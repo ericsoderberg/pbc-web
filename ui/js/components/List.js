@@ -51,21 +51,24 @@ class List extends Component {
     let filterNames;
     if (query.filter) {
       filter = query.filter;
-    } else if (props.filter) {
-      filter = props.filter;
-    } else if (props.filters) {
-      filter = {};
-      filterNames = {};
-      props.filters.forEach((aFilter) => {
-        const value = query[aFilter.property];
-        if (value) {
-          filter[aFilter.property] = value;
-          const name = query[`${aFilter.property}-name`];
-          if (name) {
-            filterNames[value] = name;
+    } else {
+      if (props.filter) {
+        filter = props.filter;
+      }
+      if (props.filters) {
+        filter = filter || {};
+        filterNames = {};
+        props.filters.forEach((aFilter) => {
+          const value = query[aFilter.property];
+          if (value) {
+            filter[aFilter.property] = value;
+            const name = query[`${aFilter.property}-name`];
+            if (name) {
+              filterNames[value] = name;
+            }
           }
-        }
-      });
+        });
+      }
     }
     const searchText = query.search || '';
     return { filter, filterNames, searchText };
@@ -170,7 +173,7 @@ class List extends Component {
   _filter(property) {
     return (event) => {
       let value = event.target.value;
-      if (value.match(/^all$/i)) {
+      if (!value || value.match(/^all$/i)) {
         value = UNSET;
       }
       const options = {};
@@ -236,8 +239,10 @@ class List extends Component {
         let value = (filter || {})[aFilter.property] || '';
         if (aFilter.options) {
           filterItems.push(
-            <Filter key={aFilter.property} options={aFilter.options}
-              allLabel={aFilter.allLabel} value={value}
+            <Filter key={aFilter.property}
+              options={aFilter.options}
+              allLabel={aFilter.allLabel}
+              value={value}
               onChange={this._filter(aFilter.property)} />,
           );
         } else {
@@ -245,9 +250,12 @@ class List extends Component {
             value = filterNames[value] || value;
           }
           filterItems.push(
-            <SelectSearch key={aFilter.property} category={aFilter.category}
-              options={{ select: 'name', sort: 'name' }} clearable={true}
-              placeholder={aFilter.allLabel} value={value}
+            <SelectSearch key={aFilter.property}
+              category={aFilter.category}
+              options={{ select: 'name', sort: 'name' }}
+              clearable={true}
+              placeholder={aFilter.allLabel}
+              value={value}
               onChange={this._select(aFilter.property)} />,
           );
         }
@@ -293,9 +301,13 @@ class List extends Component {
 
     return (
       <main>
-        <PageHeader title={title} homer={homer} back={back}
+        <PageHeader title={title}
+          homer={homer}
+          back={back}
           focusOnSearch={false}
-          searchText={searchText} onSearch={onSearch} actions={actions} />
+          searchText={searchText}
+          onSearch={onSearch}
+          actions={actions} />
         <div className="list__header">
           {filterItems}
         </div>
@@ -316,6 +328,7 @@ List.propTypes = {
   back: PropTypes.bool,
   category: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
+  filter: PropTypes.object, // used in _stateFromProps
   filters: PropTypes.arrayOf(PropTypes.shape({
     allLabel: PropTypes.string.isRequired,
     category: PropTypes.string,
@@ -358,6 +371,7 @@ List.defaultProps = {
   addIfFilter: undefined,
   adminable: true,
   back: false,
+  filter: undefined,
   filters: undefined,
   homer: false,
   items: undefined,

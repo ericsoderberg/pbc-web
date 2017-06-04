@@ -50,7 +50,7 @@ class Library extends Component {
 
   _load(props) {
     const { dispatch, id } = props;
-    dispatch(loadItem('libraries', id));
+    dispatch(loadItem('libraries', id, { populate: true }));
   }
 
   render() {
@@ -75,13 +75,26 @@ class Library extends Component {
         );
       }
 
+      const filter = {
+        property: 'author',
+        options: library.authors,
+        allLabel: 'All authors',
+      };
+
       result = (
-        <List location={location} homer={true} adminiable={false}
-          category="messages" title={`${library.name} Library`} path="/messages"
+        <List location={location}
+          homer={true}
+          adminiable={false}
+          category="messages"
+          title={`${library.name} Library`}
+          path="/messages"
           filter={{ libraryId: library._id }}
-          select="name path verses date author series color" sort="-date"
+          filters={[filter]}
+          select="name path verses date author series color"
+          sort="-date"
           Item={LibraryMessageItem}
-          addIfFilter="libraryId" actions={controls}
+          addIfFilter="libraryId"
+          actions={controls}
           history={history} />
       );
     }
