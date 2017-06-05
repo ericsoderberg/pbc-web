@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
 import { loadItem, unloadItem, loadCategory, unloadCategory } from '../../actions';
@@ -55,7 +56,9 @@ class CalendarSection extends Component {
       result = events
       .filter(event => excludeEventIds.indexOf(event._id) === -1)
       .map(event => (
-        <Section key={event._id} align="center" full={true}
+        <Section key={event._id}
+          align="center"
+          full={true}
           backgroundImage={event.image}>
           <EventSection key={event._id} id={event} />
         </Section>

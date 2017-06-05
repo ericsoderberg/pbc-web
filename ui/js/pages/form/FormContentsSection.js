@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormContentsField from './FormContentsField';
 
 // const _field = (fields, templateFieldId) => {
@@ -36,9 +37,13 @@ const FormContentsSection = (props) => {
   const contents = formTemplateFields.map((formTemplateField) => {
     const id = formTemplateField._id || formTemplateField.id;
     return (
-      <FormContentsField key={id} formTemplateField={formTemplateField}
-        field={fields[id]} error={error[id]} remaining={remains[id]}
-        linkedForm={linkedForm} linkedFormControl={linkedFormControl}
+      <FormContentsField key={id}
+        formTemplateField={formTemplateField}
+        field={fields[id]}
+        error={error[id]}
+        remaining={remains[id]}
+        linkedForm={linkedForm}
+        linkedFormControl={linkedFormControl}
         onChange={onChange} />
     );
   });

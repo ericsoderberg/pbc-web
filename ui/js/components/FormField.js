@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Markdown from 'markdown-to-jsx';
 
 export default class FormField extends Component {
@@ -104,7 +105,8 @@ export default class FormField extends Component {
         }
         help = (
           <span className={helpClassNames.join(' ')}>
-            <button className="button-plain" type="button"
+            <button className="button-plain"
+              type="button"
               onClick={() => this.setState({ helpActive: !helpActive })}>
               ?
             </button>
@@ -162,8 +164,10 @@ export default class FormField extends Component {
       <div ref={(ref) => { this._componentRef = ref; }}
         className={classNames.join(' ')}
         onClick={this._onClick}
-        onDragEnter={onDragEnter} onDragOver={onDragOver}
-        onDragLeave={onDragLeave} onDrop={onDrop} >
+        onDragEnter={onDragEnter}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop} >
         {labels}
         {this.props.children}
         {close}

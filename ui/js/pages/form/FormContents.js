@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
@@ -95,10 +96,13 @@ class FormContents extends Component {
     ))
     .map(section => (
       <FormContentsSection key={section._id || section.id}
-        formTemplateSection={section} fields={fields}
+        formTemplateSection={section}
+        fields={fields}
         remains={formTemplate.remains || {}}
-        linkedForm={linkedForm} linkedFormControl={linkedFormControl}
-        error={error} onChange={this._onChangeField} />
+        linkedForm={linkedForm}
+        linkedFormControl={linkedFormControl}
+        error={error}
+        onChange={this._onChangeField} />
     ));
 
     let admin;

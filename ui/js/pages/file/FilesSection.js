@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Audio from '../../components/Audio';
 import RightIcon from '../../icons/Right';
 
@@ -37,8 +38,11 @@ export default class FilesSection extends Component {
       if (file.type && file.type.match(/audio/)) {
         return (
           <div key={key} className="item__container">
-            <Audio className="item" file={file}
-              full={false} plain={true} autoPlay={index === playIndex}
+            <Audio className="item"
+              file={file}
+              full={false}
+              plain={true}
+              autoPlay={index === playIndex}
               onStart={() => this.setState({ playIndex: undefined })}
               onEnd={() => this.setState({
                 playIndex: nextPlayIndex[file._id] })} />

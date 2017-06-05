@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -49,13 +50,15 @@ class CalendarSectionEdit extends Component {
     return (
       <fieldset className="form__fields">
         <FormField label="Calendar">
-          <select name="calendarId" value={value}
+          <select name="calendarId"
+            value={value}
             onChange={formState.change('calendarId')}>
             {options}
           </select>
         </FormField>
         <FormField>
-          <input name="omitRecurring" type="checkbox"
+          <input name="omitRecurring"
+            type="checkbox"
             checked={section.omitRecurring || false}
             onChange={formState.toggle('omitRecurring')} />
           <label htmlFor="omitRecurring">Omit recurring events</label>

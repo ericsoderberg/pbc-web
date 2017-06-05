@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 
 const FormNumber = (props) => {
@@ -13,8 +14,11 @@ const FormNumber = (props) => {
   }
 
   let contents = (
-    <input name={formTemplateField.name} type="number"
-      min={formTemplateField.min || 0} max={max} value={value}
+    <input name={formTemplateField.name}
+      type="number"
+      min={formTemplateField.min || 0}
+      max={max}
+      value={value}
       onChange={event =>
         onChange({
           templateFieldId: formTemplateField._id,
@@ -52,7 +56,8 @@ const FormNumber = (props) => {
 
   return (
     <FormField label={formTemplateField.name}
-      help={help} error={error}>
+      help={help}
+      error={error}>
       {contents}
     </FormField>
   );

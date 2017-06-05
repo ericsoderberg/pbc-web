@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 import FormOptionLabel from './FormOptionLabel';
 
@@ -11,21 +12,27 @@ const FormChoice = (props) => {
     const checked = (field.optionId === id);
     return (
       <div key={id} className="form__field-option">
-        <input id={id} name={name} type="radio"
+        <input id={id}
+          name={name}
+          type="radio"
           checked={checked}
           onChange={() => onChange({
             templateFieldId: formTemplateField._id,
             optionId: id,
           })} />
-        <FormOptionLabel htmlFor={id} formTemplateField={formTemplateField}
-          option={option} selected={checked} remaining={remaining[id]} />
+        <FormOptionLabel htmlFor={id}
+          formTemplateField={formTemplateField}
+          option={option}
+          selected={checked}
+          remaining={remaining[id]} />
       </div>
     );
   });
 
   return (
     <FormField label={formTemplateField.name}
-      help={formTemplateField.help} error={error}>
+      help={formTemplateField.help}
+      error={error}>
       {contents}
     </FormField>
   );

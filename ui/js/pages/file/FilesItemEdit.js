@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { postFile } from '../../actions';
 import FormField from '../../components/FormField';
 import Loading from '../../components/Loading';
@@ -52,7 +53,8 @@ export default class FilesItemEdit extends Component {
     } else if (file.name) {
       // uploading
       fileField = (
-        <FormField name={`file-${index}`} label="File"
+        <FormField name={`file-${index}`}
+          label="File"
           help="Uploading, PLEASE WAIT ...">
           <Loading small={true} />
         </FormField>
@@ -60,7 +62,8 @@ export default class FilesItemEdit extends Component {
     } else {
       fileField = (
         <FormField name={`file-${index}`} label="File">
-          <input name={`file-${index}`} type="file"
+          <input name={`file-${index}`}
+            type="file"
             onChange={this._changeFile(index)} />
         </FormField>
       );
@@ -70,7 +73,8 @@ export default class FilesItemEdit extends Component {
       <div>
         {fileField}
         <FormField label="Label">
-          <input name={`label-${index}`} value={file.label || ''}
+          <input name={`label-${index}`}
+            value={file.label || ''}
             onChange={formState.change('label')} />
         </FormField>
       </div>

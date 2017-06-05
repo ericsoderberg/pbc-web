@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 import SectionsFormContents from '../../components/SectionsFormContents';
 import PageDetailsFormContents from './PageDetailsFormContents';
@@ -33,12 +34,14 @@ export default class PageFormContents extends Component {
       <div className={className}>
         <fieldset className="form__fields">
           <FormField name="name" label="Name">
-            <input name="name" value={page.name || ''}
+            <input name="name"
+              value={page.name || ''}
               onChange={formState.change('name')} />
           </FormField>
         </fieldset>
         <SectionsFormContents formState={formState} types={types} />
-        <PageDetailsFormContents formState={formState} session={session}
+        <PageDetailsFormContents formState={formState}
+          session={session}
           errors={errors} />
       </div>
     );

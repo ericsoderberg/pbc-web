@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -50,21 +51,29 @@ class PageDetailsFormContents extends Component {
     if (active) {
       contents = [
         <FormField key="align" error={errors.align}>
-          <input name="align" type="checkbox"
+          <input name="align"
+            type="checkbox"
             checked={page.align !== 'start'}
             onChange={() => formState.set('align',
               page.align === 'start' ? 'center' : 'start')} />
           <label htmlFor="align">center</label>
         </FormField>,
-        <FormField key="path" name="path" label="Url ID" help="unique url name"
+        <FormField key="path"
+          name="path"
+          label="Url ID"
+          help="unique url name"
           error={errors.path}>
-          <input name="path" value={page.path || ''}
+          <input name="path"
+            value={page.path || ''}
             onChange={formState.change('path')} />
         </FormField>,
-        <FormField key="pathAlias" name="pathAlias"
-          label="Url alias" help="alternate url name"
+        <FormField key="pathAlias"
+          name="pathAlias"
+          label="Url alias"
+          help="alternate url name"
           error={errors.pathAlias}>
-          <input name="pathAlias" value={page.pathAlias || ''}
+          <input name="pathAlias"
+            value={page.pathAlias || ''}
             onChange={formState.change('pathAlias')} />
         </FormField>,
       ];
@@ -76,9 +85,11 @@ class PageDetailsFormContents extends Component {
         ));
         options.unshift(<option key={0} />);
         administeredBy = (
-          <FormField key="admin" label="Administered by"
+          <FormField key="admin"
+            label="Administered by"
             error={errors.domainId}>
-            <select name="domainId" value={page.domainId || ''}
+            <select name="domainId"
+              value={page.domainId || ''}
               onChange={formState.change('domainId')}>
               {options}
             </select>
@@ -91,7 +102,8 @@ class PageDetailsFormContents extends Component {
     return (
       <fieldset className="form__fields">
         <div type="button" className="form-item">
-          <Button secondary={true} label="Details"
+          <Button secondary={true}
+            label="Details"
             onClick={this._onToggle} />
         </div>
         {contents}

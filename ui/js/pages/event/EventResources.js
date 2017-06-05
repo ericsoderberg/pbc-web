@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getResources } from '../../actions';
 import FormField from '../../components/FormField';
 import Button from '../../components/Button';
@@ -63,7 +64,8 @@ export default class EventResources extends Component {
         }
         return (
           <div key={resource._id} className={classNames.join(' ')}>
-            <input type="checkbox" checked={checked}
+            <input type="checkbox"
+              checked={checked}
               id={`resource-${resource._id}`}
               disabled={resource.events && !checked}
               onChange={formState.toggleIn('resourceIds', resource._id)} />
@@ -77,15 +79,25 @@ export default class EventResources extends Component {
         <FormField key="resources">
           {resources}
         </FormField>,
-        <FormField key="setup" label="Setup time" help="minutes"
+        <FormField key="setup"
+          label="Setup time"
+          help="minutes"
           error={errors.setup}>
-          <input name="setup" type="number" min="0" step="15"
+          <input name="setup"
+            type="number"
+            min="0"
+            step="15"
             value={event.setup || 0}
             onChange={formState.change('setup')} />
         </FormField>,
-        <FormField key="teaddown" label="Teardown time" help="minutes"
+        <FormField key="teaddown"
+          label="Teardown time"
+          help="minutes"
           error={errors.teardown}>
-          <input name="teardown" type="number" min="0" step="15"
+          <input name="teardown"
+            type="number"
+            min="0"
+            step="15"
             value={event.teardown || 0}
             onChange={formState.change('teardown')} />
         </FormField>,
@@ -96,7 +108,8 @@ export default class EventResources extends Component {
       <fieldset ref={(ref) => { this._containerRef = ref; }}
         className="form__fields">
         <div type="button" className="form-item">
-          <Button secondary={true} label="Resource reservations"
+          <Button secondary={true}
+            label="Resource reservations"
             onClick={this._onToggle} />
         </div>
         {fields}

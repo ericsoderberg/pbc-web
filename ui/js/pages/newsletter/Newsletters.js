@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import moment from 'moment-timezone';
 import List from '../../components/List';
@@ -9,7 +10,9 @@ const Item = (props) => {
   return (
     <Link className={classNames.join(' ')} to={`/newsletters/${newsletter._id}`}>
       <div className="item">
-        <span className="item__name">{moment(newsletter.date).format('MMM Do YYYY')}</span>
+        <span className="item__name">
+          {moment(newsletter.date).format('MMM Do YYYY')}
+        </span>
         <span>{newsletter.name}</span>
       </div>
     </Link>

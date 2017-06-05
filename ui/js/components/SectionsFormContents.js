@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormFieldAdd from './FormFieldAdd';
 import Button from './Button';
 import SectionFormContents from './SectionFormContents';
@@ -23,12 +24,15 @@ export default class SectionsFormContents extends Component {
     const item = formState.object;
 
     const sections = (item.sections || []).map((section, index) => (
-      <SectionFormContents key={section._id || section.id} formState={formState}
+      <SectionFormContents key={section._id || section.id}
+        formState={formState}
         index={index} />
     ));
 
     const addControls = types.map(type => (
-      <Button key={type} label={`Add ${type}`} secondary={true}
+      <Button key={type}
+        label={`Add ${type}`}
+        secondary={true}
         onClick={this._addSection(type)} />
     ));
 

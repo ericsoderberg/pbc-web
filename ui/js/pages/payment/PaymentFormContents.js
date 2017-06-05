@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Markdown from 'markdown-to-jsx';
@@ -77,13 +78,19 @@ class PaymentFormContents extends Component {
       method = (
         <FormField label="Method">
           <div className="box--row">
-            <input id="methodPaypal" name="method" type="radio" value="paypal"
+            <input id="methodPaypal"
+              name="method"
+              type="radio"
+              value="paypal"
               checked={payment.method === 'paypal'}
               onChange={formState.change('method')} />
             <label htmlFor="methodPaypal">paypal</label>
           </div>
           <div className="box--row">
-            <input id="methodCheck" name="method" type="radio" value="check"
+            <input id="methodCheck"
+              name="method"
+              type="radio"
+              value="check"
               checked={payment.method === 'check'}
               onChange={formState.change('method')} />
             <label htmlFor="methodCheck">check</label>
@@ -121,7 +128,8 @@ class PaymentFormContents extends Component {
         options.unshift(<option key={0} />);
         administeredBy = (
           <FormField label="Administered by">
-            <select name="domainId" value={payment.domainId || ''}
+            <select name="domainId"
+              value={payment.domainId || ''}
               onChange={formState.change('domainId')}>
               {options}
             </select>
@@ -166,14 +174,18 @@ class PaymentFormContents extends Component {
           <FormField label="Amount">
             <div className="box--row">
               <span className="prefix">$</span>
-              <input name="amount" type="text" disabled={!administrator}
+              <input name="amount"
+                type="text"
+                disabled={!administrator}
                 value={payment.amount || ''}
                 onChange={formState.change('amount')} />
             </div>
           </FormField>
           {method}
           <FormField label="Notes">
-            <textarea name="notes" value={payment.notes || ''} rows={2}
+            <textarea name="notes"
+              value={payment.notes || ''}
+              rows={2}
               onChange={formState.change('notes')} />
           </FormField>
         </fieldset>

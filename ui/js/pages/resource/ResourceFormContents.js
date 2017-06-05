@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 
 const ResourceFormContents = (props) => {
@@ -9,7 +10,8 @@ const ResourceFormContents = (props) => {
     <div className={className}>
       <fieldset className="form__fields">
         <FormField label="Name">
-          <input name="name" value={resource.name || ''}
+          <input name="name"
+            value={resource.name || ''}
             onChange={formState.change('name')} />
         </FormField>
       </fieldset>

@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory, loadItem, unloadItem } from '../../actions';
 import FormField from '../../components/FormField';

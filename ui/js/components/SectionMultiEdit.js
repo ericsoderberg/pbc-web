@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormFieldAdd from './FormFieldAdd';
 import Button from './Button';
 import SectionFields from './SectionFields';
@@ -35,9 +36,13 @@ export default class SectionMultiEdit extends Component {
     const section = formState.object;
 
     const items = (section[property] || []).map((item, index) => (
-      <SectionItem key={item._id || item.id} formState={formState} index={index}
-        property={property} label={label}>
-        <ItemEdit item={item} index={index}
+      <SectionItem key={item._id || item.id}
+        formState={formState}
+        index={index}
+        property={property}
+        label={label}>
+        <ItemEdit item={item}
+          index={index}
           onChange={nextItem => this._onChangeItem(nextItem, index)} />
       </SectionItem>
     ));
@@ -48,7 +53,8 @@ export default class SectionMultiEdit extends Component {
         {items}
         <div className="form-item-add">
           <FormFieldAdd>
-            <Button label={`Add ${label}`} secondary={true}
+            <Button label={`Add ${label}`}
+              secondary={true}
               onClick={this._onAddItem} />
           </FormFieldAdd>
         </div>

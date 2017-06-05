@@ -1,4 +1,5 @@
-import React, { Component, Children, PropTypes } from 'react';
+import React, { Component, Children } from 'react';
+import PropTypes from 'prop-types';
 import Button from './Button';
 import AddIcon from '../icons/Add';
 
@@ -24,7 +25,8 @@ export default class FormField extends Component {
     let control;
     if (Children.count(this.props.children) > 1) {
       control = (
-        <Button className="form-field-add__control" icon={<AddIcon />}
+        <Button className="form-field-add__control"
+          icon={<AddIcon />}
           onClick={this._onClick} />
       );
     }

@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getPageMap } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
@@ -52,15 +53,20 @@ export default class PageMap extends Component {
         const path = page.path || `/pages/${page._id}`;
         if (router.route.location.pathname === `${path}/map`) {
           return (
-            <Button key={page._id} className="page-map__page"
-              right={true} path={path} replaceHistory={true}>
+            <Button key={page._id}
+              className="page-map__page"
+              right={true}
+              path={path}
+              replaceHistory={true}>
               {page.name}
             </Button>
           );
         }
         return (
-          <Button key={page._id} className="page-map__page"
-            secondary={true} path={`${path}/map`}
+          <Button key={page._id}
+            className="page-map__page"
+            secondary={true}
+            path={`${path}/map`}
             replaceHistory={true}>
             {page.name}
           </Button>

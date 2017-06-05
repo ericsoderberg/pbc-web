@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { postSession, setSession } from '../../actions';
@@ -75,7 +76,9 @@ class SignIn extends Component {
       );
     } else {
       const actions = [
-        <button key="cancel" type="button" className="button"
+        <button key="cancel"
+          type="button"
+          className="button"
           onClick={this._onCancel}>
           Cancel
         </button>,
@@ -96,12 +99,14 @@ class SignIn extends Component {
             <fieldset className="form__fields">
               <FormField name="email" label="Email">
                 <input ref={(ref) => { this._emailRef = ref; }}
-                  name="email" type="email"
+                  name="email"
+                  type="email"
                   value={session.email || ''}
                   onChange={formState.change('email')} />
               </FormField>
               <FormField name="password" label="Password">
-                <input name="password" type="password"
+                <input name="password"
+                  type="password"
                   value={session.password || ''}
                   onChange={formState.change('password')} />
               </FormField>

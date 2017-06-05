@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadItem, putItem, deleteItem, unloadItem } from '../actions';
 import Form from './Form';
@@ -81,13 +82,21 @@ class Edit extends Component {
     } = this.props;
     const { error } = this.state;
     return (
-      <Form title={title} actions={actions} footerActions={footerActions}
-        submitLabel={submitLabel} session={session} loading={!item}
+      <Form title={title}
+        actions={actions}
+        footerActions={footerActions}
+        submitLabel={submitLabel}
+        session={session}
+        loading={!item}
         action={`/api/${category}/${id}`}
-        FormContents={FormContents} Preview={Preview} item={item}
+        FormContents={FormContents}
+        Preview={Preview}
+        item={item}
         onChange={onChange}
-        onSubmit={this._onUpdate} onRemove={this._onRemove}
-        error={error} onCancel={this._onCancel} />
+        onSubmit={this._onUpdate}
+        onRemove={this._onRemove}
+        error={error}
+        onCancel={this._onCancel} />
     );
   }
 }

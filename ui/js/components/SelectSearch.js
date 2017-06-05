@@ -1,6 +1,7 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../actions';
 import Button from './Button';
@@ -138,7 +139,8 @@ class SelectSearch extends Component {
     if (active) {
       Icon = UpIcon;
       const suggests = (suggestions || []).map(suggestion => (
-        <div key={suggestion._id} className="select-search__suggestion"
+        <div key={suggestion._id}
+          className="select-search__suggestion"
           onClick={this._select(suggestion)}>
           {Suggestion ? <Suggestion item={suggestion} /> : suggestion.name}
         </div>
@@ -148,7 +150,8 @@ class SelectSearch extends Component {
           <input ref={(ref) => { this._inputRef = ref; }}
             className="select-search__input"
             placeholder="Search"
-            value={searchText} onChange={this._onSearch} />
+            value={searchText}
+            onChange={this._onSearch} />
           {suggests}
         </div>
       );
@@ -158,8 +161,10 @@ class SelectSearch extends Component {
       <div ref={(ref) => { this._componentRef = ref; }}
         className={classes.join(' ')}>
         <div className="select-search__header" onClick={this._onToggle}>
-          <input className="select-search__value" disabled={true}
-            placeholder={placeholder} value={value} />
+          <input className="select-search__value"
+            disabled={true}
+            placeholder={placeholder}
+            value={value} />
           {clearControl}
           <Button className="select-search__control"
             icon={<Icon className="select-search__control-icon" />} />

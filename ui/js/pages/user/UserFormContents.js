@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -35,7 +36,8 @@ class UserFormContents extends Component {
       adminFields = (
         <fieldset className="form__fields">
           <FormField>
-            <input name="administrator" type="checkbox"
+            <input name="administrator"
+              type="checkbox"
               checked={user.administrator || false}
               onChange={formState.toggle('administrator')} />
             <label htmlFor="administrator">Administrator</label>
@@ -55,7 +57,8 @@ class UserFormContents extends Component {
       adminFields = (
         <fieldset className="form__fields">
           <FormField label="Administrator for">
-            <input name="administratorDomainId" disabled={true}
+            <input name="administratorDomainId"
+              disabled={true}
               value={domain.name} />
           </FormField>
         </fieldset>
@@ -66,28 +69,37 @@ class UserFormContents extends Component {
       <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name">
-            <input name="name" value={user.name || ''}
+            <input name="name"
+              value={user.name || ''}
               onChange={formState.change('name')} />
           </FormField>
           <FormField name="email" label="Email">
-            <input name="email" value={user.email || ''}
+            <input name="email"
+              value={user.email || ''}
               onChange={formState.change('email')} />
           </FormField>
           <FormField name="password" label="Password">
-            <input name="password" type="password" value={user.password || ''}
+            <input name="password"
+              type="password"
+              value={user.password || ''}
               onChange={formState.change('password')} />
           </FormField>
         </fieldset>
 
         <fieldset className="form__fields">
-          <ImageField label="Photo" name="image"
-            formState={formState} property="image" />
+          <ImageField label="Photo"
+            name="image"
+            formState={formState}
+            property="image" />
           <FormField name="text" label="Text" help={<TextHelp />}>
-            <textarea name="text" value={user.text || ''} rows={8}
+            <textarea name="text"
+              value={user.text || ''}
+              rows={8}
               onChange={formState.change('text')} />
           </FormField>
           <FormField name="phone" label="Phone">
-            <input name="phone" value={user.phone || ''}
+            <input name="phone"
+              value={user.phone || ''}
               onChange={formState.change('phone')} />
           </FormField>
         </fieldset>

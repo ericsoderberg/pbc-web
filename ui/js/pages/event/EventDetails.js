@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
 import { loadCategory, unloadCategory } from '../../actions';
@@ -103,11 +104,13 @@ class EventDetails extends Component {
       let primaryEvent;
       if (!event.dates || event.dates.length === 0) {
         primaryEvent = (
-          <FormField label="Primary event" help="For recurring event one-offs"
+          <FormField label="Primary event"
+            help="For recurring event one-offs"
             error={errors.primaryEventId}>
             <SelectSearch category="events"
               options={{ select: 'name start', sort: '-start' }}
-              Suggestion={Suggestion} clearable={true}
+              Suggestion={Suggestion}
+              clearable={true}
               value={(event.primaryEventId || {}).name || ''}
               onChange={this._onChangePrimaryEvent} />
           </FormField>
@@ -117,9 +120,11 @@ class EventDetails extends Component {
       let otherTimes;
       if (event.times && event.times.length > 0) {
         otherTimes = event.times.map((time, index) => [
-          <FormField key={`start-${time._id}`} label="Also starts"
+          <FormField key={`start-${time._id}`}
+            label="Also starts"
             closeControl={
-              <button type="button" className="button-icon"
+              <button type="button"
+                className="button-icon"
                 onClick={formState.removeAt('times', index)}>
                 <TrashIcon secondary={true} />
               </button>
@@ -142,7 +147,8 @@ class EventDetails extends Component {
         domainOptions.unshift(<option key={0} />);
         administeredBy = (
           <FormField label="Administered by" error={errors.domainId}>
-            <select name="domainId" value={event.domainId || ''}
+            <select name="domainId"
+              value={event.domainId || ''}
               onChange={formState.change('domainId')}>
               {domainOptions}
             </select>
@@ -165,33 +171,40 @@ class EventDetails extends Component {
             </select>
           </FormField>
           <FormField label="Url ID" help="unique url name" error={errors.path}>
-            <input name="path" value={event.path || ''}
+            <input name="path"
+              value={event.path || ''}
               onChange={formState.change('path')} />
           </FormField>
           <FormField>
-            <input name="public" type="checkbox"
+            <input name="public"
+              type="checkbox"
               checked={event.public || false}
               onChange={formState.toggle('public')} />
             <label htmlFor="public">public</label>
           </FormField>
           <FormField key="align">
-            <input name="align" type="checkbox"
+            <input name="align"
+              type="checkbox"
               checked={event.align !== 'start'}
               onChange={() => formState.set('align',
                 event.align === 'start' ? 'center' : 'start')} />
             <label htmlFor="align">center</label>
           </FormField>
-          <ImageField label="Image" name="image"
-            formState={formState} property="image" />
+          <ImageField label="Image"
+            name="image"
+            formState={formState}
+            property="image" />
           <FormField label="Background color">
-            <input name="color" value={event.color || ''}
+            <input name="color"
+              value={event.color || ''}
               onChange={formState.change('color')} />
           </FormField>
           {administeredBy}
           {primaryEvent}
           {otherTimes}
           <FormFieldAdd>
-            <Button label="Add another time" secondary={true}
+            <Button label="Add another time"
+              secondary={true}
               onClick={formState.addTo('times',
                 { start: event.start, end: event.end })} />
           </FormFieldAdd>
@@ -202,7 +215,8 @@ class EventDetails extends Component {
     return (
       <div>
         <div type="button" className="form-item">
-          <Button secondary={true} label="Details"
+          <Button secondary={true}
+            label="Details"
             onClick={this._onToggle} />
         </div>
         {contents}

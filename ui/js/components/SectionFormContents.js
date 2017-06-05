@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import DownIcon from '../icons/DownArrow';
 import UpIcon from '../icons/UpArrow';
 import BlankIcon from '../icons/Blank';
@@ -54,7 +55,8 @@ export default class SectionFormContents extends Component {
     let raise;
     if (index > 0) {
       raise = (
-        <button type="button" className="button-icon"
+        <button type="button"
+          className="button-icon"
           onClick={formState.swapWith('sections', index, index - 1)}>
           <UpIcon />
         </button>
@@ -64,7 +66,8 @@ export default class SectionFormContents extends Component {
     let lower;
     if (index < (item.sections.length - 1)) {
       lower = (
-        <button type="button" className="button-icon"
+        <button type="button"
+          className="button-icon"
           onClick={formState.swapWith('sections', index, index + 1)}>
           <DownIcon />
         </button>
@@ -88,14 +91,16 @@ export default class SectionFormContents extends Component {
     return (
       <div>
         <div type="button" className="form-item form-item__controls">
-          <button type="button" className="button-plain form-item__control"
+          <button type="button"
+            className="button-plain form-item__control"
             onClick={this._onToggle}>
             <h3>{section.type}</h3>
           </button>
           <div className="box--row box--static">
             {raise}
             {lower}
-            <button type="button" className="button-icon"
+            <button type="button"
+              className="button-icon"
               onClick={formState.removeAt('sections', index)}>
               <TrashIcon />
             </button>

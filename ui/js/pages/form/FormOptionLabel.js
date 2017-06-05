@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Markdown from 'markdown-to-jsx';
 
 export default class FormOptionLabel extends Component {
@@ -56,7 +57,8 @@ export default class FormOptionLabel extends Component {
       }
       labels.push(
         <span key="help" className={classNames.join(' ')}>
-          <button className="button-plain" type="button"
+          <button className="button-plain"
+            type="button"
             onClick={this._toggleHelp}> ? </button>
           <div className="form-field__help-drop">
             <Markdown>{help}</Markdown>

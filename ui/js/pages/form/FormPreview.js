@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import PageHeader from '../../components/PageHeader';
 import FormContents from './FormContents';
 
@@ -33,8 +34,10 @@ export default class FormPreview extends Component {
       <main className="page-preview">
         <PageHeader title="Preview" />
         <form className="form" onSubmit={this._onSubmit}>
-          <FormContents form={form} formTemplate={formTemplate}
-            full={false} onChange={this._onChange} />
+          <FormContents form={form}
+            formTemplate={formTemplate}
+            full={false}
+            onChange={this._onChange} />
           <footer className="form__footer">
             <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}

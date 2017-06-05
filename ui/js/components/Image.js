@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const Image = (props) => {
   const { avatar, className, full, image, style } = props;
@@ -14,7 +15,9 @@ const Image = (props) => {
   }
 
   return (
-    <img className={classes.join(' ')} alt="" src={image ? image.data : ''}
+    <img className={classes.join(' ')}
+      alt=""
+      src={image ? image.data : ''}
       style={style} />
   );
 };

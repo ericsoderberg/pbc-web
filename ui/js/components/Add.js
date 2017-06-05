@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { postItem, haveSession, setSession } from '../actions';
 import Form from './Form';
@@ -55,11 +56,16 @@ class Add extends Component {
     } = this.props;
     const { item, error } = this.state;
     return (
-      <Form title={title} submitLabel="Add"
-        action={`/api/${category}`} session={session}
-        FormContents={FormContents} Preview={Preview} item={item}
+      <Form title={title}
+        submitLabel="Add"
+        action={`/api/${category}`}
+        session={session}
+        FormContents={FormContents}
+        Preview={Preview}
+        item={item}
         onChange={onChange}
-        onSubmit={this._onAdd} error={error}
+        onSubmit={this._onAdd}
+        error={error}
         onCancel={this._onCancel} />
     );
   }

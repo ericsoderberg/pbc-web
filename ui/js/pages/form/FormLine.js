@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 
 const FormLine = (props) => {
@@ -9,12 +10,15 @@ const FormLine = (props) => {
   let contents;
   if (linkedField) {
     contents = (
-      <input name={formTemplateField.name} type="text"
-        value={linkedField.value || ''} disabled={true} />
+      <input name={formTemplateField.name}
+        type="text"
+        value={linkedField.value || ''}
+        disabled={true} />
     );
   } else {
     contents = (
-      <input name={formTemplateField.name} type="text"
+      <input name={formTemplateField.name}
+        type="text"
         value={field.value || ''}
         onChange={event => onChange({
           templateFieldId: formTemplateField._id,
@@ -42,7 +46,8 @@ const FormLine = (props) => {
 
   return (
     <FormField label={formTemplateField.name}
-      help={formTemplateField.help} error={error}>
+      help={formTemplateField.help}
+      error={error}>
       {contents}
       {linkedFormControl}
     </FormField>

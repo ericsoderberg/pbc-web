@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -260,7 +261,8 @@ class FormTemplate extends Component {
         onClick = this._sortForms(fieldId);
       }
       return (
-        <th key={fieldId} className={classes.join(' ')}
+        <th key={fieldId}
+          className={classes.join(' ')}
           onClick={onClick}>
           {field.label || field.name}
         </th>
@@ -433,13 +435,15 @@ class FormTemplate extends Component {
       <div className="page-header__drop box--row">
         <div>
           <h4>From</h4>
-          <DateInput inline={true} value={fromDate || ''}
+          <DateInput inline={true}
+            value={fromDate || ''}
             onChange={date => this.setState({ fromDate: date },
               this._filterForms)} />
         </div>
         <div>
           <h4>To</h4>
-          <DateInput inline={true} value={toDate || ''}
+          <DateInput inline={true}
+            value={toDate || ''}
             onChange={date => this.setState({ toDate: date },
               this._filterForms)} />
         </div>
@@ -467,7 +471,8 @@ class FormTemplate extends Component {
     );
 
     actions.push(
-      <a key="download" href={`/api/form-templates/${id}.csv`}
+      <a key="download"
+        href={`/api/form-templates/${id}.csv`}
         onClick={this._onDownload}>
         Download
       </a>,
@@ -511,8 +516,10 @@ class FormTemplate extends Component {
 
     return (
       <main>
-        <ItemHeader category="form-templates" item={formTemplate}
-          title={title} actions={actions} />
+        <ItemHeader category="form-templates"
+          item={formTemplate}
+          title={title}
+          actions={actions} />
         {contents}
         {more}
         {linkedForm}

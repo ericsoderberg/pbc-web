@@ -1,5 +1,6 @@
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import Add from '../../components/Add';
 import { searchToObject } from '../../utils/Params';
 import MessageFormContents from './MessageFormContents';
@@ -9,8 +10,11 @@ const MessageAdd = (props) => {
   const { history, location } = props;
   const query = searchToObject(location.search);
   return (
-    <Add category="messages" FormContents={MessageFormContents}
-      Preview={MessagePreview} showable={true} title="Add Message"
+    <Add category="messages"
+      FormContents={MessageFormContents}
+      Preview={MessagePreview}
+      showable={true}
+      title="Add Message"
       default={{
         libraryId: query.libraryId,
         date: (new Date()).toISOString(),

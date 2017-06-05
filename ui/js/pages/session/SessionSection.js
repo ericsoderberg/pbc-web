@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import SignIn from './SignIn';
 import SignUp from '../user/SignUp';
 import VerifyEmail from './VerifyEmail';
@@ -33,7 +34,8 @@ export default class SessionSection extends Component {
       default:
       case SIGN_IN: {
         contents = (
-          <SignIn inline={true} onCancel={onCancel}
+          <SignIn inline={true}
+            onCancel={onCancel}
             onVerifyEmail={this._nextState(VERIFY_EMAIL)}
             onSignUp={this._nextState(SIGN_UP)} />
         );
@@ -41,7 +43,8 @@ export default class SessionSection extends Component {
       }
       case SIGN_UP: {
         contents = (
-          <SignUp inline={true} onCancel={onCancel}
+          <SignUp inline={true}
+            onCancel={onCancel}
             onSignIn={this._nextState(SIGN_IN)}
             onVerifyEmail={this._nextState(VERIFY_EMAIL)} />
         );
@@ -49,9 +52,11 @@ export default class SessionSection extends Component {
       }
       case VERIFY_EMAIL: {
         contents = (
-          <VerifyEmail inline={true} onCancel={onCancel}
+          <VerifyEmail inline={true}
+            onCancel={onCancel}
             onSignIn={this._nextState(SIGN_IN)}
-            onSignUp={this._nextState(SIGN_UP)} returnPath={returnPath} />
+            onSignUp={this._nextState(SIGN_UP)}
+            returnPath={returnPath} />
         );
         break;
       }

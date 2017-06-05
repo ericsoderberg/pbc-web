@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getResourceCalendar } from '../../actions';
 import CalendarGrid from '../../components/CalendarGrid';
 import Loading from '../../components/Loading';

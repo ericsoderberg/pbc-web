@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Section from './Section';
 import Button from './Button';
 import PlayIcon from '../icons/Play';
@@ -175,8 +176,13 @@ export default class Audio extends Component {
     let volumeControl;
     if (showVolume) {
       volumeControl = (
-        <input className="audio__volume" type="range" min={0} max={1}
-          step={0.1} value={volume} onChange={this._onVolume} />
+        <input className="audio__volume"
+          type="range"
+          min={0}
+          max={1}
+          step={0.1}
+          value={volume}
+          onChange={this._onVolume} />
       );
     }
 
@@ -190,12 +196,17 @@ export default class Audio extends Component {
           <span className="audio__control">
             {playControl}
           </span>
-          <input className="audio__position" type="range"
-            min={start} max={end} value={at} onChange={this._onSeek} />
+          <input className="audio__position"
+            type="range"
+            min={start}
+            max={end}
+            value={at}
+            onChange={this._onSeek} />
           <div className="audio__details">
             <span className="audio__duration">{friendlyDuration(end - at)}</span>
             {volumeControl}
-            <Button className="audio__volume-toggle button-icon" plain={true}
+            <Button className="audio__volume-toggle button-icon"
+              plain={true}
               onClick={this._onToggleVolume}>
               <VolumeIcon />
             </Button>

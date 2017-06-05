@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Section from './Section';
 import Text from './Text';
 import Image from './Image';
@@ -31,8 +32,10 @@ export default class Sections extends Component {
           .map(s => s.eventId._id || s.eventId);
         contents = (
           <CalendarSection key={section._id || section.id}
-            id={section.calendarId} calendar={section.calendar}
-            events={section.events} excludeEventIds={excludeEventIds}
+            id={section.calendarId}
+            calendar={section.calendar}
+            events={section.events}
+            excludeEventIds={excludeEventIds}
             omitRecurring={section.omitRecurring} />
         );
       } else if (section.type === 'event') {
@@ -41,8 +44,10 @@ export default class Sections extends Component {
           innerColor = section.eventId.color;
         }
         contents = (
-          <EventSection id={section.eventId} includeMap={section.includeMap}
-            navigable={section.navigable} color={innerColor}
+          <EventSection id={section.eventId}
+            includeMap={section.includeMap}
+            navigable={section.navigable}
+            color={innerColor}
             includeBackground={section.backgroundImage === undefined} />
         );
         if (!backgroundImage && section.eventId) {
@@ -79,9 +84,12 @@ export default class Sections extends Component {
 
       if (section.type !== 'calendar') {
         contents = (
-          <Section key={section._id || section.id} align={align}
-            full={section.full} color={color}
-            backgroundImage={backgroundImage} plain={section.plain}>
+          <Section key={section._id || section.id}
+            align={align}
+            full={section.full}
+            color={color}
+            backgroundImage={backgroundImage}
+            plain={section.plain}>
             {contents}
           </Section>
         );

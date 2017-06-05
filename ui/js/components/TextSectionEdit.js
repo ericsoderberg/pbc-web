@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from './FormField';
 import TextHelp from './TextHelp';
 import FormState from '../utils/FormState';
@@ -25,7 +26,9 @@ export default class TextSectionEdit extends Component {
     return (
       <SectionEdit formState={formState}>
         <FormField name="text" label="Text" help={<TextHelp />}>
-          <textarea name="text" value={section.text || ''} rows={8}
+          <textarea name="text"
+            value={section.text || ''}
+            rows={8}
             onChange={formState.change('text')} />
         </FormField>
       </SectionEdit>

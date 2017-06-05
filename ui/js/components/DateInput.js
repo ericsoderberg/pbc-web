@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import DateSelector from './DateSelector';
 
@@ -119,9 +120,12 @@ export default class DateInput extends Component {
     if (!inline) {
       input = (
         <input ref={(ref) => { this._dateInputRef = ref; }}
-          className={'date-input__input'} type="date"
-          value={dateValue} placeholder="YYYY-MM-DD"
-          onChange={this._onChange} onFocus={this._onOpen} />
+          className={'date-input__input'}
+          type="date"
+          value={dateValue}
+          placeholder="YYYY-MM-DD"
+          onChange={this._onChange}
+          onFocus={this._onOpen} />
       );
     }
     if (active || inline) {

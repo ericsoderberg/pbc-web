@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { postItem } from '../../actions';
 import FormError from '../../components/FormError';
@@ -183,11 +184,13 @@ class PaymentPay extends Component {
         <FormError message={error} />
         <PaymentFormContents full={false}
           payByCheckInstructions={payByCheckInstructions}
-          formState={formState} session={session} />
+          formState={formState}
+          session={session} />
         {notification}
         <footer className="form__footer">
-          <div id="paypalButton" style={{
-            display: (payment.method === 'paypal' ? 'block' : 'none') }} />
+          <div id="paypalButton"
+            style={{
+              display: (payment.method === 'paypal' ? 'block' : 'none') }} />
           {submitButton}
           <Button secondary={true} label="Cancel" onClick={this._onCancel} />
         </footer>

@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loadItem, postItem, unloadItem, haveSession, setSession } from '../../actions';
@@ -113,7 +114,9 @@ class FormAdd extends Component {
           <Button secondary={true} label="Cancel" onClick={cancelFunc} />
         );
         headerCancelControl = [
-          <button key="cancel" type="button" className="button"
+          <button key="cancel"
+            type="button"
+            className="button"
             onClick={cancelFunc}>
             Cancel
           </button>,
@@ -154,12 +157,17 @@ class FormAdd extends Component {
       }
 
       result = (
-        <form className={classNames.join(' ')} action={'/forms'}
+        <form className={classNames.join(' ')}
+          action={'/forms'}
           onSubmit={this._onAdd}>
           {header}
-          <FormContents form={form} formTemplate={formTemplate}
-            linkedForm={linkedForm} linkedFormControl={linkedFormControl}
-            full={full} onChange={this._onChange} error={error} />
+          <FormContents form={form}
+            formTemplate={formTemplate}
+            linkedForm={linkedForm}
+            linkedFormControl={linkedFormControl}
+            full={full}
+            onChange={this._onChange}
+            error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">
               {formTemplate.submitLabel || 'Submit'}

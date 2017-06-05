@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link, NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteSession } from '../actions';
@@ -46,7 +47,9 @@ class MainNav extends Component {
   _renderLinks(routes) {
     const links = routes.map(route => (
       <li key={route.path}>
-        <NavLink to={route.path} exact={true} className="main-nav__link"
+        <NavLink to={route.path}
+          exact={true}
+          className="main-nav__link"
           activeClassName="main-nav__link--active">
           {route.label}
         </NavLink>
@@ -69,9 +72,11 @@ class MainNav extends Component {
     let adminLinks;
     if (session) {
       sessionControls = [
-        <Link key="name" className="main-nav__link"
+        <Link key="name"
+          className="main-nav__link"
           to={`/users/${session.userId._id}/edit`}>{session.userId.name}</Link>,
-        <button key="out" className="main-nav__link button-plain"
+        <button key="out"
+          className="main-nav__link button-plain"
           onClick={this._signOut}>
           Sign Out
         </button>,

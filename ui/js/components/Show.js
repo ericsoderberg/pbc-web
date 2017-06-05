@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadItem, unloadItem } from '../actions';
 import ItemHeader from './ItemHeader';
@@ -46,7 +47,9 @@ class Show extends Component {
 
     return (
       <main>
-        <ItemHeader title={title} category={category} item={item}
+        <ItemHeader title={title}
+          category={category}
+          item={item}
           actions={actions} />
         {contents}
       </main>

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadSite, postSite } from '../../actions';
 import Form from '../../components/Form';
@@ -50,9 +51,15 @@ class SiteEdit extends Component {
     const { site } = this.state;
 
     return (
-      <Form title="Edit Site" submitLabel="Update" action="/api/site"
-        FormContents={SiteFormContents} item={site} session={session}
-        onSubmit={this._onUpdate} error={error} onCancel={this._onCancel} />
+      <Form title="Edit Site"
+        submitLabel="Update"
+        action="/api/site"
+        FormContents={SiteFormContents}
+        item={site}
+        session={session}
+        onSubmit={this._onUpdate}
+        error={error}
+        onCancel={this._onCancel} />
     );
   }
 }

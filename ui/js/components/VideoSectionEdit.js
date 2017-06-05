@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from './FormField';
 import FormState from '../utils/FormState';
 import SectionEdit from './SectionEdit';
@@ -24,7 +25,9 @@ export default class VideoSectionEdit extends Component {
     return (
       <SectionEdit formState={formState}>
         <FormField label="Url" help="Vimeo or YouTube only">
-          <input type="text" name="url" value={section.url || ''}
+          <input type="text"
+            name="url"
+            value={section.url || ''}
             onChange={formState.change('url')} />
         </FormField>
       </SectionEdit>

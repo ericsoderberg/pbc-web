@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 import FormOptionLabel from './FormOptionLabel';
 
@@ -15,7 +16,10 @@ const FormChoices = (props) => {
     const optionRemaining = remaining[id];
     return (
       <div key={id} className="form__field-option">
-        <input id={id} name={name} type="checkbox" checked={checked}
+        <input id={id}
+          name={name}
+          type="checkbox"
+          checked={checked}
           disabled={optionRemaining <= 0 && !initialChecked}
           onChange={() => onChange({
             templateFieldId: formTemplateField._id,
@@ -24,15 +28,19 @@ const FormChoices = (props) => {
               optionIds.slice(0).concat([id])),
             initialOptionIds,
           })} />
-        <FormOptionLabel htmlFor={id} formTemplateField={formTemplateField}
-          option={option} selected={checked} remaining={optionRemaining} />
+        <FormOptionLabel htmlFor={id}
+          formTemplateField={formTemplateField}
+          option={option}
+          selected={checked}
+          remaining={optionRemaining} />
       </div>
     );
   });
 
   return (
     <FormField label={formTemplateField.name}
-      help={formTemplateField.help} error={error}>
+      help={formTemplateField.help}
+      error={error}>
       {contents}
     </FormField>
   );

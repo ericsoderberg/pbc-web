@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
@@ -285,19 +286,22 @@ class FormSection extends Component {
       case ADDING: {
         const onCancel = forms.length > 0 ? this._nextState(SUMMARY) : undefined;
         contents = (
-          <FormAdd full={false} inline={true}
+          <FormAdd full={false}
+            inline={true}
             formTemplate={activeFormTemplate}
             formTemplateId={activeFormTemplate._id}
             linkedForm={linkedForm}
             linkedFormTemplate={linkedFormTemplate}
-            onDone={this._onDone} onCancel={onCancel}
+            onDone={this._onDone}
+            onCancel={onCancel}
             onLinkedForm={() => this.setState({
               activeFormTemplate: linkedFormTemplate,
               editForm: linkedForm,
               linkedForm: undefined,
               linkedFormTemplate: undefined,
               state: EDITING })}
-            signInControl={<Button label="Sign In" secondary={true}
+            signInControl={<Button label="Sign In"
+              secondary={true}
               onClick={this._nextState(SESSION)} />} />
         );
         break;
@@ -305,12 +309,15 @@ class FormSection extends Component {
 
       case EDITING: {
         contents = (
-          <FormEdit id={editForm._id} full={false} inline={true}
+          <FormEdit id={editForm._id}
+            full={false}
+            inline={true}
             form={editForm}
             formTemplate={activeFormTemplate}
             linkedForm={linkedForm}
             linkedFormTemplate={linkedFormTemplate}
-            onDone={this._onDone} onCancel={this._nextState(SUMMARY)}
+            onDone={this._onDone}
+            onCancel={this._nextState(SUMMARY)}
             onLinkedForm={() => this.setState({
               activeFormTemplate: linkedFormTemplate,
               editForm: linkedForm,
@@ -328,7 +335,8 @@ class FormSection extends Component {
             formTemplateId={formTemplate._id}
             formTemplateName={formTemplate.name}
             payByCheckInstructions={formTemplate.payByCheckInstructions}
-            onDone={this._onDone} onCancel={this._nextState(SUMMARY)} />
+            onDone={this._onDone}
+            onCancel={this._nextState(SUMMARY)} />
         );
         break;
       }
@@ -343,7 +351,8 @@ class FormSection extends Component {
               LABEL[formTemplate.submitLabel] ||
               LABEL.Submit;
             itemContents = (
-              <FormItem item={form} onClick={this._edit(form)}
+              <FormItem item={form}
+                onClick={this._edit(form)}
                 verb={label}
                 distinguish={forms.length > 1 ||
                   formTemplate.anotherLabel !== undefined} />
@@ -351,7 +360,8 @@ class FormSection extends Component {
           } else {
             anyPending = true;
             itemContents = (
-              <FormItem item={form} onClick={this._add(form)}
+              <FormItem item={form}
+                onClick={this._add(form)}
                 intermediate={true} />
             );
           }
@@ -362,17 +372,20 @@ class FormSection extends Component {
         let another;
         if (formTemplate.anotherLabel) {
           another = (
-            <Button className="button form-summary__another" plain={true}
+            <Button className="button form-summary__another"
+              plain={true}
               label={<span>
                 {formTemplate.anotherLabel} <RightIcon className="button__indicator" />
-              </span>} onClick={this._add()} />
+              </span>}
+              onClick={this._add()} />
           );
         }
 
         let paymentControl;
         if (unpaidAmount) {
           paymentControl = (
-            <Button className="button form-summary__pay" secondary={true}
+            <Button className="button form-summary__pay"
+              secondary={true}
               label={`Pay current balance of $${unpaidAmount}`}
               onClick={this._nextState(PAYING)} />
           );

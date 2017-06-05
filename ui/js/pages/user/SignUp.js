@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { postSignUp } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
@@ -93,7 +94,9 @@ export default class SignUp extends Component {
       );
     } else {
       const actions = [
-        <button key="cancel" type="button" className="button"
+        <button key="cancel"
+          type="button"
+          className="button"
           onClick={this._onCancel}>
           Cancel
         </button>,
@@ -106,24 +109,29 @@ export default class SignUp extends Component {
 
     return (
       <div className={classNames.join(' ')}>
-        <form className="form" action="/api/users/sign-up"
+        <form className="form"
+          action="/api/users/sign-up"
           onSubmit={this._onSignUp}>
           {header}
           <FormError message={errorMessage} />
           <div className="form__contents">
             <fieldset className="form__fields">
               <FormField name="name" label="Name" error={errors.name}>
-                <input ref={(ref) => { this._nameRef = ref; }} name="name"
+                <input ref={(ref) => { this._nameRef = ref; }}
+                  name="name"
                   value={user.name || ''}
                   onChange={formState.change('name')} />
               </FormField>
               <FormField name="email" label="Email" error={errors.email}>
-                <input name="email" value={user.email || ''}
+                <input name="email"
+                  value={user.email || ''}
                   onChange={formState.change('email')} />
               </FormField>
-              <FormField name="password" label="Password"
+              <FormField name="password"
+                label="Password"
                 error={errors.password}>
-                <input name="password" type="password"
+                <input name="password"
+                  type="password"
                   value={user.password || ''}
                   onChange={formState.change('password')} />
               </FormField>

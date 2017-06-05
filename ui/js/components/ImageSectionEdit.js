@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from './FormField';
 import FormState from '../utils/FormState';
 import SectionEdit from './SectionEdit';
@@ -31,11 +32,15 @@ export default class ImageSectionEdit extends Component {
 
     return (
       <SectionEdit formState={formState}>
-        <FormField name="image" label="Image" help={imageHelp}
+        <FormField name="image"
+          label="Image"
+          help={imageHelp}
           onDrop={formState.dropImageFile('image')}>
-          <img className="form-field__image" alt=""
+          <img className="form-field__image"
+            alt=""
             src={section.image ? section.image.data : ''} />
-          <input name="image" type="file"
+          <input name="image"
+            type="file"
             onChange={formState.changeImageFile('image')} />
         </FormField>
       </SectionEdit>

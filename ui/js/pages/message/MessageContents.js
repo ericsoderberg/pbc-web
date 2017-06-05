@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import moment from 'moment-timezone';
 import Text from '../../components/Text';
@@ -47,8 +48,10 @@ export default class MessageContents extends Component {
 
   _renderMessageNav(message, type) {
     return (
-      <Button left={type === 'previous'} right={type === 'next'}
-        path={`/messages/${message.path || message._id}`} replaceHistory={true}>
+      <Button left={type === 'previous'}
+        right={type === 'next'}
+        path={`/messages/${message.path || message._id}`}
+        replaceHistory={true}>
         <div className="message__nav-name">{message.name}</div>
         <div className="message__nav-verses">{message.verses}</div>
       </Button>

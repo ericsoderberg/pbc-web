@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
@@ -63,7 +64,8 @@ class MessageItem extends Component {
     }
 
     const link = (
-      <Link className={classNames.join(' ')} style={style}
+      <Link className={classNames.join(' ')}
+        style={style}
         to={`/messages/${message.path || message._id}`}>
         <div className="item message-item">
           {linkContents}

@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getItem, postItem, putItem } from '../../actions';
 import Loading from '../../components/Loading';
 import Form from '../../components/Form';
@@ -57,11 +58,14 @@ export default class PaymentAdd extends Component {
       const FormContents = PaymentFormContents;
         // inline ? PaymentFormContentsInline : PaymentFormContents;
       result = (
-        <Form title="Payment" submitLabel="Submit"
+        <Form title="Payment"
+          submitLabel="Submit"
           action="/api/payments"
           contentsProps={{ formId, formTemplateId }}
-          FormContents={FormContents} item={payment}
-          onSubmit={this._onAdd} error={error}
+          FormContents={FormContents}
+          item={payment}
+          onSubmit={this._onAdd}
+          error={error}
           onCancel={this._onCancel} />
       );
     } else {

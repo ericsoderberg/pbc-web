@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import DownIcon from '../icons/DownArrow';
 import UpIcon from '../icons/UpArrow';
 import BlankIcon from '../icons/Blank';
@@ -11,7 +12,8 @@ const SectionItem = (props) => {
   let raise;
   if (index > 0) {
     raise = (
-      <button type="button" className="button-icon"
+      <button type="button"
+        className="button-icon"
         onClick={formState.swapWith(property, index, index - 1)}>
         <UpIcon />
       </button>
@@ -20,7 +22,8 @@ const SectionItem = (props) => {
   let lower;
   if (index < (array.length - 1)) {
     lower = (
-      <button type="button" className="button-icon"
+      <button type="button"
+        className="button-icon"
         onClick={formState.swapWith(property, index, index + 1)}>
         <DownIcon />
       </button>
@@ -40,7 +43,8 @@ const SectionItem = (props) => {
         <div className="box--row">
           {raise}
           {lower}
-          <button type="button" className="button-icon"
+          <button type="button"
+            className="button-icon"
             onClick={formState.removeAt(property, index)}>
             <TrashIcon />
           </button>

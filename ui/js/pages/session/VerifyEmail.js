@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { postVerifyEmail, postSessionViaToken, setSession } from '../../actions';
@@ -201,7 +202,9 @@ class VerifyEmail extends Component {
       );
     } else {
       const actions = [
-        <button key="cancel" type="button" className="button"
+        <button key="cancel"
+          type="button"
+          className="button"
           onClick={this._onCancel}>
           Cancel
         </button>,
@@ -224,7 +227,8 @@ class VerifyEmail extends Component {
               </div>
               <FormField name="email" label="Email" error={errors.email}>
                 <input ref={(ref) => { this._emailRef = ref; }}
-                  name="email" value={email}
+                  name="email"
+                  value={email}
                   onChange={event => this.setState({
                     email: event.target.value, errors: {} })} />
               </FormField>
@@ -232,7 +236,8 @@ class VerifyEmail extends Component {
           </div>
           <div className="form__footer-container">
             <footer className="form__footer">
-              <button type="submit" className="button"
+              <button type="submit"
+                className="button"
                 onClick={this._onSendLink}>
                 Send Email
               </button>

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
 import { loadItem, unloadItem, postNewsletterSend } from '../../actions';
@@ -68,7 +69,9 @@ class Newsletter extends Component {
           <form className="newsletter-send"
             action={`/newsletters/${newsletter._id}/send`}
             onSubmit={this._onSend}>
-            <input placeholder="email address" name="address" type="text"
+            <input placeholder="email address"
+              name="address"
+              type="text"
               onChange={event =>
                 this.setState({ address: event.target.value, sendState: READY })} />
             {button}

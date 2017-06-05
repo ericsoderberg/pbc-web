@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -51,7 +52,8 @@ class LibrarySectionEdit extends Component {
     return (
       <SectionEdit formState={formState}>
         <FormField label="Library">
-          <select name="libraryId" value={value}
+          <select name="libraryId"
+            value={value}
             onChange={formState.change('libraryId')}>
             {options}
           </select>

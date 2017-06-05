@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormState from '../../utils/FormState';
 import SectionMultiEdit from '../../components/SectionMultiEdit';
 import FilesItemEdit from './FilesItemEdit';
@@ -20,7 +21,9 @@ export default class FilesSectionEdit extends Component {
   render() {
     const { formState } = this.state;
     return (
-      <SectionMultiEdit formState={formState} property="files" label="file"
+      <SectionMultiEdit formState={formState}
+        property="files"
+        label="file"
         ItemEdit={FilesItemEdit} />
     );
   }

@@ -1,6 +1,7 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getGeocode } from '../actions';
 
 const TILES_URL = 'https://api.mapbox.com/styles/v1/ericsoderberg/' +
@@ -159,7 +160,8 @@ export default class Map extends Component {
       <div className={classNames.join(' ')}>
         <a className="map__link"
           href={`maps://?daddr=${encodeURIComponent(mergedAddress)}`} />
-        <div ref={(ref) => { this._mapRef = ref; }} id="map"
+        <div ref={(ref) => { this._mapRef = ref; }}
+          id="map"
           className="map__map">
           {addressElement}
         </div>

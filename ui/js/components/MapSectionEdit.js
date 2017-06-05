@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from './FormField';
 import FormState from '../utils/FormState';
 import SectionEdit from './SectionEdit';
@@ -24,7 +25,8 @@ export default class TextSectionEdit extends Component {
     return (
       <SectionEdit formState={formState}>
         <FormField label="Address">
-          <input name="address" value={section.address || ''}
+          <input name="address"
+            value={section.address || ''}
             onChange={formState.change('address')} />
         </FormField>
       </SectionEdit>

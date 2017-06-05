@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Image from '../../components/Image';
 import Button from '../../components/Button';
@@ -28,16 +29,21 @@ export default class PagesSection extends Component {
       let link;
       if (pageRef.image) {
         link = (
-          <Link key={key} className="page-tile pages-section__page"
-            to={path} style={style}>
+          <Link key={key}
+            className="page-tile pages-section__page"
+            to={path}
+            style={style}>
             <Image image={pageRef.image} />
             <Button>{page.name}</Button>
           </Link>
         );
       } else if (pages.length === 1) {
         link = (
-          <Button key={key} className="pages-section__page"
-            plain={true} path={path} style={style}>
+          <Button key={key}
+            className="pages-section__page"
+            plain={true}
+            path={path}
+            style={style}>
             <div className="pages-section__name">
               <h2>{page.name}</h2>
               <RightIcon className="anchor__indicator" />
@@ -46,8 +52,11 @@ export default class PagesSection extends Component {
         );
       } else {
         link = (
-          <Button key={key} className="pages-section__page"
-            circle={true} path={path} style={style}>
+          <Button key={key}
+            className="pages-section__page"
+            circle={true}
+            path={path}
+            style={style}>
             {page.name}
           </Button>
         );

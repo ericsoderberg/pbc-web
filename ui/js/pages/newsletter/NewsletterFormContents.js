@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -71,7 +72,8 @@ class NewsletterFormContents extends Component {
       options.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by">
-          <select name="domainId" value={newsletter.domainId || ''}
+          <select name="domainId"
+            value={newsletter.domainId || ''}
             onChange={formState.change('domainId')}>
             {options}
           </select>
@@ -83,7 +85,8 @@ class NewsletterFormContents extends Component {
       <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name">
-            <input name="name" value={newsletter.name || ''}
+            <input name="name"
+              value={newsletter.name || ''}
               onChange={formState.change('name')} />
           </FormField>
           <FormField label="Date">

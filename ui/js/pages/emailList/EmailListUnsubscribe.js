@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, postUnsubscribe, unloadCategory } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -114,12 +115,14 @@ class EmailListUnsubscribe extends Component {
                 title={`Unsubscribe from ${emailList.name}`} />
               <fieldset className="form__fields">
                 <FormField label="Address">
-                  <input type="text" value={session.userId.email}
+                  <input type="text"
+                    value={session.userId.email}
                     disabled={true} />
                 </FormField>
               </fieldset>
               <footer className="form__footer">
-                <button type="submit" className="button"
+                <button type="submit"
+                  className="button"
                   onClick={this._onUnsubscribe}>
                   Unsubscribe
                 </button>

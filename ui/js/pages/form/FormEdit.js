@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loadItem, putItem, deleteItem, unloadItem } from '../../actions';
@@ -133,7 +134,9 @@ class FormEdit extends Component {
       let header;
       if (!inline) {
         const cancelControl = [
-          <button key="cancel" type="button" className="button"
+          <button key="cancel"
+            type="button"
+            className="button"
             onClick={this._onCancel}>
             Cancel
           </button>,
@@ -165,16 +168,22 @@ class FormEdit extends Component {
       }
 
       result = (
-        <form className={classNames.join(' ')} action={`/forms/${form._id}`}
+        <form className={classNames.join(' ')}
+          action={`/forms/${form._id}`}
           onSubmit={this._onUpdate}>
           {header}
-          <FormContents form={form} formTemplate={formTemplate}
-            linkedForm={linkedForm} linkedFormControl={linkedFormControl}
-            full={full} onChange={this._onChange} error={error} />
+          <FormContents form={form}
+            formTemplate={formTemplate}
+            linkedForm={linkedForm}
+            linkedFormControl={linkedFormControl}
+            full={full}
+            onChange={this._onChange}
+            error={error} />
           <footer className="form__footer">
             <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />
-            <button type="button" className="button button--secondary"
+            <button type="button"
+              className="button button--secondary"
               onClick={this._onCancel}>
               Cancel
             </button>

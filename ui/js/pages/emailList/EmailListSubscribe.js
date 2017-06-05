@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory, postSubscribe } from '../../actions';
 import PageHeader from '../../components/PageHeader';
@@ -52,21 +53,26 @@ class EmailListSubscribe extends Component {
       result = <Loading />;
     } else {
       const cancel = (
-        <button key="cancel" type="button" className="button"
+        <button key="cancel"
+          type="button"
+          className="button"
           onClick={this._onCancel}>
           Cancel
         </button>
       );
       result = (
         <div className="form__container">
-          <form className="form" action={`/api/email-lists/${emailList._id}`}
+          <form className="form"
+            action={`/api/email-lists/${emailList._id}`}
             onSubmit={this._onSubscribe}>
             <PageHeader title={`Subscribe to ${emailList.name}`}
               actions={[cancel]} />
             <div className="form__contents">
               <fieldset className="form__fields">
                 <FormField label="Addresses" help="one per line">
-                  <textarea name="addresses" rows="6" value={addresses}
+                  <textarea name="addresses"
+                    rows="6"
+                    value={addresses}
                     onChange={e =>
                       this.setState({ addresses: e.target.value })} />
                 </FormField>
@@ -74,7 +80,8 @@ class EmailListSubscribe extends Component {
             </div>
             <div className="form__footer-container">
               <footer className="form__footer">
-                <button type="submit" className="button"
+                <button type="submit"
+                  className="button"
                   onClick={this._onSubscribe}>
                   Subscribe
                 </button>

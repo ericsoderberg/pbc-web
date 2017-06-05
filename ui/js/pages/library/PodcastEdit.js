@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 import ImageField from '../../components/ImageField';
 import FormState from '../../utils/FormState';
@@ -24,25 +25,30 @@ export default class PodcastEdit extends Component {
     return (
       <fieldset>
         <FormField label="Title">
-          <input name="title" value={podcast.title || ''}
+          <input name="title"
+            value={podcast.title || ''}
             onChange={formState.change('title')} />
         </FormField>
         <FormField label="Subtitle">
-          <input name="subtitle" value={podcast.subtitle || ''}
+          <input name="subtitle"
+            value={podcast.subtitle || ''}
             onChange={formState.change('subtitle')} />
         </FormField>
         <FormField label="Summary">
           <textarea name="summary"
-            value={podcast.summary || ''} rows={4}
+            value={podcast.summary || ''}
+            rows={4}
             onChange={formState.change('summary')} />
         </FormField>
         <FormField label="Description">
           <textarea name="description"
-            value={podcast.description || ''} rows={4}
+            value={podcast.description || ''}
+            rows={4}
             onChange={formState.change('description')} />
         </FormField>
         <FormField label="Category">
-          <input name="category" value={podcast.category || ''}
+          <input name="category"
+            value={podcast.category || ''}
             onChange={formState.change('category')} />
         </FormField>
         <FormField label="Sub category">
@@ -50,8 +56,10 @@ export default class PodcastEdit extends Component {
             value={podcast.subCategory || ''}
             onChange={formState.change('subCategory')} />
         </FormField>
-        <ImageField label="Image" name="image"
-          formState={formState} property="image" />
+        <ImageField label="Image"
+          name="image"
+          formState={formState}
+          property="image" />
       </fieldset>
     );
   }

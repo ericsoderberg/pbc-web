@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 
 const FormLines = (props) => {
@@ -6,9 +7,11 @@ const FormLines = (props) => {
 
   return (
     <FormField label={formTemplateField.name}
-      help={formTemplateField.help} error={error}>
+      help={formTemplateField.help}
+      error={error}>
       <div className="textarea-print">{field.value}</div>
-      <textarea name={formTemplateField.name} value={field.value || ''}
+      <textarea name={formTemplateField.name}
+        value={field.value || ''}
         onChange={event => onChange({
           templateFieldId: formTemplateField._id,
           value: event.target.value,

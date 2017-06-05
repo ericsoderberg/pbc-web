@@ -1,4 +1,5 @@
-import React, { Component, PropTypes, Children } from 'react';
+import React, { Component, Children } from 'react';
+import PropTypes from 'prop-types';
 import Image from './Image';
 import { isDarkBackground } from '../utils/Color';
 
@@ -93,7 +94,8 @@ export default class Section extends Component {
 
       result = (
         <div ref={(ref) => { this._componentRef = ref; }}
-          className={classNames.join(' ')} style={style}>
+          className={classNames.join(' ')}
+          style={style}>
           {background}
           {child}
         </div>

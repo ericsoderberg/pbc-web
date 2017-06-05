@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
@@ -51,13 +52,15 @@ export default class EventSectionEdit extends Component {
                 _id: suggestion._id, name: suggestion.name })} />
         </FormField>
         <FormField>
-          <input name="includeMap" type="checkbox"
+          <input name="includeMap"
+            type="checkbox"
             checked={section.includeMap || false}
             onChange={formState.toggle('includeMap')} />
           <label htmlFor="includeMap">Map?</label>
         </FormField>
         <FormField>
-          <input name="navigable" type="checkbox"
+          <input name="navigable"
+            type="checkbox"
             checked={(section.navigable === false ? section.navigable : true)}
             onChange={formState.toggle('navigable')} />
           <label htmlFor="navigable">Navigable?</label>

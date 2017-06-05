@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loadItem, postUnsubscribe, unloadItem } from '../../actions';
@@ -125,7 +126,8 @@ class EmailList extends Component {
               <div className="box--row box--static box--between">
                 {user}
                 {state}
-                <button type="button" className="button-icon"
+                <button type="button"
+                  className="button-icon"
                   onClick={this._unsubscribe(address.address)}>
                   <TrashIcon />
                 </button>
@@ -150,8 +152,11 @@ class EmailList extends Component {
 
       result = (
         <main>
-          <PageHeader title={emailList.name} homer={true} focusOnSearch={false}
-            searchText={searchText} onSearch={this._onSearch}
+          <PageHeader title={emailList.name}
+            homer={true}
+            focusOnSearch={false}
+            searchText={searchText}
+            onSearch={this._onSearch}
             actions={actions} />
           <ul className="list email-list__addresses">
             {items}

@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import { getUnavailableDates } from '../../actions';
 import Button from '../../components/Button';
@@ -117,7 +118,8 @@ export default class EventDates extends Component {
         <div key={name} className="calendar__day">
           <div className="calendar__day-date">
             <label htmlFor={day}>{name}</label>
-            <input id={day} type="checkbox"
+            <input id={day}
+              type="checkbox"
               checked={weekDayChecked[day] || false}
               onChange={this._toggleWeekDay(day)} />
           </div>
@@ -162,8 +164,10 @@ export default class EventDates extends Component {
         <div key={name} className={classNames.join(' ')}>
           <div className="calendar__day-date">
             <label htmlFor={dateValue}>{name}</label>
-            <input id={dateValue} type="checkbox"
-              checked={checked} disabled={disabled}
+            <input id={dateValue}
+              type="checkbox"
+              checked={checked}
+              disabled={disabled}
               onChange={formState.toggleIn('dates', dateValue)} />
           </div>
         </div>,
@@ -199,7 +203,8 @@ export default class EventDates extends Component {
       <fieldset ref={(ref) => { this._containerRef = ref; }}
         className="form__fields">
         <div type="button" className="form-item">
-          <Button secondary={true} label="Recurring dates"
+          <Button secondary={true}
+            label="Recurring dates"
             onClick={this._onToggle} />
         </div>
         {calendar}

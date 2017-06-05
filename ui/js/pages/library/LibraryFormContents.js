@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -35,7 +36,8 @@ class LibraryFormContents extends Component {
       options.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by" error={errors.domainId}>
-          <select name="domainId" value={library.domainId || ''}
+          <select name="domainId"
+            value={library.domainId || ''}
             onChange={formState.change('domainId')}>
             {options}
           </select>
@@ -55,21 +57,28 @@ class LibraryFormContents extends Component {
       <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name" error={errors.name}>
-            <input name="name" value={library.name || ''}
+            <input name="name"
+              value={library.name || ''}
               onChange={formState.change('name')} />
           </FormField>
           <FormField name="text" label="Description" help={<TextHelp />}>
-            <textarea name="text" value={library.text || ''} rows={4}
+            <textarea name="text"
+              value={library.text || ''}
+              rows={4}
               onChange={formState.change('text')} />
           </FormField>
-          <FormField name="path" label="Url ID" help="unique url name"
+          <FormField name="path"
+            label="Url ID"
+            help="unique url name"
             error={errors.path}>
-            <input name="path" value={library.path || ''}
+            <input name="path"
+              value={library.path || ''}
               onChange={formState.change('path')} />
           </FormField>
           {administeredBy}
           <FormField>
-            <input name="podcast" type="checkbox"
+            <input name="podcast"
+              type="checkbox"
               checked={library.podcast}
               onChange={() =>
                 formState.set('podcast', library.podcast ? undefined : {})} />

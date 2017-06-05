@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
@@ -34,7 +35,8 @@ class CalendarFormContents extends Component {
       options.unshift(<option key={0} />);
       administeredBy = (
         <FormField label="Administered by" error={errors.domainId}>
-          <select name="domainId" value={calendar.domainId || ''}
+          <select name="domainId"
+            value={calendar.domainId || ''}
             onChange={formState.change('domainId')}>
             {options}
           </select>
@@ -46,16 +48,21 @@ class CalendarFormContents extends Component {
       <div className={className}>
         <fieldset className="form__fields">
           <FormField label="Name" error={errors.name}>
-            <input name="name" value={calendar.name || ''}
+            <input name="name"
+              value={calendar.name || ''}
               onChange={formState.change('name')} />
           </FormField>
-          <FormField name="path" label="Url ID" help="unique url name"
+          <FormField name="path"
+            label="Url ID"
+            help="unique url name"
             error={errors.path}>
-            <input name="path" value={calendar.path || ''}
+            <input name="path"
+              value={calendar.path || ''}
               onChange={formState.change('path')} />
           </FormField>
           <FormField>
-            <input name="public" type="checkbox"
+            <input name="public"
+              type="checkbox"
               checked={calendar.public || false}
               onChange={formState.toggle('public')} />
             <label htmlFor="public">public</label>

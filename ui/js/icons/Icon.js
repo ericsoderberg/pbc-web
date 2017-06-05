@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 // cannot be a function because we extend it for other icons
 export default class Icon extends Component {
@@ -16,14 +17,20 @@ export default class Icon extends Component {
     if (pathCommands) {
       contents = (
         <path fill="none"
-          strokeWidth="2" strokeMiterlimit="10" d={pathCommands} />
+          strokeWidth="2"
+          strokeMiterlimit="10"
+          d={pathCommands} />
       );
     } else if (children) {
       contents = children;
     }
     return (
-      <svg version="1.1" viewBox="0 0 24 24" width="24px" height="24px"
-        role="img" className={classNames.join(' ')}>
+      <svg version="1.1"
+        viewBox="0 0 24 24"
+        width="24px"
+        height="24px"
+        role="img"
+        className={classNames.join(' ')}>
         <g stroke={color}>
           <rect x="0" y="0" fill="none" stroke="none" width="24" height="24" />
           {contents}

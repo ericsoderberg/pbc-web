@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from './FormField';
 import ImageField from './ImageField';
 
@@ -19,21 +20,25 @@ export default class SectionFields extends Component {
       let backgroundImage;
       if (allowBackgroundImage) {
         backgroundImage = (
-          <ImageField label="Background image" name="backgroundImage"
-            formState={formState} property="backgroundImage" />
+          <ImageField label="Background image"
+            name="backgroundImage"
+            formState={formState}
+            property="backgroundImage" />
         );
       }
 
       result = (
         <div>
           <FormField>
-            <input name="full" type="checkbox"
+            <input name="full"
+              type="checkbox"
               checked={section.full || false}
               onChange={formState.toggle('full')} />
             <label htmlFor="full">Edge to edge</label>
           </FormField>
           <FormField label="Background color">
-            <input name="color" value={section.color || ''}
+            <input name="color"
+              value={section.color || ''}
               onChange={formState.change('color')} />
           </FormField>
           {backgroundImage}

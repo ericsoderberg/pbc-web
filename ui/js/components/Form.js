@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import PageHeader from './PageHeader';
 import FormError from './FormError';
 import FormState from '../utils/FormState';
@@ -71,7 +72,9 @@ export default class Form extends Component {
       );
     } else {
       actions = [...actions,
-        <button key="cancel" type="button" className="button"
+        <button key="cancel"
+          type="button"
+          className="button"
           onClick={onCancel}>
           Cancel
         </button>,
@@ -104,8 +107,11 @@ export default class Form extends Component {
         errors[key] = err.kind === 'required' ? 'required' : err.message;
       });
       contents = (
-        <FormContents className="form__contents" {...contentsProps}
-          formState={formState} session={session} errors={errors} />
+        <FormContents className="form__contents"
+          {...contentsProps}
+          formState={formState}
+          session={session}
+          errors={errors} />
       );
     }
 

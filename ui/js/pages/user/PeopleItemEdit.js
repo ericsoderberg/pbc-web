@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 import FormState from '../../utils/FormState';
 import SelectSearch from '../../components/SelectSearch';
@@ -49,12 +50,15 @@ export default class PeopleItemEdit extends Component {
               })} />
         </FormField>
         <FormField label="Text" help={<TextHelp />}>
-          <textarea name={`text-${index}`} rows={4}
+          <textarea name={`text-${index}`}
+            rows={4}
             value={personSummary.text || ''}
             onChange={formState.change('text')} />
         </FormField>
-        <ImageField label="Image" name={`image-${index}`}
-          formState={formState} property="image" />
+        <ImageField label="Image"
+          name={`image-${index}`}
+          formState={formState}
+          property="image" />
       </div>
     );
   }

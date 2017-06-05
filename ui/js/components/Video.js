@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 // e.g. https://vimeo.com/205930454
 const VIMEO_REGEXP = /vimeo\.com\/(\d+)/;
@@ -19,9 +20,12 @@ export default class Video extends Component {
           `${match[1]}?title=0&byline=0&portrait=0`;
         contents = (
           <iframe src={src}
-            width="960" height="540" frameBorder="0"
+            width="960"
+            height="540"
+            frameBorder="0"
             webkitAllowFullScreen={true}
-            mozallowfullscreen={true} allowFullScreen={true} />
+            mozallowfullscreen={true}
+            allowFullScreen={true} />
         );
       }
       match = url.match(VIMEO_REGEXP);
@@ -32,10 +36,13 @@ export default class Video extends Component {
           src += '&autoplay=1';
         }
         contents = (
-          <iframe className="video vimeo-player" type="text/html"
-            width="960" height="540"
+          <iframe className="video vimeo-player"
+            type="text/html"
+            width="960"
+            height="540"
             src={src}
-            frameBorder="0" allowFullScreen={true} />
+            frameBorder="0"
+            allowFullScreen={true} />
         );
       }
       match = url.match(YOUTUBE_REGEXP);
@@ -43,8 +50,12 @@ export default class Video extends Component {
         const src = `${window.location.protocol}//www.youtube.com/embed/` +
           `${match[1] || match[2]}`;
         contents = (
-          <iframe className="video youtube-player" type="text/html" src={src}
-            frameBorder="0" width="960" height="540" />
+          <iframe className="video youtube-player"
+            type="text/html"
+            src={src}
+            frameBorder="0"
+            width="960"
+            height="540" />
         );
       }
     }

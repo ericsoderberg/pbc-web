@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class Button extends Component {
 
@@ -70,7 +71,8 @@ export default class Button extends Component {
     } else if (left) {
       classNames.push('button-left');
       arrow = (
-        <svg viewBox="0 0 24 24" preserveAspectRatio="none"
+        <svg viewBox="0 0 24 24"
+          preserveAspectRatio="none"
           className="button__arrow">
           <path d="M24,0 L24,24 L0,12 Z" />
         </svg>
@@ -84,7 +86,8 @@ export default class Button extends Component {
     } else if (right) {
       classNames.push('button-right');
       arrow = (
-        <svg viewBox="0 0 24 24" preserveAspectRatio="none"
+        <svg viewBox="0 0 24 24"
+          preserveAspectRatio="none"
           className="button__arrow">
           <path d="M0,0 L24,12 L0,24 Z" />
         </svg>
@@ -121,7 +124,10 @@ export default class Button extends Component {
     return (
       <Tag ref={(ref) => { this._componentRef = ref; }}
         className={classNames.join(' ')}
-        href={href} type={type} onClick={onClick} style={style}>
+        href={href}
+        type={type}
+        onClick={onClick}
+        style={style}>
         {contents}
         {arrow}
       </Tag>

@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loadSite, haveSession } from '../actions';
@@ -8,7 +9,8 @@ import Button from './Button';
 import MainNav from './MainNav';
 
 const PrivateRoute = ({ component, ...rest }) => (
-  <Route {...rest} render={props => (
+  <Route {...rest}
+    render={props => (
     haveSession() ? (
       React.createElement(component, props)
     ) : (

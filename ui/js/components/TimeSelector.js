@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 
 function pad(num, size) {
@@ -53,7 +54,8 @@ export default class TimeSelector extends Component {
         classes.push('time-selector__hour--active');
       }
       hours.push(
-        <button key={hour} className={classes.join(' ')}
+        <button key={hour}
+          className={classes.join(' ')}
           onClick={this._hour(hour)}>
           {hour}
         </button>,
@@ -68,7 +70,8 @@ export default class TimeSelector extends Component {
         classes.push('time-selector__minute--active');
       }
       minutes.push(
-        <button key={minute} className={classes.join(' ')}
+        <button key={minute}
+          className={classes.join(' ')}
           onClick={this._minute(minute)}>
           {pad(minute, 2)}
         </button>,
@@ -82,7 +85,8 @@ export default class TimeSelector extends Component {
         classes.push('time-selector__ampm--active');
       }
       return (
-        <button key={ampm} className={classes.join(' ')}
+        <button key={ampm}
+          className={classes.join(' ')}
           onClick={this._amPm(ampm)}>
           {ampm}
         </button>

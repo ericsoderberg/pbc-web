@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import FormField from './FormField';
 
 export default class ImageField extends Component {
@@ -17,14 +18,19 @@ export default class ImageField extends Component {
           </div>
           <div className="image-field__controls">
             <span>
-              <input id={darkName} name={darkName} type="checkbox"
+              <input id={darkName}
+                name={darkName}
+                type="checkbox"
                 checked={image.dark}
                 onChange={() => formState.set(property,
                   { ...image, dark: !image.dark })} />
               <label htmlFor={darkName}>Dark</label>
             </span>
             <span>
-              <input id={name} name={name} type="checkbox" checked={false}
+              <input id={name}
+                name={name}
+                type="checkbox"
+                checked={false}
                 onChange={() => formState.set(property, undefined)} />
               <label htmlFor={name}>Clear</label>
             </span>
@@ -42,9 +48,11 @@ export default class ImageField extends Component {
       );
 
       result = (
-        <FormField label={label} help={imageHelp}
+        <FormField label={label}
+          help={imageHelp}
           onDrop={formState.dropImageFile(property)}>
-          <input name={name} type="file"
+          <input name={name}
+            type="file"
             onChange={formState.changeImageFile(property)} />
         </FormField>
       );

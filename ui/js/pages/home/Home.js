@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { loadItem, deleteSession } from '../../actions';
@@ -254,7 +255,8 @@ class Home extends Component {
     let sections;
     if (page) {
       sections = (
-        <Sections key="page" align={page.align}
+        <Sections key="page"
+          align={page.align}
           sections={page.sections} />
       );
     } else {
@@ -278,17 +280,22 @@ class Home extends Component {
     }
     const links = this._renderMenuLinks();
     const menu = (
-      <div key="menu" ref={(ref) => { this._menuRef = ref; }}
-        className={menuClasses.join(' ')} style={menuStyle}>
+      <div key="menu"
+        ref={(ref) => { this._menuRef = ref; }}
+        className={menuClasses.join(' ')}
+        style={menuStyle}>
         {links}
       </div>
     );
 
     const search = (
       <form key="search" className="home__search" onSubmit={this._onSearch}>
-        <input type="text" placeholder="Search" value={searchText || ''}
+        <input type="text"
+          placeholder="Search"
+          value={searchText || ''}
           onChange={e => this.setState({ searchText: e.target.value })} />
-        <button className="button-icon" type="submit"
+        <button className="button-icon"
+          type="submit"
           onClick={this._onSearch}>
           <SearchIcon />
         </button>
@@ -300,7 +307,8 @@ class Home extends Component {
     return [
       menu,
       <header key="header" className="home__header">
-        <Button className={menuControlClasses.join(' ')} plain={true}
+        <Button className={menuControlClasses.join(' ')}
+          plain={true}
           onClick={showMenu ? undefined : this._showMenu}>
           menu
         </Button>
@@ -332,7 +340,8 @@ class Home extends Component {
     }
 
     return (
-      <main className={classNames.join(' ')} style={style}
+      <main className={classNames.join(' ')}
+        style={style}
         onClick={showMenu ? this._hideMenu : undefined} >
         {contents}
       </main>

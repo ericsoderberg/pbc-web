@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
 import Image from '../../components/Image';
@@ -24,7 +25,8 @@ export default class PeopleSection extends Component {
       let image;
       if (person.image || user.image) {
         image = (
-          <Image className="person-summary__image" plain={true}
+          <Image className="person-summary__image"
+            plain={true}
             image={person.image || user.image} />
         );
       } else {
@@ -32,7 +34,8 @@ export default class PeopleSection extends Component {
       }
 
       return (
-        <Link key={user._id} to={`/users/${user._id}`}
+        <Link key={user._id}
+          to={`/users/${user._id}`}
           className="person-summary">
           {image}
           <div className="person-summary__summary">

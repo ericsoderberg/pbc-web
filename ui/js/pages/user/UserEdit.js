@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { loadItem, unloadItem } from '../../actions';
@@ -44,8 +45,12 @@ class UserEdit extends Component {
       <Link key="email" to={emailListsPath}>Email lists</Link>,
     ];
     return (
-      <Edit title="Edit Account" category="users" id={id} item={user}
-        actions={actions} FormContents={UserFormContents} />
+      <Edit title="Edit Account"
+        category="users"
+        id={id}
+        item={user}
+        actions={actions}
+        FormContents={UserFormContents} />
     );
   }
 }

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import FormInstructions from './FormInstructions';
 import FormLine from './FormLine';
 import FormLines from './FormLines';
@@ -35,9 +36,13 @@ const FormContentsField = (props) => {
   }
   return (
     <Component key={formTemplateField._id || formTemplateField.id}
-      formTemplateField={formTemplateField} field={field} remaining={remaining}
-      linkedField={linkedField} linkedFormControl={linkedFormControl}
-      onChange={onChange} error={error} />
+      formTemplateField={formTemplateField}
+      field={field}
+      remaining={remaining}
+      linkedField={linkedField}
+      linkedFormControl={linkedFormControl}
+      onChange={onChange}
+      error={error} />
   );
 };
 
