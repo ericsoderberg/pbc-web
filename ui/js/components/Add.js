@@ -52,7 +52,7 @@ class Add extends Component {
 
   render() {
     const {
-      category, FormContents, onChange, Preview, session, title,
+      category, contentsProps, FormContents, onChange, Preview, session, title,
     } = this.props;
     const { item, error } = this.state;
     return (
@@ -60,6 +60,7 @@ class Add extends Component {
         submitLabel="Add"
         action={`/api/${category}`}
         session={session}
+        contentsProps={contentsProps}
         FormContents={FormContents}
         Preview={Preview}
         item={item}
@@ -73,6 +74,7 @@ class Add extends Component {
 
 Add.propTypes = {
   category: PropTypes.string.isRequired,
+  contentsProps: PropTypes.object,
   createSession: PropTypes.bool,
   default: PropTypes.object,
   dispatch: PropTypes.func.isRequired,
@@ -86,6 +88,7 @@ Add.propTypes = {
 };
 
 Add.defaultProps = {
+  contentsProps: undefined,
   createSession: false,
   default: {},
   onChange: undefined,

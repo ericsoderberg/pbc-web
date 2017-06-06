@@ -12,7 +12,8 @@ const SiteFormContents = (props) => {
   const { formState } = props;
   const site = formState.object;
 
-  const timezoneOptions = moment.tz.names().map(name => <option>{name}</option>);
+  const timezoneOptions = moment.tz.names().map(name =>
+    <option key={name}>{name}</option>);
 
   let socialLinks;
   if (site.socialUrls && site.socialUrls.length > 0) {
