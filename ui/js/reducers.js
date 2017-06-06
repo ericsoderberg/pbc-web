@@ -53,13 +53,20 @@ const handlers = {
     const nextState = {};
     if (!action.error) {
       action.payload.error = undefined;
-      const { category, skip } = action.payload;
+      const { category, context, skip } = action.payload;
       let { items } = action.payload;
       const mightHaveMore = items.length === 20;
       if (skip) {
         items = state[category].items.concat(items);
       }
-      nextState[category] = { items, mightHaveMore };
+      if (context) {
+        if (!nextState[context]) {
+          nextState[context] = {};
+        }
+        nextState[context][category] = { items, mightHaveMore };
+      } else {
+        nextState[category] = { items, mightHaveMore };
+      }
     } else {
       nextState.error = action.payload;
     }

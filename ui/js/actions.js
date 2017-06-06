@@ -122,7 +122,7 @@ export function deleteSession() {
 //   });
 // }
 
-export const loadCategory = (category, options = {}) =>
+export const loadCategory = (category, options = {}, context) =>
   (dispatch) => {
     const params = [];
     if (options.search) {
@@ -160,7 +160,7 @@ export const loadCategory = (category, options = {}) =>
     .then(processStatus)
     .then(response => response.json())
     .then(items => dispatch({
-      type: CATEGORY_LOAD, payload: { category, items, ...options },
+      type: CATEGORY_LOAD, payload: { category, items, ...options, context },
     }))
     .catch(payload => dispatch({
       type: CATEGORY_LOAD, error: true, payload,

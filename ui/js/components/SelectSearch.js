@@ -91,7 +91,8 @@ class SelectSearch extends Component {
     const searchText = event.target.value;
     this.setState({ searchText });
     dispatch(loadCategory(category,
-      { select: 'name', sort: 'name', ...options, search: searchText }));
+      { select: 'name', sort: 'name', ...options, search: searchText },
+      'suggestions'));
   }
 
   _activation(active) {
@@ -211,7 +212,7 @@ SelectSearch.defaultProps = {
 };
 
 const select = (state, props) => ({
-  items: (state[props.category] || {}).items || [],
+  items: ((state.suggestions || {})[props.category] || {}).items || [],
 });
 
 export default connect(select)(SelectSearch);

@@ -11,6 +11,20 @@ mongoose.Promise = global.Promise;
 
 // /api/payments
 
+const updateForms = (payment, formIds) => {
+  // update forms to record payment
+  const Form = mongoose.model('Form');
+  const promises = [];
+  (formIds || []).forEach((formId) => {
+    promises.push(Form.findOne({ _id: formId }).exec()
+    .then((form) => {
+      form.paymentIds.push(payment._id);
+      return form.save();
+    }));
+  });
+  return Promise.all(promises);
+};
+
 const deletePaymentRelated = (doc) => {
   const Form = mongoose.model('Form');
   Form.update(
@@ -97,21 +111,8 @@ export default function (router) {
       const payment = new Payment(data);
       return payment.save().then(doc => ({ doc, ...context }));
     })
-    .then((context) => {
-      const { data, doc } = context;
-      // update forms to record payment
-      const Form = mongoose.model('Form');
-      const formIds = data.formIds;
-      const promises = [];
-      formIds.forEach((formId) => {
-        promises.push(Form.findOne({ _id: formId }).exec()
-        .then((form) => {
-          form.paymentIds.push(doc._id);
-          return form.save();
-        }));
-      });
-      return Promise.all(promises).then(() => doc);
-    })
+    .then(context => updateForms(context.doc, context.data.formIds)
+      .then(() => context.doc))
     .then(doc => res.status(200).send(doc))
     .catch(error => catcher(error, res));
   });
@@ -152,8 +153,11 @@ export default function (router) {
       const useUser = user || session.userId;
       data.name = useUser.name || useUser.email;
       data.modified = new Date();
-      return payment.update(unsetDomainIfNeeded(data, session));
+      return payment.save(unsetDomainIfNeeded(data, session))
+      .then(doc => ({ data, doc }));
     })
+    .then(context => updateForms(context.doc, context.data.formIds)
+      .then(() => context.doc))
     .then(doc => res.status(200).json(doc))
     .catch(error => catcher(error, res));
   });

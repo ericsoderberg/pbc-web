@@ -87,11 +87,16 @@ class PaymentFormContents extends Component {
 
     if (full && session.userId.administrator && payment) {
       if (payment._id) {
-        dispatch(loadCategory('forms',
-          { filter: { paymentIds: payment._id }, populate: 'formTemplateId' }));
+        dispatch(loadCategory('forms', {
+          filter: { paymentIds: payment._id },
+          select: 'name formTemplateId paymentIds',
+          populate: 'formTemplateId',
+        }));
       } else if (formId) {
-        dispatch(loadItem('forms', formId,
-          { select: 'name formTemplateId', populate: 'formTemplateId' }));
+        dispatch(loadItem('forms', formId, {
+          select: 'name formTemplateId paymentIds',
+          populate: 'formTemplateId',
+        }));
       }
     }
   }
@@ -172,7 +177,7 @@ class PaymentFormContents extends Component {
             {links}
           </div>
         );
-      } else if (!payment._id) {
+      } else if (!payment._id || (forms && forms.length === 0)) {
         const form = (payment.formIds || [])[0];
         formItems = (
           <FormField label="Form">
