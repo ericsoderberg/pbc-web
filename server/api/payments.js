@@ -118,13 +118,13 @@ export default function (router) {
   });
 
   router.put('/payments/:id', (req, res) => {
+    const Payment = mongoose.model('Payment');
     getSession(req)
     .then(requireSession)
     .then(session => getPostData(req).then(data => ({ session, data })))
     // get prior payment
     .then((context) => {
       const id = req.params.id;
-      const Payment = mongoose.model('Payment');
       return Payment.findOne({ _id: id }).exec()
       .then(payment => ({ payment, ...context }));
     })
@@ -153,8 +153,12 @@ export default function (router) {
       const useUser = user || session.userId;
       data.name = useUser.name || useUser.email;
       data.modified = new Date();
-      return payment.save(unsetDomainIfNeeded(data, session))
-      .then(doc => ({ data, doc }));
+      // Have to use update in case non-admin edits something, don't want
+      // to overwrite admin fields.
+      return payment.update(unsetDomainIfNeeded(data, session))
+      .then(() => Payment.findOne({ _id: req.params.id })
+        .exec()
+        .then(doc => ({ doc, data })));
     })
     .then(context => updateForms(context.doc, context.data.formIds)
       .then(() => context.doc))
