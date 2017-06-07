@@ -127,7 +127,8 @@ class FormContents extends Component {
           </Link>
         ));
       } else {
-        payments = <span />;
+        payments =
+          <Link to={`/payments/add?formId=${form._id}`}>Add payment</Link>;
       }
 
       admin = (

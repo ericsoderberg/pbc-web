@@ -90,7 +90,7 @@ Add.propTypes = {
 Add.defaultProps = {
   contentsProps: undefined,
   createSession: false,
-  default: {},
+  default: undefined,
   onChange: undefined,
   Preview: undefined,
   session: undefined,

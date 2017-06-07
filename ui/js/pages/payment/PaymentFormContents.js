@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
 import Markdown from 'markdown-to-jsx';
-import { loadCategory, unloadCategory, loadItem, unloadItem } from '../../actions';
+import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
@@ -45,7 +45,7 @@ FormSuggestion.propTypes = {
 class PaymentFormContents extends Component {
 
   componentDidMount() {
-    const { dispatch, form, formState, full, session } = this.props;
+    const { dispatch, formState, full, session } = this.props;
 
     if (full && session.userId.administrator) {
       dispatch(loadCategory('domains', { sort: 'name' }));
@@ -54,46 +54,30 @@ class PaymentFormContents extends Component {
     }
 
     this._loadForms(this.props);
-
-    if (form) {
-      formState.addTo('formIds', form);
-    }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { formState } = nextProps;
     if (nextProps.formState.object._id !== this.props.formState.object._id) {
       this._loadForms(nextProps);
-    }
-    if (nextProps.form && !this.props.form) {
-      formState.addTo('formIds', nextProps.form);
     }
   }
 
   componentWillUnmount() {
-    const { dispatch, formId, full, session } = this.props;
+    const { dispatch, full, session } = this.props;
     if (full && session.userId.administrator) {
       dispatch(unloadCategory('domains'));
       dispatch(unloadCategory('forms'));
-      if (formId) {
-        dispatch(unloadItem(formId));
-      }
     }
   }
 
   _loadForms(props) {
-    const { dispatch, formId, formState, full, session } = props;
+    const { dispatch, formState, full, session } = props;
     const payment = formState.object;
 
     if (full && session.userId.administrator && payment) {
       if (payment._id) {
         dispatch(loadCategory('forms', {
           filter: { paymentIds: payment._id },
-          select: 'name formTemplateId paymentIds',
-          populate: 'formTemplateId',
-        }));
-      } else if (formId) {
-        dispatch(loadItem('forms', formId, {
           select: 'name formTemplateId paymentIds',
           populate: 'formTemplateId',
         }));
@@ -252,8 +236,6 @@ PaymentFormContents.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   domains: PropTypes.array,
-  form: PropTypes.object,
-  formId: PropTypes.string,
   forms: PropTypes.array,
   formState: PropTypes.object.isRequired,
   payByCheckInstructions: PropTypes.string,
