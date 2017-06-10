@@ -16,21 +16,36 @@ export function splitEvents(events, start, end, includeResources = false) {
   // separate by dates within the range
   const result = [];
   events.forEach((event) => {
-    const base = { _id: event._id, name: event.name, path: event.path };
+    const base = {
+      _id: event._id, name: event.name, path: event.path, allDay: event.allDay,
+    };
     if (includeResources) {
       base.resourceIds = event.resourceIds.slice(0);
     }
 
-    if (moment(event.start).isBetween(start, end) ||
-      moment(event.end).isBetween(start, end)) {
-      result.push({
-        ...base, id: event._id, start: event.start, end: event.end,
-      });
-      event.times.forEach((time) => {
-        result.push({
-          ...base, id: `${event._id}-1`, start: time.start, end: time.end,
+    const day = moment(event.start);
+    const endDate = moment(event.end);
+    while (day.isSameOrBefore(endDate, 'day')) {
+      if (day.isBetween(start, end)) {
+        const dayEvent = { ...base, id: event._id, start: moment(day) };
+        const endOfDay = moment(day).endOf('day');
+        if (moment(event.end).isBefore(endOfDay)) {
+          dayEvent.end = event.end;
+        } else {
+          dayEvent.end = endOfDay;
+        }
+        if (day.isAfter(event.start, 'day')) {
+          dayEvent.multi = true;
+        }
+        result.push(dayEvent);
+
+        event.times.forEach((time) => {
+          result.push({
+            ...base, id: `${event._id}-1`, start: time.start, end: time.end,
+          });
         });
-      });
+      }
+      day.add(1, 'day').startOf('day');
     }
 
     if (event.dates && event.dates.length > 0) {
@@ -41,7 +56,9 @@ export function splitEvents(events, start, end, includeResources = false) {
         });
       }
 
-      event.dates.map(d => moment(d)).forEach((date, index) => {
+      event.dates.map(d => moment(d))
+      .filter(d => !d.isSame(event.start, 'day'))
+      .forEach((date, index) => {
         if (date.isBetween(start, end)) {
           times.forEach((time, index2) => {
             const [timeStart, timeEnd] = time;
@@ -60,6 +77,7 @@ export function splitEvents(events, start, end, includeResources = false) {
       });
     }
   });
+
   return result;
 }
 
@@ -96,7 +114,7 @@ export function eventsToCalendarWeeks(events, start, end) {
     date.add(1, 'day');
   }
   if (startOfWeek.isBefore(date, 'week')) {
-    weeks.push({ startOfWeek, days });
+    weeks.push({ start: startOfWeek, days });
   }
 
   return weeks;
@@ -215,7 +233,7 @@ export default function (router) {
           { public: true }, { domainId: session.userId.administratorDomainId },
         ] });
       }
-      query.select('path name start end dates times');
+      query.select('path name start end dates times allDay');
 
       return query.sort('start').exec()
       .then(events => ({

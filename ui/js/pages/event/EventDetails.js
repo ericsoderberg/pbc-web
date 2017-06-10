@@ -139,6 +139,18 @@ class EventDetails extends Component {
         ]);
       }
 
+      let addOtherTime;
+      if (!event.allDay) {
+        addOtherTime = (
+          <FormFieldAdd>
+            <Button label="Add another time"
+              secondary={true}
+              onClick={formState.addTo('times',
+                { start: event.start, end: event.end })} />
+          </FormFieldAdd>
+        );
+      }
+
       let administeredBy;
       if (session.userId.administrator) {
         const domainOptions = domains.map(domain => (
@@ -202,12 +214,7 @@ class EventDetails extends Component {
           {administeredBy}
           {primaryEvent}
           {otherTimes}
-          <FormFieldAdd>
-            <Button label="Add another time"
-              secondary={true}
-              onClick={formState.addTo('times',
-                { start: event.start, end: event.end })} />
-          </FormFieldAdd>
+          {addOtherTime}
         </fieldset>
       );
     }

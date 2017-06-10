@@ -352,6 +352,12 @@ export function getResourceEvents(resource) {
   .then(response => response.json());
 }
 
+export function getResourcesCalendar() {
+  return fetch('/api/resources/calendar', {
+    method: 'GET', headers: _headers })
+  .then(response => response.json());
+}
+
 export function getResourcesEvents() {
   return fetch('/api/resources/events', {
     method: 'GET', headers: _headers })

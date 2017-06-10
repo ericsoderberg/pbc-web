@@ -89,8 +89,10 @@ const EventTimes = (props) => {
           <span className="event-times__separator">-</span>
           <span className="event-times__label">{formatDate(last)}</span>
         </div>,
-        <TimesSet key={3} start={start} end={end} />,
       ];
+      if (!event.allDay) {
+        contents.push(<TimesSet key={3} start={start} end={end} />);
+      }
     } else if (weekly) {
       if (event.times && event.times.length > 0) {
         // multiple times
@@ -114,10 +116,14 @@ const EventTimes = (props) => {
           <div key={1} className="event-times__set">
             <span className="event-times__label">{start.format('dddd[s]')}</span>
           </div>,
-          <div key={2} className="event-times__set">
-            <span className="event-times__label">{formatTimes(start, end)}</span>
-          </div>,
         ];
+        if (!event.allDay) {
+          contents.push(
+            <div key={2} className="event-times__set">
+              <span className="event-times__label">{formatTimes(start, end)}</span>
+            </div>,
+          );
+        }
       }
     } else if (sameDayOfWeek && dates.length > 4) {
       // not weekly, but regular enough
@@ -137,10 +143,14 @@ const EventTimes = (props) => {
         <div key={1} className="event-times__set">
           <span className="event-times__label">{formatDate(nextDate)}</span>
         </div>,
-        <div key={2} className="event-times__set">
-          <span className="event-times__label">{formatTimes(start, end)}</span>
-        </div>,
       ];
+      if (!event.allDay) {
+        contents.push(
+          <div key={2} className="event-times__set">
+            <span className="event-times__label">{formatTimes(start, end)}</span>
+          </div>,
+        );
+      }
     } else {
       // irreguler
       const datesString = dates.filter(date => date.isSameOrAfter(today))
@@ -151,34 +161,52 @@ const EventTimes = (props) => {
         <div key={1} className="event-times__set">
           <span className="event-times__label">{datesString}</span>
         </div>,
-        <TimesSet key={3} start={start} end={end} />,
       ];
+      if (!event.allDay) {
+        contents.push(<TimesSet key={3} start={start} end={end} />);
+      }
     }
   } else if (!start.isSame(end, 'day')) {
     // multi-day, non-recurring
-    contents = [
-      <div key={1} className="event-times__set">
-        <span className="event-times__label">{formatDate(start)}</span>
-        <span className="event-times__separator" />
-        <span className="event-times__label">{formatTime(start)}</span>
-      </div>,
-      <span key={2} className="event-times__separator">to</span>,
-      <div key={3} className="event-times__set">
-        <span className="event-times__label">{formatDate(end)}</span>
-        <span className="event-times__separator" />
-        <span className="event-times__label">{formatTime(end)}</span>
-      </div>,
-    ];
+    if (!event.allDay) {
+      contents = [
+        <div key={1} className="event-times__set">
+          <span className="event-times__label">{formatDate(start)}</span>
+          <span className="event-times__separator" />
+          <span className="event-times__label">{formatTime(start)}</span>
+        </div>,
+        <span key={2} className="event-times__separator">to</span>,
+        <div key={3} className="event-times__set">
+          <span className="event-times__label">{formatDate(end)}</span>
+          <span className="event-times__separator" />
+          <span className="event-times__label">{formatTime(end)}</span>
+        </div>,
+      ];
+    } else {
+      contents = [
+        <div key={1} className="event-times__set">
+          <span className="event-times__label">{formatDate(start)}</span>
+        </div>,
+        <span key={2} className="event-times__separator">to</span>,
+        <div key={3} className="event-times__set">
+          <span className="event-times__label">{formatDate(end)}</span>
+        </div>,
+      ];
+    }
   } else {
     // single day, non-recurring
     contents = [
       <div key={1} className="event-times__set">
         <span className="event-times__label">{formatDate(start)}</span>
       </div>,
-      <div key={2} className="event-times__set">
-        <span className="event-times__label">{formatTimes(start, end)}</span>
-      </div>,
     ];
+    if (!event.allDay) {
+      contents.push(
+        <div key={2} className="event-times__set">
+          <span className="event-times__label">{formatTimes(start, end)}</span>
+        </div>,
+      );
+    }
   }
 
   return <div className={classes.join(' ')}>{contents}</div>;

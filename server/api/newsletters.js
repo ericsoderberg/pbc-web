@@ -18,7 +18,7 @@ const unsetReferences = (data) => {
 
 const populateNewsletterForRendering = (newsletter) => {
   const Event = mongoose.model('Event');
-  const eventFields = 'name start end location times image dates';
+  const eventFields = 'name start end location times image dates allDay';
   const Message = mongoose.model('Message');
   const messageFields = 'name verses date path author';
   const Page = mongoose.model('Page');

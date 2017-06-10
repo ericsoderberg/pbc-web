@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import FormField from '../../components/FormField';
 import DateTimeInput from '../../components/DateTimeInput';
+import DateInput from '../../components/DateInput';
 import SectionsFormContents from '../../components/SectionsFormContents';
 import EventDates from './EventDates';
 import EventDetails from './EventDetails';
@@ -37,6 +38,11 @@ export default class EventFormContents extends Component {
     const { className, errors, formState, session } = this.props;
     const event = formState.object;
 
+    const WhenInput = !event.allDay ? DateTimeInput : DateInput;
+
+    const eventDates = moment(event.start).isSame(event.end, 'day') ?
+      <EventDates formState={formState} session={session} /> : null;
+
     return (
       <div className={className}>
 
@@ -46,12 +52,19 @@ export default class EventFormContents extends Component {
               value={event.name || ''}
               onChange={formState.change('name')} />
           </FormField>
+          <FormField>
+            <input name="allDay"
+              type="checkbox"
+              checked={event.allDay || false}
+              onChange={formState.toggle('allDay')} />
+            <label htmlFor="allDay">All day</label>
+          </FormField>
           <FormField label="Starts" error={errors.start}>
-            <DateTimeInput value={event.start || ''}
+            <WhenInput value={event.start || ''}
               onChange={this._onStartChange} />
           </FormField>
           <FormField label="Ends" error={errors.end}>
-            <DateTimeInput value={event.end || ''}
+            <WhenInput value={event.end || ''}
               onChange={formState.change('end')} />
           </FormField>
           <FormField label="Location" error={errors.location}>
@@ -67,7 +80,7 @@ export default class EventFormContents extends Component {
           session={session}
           errors={errors} />
         <EventResources formState={formState} session={session} />
-        <EventDates formState={formState} session={session} />
+        {eventDates}
       </div>
     );
   }

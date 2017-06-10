@@ -80,17 +80,24 @@ function renderDates(event) {
     if (consecutive) {
       const first = dates[0];
       const last = dates[dates.length - 1];
-      result =
-        `${formatDate(first)} - ${formatDate(last)} @ ${formatTimes(start, end)}`;
+      result = `${formatDate(first)} - ${formatDate(last)}`;
+      if (!event.allDay) {
+        result += ` @ ${formatTimes(start, end)}`;
+      }
     } else if (weekly) {
       if (event.times && event.times.length > 0) {
         // multiple times
         const secondTime = event.times[0];
-        result = `${start.format('dddd[s]')} @ ${formatTimes(start, end)} ` +
-          `& ${formatTimes(moment(secondTime.start), moment(secondTime.end))}`;
+        result = `${start.format('dddd[s]')} @ ${formatTimes(start, end)}`;
+        if (!event.allDay) {
+          result += ` & ${formatTimes(moment(secondTime.start), moment(secondTime.end))}`;
+        }
       } else {
         // single time
-        result = `${start.format('dddd[s]')} @ ${formatTimes(start, end)}`;
+        result = `${start.format('dddd[s]')}`;
+        if (!event.allDay) {
+          result += ` @ ${formatTimes(start, end)}`;
+        }
       }
     } else if (sameDayOfWeek && dates.length > 4) {
       // not weekly, but regular enough
@@ -105,21 +112,34 @@ function renderDates(event) {
       if (!nextDate) {
         nextDate = dates[dates.length - 1];
       }
-      result = `${formatDate(nextDate)} @ ${formatTimes(start, end)}`;
+      result = `${formatDate(nextDate)}`;
+      if (!event.allDay) {
+        result += ` @ ${formatTimes(start, end)}`;
+      }
     } else {
       // irreguler
       const datesString = dates.filter(date => date.isSameOrAfter(now))
       .slice(0, 4)
       .map(date => formatDate(date, false)).join(', ');
-      result = `${datesString} @ ${formatTimes(start, end)}`;
+      result = `${datesString}`;
+      if (!event.allDay) {
+        result += ` @ ${formatTimes(start, end)}`;
+      }
     }
   } else if (!start.isSame(end, 'day')) {
     // multi-day, non-recurring
-    result = `${formatDate(start)} @ ${formatTime(start)} to ` +
-      `${formatDate(end)} ${formatTime(end)}`;
+    if (!event.allDay) {
+      result = `${formatDate(start)} @ ${formatTime(start)} to ` +
+        `${formatDate(end)} ${formatTime(end)}`;
+    } else {
+      result = `${formatDate(start)} to ${formatDate(end)}`;
+    }
   } else {
     // single day, non-recurring
-    result = `${formatDate(start)} @ ${formatTimes(start, end)}`;
+    result = `${formatDate(start)}`;
+    if (!event.allDay) {
+      result += ` @ ${formatTimes(start, end)}`;
+    }
   }
 
   return result;

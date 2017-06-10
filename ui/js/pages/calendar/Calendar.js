@@ -8,6 +8,7 @@ import {
 } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
+import CalendarGrid from '../../components/CalendarGrid';
 import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
@@ -152,20 +153,29 @@ class Calendar extends Component {
 
   _changeDate(date) {
     return () => {
-      this.setState({ date, focus: undefined }, this._load);
+      this.setState({ date, focus: undefined }, () => {
+        this._setLocation();
+        this._load();
+      });
     };
   }
 
   _onChangeMonth(event) {
     const date = moment(this.state.date);
     date.month(event.target.value);
-    this.setState({ date, focus: undefined }, this._load);
+    this.setState({ date, focus: undefined }, () => {
+      this._setLocation();
+      this._load();
+    });
   }
 
   _onChangeYear(event) {
     const date = moment(this.state.date);
     date.year(event.target.value);
-    this.setState({ date, focus: undefined }, this._load);
+    this.setState({ date, focus: undefined }, () => {
+      this._setLocation();
+      this._load();
+    });
   }
 
   _onSearch(event) {
@@ -173,7 +183,7 @@ class Calendar extends Component {
     this.setState({ searchText });
     // throttle when user is typing
     clearTimeout(this._getTimer);
-    this._getTimer = setTimeout(() => this._setLocation({ searchText }), 100);
+    this._getTimer = setTimeout(() => this._setLocation(), 100);
   }
 
   _onFilter(event) {
@@ -208,101 +218,6 @@ class Calendar extends Component {
       this.setState({ activeCalendars: nextActiveCalendars },
         this._load);
     };
-  }
-
-  _renderDaysOfWeek() {
-    const { calendar } = this.props;
-    const result = [];
-    let date = moment(calendar.start);
-    while (result.length < 7) {
-      const name = date.format('dddd');
-      result.push(<div key={name} className="calendar__day">{name}</div>);
-      date = date.add(1, 'day');
-    }
-    return result;
-  }
-
-  _renderEvent(event) {
-    return (
-      <li key={event.id} className="calendar__event">
-        <Link to={`/events/${event.path || event._id}`}>
-          <span className="calendar__event-time">
-            {moment(event.start).format('h:mm a')}
-          </span>
-          <span className="calendar__event-name">{event.name}</span>
-        </Link>
-      </li>
-    );
-  }
-
-  _renderDay(day) {
-    const { calendar } = this.props;
-    const { date: referenceDate, focus } = this.state;
-    const { events } = day;
-    const date = moment(day.date);
-
-    const dayClassNames = ['calendar__day'];
-    if (focus && date.isSame(focus, 'date')) {
-      dayClassNames.push('calendar__day--today');
-    }
-    if (date.month() !== referenceDate.month()) {
-      dayClassNames.push('calendar__day--alternate');
-    }
-    if (events.length === 0) {
-      dayClassNames.push('calendar__day--empty');
-    }
-    if (date.date() === 1) {
-      dayClassNames.push('calendar__day--first');
-    }
-
-    const path = `${((calendar.path || calendar._id) ?
-      `/calendars/${calendar.path || calendar._id}` : '/calendar')}
-      ?focus=${encodeURIComponent(moment(date).format(DATE_FORMAT))}`;
-
-    const eventItems = events.map(event => this._renderEvent(event));
-
-    return (
-      <div key={date.valueOf()} className={dayClassNames.join(' ')}>
-        <Link to={path} className="calendar__day-date">
-          <span className="calendar__day-date-dayofweek">
-            {date.format('dddd')}
-          </span>
-          <span className="calendar__day-date-month">
-            {date.format('MMMM')}
-          </span>
-          <span className="calendar__day-date-day">
-            {date.format('D')}
-          </span>
-        </Link>
-        <ol className="calendar__events">
-          {eventItems}
-        </ol>
-      </div>
-    );
-  }
-
-  _renderWeeks() {
-    const { calendar } = this.props;
-    const { focus } = this.state;
-    const weeks = calendar.weeks;
-
-    return weeks.map((week) => {
-      const { days } = week;
-      const startOfWeek = moment(week.startOfWeek);
-
-      const weekClassNames = ['calendar__week'];
-      if (focus && startOfWeek.isSame(focus, 'week')) {
-        weekClassNames.push('calendar__week--focus');
-      }
-
-      const dayItems = days.map(day => this._renderDay(day));
-
-      return (
-        <div key={startOfWeek.valueOf()} className={weekClassNames.join(' ')}>
-          {dayItems}
-        </div>
-      );
-    });
   }
 
   _renderFilter() {
@@ -343,8 +258,6 @@ class Calendar extends Component {
     let contents;
     if (calendar) {
       const date = moment(calendar.date);
-      const daysOfWeek = this._renderDaysOfWeek();
-      const weeks = loading ? <Loading /> : this._renderWeeks();
 
       let filter;
       if (filterActive) {
@@ -394,16 +307,13 @@ class Calendar extends Component {
         yearDate.add(1, 'year');
       }
 
-      // let today;
-      // if (false && !date.isSame(now, 'date')) {
-      //   today = <a onClick={this._changeDate(moment())}>Today</a>;
-      // }
+      const grid = loading ? <Loading /> : <CalendarGrid weeks={calendar.weeks} />;
 
       let more;
       if (loadingMore) {
         more = <Loading />;
       } else if (session && session.userId.administrator &&
-        weeks && weeks.length < 7) {
+        calendar.weeks && calendar.weeks.length < 7) {
         more = <Button plain={true} onClick={this._onMore}>more</Button>;
       }
 
@@ -421,34 +331,29 @@ class Calendar extends Component {
             searchText={searchText}
             onSearch={this._onSearch}
             actions={actions} />
-          <div className="calendar">
-            <div className="calendar__header">
-              <button type="button"
-                className="button-icon"
-                onClick={this._changeDate(moment(calendar.previous))}>
-                <LeftIcon className="button__indicator" />
-              </button>
-              <span>
-                <select value={moment(calendar.date).format('MMMM')}
-                  onChange={this._onChangeMonth}>
-                  {months}
-                </select>
-                <select value={moment(calendar.date).format('YYYY')}
-                  onChange={this._onChangeYear}>
-                  {years}
-                </select>
-              </span>
-              <button type="button"
-                className="button-icon"
-                onClick={this._changeDate(moment(calendar.next))}>
-                <RightIcon className="button__indicator" />
-              </button>
-            </div>
-            <div className="calendar__week calendar__week--header">
-              {daysOfWeek}
-            </div>
-            {weeks}
+          <div className="calendar__header">
+            <button type="button"
+              className="button-icon"
+              onClick={this._changeDate(moment(calendar.previous))}>
+              <LeftIcon className="button__indicator" />
+            </button>
+            <span>
+              <select value={moment(calendar.date).format('MMMM')}
+                onChange={this._onChangeMonth}>
+                {months}
+              </select>
+              <select value={moment(calendar.date).format('YYYY')}
+                onChange={this._onChangeYear}>
+                {years}
+              </select>
+            </span>
+            <button type="button"
+              className="button-icon"
+              onClick={this._changeDate(moment(calendar.next))}>
+              <RightIcon className="button__indicator" />
+            </button>
           </div>
+          {grid}
           {more}
           {pageContext}
         </main>

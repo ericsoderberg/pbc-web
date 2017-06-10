@@ -27,12 +27,20 @@ export default class CalendarGrid extends Component {
 
   _renderEvent(event) {
     const start = moment(event.start);
+    let time;
+    // If it is an all day event, or if this is not the first day in a
+    // multi-day event, don't show the time.
+    if (!event.allDay && !event.multi) {
+      time = (
+        <span className="calendar__event-time">
+          {start.format('h:mm a')}
+        </span>
+      );
+    }
     return (
       <li key={event.id} className="calendar__event">
         <Link to={`/events/${event.path || event._id}`}>
-          <span className="calendar__event-time">
-            {start.format('h:mm a')}
-          </span>
+          {time}
           <span className="calendar__event-name">{event.name}</span>
         </Link>
       </li>

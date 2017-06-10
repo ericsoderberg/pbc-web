@@ -80,10 +80,10 @@
   border: 1px solid $background-color;
   text-decoration: none;
 
-  &:hover {
-    background-color: $control-hover-background;
-    color: $control-hover-color;
-  }
+  // &:hover {
+  //   background-color: $control-hover-background;
+  //   color: $control-hover-color;
+  // }
 
   @media all and (min-width: 700px) {
     display: flex;
@@ -116,10 +116,10 @@
     background-color: $secondary-background-color;
     font-weight: 100;
 
-    &:hover {
-      background-color: $control-hover-background;
-      color: $control-hover-color;
-    }
+    // &:hover {
+    //   background-color: $control-hover-background;
+    //   color: $control-hover-color;
+    // }
   }
 }
 
