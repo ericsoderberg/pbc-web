@@ -7,6 +7,7 @@ import moment from 'moment-timezone';
 import FormError from '../../components/FormError';
 import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
+import FormSuggestion from './FormSuggestion';
 import FormTotal from './FormTotal';
 import FormContentsSection from './FormContentsSection';
 import { isFieldSet } from './FormUtils';
@@ -131,6 +132,30 @@ class FormContents extends Component {
           <Link to={`/payments/add?formId=${form._id}`}>Add payment</Link>;
       }
 
+      let linkTo;
+      if (formTemplate.linkedFormTemplateId && !linkedForm) {
+        // allow admin to link this form to a form from the linkedFormTemplate
+        linkTo = (
+          <FormField label="Linked form">
+            <SelectSearch category="forms"
+              options={{
+                filter: { formTemplateId: formTemplate.linkedFormTemplateId },
+                select: 'name formTemplateId modified',
+                populate: { path: 'formTemplateId', select: 'name' },
+                sort: '-created',
+              }}
+              Suggestion={FormSuggestion}
+              value={(form.linkedFormId ?
+                `${form.linkedFormId.formTemplateId.name} ${form.linkedFormId.name}` : '')}
+              onChange={(suggestion) => {
+                const nextForm = { ...form };
+                nextForm.linkedFormId = suggestion;
+                this.props.onChange(nextForm);
+              }} />
+          </FormField>
+        );
+      }
+
       admin = (
         <fieldset className="form__fields">
           <div className="form__header">
@@ -143,10 +168,12 @@ class FormContents extends Component {
               Suggestion={UserSuggestion}
               value={(form.userId || session).name || ''}
               onChange={(suggestion) => {
-                form.userId = suggestion;
-                this.props.onChange(form);
+                const nextForm = { ...form };
+                nextForm.userId = suggestion;
+                this.props.onChange(nextForm);
               }} />
           </FormField>
+          {linkTo}
           <div className="form__footer">
             {payments}
             <Link to={formTemplatePath}>template</Link>

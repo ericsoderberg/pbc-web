@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment-timezone';
 import Markdown from 'markdown-to-jsx';
 import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
+import FormSuggestion from '../form/FormSuggestion';
 
 const UserSuggestion = props => (
   <div className="box--between">
@@ -19,25 +19,6 @@ const UserSuggestion = props => (
 UserSuggestion.propTypes = {
   item: PropTypes.shape({
     email: PropTypes.string,
-    name: PropTypes.string,
-  }).isRequired,
-};
-
-const FormSuggestion = props => (
-  <div className="box--between">
-    <span>{(props.item.formTemplateId || {}).name} {props.item.name}</span>
-    <span className="secondary">
-      {moment(props.item.modified).format('MMM Do YYYY')}
-    </span>
-  </div>
-);
-
-FormSuggestion.propTypes = {
-  item: PropTypes.shape({
-    formTemplateId: PropTypes.shape({
-      name: PropTypes.string,
-    }),
-    modified: PropTypes.string,
     name: PropTypes.string,
   }).isRequired,
 };
