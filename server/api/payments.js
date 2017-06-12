@@ -11,18 +11,24 @@ mongoose.Promise = global.Promise;
 
 // /api/payments
 
-const updateForms = (payment, formIds) => {
+const loadPaymentForms = (context) => {
+  const { data } = context;
+  if (data.formIds && data.formIds.length > 0) {
+    const Form = mongoose.model('Form');
+    return Form.find({ _id: { $in: data.formIds } }).exec()
+    .then(forms => ({ ...context, forms }));
+  }
+  return context;
+};
+
+const updateForms = (context) => {
   // update forms to record payment
-  const Form = mongoose.model('Form');
-  const promises = [];
-  (formIds || []).forEach((formId) => {
-    promises.push(Form.findOne({ _id: formId }).exec()
-    .then((form) => {
-      form.paymentIds.push(payment._id);
-      return form.save();
-    }));
+  const { doc, forms } = context;
+  forms.forEach((form) => {
+    form.paymentIds.push(doc._id);
+    form.save();
   });
-  return Promise.all(promises);
+  return context;
 };
 
 const deletePaymentRelated = (doc) => {
@@ -93,8 +99,9 @@ export default function (router) {
       }
       return context;
     })
+    .then(loadPaymentForms)
     .then((context) => {
-      const { data, session, user } = context;
+      const { data, forms, session, user } = context;
       const Payment = mongoose.model('Payment');
       data.created = new Date();
       data.modified = data.created;
@@ -108,12 +115,14 @@ export default function (router) {
       }
       const useUser = user || session.userId;
       data.name = useUser.name || useUser.email;
+      if (forms && forms.length > 0) {
+        data.domainId = forms[0].domainId;
+      }
       const payment = new Payment(data);
       return payment.save().then(doc => ({ doc, ...context }));
     })
-    .then(context => updateForms(context.doc, context.data.formIds)
-      .then(() => context.doc))
-    .then(doc => res.status(200).send(doc))
+    .then(updateForms)
+    .then(context => res.status(200).send(context.doc))
     .catch(error => catcher(error, res));
   });
 
@@ -143,6 +152,7 @@ export default function (router) {
       }
       return context;
     })
+    .then(loadPaymentForms)
     .then((context) => {
       const { data, session, payment, user } = context;
       // Allow an administrator to set the userId. Otherwise, set it to
@@ -160,9 +170,8 @@ export default function (router) {
         .exec()
         .then(doc => ({ doc, data })));
     })
-    .then(context => updateForms(context.doc, context.data.formIds)
-      .then(() => context.doc))
-    .then(doc => res.status(200).json(doc))
+    .then(updateForms)
+    .then(context => res.status(200).json(context.doc))
     .catch(error => catcher(error, res));
   });
 
