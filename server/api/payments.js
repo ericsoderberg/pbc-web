@@ -51,6 +51,7 @@ export default function (router) {
     modelName: 'Payment',
     omit: ['get', 'post', 'put', 'delete'], // special handling below
     index: {
+      authorization: requireSession,
       filterAuthorized: authorizedForDomainOrSelf,
       populate: [
         { path: 'userId', select: 'name' },
