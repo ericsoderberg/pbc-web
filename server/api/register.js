@@ -128,7 +128,9 @@ export default (router, options) => {
       .then((session) => {
         const searchProperties = indexOpts.searchProperties || 'name';
         const query = Doc.find();
-        if (indexOpts.filterAuthorized) {
+        if (req.query.adminable) {
+          query.find(authorizedForDomain(session));
+        } else if (indexOpts.filterAuthorized) {
           query.find(indexOpts.filterAuthorized(session));
         }
         if (req.query.search) {
@@ -153,9 +155,6 @@ export default (router, options) => {
               query.find(obj);
             }
           }
-        }
-        if (req.query.adminable) {
-          query.find(authorizedForDomain(session));
         }
         if (req.query.filter) {
           let filter = JSON.parse(req.query.filter);
