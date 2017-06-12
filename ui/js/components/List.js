@@ -284,7 +284,7 @@ class List extends Component {
       more = <Loading />;
     } else if (mightHaveMore) {
       more = <div ref={(ref) => { this._moreRef = ref; }} />;
-    } else if (items && items.length > 20) {
+    } else if (items && items.length > 1) {
       more = <div className="list__count">{items.length}</div>;
     }
 
