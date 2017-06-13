@@ -47,7 +47,8 @@ const populatePage = (data, session) => {
   const promises = [Promise.resolve(page)];
 
   // Library
-  page.sections.filter(section => section.type === 'library')
+  page.sections
+  .filter(section => (section.type === 'library' && section.libraryId))
   .forEach((section) => {
     promises.push(
       Message.findOne({
@@ -69,7 +70,8 @@ const populatePage = (data, session) => {
   });
 
   // Calendar
-  page.sections.filter(section => section.type === 'calendar')
+  page.sections
+  .filter(section => (section.type === 'calendar' && section.calendarId))
   .forEach((section) => {
     // un-populate
     section.calendar = section.calendarId;
@@ -108,7 +110,8 @@ const populatePage = (data, session) => {
   });
 
   // FormTemplate
-  page.sections.filter(section => section.type === 'form')
+  page.sections
+  .filter(section => (section.type === 'form' && section.formTemplateId))
   .forEach((section) => {
     section.formTemplateId = section.formTemplateId._id; // un-populate
     promises.push(
