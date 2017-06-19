@@ -24,7 +24,7 @@ const loadPaymentForms = (context) => {
 const updateForms = (context) => {
   // update forms to record payment
   const { doc, forms } = context;
-  forms.forEach((form) => {
+  (forms || []).forEach((form) => {
     form.paymentIds.push(doc._id);
     form.save();
   });
