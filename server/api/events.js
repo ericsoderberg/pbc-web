@@ -151,11 +151,13 @@ const unsetReferences = (data) => {
     data.$unset.image = '';
   }
   // remove deprecated text property
+  delete data.text;
   if (!data.$unset) {
     data.$unset = {};
   }
   data.$unset.text = '';
   // remove deprecated address property
+  delete data.address;
   if (!data.$unset) {
     data.$unset = {};
   }
