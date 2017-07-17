@@ -330,20 +330,23 @@ export default function (router, transporter) {
   });
 
   router.put('/forms/:id', (req, res) => {
+    const Form = mongoose.model('Form');
+    const id = req.params.id;
     getSession(req)
     .then(requireSession)
     // get form and template and authorize
-    .then(session => getFormContext(session, req.params.id))
+    .then(session => getFormContext(session, id))
     // update form
     .then((context) => {
-      const { form, formTemplate, session } = context;
+      const { formTemplate, session } = context;
       let data = req.body;
       if (!formTemplate._id.equals(data.formTemplateId._id)) {
         return Promise.reject({ error: 'Mismatched template' });
       }
       data.modified = new Date();
       data = unsetDomainIfNeeded(data, session);
-      return form.update(data)
+      return Form.findOneAndUpdate({ _id: id }, data,
+        { new: true, runValidators: true }).exec()
       .then(formUpdated => ({ ...context, form: formUpdated }));
     })
     // send emails
