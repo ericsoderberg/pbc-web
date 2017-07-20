@@ -137,7 +137,8 @@ const sendEmails = (req, transporter, update = false) => (
 );
 
 // duplicated in FormUtils, TODO: remove from UI and rely on server entirely
-export const addFormTotals = (formTemplate, form, payments = {}) => {
+export const addFormTotals = (data, formTemplate, payments = {}) => {
+  const form = data.toObject ? data.toObject() : data;
   let totalCost = 0;
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
@@ -191,6 +192,8 @@ export const addFormTotals = (formTemplate, form, payments = {}) => {
 
   form.totalCost = Math.max(0, totalCost);
   form.paidAmount = paidAmount;
+
+  return form;
 };
 
 const addFullness = context =>
@@ -198,8 +201,7 @@ const addFullness = context =>
   .then(() => {
     const { formTemplate } = context;
     let { form } = context;
-    form = form.toObject();
-    addFormTotals(formTemplate, form);
+    form = addFormTotals(form, formTemplate);
     if (form.linkedFormId) {
       const Form = mongoose.model('Form');
       return Form.findOne({ _id: form.linkedFormId })

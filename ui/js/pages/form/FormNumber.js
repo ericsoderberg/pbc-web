@@ -6,20 +6,22 @@ const FormNumber = (props) => {
   const { error, field, formTemplateField, onChange } = props;
   const { remaining } = formTemplateField;
 
-  const value = parseFloat(field.value || formTemplateField.min || 0, 10);
-  const initialValue = field.initialValue || value || 0;
+  let min = formTemplateField.min || 0;
   let max = formTemplateField.max;
+  // const value = parseFloat(field.value || min, 10);
+  const initialValue = field.initialValue || field.value || 0;
   if (remaining !== undefined) {
-    const initialPlusRemaining = initialValue + remaining;
+    const initialPlusRemaining = parseFloat(initialValue, 10) + parseFloat(remaining, 10);
     max = max ? Math.min(initialPlusRemaining, max) : initialPlusRemaining;
+    min = Math.min(min, max);
   }
 
   let contents = (
     <input name={formTemplateField.name}
       type="number"
-      min={formTemplateField.min || 0}
+      min={min}
       max={max}
-      value={value}
+      value={field.value || min}
       onChange={event =>
         onChange({
           templateFieldId: formTemplateField._id,
@@ -52,7 +54,7 @@ const FormNumber = (props) => {
 
   let help = formTemplateField.help || '';
   if (remaining !== undefined) {
-    help += `${remaining} remaining`;
+    help += `${Math.max(0, remaining)} remaining`;
   }
 
   return (
@@ -69,7 +71,6 @@ FormNumber.propTypes = {
   field: PropTypes.object,
   formTemplateField: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
-  remaining: PropTypes.number,
 };
 
 FormNumber.defaultProps = {

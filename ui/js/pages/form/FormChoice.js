@@ -17,6 +17,7 @@ const FormChoice = (props) => {
           name={name}
           type="radio"
           checked={checked}
+          disabled={remaining <= 0 && !checked}
           onChange={() => onChange({
             templateFieldId: formTemplateField._id,
             optionId: id,

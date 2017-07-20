@@ -4,7 +4,7 @@ import {
   getSession, allowAnyone, authorizedForDomain, requireAdministrator,
   requireSomeAdministrator,
 } from './auth';
-import { addForms, addNewForm } from './formTemplates';
+import { addForms, addNewForm, addFormTemplateTotals } from './formTemplates';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 import { catcher } from './utils';
@@ -119,10 +119,9 @@ const populatePage = (data, session) => {
       .exec()
       .then((formTemplate) => {
         if (formTemplate) {
-          formTemplate = addNewForm(formTemplate, session);
-          if (session) {
-            return addForms(formTemplate, session);
-          }
+          return addFormTemplateTotals(formTemplate)
+          .then(data2 => addNewForm(data2, session))
+          .then(data2 => (session ? addForms(data2, session) : data2));
         }
         return formTemplate;
       }),

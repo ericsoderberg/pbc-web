@@ -47,7 +47,7 @@ export default class FormOptionLabel extends Component {
 
     let help = option.help || '';
     if (remaining !== undefined) {
-      help += `${remaining} remaining`;
+      help += `${Math.max(0, remaining)} remaining`;
     }
 
     if (help) {

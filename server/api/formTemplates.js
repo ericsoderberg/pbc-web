@@ -93,10 +93,10 @@ export const addNewForm = (data, session, linkedFormId) => {
         });
       }
 
-      // pre-fill out fields with a minimum value
-      if (field.min) {
-        form.fields.push({ templateFieldId: field._id, value: field.min });
-      }
+      // // pre-fill out fields with a minimum value
+      // if (field.min) {
+      //   form.fields.push({ templateFieldId: field._id, value: field.min });
+      // }
     });
   });
   formTemplate.newForm = form;
@@ -133,82 +133,101 @@ const initializeTotals = (formTemplate) => {
   return { templateFieldMap, optionMap };
 };
 
-const addTotals = (formTemplate, forms) => {
-  const { templateFieldMap, optionMap } = initializeTotals(formTemplate);
-  let totalCost = 0;
-  let paidAmount = 0;
-
-  formTemplate.forms = forms.map(form => form.toObject());
+export const initializePayments = (forms) => {
   // unify all payments
   const payments = {};
-  formTemplate.forms.forEach((form) => {
+  forms.forEach((form) => {
     (form.paymentIds || []).forEach((payment) => {
       payment.allocated = 0;
       payments[payment._id] = payment;
     });
   });
+  return payments;
+};
 
-  formTemplate.forms.forEach((form) => {
-    addFormTotals(formTemplate, form, payments);
-    totalCost += form.totalCost;
-    paidAmount += form.paidAmount;
+export const addFormTemplateTotals = (data) => {
+  const formTemplate = data.toObject ? data.toObject() : data;
+  const Form = mongoose.model('Form');
+  return Form.find({ formTemplateId: formTemplate._id })
+  .populate({ path: 'paymentIds', select: 'amount' })
+  .exec()
+  .then((forms) => {
+    const { templateFieldMap, optionMap } = initializeTotals(formTemplate);
+    let totalCost = 0;
+    let paidAmount = 0;
 
-    form.fields.forEach((field) => {
-      const templateField = templateFieldMap[field.templateFieldId];
-      if (templateField && templateField.total >= 0) {
-        const value = parseFloat(
-          fieldValue(field, templateFieldMap, optionMap), 10);
-        if (value) {
-          templateField.total += value;
+    // unify all payments
+    const payments = initializePayments(forms);
+
+    forms.forEach((form) => {
+      addFormTotals(form, formTemplate, payments);
+      totalCost += form.totalCost;
+      paidAmount += form.paidAmount;
+
+      form.fields.forEach((field) => {
+        const templateField = templateFieldMap[field.templateFieldId];
+        if (templateField && templateField.total >= 0) {
+          const value = parseFloat(
+            fieldValue(field, templateFieldMap, optionMap), 10);
+          if (value) {
+            templateField.total += value;
+          }
         }
-      }
 
-      if (templateField && templateField.remaining !== undefined) {
-        if (templateField.type === 'number' || templateField.type === 'count') {
-          templateField.remaining -= parseFloat(field.value, 10);
-        } else {
-          templateField.remaining -= 1;
+        if (templateField && templateField.remaining !== undefined) {
+          if (templateField.type === 'number' || templateField.type === 'count') {
+            templateField.remaining -= parseFloat(field.value, 10);
+          } else {
+            templateField.remaining -= 1;
+          }
         }
-      }
 
-      if (templateField && templateField.options) {
-        let selectedOptions = [];
-        if (field.optionId) {
-          selectedOptions.push(field.optionId);
-        } else {
-          selectedOptions = selectedOptions.concat(field.optionIds || []);
-        }
-        templateField.options.filter(o => o.remaining !== undefined)
-        .forEach((option) => {
-          selectedOptions.forEach((optionId) => {
-            if (option._id.equals(optionId)) {
-              option.remaining -= 1;
-            }
+        if (templateField && templateField.options) {
+          let selectedOptions = [];
+          if (field.optionId) {
+            selectedOptions.push(field.optionId);
+          } else {
+            selectedOptions = selectedOptions.concat(field.optionIds || []);
+          }
+          templateField.options.filter(o => o.remaining !== undefined)
+          .forEach((option) => {
+            selectedOptions.forEach((optionId) => {
+              if (option._id.equals(optionId)) {
+                option.remaining -= 1;
+              }
+            });
           });
-        });
-      }
+        }
+      });
     });
-  });
 
-  formTemplate.totalCost = totalCost;
-  formTemplate.paidAmount = paidAmount;
+    formTemplate.totalCost = totalCost;
+    formTemplate.paidAmount = paidAmount;
+
+    return formTemplate;
+  });
 };
 
 export const addForms = (data, forSession) => {
+  const formTemplate = data.toObject ? data.toObject() : data;
   const Form = mongoose.model('Form');
   const FormTemplate = mongoose.model('FormTemplate');
-  const formTemplate = data.toObject ? data.toObject() : data;
   const criteria = { formTemplateId: formTemplate._id };
   if (forSession) {
     criteria.userId = forSession.userId._id;
   }
-  addNewForm(formTemplate, forSession);
+  // addNewForm(formTemplate, forSession);
   return Form.find(criteria)
   .populate({ path: 'paymentIds', select: 'amount' })
   .populate({ path: 'userId', select: 'name' })
   .sort('-modified')
   .exec()
-  .then(forms => addTotals(formTemplate, forms))
+  .then((forms) => {
+    const payments = initializePayments(forms);
+    formTemplate.forms = forms.map(form =>
+      addFormTotals(form, formTemplate, payments));
+    return formTemplate;
+  })
   .then(() => {
     if (formTemplate.linkedFormTemplateId) {
       const linkedId =
@@ -270,6 +289,10 @@ export default function (router) {
     .then((context) => {
       const { formTemplate } = context;
       return Form.find({ formTemplateId: formTemplate._id }).exec()
+      .then((forms) => {
+        const payments = initializePayments(forms);
+        return forms.map(form => addFormTotals(form, formTemplate, payments));
+      })
       .then(forms => ({ ...context, forms }));
     })
     .then((context) => {
@@ -312,12 +335,10 @@ export default function (router) {
           }
         }));
 
-      let forms2 = forms;
       if (formTemplate.payable) {
         fields.push('balance');
         fieldNames.push('Balance');
-        addTotals(formTemplate, forms);
-        forms2 = formTemplate.forms;
+        addFormTemplateTotals(formTemplate);
       }
 
       fields.push('created');
@@ -342,7 +363,7 @@ export default function (router) {
           }));
       }
 
-      const data = forms2.map((form) => {
+      const data = forms.map((form) => {
         const item = { created: form.created, modified: form.modified };
         const linkedForm =
           form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
@@ -429,7 +450,8 @@ export default function (router) {
           // reset modified time to now to avoid caching issues when deleting forms
           formTemplate.modified = moment.utc();
           return addForms(formTemplate,
-            (req.query.forSession || !admin) ? session : undefined);
+            (req.query.forSession || !admin) ? session : undefined)
+          .then(data => addFormTemplateTotals(data));
         }
         return formTemplate;
       },
