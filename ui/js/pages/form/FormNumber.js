@@ -12,8 +12,8 @@ const FormNumber = (props) => {
   const initialValue = field.initialValue || field.value || 0;
   if (remaining !== undefined) {
     const initialPlusRemaining = parseFloat(initialValue, 10) + parseFloat(remaining, 10);
-    max = max ? Math.min(initialPlusRemaining, max) : initialPlusRemaining;
-    min = Math.min(min, max);
+    max = Math.max(0, max ? Math.min(initialPlusRemaining, max) : initialPlusRemaining);
+    min = Math.max(0, Math.min(min, max));
   }
 
   let contents = (
