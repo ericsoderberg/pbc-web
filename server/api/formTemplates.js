@@ -104,7 +104,7 @@ export const addNewForm = (data, session, linkedFormId) => {
 };
 
 const initializeTotals = (formTemplate) => {
-  // initialize maps for fields and options and their totals and remains
+  // initialize maps for fields and options and their totals and remaining
   const templateFieldMap = {};
   const optionMap = {};
 
@@ -172,10 +172,16 @@ const addTotals = (formTemplate, forms) => {
       }
 
       if (templateField && templateField.options) {
-        templateField.options.map(o => o.remaining !== undefined)
+        let selectedOptions = [];
+        if (field.optionId) {
+          selectedOptions.push(field.optionId);
+        } else {
+          selectedOptions = selectedOptions.concat(field.optionIds || []);
+        }
+        templateField.options.filter(o => o.remaining !== undefined)
         .forEach((option) => {
-          (field.optionIds || []).forEach((optionId) => {
-            if (option._id === optionId) {
+          selectedOptions.forEach((optionId) => {
+            if (option._id.equals(optionId)) {
               option.remaining -= 1;
             }
           });

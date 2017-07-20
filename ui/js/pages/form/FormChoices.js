@@ -4,7 +4,7 @@ import FormField from '../../components/FormField';
 import FormOptionLabel from './FormOptionLabel';
 
 const FormChoices = (props) => {
-  const { error, field, formTemplateField, onChange, remaining } = props;
+  const { error, field, formTemplateField, onChange } = props;
 
   const optionIds = field.optionIds || [];
   const initialOptionIds = field.initialOptionIds || optionIds;
@@ -13,14 +13,14 @@ const FormChoices = (props) => {
     const id = option._id || option.id;
     const checked = (optionIds.indexOf(id) !== -1);
     const initialChecked = (initialOptionIds.indexOf(id) !== -1);
-    const optionRemaining = remaining[id];
+    const remaining = option.remaining;
     return (
       <div key={id} className="form__field-option">
         <input id={id}
           name={name}
           type="checkbox"
           checked={checked}
-          disabled={optionRemaining <= 0 && !initialChecked}
+          disabled={remaining <= 0 && !initialChecked}
           onChange={() => onChange({
             templateFieldId: formTemplateField._id,
             optionIds: (checked ?
@@ -32,7 +32,7 @@ const FormChoices = (props) => {
           formTemplateField={formTemplateField}
           option={option}
           selected={checked}
-          remaining={optionRemaining} />
+          remaining={remaining} />
       </div>
     );
   });
@@ -51,13 +51,11 @@ FormChoices.propTypes = {
   field: PropTypes.object,
   formTemplateField: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
-  remaining: PropTypes.object,
 };
 
 FormChoices.defaultProps = {
   error: undefined,
   field: {},
-  remaining: {},
 };
 
 export default FormChoices;

@@ -99,7 +99,6 @@ class FormContents extends Component {
       <FormContentsSection key={section._id || section.id}
         formTemplateSection={section}
         fields={fields}
-        remains={formTemplate.remains || {}}
         linkedForm={linkedForm}
         linkedFormControl={linkedFormControl}
         error={error}

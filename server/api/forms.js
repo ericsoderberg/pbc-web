@@ -340,7 +340,8 @@ export default function (router, transporter) {
     .then((context) => {
       const { formTemplate, session } = context;
       let data = req.body;
-      if (!formTemplate._id.equals(data.formTemplateId._id)) {
+      if (!formTemplate._id.equals(data.formTemplateId._id) &&
+        !formTemplate._id.equals(data.formTemplateId)) {
         return Promise.reject({ error: 'Mismatched template' });
       }
       data.modified = new Date();

@@ -17,7 +17,6 @@ import FormContentsField from './FormContentsField';
 const FormContentsSection = (props) => {
   const {
     error, fields, formTemplateSection, linkedForm, linkedFormControl, onChange,
-    remains,
   } = props;
 
   const formTemplateFields = (formTemplateSection.fields || [])
@@ -41,7 +40,6 @@ const FormContentsSection = (props) => {
         formTemplateField={formTemplateField}
         field={fields[id]}
         error={error[id]}
-        remaining={remains[id]}
         linkedForm={linkedForm}
         linkedFormControl={linkedFormControl}
         onChange={onChange} />
@@ -65,7 +63,6 @@ FormContentsSection.propTypes = {
   linkedForm: PropTypes.object,
   linkedFormControl: PropTypes.element,
   onChange: PropTypes.func.isRequired,
-  remains: PropTypes.object.isRequired,
 };
 
 FormContentsSection.defaultProps = {

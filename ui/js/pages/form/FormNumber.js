@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import FormField from '../../components/FormField';
 
 const FormNumber = (props) => {
-  const { error, field, formTemplateField, onChange, remaining } = props;
+  const { error, field, formTemplateField, onChange } = props;
+  const { remaining } = formTemplateField;
 
   const value = parseFloat(field.value || formTemplateField.min || 0, 10);
   const initialValue = field.initialValue || value || 0;

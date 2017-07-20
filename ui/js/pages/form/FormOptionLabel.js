@@ -51,20 +51,24 @@ export default class FormOptionLabel extends Component {
     }
 
     if (help) {
-      const classNames = ['form-field__help'];
-      if (helpActive) {
-        classNames.push('form-field__help--active');
+      if (help.length > 30) {
+        const classNames = ['form-field__help'];
+        if (helpActive) {
+          classNames.push('form-field__help--active');
+        }
+        labels.push(
+          <span key="help" className={classNames.join(' ')}>
+            <button className="button-plain"
+              type="button"
+              onClick={this._toggleHelp}> ? </button>
+            <div className="form-field__help-drop">
+              <Markdown>{help}</Markdown>
+            </div>
+          </span>,
+        );
+      } else {
+        labels.push(<span key="help" className="form-field__help">{help}</span>);
       }
-      labels.push(
-        <span key="help" className={classNames.join(' ')}>
-          <button className="button-plain"
-            type="button"
-            onClick={this._toggleHelp}> ? </button>
-          <div className="form-field__help-drop">
-            <Markdown>{help}</Markdown>
-          </div>
-        </span>,
-      );
     }
 
     return (

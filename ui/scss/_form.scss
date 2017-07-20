@@ -213,8 +213,8 @@
 
     & + label {
       display: inline-block;
-      max-width: 404px; // empirical, to align with form total $
-      margin: $half-unit;
+      max-width: 430px; // empirical, to align with form total $
+      margin: $half-unit $half-unit $half-unit 0;
       vertical-align: top;
 
       &.form-option-label {
@@ -299,6 +299,7 @@
 .form-field__help {
   position: relative;
   text-align: right;
+  color: $tertiary-color;
 }
 
 .form-field__error {
@@ -377,7 +378,7 @@
 
 .form__field-option-amount {
   white-space: nowrap;
-  padding-right: $unit;
+  padding-right: $half-unit;
 }
 
 .form__tabs {
@@ -829,7 +830,7 @@
 .form-total {
   max-width: $form-width;
   margin: $unit auto;
-  padding: 0 $unit;
+  padding: 0 $half-unit;
   text-align: right;
 
   .secondary {
@@ -1068,14 +1069,15 @@
 .form-field__help-drop {
   display: none;
   position: absolute;
-  bottom: $unit;
-  right: -$half-unit;
+  bottom: $unit + $quarter-unit;
+  right: -$unit;
   max-width: $form-width;
   margin: 0;
   text-align: left;
-  padding: $half-unit;
+  padding: $half-unit $unit;
+  color: $color;
   border: 1px solid $border-color;
-  background-color: $secondary-background-color;
+  background-color: $help-drop-color;
 
   span {
     display: block;
@@ -1093,7 +1095,7 @@
 .form-field__help--active {
   .form-field__help-drop {
     display: block;
-    width: $form-width;
+    width: $form-width - $unit;
     text-align: left;
   }
 }
