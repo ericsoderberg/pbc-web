@@ -157,7 +157,7 @@ export const addFormTotals = (data, formTemplate, payments = {}) => {
               }
             } else if (templateField.type === 'choice') {
               templateField.options.forEach((option) => {
-                if (option.value && field.optionId === option._id) {
+                if (option.value && field.optionId.equals(option._id)) {
                   totalCost += parseInt(option.value, 10);
                 }
               });
