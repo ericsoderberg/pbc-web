@@ -4,7 +4,7 @@ import { unsetDomainIfNeeded } from './domains';
 import { unsetLibraryIfNeeded } from './libraries';
 import register from './register';
 import { render as renderNewsletter } from './newsletter';
-import { catcher } from './utils';
+import { catcher, sendImage } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -128,15 +128,9 @@ export default function (router, transporter) {
       const section = newsletter.sections.filter(s =>
         (s.type === 'image' && s.image.name === imageName))[0];
       if (section) {
-        const matches = section.image.data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-        const img = new Buffer(matches[2], 'base64');
-        res.writeHead(200, {
-          'Content-Type': section.image.type,
-          'Content-Length': img.length,
-        });
-        res.end(img);
+        sendImage(section.image, res);
       } else {
-        res.status(404);
+        res.status(404).send();
       }
     })
     .catch(error => catcher(error, res));

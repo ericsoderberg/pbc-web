@@ -152,7 +152,7 @@ function markupEvent(event, urlBase) {
   if (event.image) {
     image = `
 <a href="${url}"><img style="max-width: 432px; padding-top: 24px;"
-src="${event.image.data}" /></a>
+src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   `;
   }
   const at = `<div style="padding-bottom: 6px;">${dates}</div>`;
@@ -205,6 +205,7 @@ function markupMessage(label, message, urlBase) {
 
 function markupPage(page, section, urlBase) {
   const url = `${urlBase}/${page.path || `pages/${page._id}`}`;
+  // TODO: revisit this when aligning event and page images and colors
   let image = '';
   if (section.backgroundImage) {
     image = `

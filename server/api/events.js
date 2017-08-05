@@ -7,7 +7,7 @@ import { unsetDomainIfNeeded } from './domains';
 import { unsetCalendarIfNeeded } from './calendars';
 import { addForms, addNewForm } from './formTemplates';
 import register from './register';
-import { catcher } from './utils';
+import { catcher, sendImage } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -289,6 +289,21 @@ export default function (router) {
       return unavailableDatesMerged;
     })
     .then(unavailableDates => res.status(200).json(unavailableDates))
+    .catch(error => catcher(error, res));
+  });
+
+  router.get('/events/:id/:imageName', (req, res) => {
+    const Event = mongoose.model('Event');
+    const id = req.params.id;
+    const imageName = req.params.imageName;
+    Event.findOne({ _id: id }).exec()
+    .then((event) => {
+      if (event.image && event.image.name === imageName) {
+        sendImage(event.image, res);
+      } else {
+        res.status(404).send();
+      }
+    })
     .catch(error => catcher(error, res));
   });
 

@@ -27,3 +27,13 @@ export const getPostData = req =>
       resolve(req.body);
     }
   });
+
+export const sendImage = (image, res) => {
+  const matches = image.data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+  const img = new Buffer(matches[2], 'base64');
+  res.writeHead(200, {
+    'Content-Type': image.type,
+    'Content-Length': img.length,
+  });
+  res.end(img);
+};
