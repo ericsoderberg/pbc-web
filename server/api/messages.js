@@ -126,6 +126,10 @@ export default function (router) {
         // first to de-string and then to de-stringify
         filter = JSON.parse(filter);
       }
+      if (filter.verses) {
+        // Adjust verses filter to match books flexibly
+        filter.verses = { $regex: filter.verses, $options: 'i' };
+      }
       criteria = { ...criteria, ...filter };
     }
 
