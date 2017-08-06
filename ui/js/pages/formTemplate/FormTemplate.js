@@ -173,7 +173,12 @@ class FormTemplate extends Component {
         </span>
       );
     } else if (templateField.type === 'choice' && field.optionId) {
-      contents = optionMap[field.optionId].name;
+      const option = optionMap[field.optionId];
+      let suffix = '';
+      if (templateField.monetary) {
+        suffix = ` $ ${option.value}`;
+      }
+      contents = `${option.name || ''}${suffix}`;
     } else if (templateField.type === 'choices' && field.optionIds) {
       contents = field.optionIds.map((optionId) => {
         const option = optionMap[optionId];
