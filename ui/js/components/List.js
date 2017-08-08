@@ -83,12 +83,6 @@ class List extends Component {
         { sort, filter, search: searchText, select, populate, adminable })));
   }
 
-  _throttleLoad() {
-    // throttle when user is typing
-    clearTimeout(this._getTimer);
-    this._getTimer = setTimeout(this._load, 100);
-  }
-
   _setLocation(options) {
     const { filters, history, location } = this.props;
     const { filterNames } = this.state;
@@ -305,13 +299,11 @@ class List extends Component {
         <PageHeader title={title}
           homer={homer}
           back={back}
+          filters={filterItems}
           focusOnSearch={false}
           searchText={searchText}
           onSearch={onSearch}
           actions={actions} />
-        <div className="list__header">
-          {filterItems}
-        </div>
         <ul className="list">
           {contents}
         </ul>

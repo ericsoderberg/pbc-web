@@ -163,6 +163,12 @@ export default (router, options) => {
             // first to de-string and then to de-stringify
             filter = JSON.parse(filter);
           }
+          if (filter.created && Array.isArray(filter.created)) {
+            filter.created = {
+              $gte: new Date(filter.created[0]),
+              $lte: new Date(filter.created[1]),
+            };
+          }
           query.find(filter);
         }
         if (req.query.sort && (!indexOpts.textSearch || !req.query.search)) {

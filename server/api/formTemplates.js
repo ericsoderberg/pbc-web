@@ -288,7 +288,30 @@ export default function (router) {
     })
     .then((context) => {
       const { formTemplate } = context;
-      return Form.find({ formTemplateId: formTemplate._id }).exec()
+      const query = Form.find();
+      if (req.query.search) {
+        const exp = new RegExp(req.query.search, 'i');
+        query.find({ name: exp });
+      }
+      if (req.query.filter) {
+        let filter = JSON.parse(req.query.filter);
+        if (typeof filter === 'string') {
+          // need double de-escape,
+          // first to de-string and then to de-stringify
+          filter = JSON.parse(filter);
+        }
+        if (filter.created && Array.isArray(filter.created)) {
+          filter.created = {
+            $gte: new Date(filter.created[0]),
+            $lte: new Date(filter.created[1]),
+          };
+        }
+        query.find(filter);
+      }
+      if (req.query.sort) {
+        query.sort(req.query.sort);
+      }
+      return query.exec()
       .then((forms) => {
         const payments = initializePayments(forms);
         return forms.map(form => addFormTotals(form, formTemplate, payments));

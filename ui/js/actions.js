@@ -366,8 +366,19 @@ export function getResourcesEvents() {
 
 // Forms
 
-export function getFormTemplateDownload(id) {
-  return fetch(`/api/form-templates/${id}.csv`, {
+export function getFormTemplateDownload(id, options) {
+  const params = [];
+  if (options.search) {
+    params.push(`search=${encodeURIComponent(options.search)}`);
+  }
+  if (options.filter) {
+    params.push(`filter=${encodeURIComponent(JSON.stringify(options.filter))}`);
+  }
+  if (options.sort) {
+    params.push(`sort=${encodeURIComponent(options.sort)}`);
+  }
+  const q = params.length > 0 ? `?${params.join('&')}` : '';
+  return fetch(`/api/form-templates/${id}.csv${q}`, {
     method: 'GET', headers: _headers })
     .then((response) => {
       const cd = response.headers.get('Content-Disposition');

@@ -312,8 +312,7 @@
 .page-header__actions {
   > a,
   > .button,
-  > select,
-  > .page-header__dropper > .button {
+  > select {
     @include page-header-input();
   }
 
@@ -335,11 +334,37 @@
 .page-header__secondary {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  align-items: center;
   background-color: $header-background-color;
+
+  > .button {
+    @include page-header-input();
+    padding: 0 $unit;
+  }
 
   .search {
     max-width: $page-width + $double-unit;
+  }
+}
+
+.page-header__tertiary {
+  display: flex;
+  background-color: $secondary-background-color;
+
+  @media all and (min-width: 700px) {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    > * {
+      margin: 0 $unit;
+      flex: 0 1 auto;
+    }
+  }
+
+  @media all and (max-width: 699px) {
+    flex-direction: column;
+    align-items: flex-end;
   }
 }
 
@@ -360,6 +385,20 @@
 
   &.box--row {
     align-items: flex-start;
+  }
+}
+
+.header-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  label {
+    margin-right: $half-unit;
+  }
+
+  input {
+    padding: $quarter-unit $half-unit;
   }
 }
 

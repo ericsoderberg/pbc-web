@@ -70,6 +70,11 @@ export default class DateInput extends Component {
           onChange(date);
         }
       }
+    } else if (this.state.dateValue) {
+      // cleared
+      if (onChange) {
+        onChange('');
+      }
     }
   }
 

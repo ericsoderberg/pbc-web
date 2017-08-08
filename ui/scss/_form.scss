@@ -754,10 +754,6 @@
 .select-search__value {
   height: $double-unit;
   flex: 1;
-
-  .list__header & {
-    background-color: inherit;
-  }
 }
 
 .select-search__drop {

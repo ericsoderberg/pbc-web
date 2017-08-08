@@ -5,55 +5,107 @@ import { findDOMNode } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment-timezone';
-import { loadItem, getFormTemplateDownload, unloadItem } from '../../actions';
+import {
+  loadItem, loadCategory, getFormTemplateDownload, unloadItem, unloadCategory,
+} from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
-import Button from '../../components/Button';
+import Filter from '../../components/Filter';
 import DateInput from '../../components/DateInput';
 import Loading from '../../components/Loading';
 import PageContext from '../page/PageContext';
+import { searchToObject } from '../../utils/Params';
 
 const FIXED_FIELDS = [
   { name: 'created', label: 'Submitted' },
   { name: 'modified', label: 'Updated' },
 ];
 
+const UNSET = '$unset';
+
 class FormTemplate extends Component {
 
   constructor() {
     super();
+    this._load = this._load.bind(this);
     this._layout = this._layout.bind(this);
-    // this._onScroll = this._onScroll.bind(this);
+    this._onSearch = this._onSearch.bind(this);
+    this._onFrom = this._onFrom.bind(this);
+    this._onTo = this._onTo.bind(this);
+    this._onPayment = this._onPayment.bind(this);
+    this._onScroll = this._onScroll.bind(this);
     this._onDownload = this._onDownload.bind(this);
-    this.state = { columns: [], sortReverse: false };
+    this.state = {
+      columns: [], fromDate: '', toDate: '', payment: '', searchText: '', sort: '-created',
+    };
   }
 
   componentDidMount() {
     const { dispatch, id } = this.props;
-    dispatch(loadItem('form-templates', id, { full: true }));
-    // window.addEventListener('scroll', this._onScroll);
+    dispatch(loadItem('form-templates', id)); // , { full: true }));
+    this.setState(this._stateFromProps(this.props), this._load);
+    window.addEventListener('scroll', this._onScroll);
   }
 
   componentWillReceiveProps(nextProps) {
     const { dispatch, id } = nextProps;
     if (id !== this.props.id) {
       dispatch(loadItem('form-templates', id, { full: true }));
+      this.setState({
+        searchText: '', filter: {}, sort: undefined, forms: undefined,
+      });
     } else if (nextProps.formTemplate) {
       document.title = nextProps.formTemplate.name;
       this._setupColumns(nextProps.formTemplate);
+      if (nextProps.location.search !== this.props.location.search) {
+        this.setState(this._stateFromProps(nextProps), this._load);
+      }
     }
   }
 
   componentDidUpdate() {
     setTimeout(() => {
       this._layout();
-      // this._onScroll();
+      this._onScroll();
     }, 20);
   }
 
   componentWillUnmount() {
     const { dispatch, id } = this.props;
+    dispatch(unloadCategory('forms'));
     dispatch(unloadItem('form-templates', id));
-    // window.removeEventListener('scroll', this._onScroll);
+    window.removeEventListener('scroll', this._onScroll);
+  }
+
+  _stateFromProps(props) {
+    const { location } = props;
+    const query = searchToObject(location.search);
+    return {
+      fromDate: query.fromDate || '',
+      toDate: query.toDate || '',
+      payment: query.payment || '',
+      searchText: query.search || '',
+      sort: query.sort,
+    };
+  }
+
+  _actionOptions() {
+    const { id } = this.props;
+    const { fromDate, toDate, payment, searchText, sort } = this.state;
+    const filter = { formTemplateId: id };
+    if (fromDate && toDate) {
+      filter.created = [fromDate, toDate];
+    }
+    if (payment) {
+      filter.payment = payment;
+    }
+    return { filter, search: searchText, sort: sort || '-created' };
+  }
+
+  _load() {
+    const { dispatch } = this.props;
+    const options = this._actionOptions();
+    this.setState({ loading: true }, () =>
+      dispatch(loadCategory('forms', options)));
   }
 
   _layout() {
@@ -114,20 +166,103 @@ class FormTemplate extends Component {
     });
   }
 
+  _setLocation(options) {
+    const { history } = this.props;
+    const state = { ...this.state, ...options };
+    const searchParams = [];
+
+    if (state.searchText) {
+      searchParams.push(`search=${encodeURIComponent(state.searchText)}`);
+    }
+
+    if (state.fromDate) {
+      searchParams.push(`fromDate=${state.fromDate}`);
+    }
+    if (state.toDate) {
+      searchParams.push(`toDate=${state.toDate}`);
+    }
+    if (state.payment) {
+      searchParams.push(`toDate=${state.toDate}`);
+    }
+    if (state.sort) {
+      searchParams.push(`sort=${state.sort}`);
+    }
+
+    history.replace({
+      pathname: window.location.pathname,
+      search: `?${searchParams.join('&')}`,
+    });
+  }
+
+  _onMore() {
+    const { dispatch, forms } = this.props;
+    const { filter, searchText, sort } = this.state;
+    this.setState({ loadingMore: true }, () => {
+      dispatch(loadCategory('forms', {
+        sort, filter, search: searchText, skip: forms.length,
+      }));
+    });
+  }
+
+  _onScroll() {
+    const { mightHaveMore } = this.props;
+    const { loadingMore } = this.state;
+    if (mightHaveMore && !loadingMore) {
+      const more = this._moreRef;
+      if (more) {
+        const rect = more.getBoundingClientRect();
+        // start loading just before they get there
+        if (rect.top <= (window.innerHeight + 200)) {
+          this._onMore();
+        }
+      }
+    }
+  }
+
+  _onSearch(event) {
+    const searchText = event.target.value;
+    this.setState({ searchText });
+    // throttle when user is typing
+    clearTimeout(this._getTimer);
+    this._getTimer = setTimeout(() => this._setLocation({ searchText }), 100);
+  }
+
+  _onFrom(fromDate) {
+    this.setState({ fromDate });
+    this._setLocation({ fromDate: fromDate ? fromDate.toISOString() : undefined });
+  }
+
+  _onTo(toDate) {
+    this.setState({ toDate });
+    this._setLocation({ toDate: toDate ? toDate.toISOString() : undefined });
+  }
+
+  _onPayment(event) {
+    let value = event.target.value;
+    if (!value || value.match(/^all$/i)) {
+      value = UNSET;
+    }
+    this._setLocation({ payment: value });
+  }
+
+  _onSort(fieldId) {
+    return () => {
+      let sort;
+      if (this.state.sort && this.state.sort === fieldId) {
+        sort = `-${fieldId}`;
+      } else {
+        sort = fieldId;
+      }
+      this.setState({ sort });
+      this._setLocation({ sort });
+    };
+  }
+
   _onDownload(event) {
     const { id } = this.props;
     event.preventDefault();
-    getFormTemplateDownload(id);
-  }
-
-  _filterForms() {
-    // TODO: move to back-end
-    const { fromDate, toDate } = this.state;
-    const filteredForms = this.state.forms.filter(form => (
-      (!fromDate || moment(form.created).isAfter(fromDate)) &&
-      (!toDate || moment(form.created).isBefore(toDate))
-    ));
-    this.setState({ filteredForms });
+    const options = this._actionOptions();
+    getFormTemplateDownload(id, options);
   }
 
   _editForm(id) {
@@ -215,42 +350,17 @@ class FormTemplate extends Component {
     return result;
   }
 
-  _sortForms(templateFieldId) {
-    return () => {
-      const { formTemplate: { forms } } = this.props;
-      const { sortFieldId, sortReverse } = this.state;
-      const nextSortReverse = (templateFieldId === sortFieldId ?
-        !sortReverse : false);
-
-      const nextForms = forms.sort((form1, form2) => {
-        const value1 = this._fieldValueFor(form1, templateFieldId);
-        const value2 = this._fieldValueFor(form2, templateFieldId);
-        if (value1 && (!value2 || value1 < value2)) {
-          return nextSortReverse ? 1 : -1;
-        }
-        if (value2 && (!value1 || value2 < value1)) {
-          return nextSortReverse ? -1 : 1;
-        }
-        return 0;
-      });
-
-      this.setState({
-        forms: nextForms,
-        sortFieldId: templateFieldId,
-        sortReverse: nextSortReverse,
-      });
-    };
-  }
-
   _renderHeaderCells() {
-    const {
-      columns, mightHaveMore, templateFieldMap, sortFieldId, sortReverse,
-    } = this.state;
+    const { columns, templateFieldMap, sortFieldId, sortReverse } = this.state;
     const cells = columns.map((fieldId) => {
       const field = templateFieldMap[fieldId];
       const classes = [];
-      if (!mightHaveMore) {
+      let onClick;
+      if (fieldId === 'created' || fieldId === 'modified' ||
+        field.linkToUserProperty === 'name') {
         classes.push('sortable');
+        const sortBy = field.linkToUserProperty === 'name' ? 'name' : fieldId;
+        onClick = this._onSort(sortBy);
       }
       if (sortFieldId === fieldId) {
         classes.push('sort');
@@ -260,10 +370,6 @@ class FormTemplate extends Component {
       }
       if (field.total >= 0) {
         classes.push('numeric');
-      }
-      let onClick;
-      if (!mightHaveMore) {
-        onClick = this._sortForms(fieldId);
       }
       return (
         <th key={fieldId}
@@ -366,9 +472,8 @@ class FormTemplate extends Component {
   }
 
   _renderRows() {
-    const { formTemplate } = this.props;
+    const { forms, formTemplate } = this.props;
     const { filteredForms } = this.state;
-    const forms = this.state.forms || formTemplate.forms;
     const linkedForms = {};
     ((formTemplate.linkedFormTemplate || {}).forms || []).forEach((form) => {
       linkedForms[form._id] = form;
@@ -434,46 +539,13 @@ class FormTemplate extends Component {
     );
   }
 
-  _renderFilter() {
-    const { fromDate, toDate } = this.state;
-    return (
-      <div className="page-header__drop box--row">
-        <div>
-          <h4>From</h4>
-          <DateInput inline={true}
-            value={fromDate || ''}
-            onChange={date => this.setState({ fromDate: date },
-              this._filterForms)} />
-        </div>
-        <div>
-          <h4>To</h4>
-          <DateInput inline={true}
-            value={toDate || ''}
-            onChange={date => this.setState({ toDate: date },
-              this._filterForms)} />
-        </div>
-      </div>
-    );
-  }
-
   render() {
     const { formTemplate, id } = this.props;
-    const { filterActive, loadingMore, mightHaveMore } = this.state;
-
-    let filter;
-    if (filterActive) {
-      filter = this._renderFilter();
-    }
+    const {
+      fromDate, toDate, loadingMore, mightHaveMore, payment, searchText,
+    } = this.state;
 
     const actions = [];
-    actions.push(
-      <span key="filter" className="page-header__dropper">
-        <Button label="Filter"
-          onClick={() => this.setState({
-            filterActive: !this.state.filterActive })} />
-        {filter}
-      </span>,
-    );
 
     actions.push(
       <a key="download"
@@ -489,6 +561,31 @@ class FormTemplate extends Component {
         Add
       </Link>,
     );
+
+    const filterItems = [];
+    if (formTemplate) {
+      filterItems.push(
+        <span key="from" className="header-field">
+          <label htmlFor="from">From</label>
+          <DateInput id="from" value={fromDate} onChange={this._onFrom} />
+        </span>,
+      );
+      filterItems.push(
+        <span key="to" className="header-field">
+          <label htmlFor="to">To</label>
+          <DateInput id="to" value={toDate} onChange={this._onTo} />
+        </span>,
+      );
+      if (formTemplate.payable) {
+        filterItems.push(
+          <Filter key="paid"
+            options={['paid', 'unpaid']}
+            allLabel="All"
+            value={payment}
+            onChange={this._onPayment} />,
+        );
+      }
+    }
 
     let title;
     let contents;
@@ -524,7 +621,10 @@ class FormTemplate extends Component {
         <ItemHeader category="form-templates"
           item={formTemplate}
           title={title}
-          actions={actions} />
+          actions={actions}
+          searchText={searchText}
+          onSearch={this._onSearch}
+          filters={filterItems} />
         {contents}
         {more}
         {linkedForm}
@@ -536,21 +636,29 @@ class FormTemplate extends Component {
 
 FormTemplate.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  forms: PropTypes.array,
+  formTemplate: PropTypes.object,
   history: PropTypes.any.isRequired,
   id: PropTypes.string.isRequired,
-  formTemplate: PropTypes.object,
+  location: PropTypes.object.isRequired,
+  mightHaveMore: PropTypes.bool,
 };
 
 FormTemplate.defaultProps = {
+  forms: undefined,
   formTemplate: undefined,
+  mightHaveMore: false,
 };
 
 const select = (state, props) => {
   const id = props.match.params.id;
+  const formsState = state.forms || {};
   return {
     id,
-    notFound: state.notFound[id],
+    forms: formsState.items,
     formTemplate: state[id],
+    mightHaveMore: formsState.mightHaveMore,
+    notFound: state.notFound[id],
     session: state.session,
   };
 };

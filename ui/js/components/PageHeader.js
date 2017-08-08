@@ -12,6 +12,7 @@ class PageHeader extends Component {
     this._onHome = this._onHome.bind(this);
     this._onBack = this._onBack.bind(this);
     this._toggleMenu = this._toggleMenu.bind(this);
+    this._toggleFilters = this._toggleFilters.bind(this);
     this.state = {};
   }
 
@@ -34,12 +35,16 @@ class PageHeader extends Component {
     this.setState({ showMenu: !this.state.showMenu });
   }
 
+  _toggleFilters() {
+    this.setState({ showFilters: !this.state.showFilters });
+  }
+
   render() {
     const {
       title, searchText, searchPlaceholder, onSearch, actions, back, homer,
-      focusOnSearch, responsive, site,
+      filters, focusOnSearch, responsive, site,
     } = this.props;
-    const { showMenu } = this.state;
+    const { showFilters, showMenu } = this.state;
     const classes = ['page-header'];
     if (responsive && actions &&
       (actions.length > 1 || (actions.length === 1 && onSearch))) {
@@ -107,6 +112,16 @@ class PageHeader extends Component {
     );
 
     if (onSearch) {
+      let filterControl;
+      let tertiary;
+      if (filters && filters.length > 0) {
+        filterControl = (
+          <Button label="Filter" onClick={this._toggleFilters} />
+        );
+        if (showFilters) {
+          tertiary = <div className="page-header__tertiary">{filters}</div>;
+        }
+      }
       contents = (
         <div>
           {contents}
@@ -116,7 +131,9 @@ class PageHeader extends Component {
               value={searchText}
               onChange={onSearch}
               focusOnMount={focusOnSearch} />
+            {filterControl}
           </div>
+          {tertiary}
         </div>
       );
     }
@@ -128,6 +145,7 @@ class PageHeader extends Component {
 PageHeader.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   back: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  filters: PropTypes.arrayOf(PropTypes.node),
   focusOnSearch: PropTypes.bool,
   homer: PropTypes.bool,
   onSearch: PropTypes.func,
@@ -141,6 +159,7 @@ PageHeader.propTypes = {
 PageHeader.defaultProps = {
   actions: [],
   back: false,
+  filters: undefined,
   focusOnSearch: false,
   homer: false,
   onSearch: undefined,

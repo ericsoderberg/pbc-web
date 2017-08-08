@@ -29,7 +29,9 @@ class ItemHeader extends Component {
   }
 
   render() {
-    const { category, item, title, session } = this.props;
+    const {
+      category, filters, item, onSearch, searchText, title, session,
+    } = this.props;
     let { actions } = this.props;
 
     if (item && session && (session.userId.administrator ||
@@ -46,7 +48,12 @@ class ItemHeader extends Component {
     }
 
     return (
-      <PageHeader title={title} homer={true} actions={actions} />
+      <PageHeader title={title}
+        homer={true}
+        actions={actions}
+        searchText={searchText}
+        onSearch={onSearch}
+        filters={filters} />
     );
   }
 }
@@ -54,7 +61,10 @@ class ItemHeader extends Component {
 ItemHeader.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.element),
   category: PropTypes.string.isRequired,
+  filters: PropTypes.arrayOf(PropTypes.node),
   item: PropTypes.object,
+  onSearch: PropTypes.func,
+  searchText: PropTypes.string,
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
@@ -66,7 +76,10 @@ ItemHeader.propTypes = {
 
 ItemHeader.defaultProps = {
   actions: [],
+  filters: undefined,
   item: undefined,
+  onSearch: undefined,
+  searchText: undefined,
   session: undefined,
   title: undefined,
 };

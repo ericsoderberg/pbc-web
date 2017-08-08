@@ -16,27 +16,6 @@
   color: $tertiary-color;
 }
 
-.list__header {
-  display: flex;
-  background-color: $secondary-background-color;
-
-  @media all and (min-width: 700px) {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-
-    > * {
-      margin: 0 $unit;
-      flex: 0 1 auto;
-    }
-  }
-
-  @media all and (max-width: 699px) {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-}
-
 .list__message {
   padding: $quadruple-unit $triple-unit;
   color: $tertiary-color;
