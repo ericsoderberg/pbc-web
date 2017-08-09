@@ -58,6 +58,8 @@ class FormTemplate extends Component {
       this._setupColumns(nextProps.formTemplate);
       if (nextProps.location.search !== this.props.location.search) {
         this.setState(this._stateFromProps(nextProps), this._load);
+      } else {
+        this.setState({ loading: false, loadingMore: false });
       }
     }
   }
@@ -196,11 +198,9 @@ class FormTemplate extends Component {
 
   _onMore() {
     const { dispatch, forms } = this.props;
-    const { filter, searchText, sort } = this.state;
     this.setState({ loadingMore: true }, () => {
-      dispatch(loadCategory('forms', {
-        sort, filter, search: searchText, skip: forms.length,
-      }));
+      const options = this._actionOptions();
+      dispatch(loadCategory('forms', { ...options, skip: forms.length }));
     });
   }
 
@@ -473,14 +473,13 @@ class FormTemplate extends Component {
 
   _renderRows() {
     const { forms, formTemplate } = this.props;
-    const { filteredForms } = this.state;
     const linkedForms = {};
     ((formTemplate.linkedFormTemplate || {}).forms || []).forEach((form) => {
       linkedForms[form._id] = form;
     });
     const fixedRows = [];
     const flexedRows = [];
-    (filteredForms || forms || []).forEach((form) => {
+    (forms || []).forEach((form) => {
       const linkedForm = linkedForms[form.linkedFormId];
       const cells = this._renderCells(form, linkedForm);
       fixedRows.push(
@@ -540,10 +539,8 @@ class FormTemplate extends Component {
   }
 
   render() {
-    const { formTemplate, id } = this.props;
-    const {
-      fromDate, toDate, loadingMore, mightHaveMore, payment, searchText,
-    } = this.state;
+    const { forms, formTemplate, id, mightHaveMore } = this.props;
+    const { fromDate, toDate, loadingMore, payment, searchText } = this.state;
 
     const actions = [];
 
@@ -601,9 +598,8 @@ class FormTemplate extends Component {
       more = <Loading />;
     } else if (mightHaveMore) {
       more = <div ref={(ref) => { this._moreRef = ref; }} />;
-    } else if (formTemplate && formTemplate.forms &&
-      formTemplate.forms.length > 20) {
-      more = <div className="list__count">{formTemplate.forms.length}</div>;
+    } else if (forms && forms.length > 5) {
+      more = <div className="list__count">{forms.length}</div>;
     }
 
     let linkedForm;
