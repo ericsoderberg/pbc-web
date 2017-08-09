@@ -30,6 +30,10 @@ a,
   .dark-background & {
     color: #fff;
   }
+
+  &:focus {
+    outline: 2px solid $focus-border-color;
+  }
 }
 
 .anchor__indicator.control-icon {
@@ -60,6 +64,10 @@ a,
   text-decoration: none;
   transition: all 0.3s;
   flex-shrink: 0;
+
+  &:focus {
+    outline: 2px solid $focus-border-color;
+  }
 }
 
 .button,
