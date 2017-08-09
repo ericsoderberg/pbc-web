@@ -31,11 +31,11 @@ class FormTemplateFormContents extends Component {
   componentDidMount() {
     const { dispatch, formState, session } = this.props;
     if (session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name' }));
+      dispatch(loadCategory('domains', { sort: 'name', limit: 100 }));
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
-    dispatch(loadCategory('email-lists', { sort: 'name' }));
+    dispatch(loadCategory('email-lists', { sort: 'name', limit: 100 }));
     this._loadDependency(this.props);
   }
 
