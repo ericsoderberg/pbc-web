@@ -135,6 +135,55 @@ const populateEmailList = (emailList) => {
   ));
 };
 
+export function subscribe(id, addresses) {
+  const EmailList = mongoose.model('EmailList');
+  return EmailList.findOne({ _id: id }).exec()
+  .then((emailList) => {
+    let updated = false;
+    addresses.map(a => (typeof a === 'string' ? { address: a } : a))
+    .forEach((address) => {
+      if (!emailList.addresses.some(a =>
+        a.address.toLowerCase() === address.address.toLowerCase())) {
+        emailList.addresses.push({
+          ...address,
+          address: address.address.toLowerCase(),
+        });
+        updated = true;
+      }
+    });
+    if (updated) {
+      emailList.modified = new Date();
+      return emailList.save()
+      .then(() => addAddresses(emailList.name, addresses));
+    }
+    return emailList;
+  });
+}
+
+export function unsubscribe(id, addresses) {
+  const EmailList = mongoose.model('EmailList');
+  return EmailList.findOne({ _id: id }).exec()
+  .then((emailList) => {
+    let updated = false;
+    addresses.map(a => (typeof a === 'string' ? { address: a } : a))
+    .forEach((address) => {
+      if (emailList.addresses.some(a =>
+        a.address.toLowerCase() === address.address.toLowerCase())) {
+        emailList.addresses =
+          emailList.addresses.filter(a =>
+            a.address.toLowerCase() !== address.address.toLowerCase());
+        updated = true;
+      }
+    });
+    if (updated) {
+      emailList.modified = new Date();
+      return emailList.save()
+      .then(() => removeAddresses(emailList.name, addresses));
+    }
+    return emailList;
+  });
+}
+
 export default function (router) {
   register(router, {
     category: 'email-lists',
@@ -180,27 +229,8 @@ export default function (router) {
     .then(requireSession)
     .then(() => {
       const id = req.params.id;
-      const EmailList = mongoose.model('EmailList');
-      return EmailList.findOne({ _id: id }).exec();
+      return subscribe(id, req.body);
     })
-    .then((doc) => {
-      // normalize addresses
-      const addresses = req.body.map(a => (
-        typeof a === 'string' ? { address: a } : a
-      ));
-      addresses.forEach((address) => {
-        if (!doc.addresses.some(a =>
-          a.address.toLowerCase() === address.address.toLowerCase())) {
-          doc.addresses.push({
-            ...address,
-            address: address.address.toLowerCase(),
-          });
-        }
-      });
-      doc.modified = new Date();
-      return doc.save();
-    })
-    .then(doc => addAddresses(doc.name, req.body))
     .then(() => res.status(200).send())
     .catch(error => catcher(error, res));
   });
@@ -210,23 +240,8 @@ export default function (router) {
     .then(requireSession)
     .then(() => {
       const id = req.params.id;
-      const EmailList = mongoose.model('EmailList');
-      return EmailList.findOne({ _id: id }).exec();
+      return unsubscribe(id, req.body);
     })
-    .then((doc) => {
-      // normalize addresses
-      const addresses = req.body.map(a => (
-        typeof a === 'string' ? { address: a } : a
-      ));
-      addresses.forEach((address) => {
-        doc.addresses =
-          doc.addresses.filter(a =>
-            a.address.toLowerCase() !== address.address.toLowerCase());
-      });
-      doc.modified = new Date();
-      return doc.save();
-    })
-    .then(doc => removeAddresses(doc.name, req.body))
     .then(() => res.status(200).send())
     .catch(error => catcher(error, res));
   });

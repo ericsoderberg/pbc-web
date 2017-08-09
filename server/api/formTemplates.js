@@ -22,6 +22,13 @@ const unsetReferences = (data) => {
     }
     data.$unset.linkedFormTemplateId = '';
   }
+  if (!data.emailListId) {
+    delete data.emailListId;
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.emailListId = '';
+  }
   return data;
 };
 

@@ -195,7 +195,7 @@ export function createUser(data) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  const emailRegexp = new RegExp(`^${data.email}`, 'i');
+  const emailRegexp = new RegExp(`^${data.email}$`, 'i');
   return User.findOne({ email: emailRegexp }).exec()
   .then((user) => {
     if (user) {
@@ -211,23 +211,18 @@ export function createUser(data) {
   });
 }
 
-export function findOrCreateUser(email, name) {
-  if (!email || !name) {
+export function findOrCreateUser(data) {
+  if (!data.email || !data.name) {
     return Promise.reject('No email or name');
   }
   const User = mongoose.model('User');
-  const emailRegexp = new RegExp(`^${email}`, 'i');
+  const emailRegexp = new RegExp(`^${data.email}$`, 'i');
   return User.findOne({ email: emailRegexp }).exec()
   .then((user) => {
     if (!user) {
       // create a new user
       const now = new Date();
-      user = new User({
-        created: now,
-        email,
-        modified: now,
-        name,
-      });
+      user = new User({ ...data, created: now, modified: now });
       return user.save();
     }
     return user;

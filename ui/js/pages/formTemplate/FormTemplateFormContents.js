@@ -35,6 +35,7 @@ class FormTemplateFormContents extends Component {
     } else if (session.userId.administratorDomainId) {
       formState.change('domainId')(session.userId.administratorDomainId);
     }
+    dispatch(loadCategory('email-lists', { sort: 'name' }));
     this._loadDependency(this.props);
   }
 
@@ -49,6 +50,7 @@ class FormTemplateFormContents extends Component {
   componentWillUnmount() {
     const { dispatch } = this.props;
     dispatch(unloadCategory('domains'));
+    dispatch(unloadCategory('email-lists'));
   }
 
   _loadDependency(props) {
@@ -128,7 +130,8 @@ class FormTemplateFormContents extends Component {
 
   render() {
     const {
-      className, domains, errors, formState, linkedToFormTemplate, session,
+      className, domains, emailLists, errors, formState, linkedToFormTemplate,
+      session,
     } = this.props;
     const { expandedSections, detailsActive } = this.state;
     const formTemplate = formState.object;
@@ -288,6 +291,25 @@ class FormTemplateFormContents extends Component {
         );
       }
 
+      const options2 = emailLists.map(emailList => (
+        <option key={emailList._id} label={emailList.name} value={emailList._id} />
+      ));
+      options2.unshift(<option key={0} />);
+      details.push(
+        <FormField key="emailList"
+          label="Email list"
+          help={`Email addresses will be added and removed from this email list
+            when forms are added and removed. Other email addresses in the
+            email list will not be affected.`}
+          error={errors.emailListId}>
+          <select name="emailListId"
+            value={formTemplate.emailListId || ''}
+            onChange={formState.change('emailListId')}>
+            {options2}
+          </select>
+        </FormField>,
+      );
+
       details.push(
         <FormField key="notify"
           label="Notify email addresses"
@@ -349,6 +371,7 @@ FormTemplateFormContents.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   domains: PropTypes.array,
+  emailLists: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   linkedToFormTemplate: PropTypes.object,
@@ -358,12 +381,14 @@ FormTemplateFormContents.propTypes = {
 FormTemplateFormContents.defaultProps = {
   className: undefined,
   domains: [],
+  emailLists: [],
   errors: undefined,
   linkedToFormTemplate: undefined,
 };
 
 const select = state => ({
   domains: (state.domains || {}).items || [],
+  emailLists: (state['email-lists'] || {}).items || [],
   linkedToFormTemplate:
     linkedToFormTemplateId ? state[linkedToFormTemplateId] : undefined,
   session: state.session,

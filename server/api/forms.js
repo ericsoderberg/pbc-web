@@ -3,9 +3,11 @@ import {
   getSession, authorizedForDomainOrSelf, requireSession,
   requireDomainAdministratorOrUser,
 } from './auth';
-import { useOrCreateSession } from './sessions';
+import { findOrCreateUser } from './users';
+import { createUserAndSession } from './sessions';
 import { unsetDomainIfNeeded } from './domains';
 import { renderNotification } from './email';
+import { subscribe, unsubscribe } from './emailLists';
 import register from './register';
 import { catcher } from './utils';
 
@@ -292,29 +294,48 @@ export default function (router, transporter) {
       if (!session && formTemplate.authenticate) {
         return Promise.reject({ status: 403 });
       }
+      // determine if the person submitting the form is an administrator
+      // for the template
+      const admin = session && (session.userId.administrator ||
+        (session.userId.administratorDomainId &&
+        session.userId.administratorDomainId.equals(formTemplate.domainId)));
+
       const data = req.body;
       const userData = pullUserData(formTemplate, data);
-      return useOrCreateSession(session, userData)
-      .then(session2 => ({ ...context, session: session2 }));
+      if (admin && userData.email !== session.userId.email) {
+        // admin submitting for another user
+        return findOrCreateUser(userData)
+        .then(formUser => ({ ...context, admin, formUser }));
+      } else if (session) {
+        return ({ ...context, admin, formUser: session.userId });
+      }
+      // no session, create one
+      return createUserAndSession(userData)
+      .then(newSession => ({ ...context, admin, session: newSession }));
     })
     // save form
     .then((context) => {
-      const { session, formTemplate } = context;
+      const { admin, formUser } = context;
       const Form = mongoose.model('Form');
       const data = req.body;
       data.created = new Date();
       data.modified = data.created;
-      const admin = (session.userId.administrator ||
-        (session.userId.administratorDomainId &&
-        session.userId.administratorDomainId.equals(formTemplate.domainId)));
-      // Allow an administrator to set the userId. Otherwise, set it to
-      // the current session user
+      // Allow an administrator to set the userId.
       if (!admin || !data.userId) {
-        data.userId = session.userId;
+        data.userId = formUser._id;
       }
       const form = new Form(data);
       return form.save()
       .then(formSaved => ({ ...context, form: formSaved }));
+    })
+    // subscribe to email list, if any
+    .then((context) => {
+      const { formTemplate, formUser } = context;
+      if (formTemplate.emailListId) {
+        return subscribe(formTemplate.emailListId, [formUser.email])
+        .then(() => context);
+      }
+      return context;
     })
     // send emails
     .then(sendEmails(req, transporter))
@@ -363,7 +384,18 @@ export default function (router, transporter) {
     getSession(req)
     .then(requireSession)
     // get form and template and authorize
-    .then(session => getFormContext(session, req.params.id))
+    .then(session => getFormContext(session, req.params.id, [
+      { path: 'userId', select: 'email' },
+    ]))
+    // unsubscribe from email list, if any
+    .then((context) => {
+      const { formTemplate, form } = context;
+      if (formTemplate.emailListId) {
+        return unsubscribe(formTemplate.emailListId, [form.userId.email])
+        .then(() => context);
+      }
+      return context;
+    })
     // remove form
     .then(context => context.form.remove())
     // respond

@@ -311,6 +311,7 @@ const formTemplateSchema = Schema({
   created: Date,
   linkedFormTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  emailListId: { type: Schema.Types.ObjectId, ref: 'EmailList' },
   modified: Date,
   name: { type: String, required: true, unique: true },
   notify: String,

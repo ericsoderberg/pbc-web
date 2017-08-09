@@ -76,22 +76,19 @@ export default function (router) {
   });
 }
 
-export function useOrCreateSession(session, userData) {
-  if (!session) {
-    return createUser(userData)
-    .then((user) => {
-      // create a new session
-      const Session = mongoose.model('Session');
-      const newSession = new Session({
-        token: hat(), // better to encrypt this before storing it, someday
-        userId: user._id,
-      });
-      return newSession.save()
-      .then(sessionSaved => Session.findOne({ token: sessionSaved.token })
-        .populate('userId', 'email name administrator administratorDomainId phone')
-        .exec(),
-      );
+export function createUserAndSession(userData) {
+  return createUser(userData)
+  .then((user) => {
+    // create a new session
+    const Session = mongoose.model('Session');
+    const newSession = new Session({
+      token: hat(), // better to encrypt this before storing it, someday
+      userId: user._id,
     });
-  }
-  return Promise.resolve(session);
+    return newSession.save()
+    .then(session => Session.findOne({ token: session.token })
+      .populate('userId', 'email name administrator administratorDomainId phone')
+      .exec(),
+    );
+  });
 }
