@@ -206,8 +206,9 @@ class FormSection extends Component {
 
   _onDone() {
     const { dispatch, formTemplateId } = this.props;
+    this.setState({ editId: undefined, editForm: undefined, state: LOADING });
     dispatch(loadItem('form-templates', formTemplateId,
-      { full: true, forSession: true }));
+      { full: true, forSession: true, new: true }));
   }
 
   render() {
