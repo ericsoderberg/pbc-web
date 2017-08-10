@@ -86,9 +86,10 @@ export function createUserAndSession(userData) {
       userId: user._id,
     });
     return newSession.save()
-    .then(session => Session.findOne({ token: session.token })
+    .then(saveSession => Session.findOne({ token: saveSession.token })
       .populate('userId', 'email name administrator administratorDomainId phone')
-      .exec(),
+      .exec()
+      .then(session => ({ session, user })),
     );
   });
 }

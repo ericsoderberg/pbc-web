@@ -311,7 +311,8 @@ export default function (router, transporter) {
       }
       // no session, create one
       return createUserAndSession(userData)
-      .then(newSession => ({ ...context, admin, session: newSession }));
+      .then(({ session: newSession, user: formUser }) => ({
+        ...context, admin, session: newSession, formUser }));
     })
     // save form
     .then((context) => {
