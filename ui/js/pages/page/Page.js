@@ -27,7 +27,8 @@ class Page extends Component {
     }
     if (nextProps.page) {
       document.title = nextProps.page.name;
-      if (nextProps.page.pathAlias === nextProps.id) {
+      if (nextProps.page.pathAlias === nextProps.id &&
+        nextProps.page.pathAlias !== nextProps.page.path) {
         nextProps.history.replace(`/${nextProps.page.path}`);
       }
     }

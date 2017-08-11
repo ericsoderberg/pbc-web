@@ -231,6 +231,13 @@ const preparePage = (data) => {
     }
     data.$unset.path = '';
   }
+  if (!data.pathAlias) {
+    delete data.pathAlias;
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.pathAlias = '';
+  }
   return data;
 };
 
