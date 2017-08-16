@@ -77,17 +77,20 @@ const sendEmails = (req, transporter, update = false) => (
         const { session, formTemplate, form, site } = emailContext;
         if (formTemplate.acknowledge) {
           const title = formTemplate.name;
-          let gerund;
-          if (update) {
-            gerund = UPDATE_GERUND[formTemplate.submitLabel] || UPDATE_GERUND.Submit;
-          } else {
-            gerund = SUBMIT_GERUND[formTemplate.submitLabel] || SUBMIT_GERUND.Submit;
+          let message = formTemplate.acknowledgeMessage;
+          if (!message) {
+            let gerund;
+            if (update) {
+              gerund = UPDATE_GERUND[formTemplate.submitLabel] || UPDATE_GERUND.Submit;
+            } else {
+              gerund = SUBMIT_GERUND[formTemplate.submitLabel] || SUBMIT_GERUND.Submit;
+            }
+            let suffix = '';
+            if (formTemplate.anotherLabel && form.name) {
+              suffix = `${update ? ' for' : ''} ${form.name}`;
+            }
+            message = `Thank you for ${gerund}${suffix}.`;
           }
-          let suffix = '';
-          if (formTemplate.anotherLabel && form.name) {
-            suffix = `${update ? ' for' : ''} ${form.name}`;
-          }
-          const message = `Thank you for ${gerund}${suffix}.`;
           const url = `${req.headers.origin}/forms/${form._id}/edit`;
           const contents = renderNotification(title, message, 'Review', url);
 

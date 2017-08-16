@@ -209,9 +209,14 @@ class FormTemplateFormContents extends Component {
       );
     });
 
-    let details;
+    let details = [
+      <button key="control"
+        type="button"
+        className="form__more-control button button-plain"
+        onClick={() => this.setState({ detailsActive: !detailsActive })}>Details</button>,
+    ];
     if (detailsActive) {
-      details = [
+      details.push(
         <FormField key="submit"
           label="Submit button label"
           error={errors.submitLabel}>
@@ -219,6 +224,8 @@ class FormTemplateFormContents extends Component {
             value={formTemplate.submitLabel || 'Submit'}
             onChange={formState.change('submitLabel')} />
         </FormField>,
+      );
+      details.push(
         <FormField key="message"
           label="Post submit message"
           help={<TextHelp />}
@@ -228,6 +235,8 @@ class FormTemplateFormContents extends Component {
             value={formTemplate.postSubmitMessage || ''}
             onChange={formState.change('postSubmitMessage')} />
         </FormField>,
+      );
+      details.push(
         <FormField key="another"
           label="Another button label"
           help="if multiple are expected per user"
@@ -236,31 +245,52 @@ class FormTemplateFormContents extends Component {
             value={formTemplate.anotherLabel || ''}
             onChange={formState.change('anotherLabel')} />
         </FormField>,
+      );
+      details.push(
         <FormField key="ack"
           error={errors.acknowledge}
           help={`After a form is submitted, the submitter will be sent a
             standardized email indicating that we received it`}>
-          <input name="acknowledge"
+          <input id="acknowledge"
+            name="acknowledge"
             type="checkbox"
             checked={formTemplate.acknowledge || false}
             onChange={formState.toggle('acknowledge')} />
           <label htmlFor="acknowledge">acknowledge via email</label>
         </FormField>,
+      );
+      if (formTemplate.acknowledge) {
+        details.push(
+          <FormField key="ackMessage"
+            label="Acknowledgement message"
+            help="Customize the acknowledgement message"
+            error={errors.acknowledgeMessage}>
+            <textarea name="acknowledgeMessage"
+              value={formTemplate.acknowledgeMessage || ''}
+              onChange={formState.change('acknowledgeMessage')} />
+          </FormField>,
+        );
+      }
+      details.push(
         <FormField key="auth" error={errors.authenticate}>
-          <input name="authenticate"
+          <input id="authenticate"
+            name="authenticate"
             type="checkbox"
             checked={formTemplate.authenticate || false}
             onChange={formState.toggle('authenticate')} />
           <label htmlFor="authenticate">authenticate</label>
         </FormField>,
+      );
+      details.push(
         <FormField key="pay" error={errors.payable}>
-          <input name="payable"
+          <input id="payable"
+            name="payable"
             type="checkbox"
             checked={formTemplate.payable || false}
             onChange={formState.toggle('payable')} />
           <label htmlFor="payable">accept payment</label>
         </FormField>,
-      ];
+      );
 
       if (formTemplate.payable) {
         details.push(
@@ -337,11 +367,6 @@ class FormTemplateFormContents extends Component {
           </FormField>,
         );
       }
-    } else {
-      details = (
-        <button className="form__more-control button button-plain"
-          onClick={() => this.setState({ detailsActive: true })}>details</button>
-      );
     }
 
     return (

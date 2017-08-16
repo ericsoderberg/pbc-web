@@ -306,6 +306,7 @@ const formTemplateSectionSchema = Schema({
 
 const formTemplateSchema = Schema({
   acknowledge: Boolean,
+  acknowledgeMessage: String,
   anotherLabel: String,
   authenticate: Boolean,
   created: Date,
