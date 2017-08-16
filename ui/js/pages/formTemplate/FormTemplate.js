@@ -665,7 +665,7 @@ const select = (state, props) => {
   const id = props.match.params.id;
   const formsState = state.forms || {};
   const formTemplate = state[id];
-  if (formsState.items) {
+  if (formsState.items && formTemplate) {
     const cost = { total: 0, paid: 0, received: 0 };
     formsState.items.forEach((form) => {
       cost.total += form.cost.total;
