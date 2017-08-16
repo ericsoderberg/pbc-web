@@ -54,7 +54,6 @@ class Page extends Component {
       if (session && (session.userId.administrator ||
         (page.domainId &&
           session.userId.administratorDomainId === page.domainId))) {
-        console.log('!!!', session);
         actions = [
           <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>,
         ];
