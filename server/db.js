@@ -350,7 +350,9 @@ const formSchema = Schema({
   cost: {
     balance: Number,
     paid: Number,
+    received: Number,
     total: Number,
+    unreceived: Number,
   },
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },

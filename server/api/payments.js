@@ -15,8 +15,9 @@ mongoose.Promise = global.Promise;
 const loadPaymentForms = (context) => {
   const { data } = context;
   if (data.formIds && data.formIds.length > 0) {
+    const formIds = data.formIds.map(id => (typeof id === 'string' ? id : id._id));
     const Form = mongoose.model('Form');
-    return Form.find({ _id: { $in: data.formIds } }).exec()
+    return Form.find({ _id: { $in: formIds } }).exec()
       .then(forms => ({ ...context, forms }));
   }
   return context;
@@ -179,7 +180,7 @@ export default function (router) {
         return payment.update(unsetDomainIfNeeded(data, session))
           .then(() => Payment.findOne({ _id: req.params.id })
             .exec()
-            .then(doc => ({ doc, data })));
+            .then(doc => ({ ...context, doc, data })));
       })
       .then(connectForms)
       .then(updateForms)

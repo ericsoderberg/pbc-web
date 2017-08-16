@@ -331,7 +331,7 @@ class FormSection extends Component {
       case PAYING: {
         contents = (
           <PaymentPay amount={balance}
-            formIds={formTemplate.forms.filter(f => f.balance > 0)
+            formIds={formTemplate.forms.filter(f => f.cost.balance > 0)
               .map(f => f._id)}
             formTemplateId={formTemplate._id}
             formTemplateName={formTemplate.name}

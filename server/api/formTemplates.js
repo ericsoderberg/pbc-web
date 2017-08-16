@@ -149,36 +149,21 @@ const initializeTotals = (formTemplate) => {
   return { templateFieldMap, optionMap };
 };
 
-export const initializePayments = (forms) => {
-  // unify all payments
-  const payments = {};
-  forms.forEach((form) => {
-    (form.paymentIds || []).forEach((payment) => {
-      payment.allocated = 0;
-      payments[payment._id] = payment;
-    });
-  });
-  return payments;
-};
-
 export const addFormTemplateTotals = (data) => {
   const formTemplate = data.toObject ? data.toObject() : data;
   const Form = mongoose.model('Form');
   return Form.find({ formTemplateId: formTemplate._id })
-    .populate({ path: 'paymentIds', select: 'amount' })
     .exec()
     .then((forms) => {
       const { templateFieldMap, optionMap } = initializeTotals(formTemplate);
       let total = 0;
       let paid = 0;
-
-      // unify all payments
-      const payments = initializePayments(forms);
+      let received = 0;
 
       forms.forEach((form) => {
-        form = addFormCost(form, formTemplate, payments);
         total += form.cost.total;
         paid += form.cost.paid;
+        received += form.cost.received;
 
         form.fields.forEach((field) => {
           const templateField = templateFieldMap[field.templateFieldId];
@@ -218,7 +203,8 @@ export const addFormTemplateTotals = (data) => {
       });
 
       const balance = total - paid;
-      formTemplate.cost = { balance, paid, total };
+      const unreceived = total - received;
+      formTemplate.cost = { balance, paid, received, total, unreceived };
 
       return formTemplate;
     });
@@ -239,9 +225,7 @@ export const addForms = (data, forSession) => {
     .sort('-modified')
     .exec()
     .then((forms) => {
-      const payments = initializePayments(forms);
-      formTemplate.forms = forms.map(form =>
-        addFormCost(form, formTemplate, payments));
+      formTemplate.forms = forms;
       return formTemplate;
     })
     .then(() => {
@@ -328,10 +312,6 @@ export default function (router) {
           query.sort(req.query.sort);
         }
         return query.exec()
-          .then((forms) => {
-            const payments = initializePayments(forms);
-            return forms.map(form => addFormCost(form, formTemplate, payments));
-          })
           .then(forms => ({ ...context, forms }));
       })
       .then((context) => {

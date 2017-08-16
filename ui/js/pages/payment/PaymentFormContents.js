@@ -73,9 +73,9 @@ class PaymentFormContents extends Component {
     const payment = formState.object;
 
     let method;
-    if (payByCheckInstructions) {
+    if (payByCheckInstructions || full) {
       let checkInstructions;
-      if (payment.method === 'check') {
+      if (payment.method === 'check' && payByCheckInstructions) {
         checkInstructions = (
           <div className="form-field__text">
             <Markdown>{payByCheckInstructions || ''}</Markdown>

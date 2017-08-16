@@ -189,20 +189,29 @@ export const addFormCost = (data, formTemplate, payments = {}) => {
   });
 
   let paid = 0;
+  let received = 0;
   (form.paymentIds || []).forEach((payment) => {
+    let amount;
+    let receivedDate;
     const payment2 = payments[payment._id]; // consolidated, so we can track allocated
     if (payment2) {
-      const amount = Math.min(payment2.amount - payment2.allocated, total);
+      amount = Math.min(payment2.amount - payment2.allocated, total);
       payment2.allocated += amount;
-      paid += amount;
+      receivedDate = payment2.received;
     } else {
-      paid += payment.amount;
+      amount = payment.amount;
+      receivedDate = payment.received;
+    }
+    paid += amount;
+    if (receivedDate) {
+      received += amount;
     }
   });
 
   total = Math.max(0, total);
   const balance = total - paid;
-  form.cost = { balance, paid, total };
+  const unreceived = total - received;
+  form.cost = { balance, paid, received, total, unreceived };
 
   return form;
 };
@@ -212,7 +221,7 @@ export const updateFormCosts = (query) => {
   const Form = mongoose.model('Form');
   return Form.find(query)
     .populate({ path: 'formTemplateId ' })
-    .populate({ path: 'paymentIds', select: 'amount' })
+    .populate({ path: 'paymentIds', select: 'amount received' })
     .exec()
     .then((forms) => {
       const promises = [];
@@ -228,7 +237,7 @@ export const updateFormCosts = (query) => {
             }
           });
           form = addFormCost(form, form.formTemplateId, payments);
-          console.log('!!!', form._id, form.cost);
+          // console.log('!!!', form._id, form.cost);
           promises.push(form.save());
         });
       return Promise.all(promises);

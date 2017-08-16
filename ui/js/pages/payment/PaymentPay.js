@@ -143,8 +143,8 @@ class PaymentPay extends Component {
       this.setState({ error });
     } else {
       postItem('payments', payment)
-      .then(() => onDone())
-      .catch(error2 => this.setState({ error: error2 }));
+        .then(() => onDone())
+        .catch(error2 => this.setState({ error: error2 }));
     }
   }
 

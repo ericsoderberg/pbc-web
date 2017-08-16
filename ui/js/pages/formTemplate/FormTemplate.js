@@ -96,7 +96,14 @@ class FormTemplate extends Component {
       filter.created = [fromDate, toDate];
     }
     if (payment) {
-      filter['cost.balance'] = payment === 'unpaid' ? { $gt: 0 } : { $lte: 0 };
+      if (payment === 'not received') {
+        filter['cost.unreceived'] = { $gt: 0 };
+      } else if (payment === 'not paid') {
+        filter['cost.balance'] = { $gt: 0 };
+      } else {
+        filter['cost.unreceived'] = { $lte: 0 };
+        filter['cost.balance'] = { $lte: 0 };
+      }
     }
     return { filter, search: searchText, sort: sort || '-created', totals: true };
   }
@@ -143,7 +150,7 @@ class FormTemplate extends Component {
         name: 'balance',
         label: 'Balance',
         monetary: true,
-        total: (formTemplate.cost.balance),
+        total: (formTemplate.cost.unreceived),
       };
       columns.push('balance');
     }
@@ -388,17 +395,22 @@ class FormTemplate extends Component {
   }
 
   _renderFooterCells() {
-    const { columns, templateFieldMap, sortFieldId } = this.state;
+    const {
+      columns, templateFieldMap, fromDate, toDate, payment, searchText,
+    } = this.state;
     return columns.map((fieldId) => {
-      const field = templateFieldMap[fieldId];
-      const total = field.total;
-      let classes = (total >= 0 ? 'total' : '');
-      if (fieldId === sortFieldId) {
-        classes += ' sort';
-      }
-      let contents = total >= 0 ? total : '';
-      if (field.monetary) {
-        contents = `$ ${contents}`;
+      let contents = '';
+      let classes = '';
+      if ((!fromDate && !toDate && !payment && !searchText) || fieldId === 'balance') {
+        const field = templateFieldMap[fieldId];
+        const total = field.total;
+        if (total > 0) {
+          classes = 'total';
+          contents = total;
+        }
+        if (field.monetary && contents) {
+          contents = `$ ${contents}`;
+        }
       }
       return <td key={fieldId} className={classes}>{contents}</td>;
     });
@@ -454,6 +466,8 @@ class FormTemplate extends Component {
     if (form.cost && form.cost.balance) {
       cellMap.balance = `$ ${form.cost.balance}`;
       unpaid = true;
+    } else if (form.cost && form.cost.unreceived) {
+      cellMap.balance = `$ ${form.cost.unreceived}`;
     }
 
     const cells = columns.map((templateFieldId) => {
@@ -577,7 +591,7 @@ class FormTemplate extends Component {
       if (formTemplate.payable) {
         filterItems.push(
           <Filter key="paid"
-            options={['paid', 'unpaid']}
+            options={['not paid', 'not received', 'received']}
             allLabel="All"
             value={payment}
             onChange={this._onPayment} />,
@@ -650,10 +664,22 @@ FormTemplate.defaultProps = {
 const select = (state, props) => {
   const id = props.match.params.id;
   const formsState = state.forms || {};
+  const formTemplate = state[id];
+  if (formsState.items) {
+    const cost = { total: 0, paid: 0, received: 0 };
+    formsState.items.forEach((form) => {
+      cost.total += form.cost.total;
+      cost.paid += form.cost.paid;
+      cost.received += form.cost.received;
+    });
+    cost.balance = cost.total - cost.paid;
+    cost.unreceived = cost.total - cost.received;
+    formTemplate.cost = cost;
+  }
   return {
     id,
     forms: formsState.items,
-    formTemplate: state[id],
+    formTemplate,
     mightHaveMore: formsState.mightHaveMore,
     notFound: state.notFound[id],
     session: state.session,
