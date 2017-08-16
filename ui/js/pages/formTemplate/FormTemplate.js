@@ -307,28 +307,25 @@ class FormTemplate extends Component {
       );
     } else if (templateField.type === 'choice' && field.optionId) {
       const option = optionMap[field.optionId];
-      if (templateField.monetary && option.value === null) {
-        // older form
-        contents = `$ ${option.name}`;
-      } else {
-        let suffix = '';
-        if (templateField.monetary) {
-          suffix = ` $ ${option.value}`;
+      if (templateField.monetary) {
+        if (option.value === null || option.value === option.name) {
+          contents = `$ ${option.name}`;
+        } else {
+          contents = `${option.name || ''} $ ${option.value}`;
         }
-        contents = `${option.name || ''}${suffix}`;
+      } else {
+        contents = option.name;
       }
     } else if (templateField.type === 'choices' && field.optionIds) {
       contents = field.optionIds.map((optionId) => {
         const option = optionMap[optionId];
-        if (templateField.monetary && option.value === null) {
-          // older form
-          return `$ ${option.name}`;
-        }
-        let suffix = '';
         if (templateField.monetary) {
-          suffix = ` $ ${option.value}`;
+          if (option.value === null || option.value === option.name) {
+            return `$ ${option.name}`;
+          }
+          return `${option.name || ''} $ ${option.value}`;
         }
-        return `${option.name}${suffix}`;
+        return option.name;
       })
         .join(', ');
     } else if (templateField.type === 'date') {
