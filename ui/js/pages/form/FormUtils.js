@@ -14,27 +14,27 @@ function formFieldError(templateField, form) {
     }
   } else if (templateField.options) {
     templateField.options.filter(option => option.required)
-    .forEach((option) => {
-      // see if we have it
-      let found = false;
-      form.fields
-      .filter(field => (field.templateFieldId === templateField._id))
-      .forEach((field) => {
-        if (field.optionId === option._id) {
-          found = true;
-        } else {
-          (field.optionIds || []).some((optionId) => {
-            if (optionId === option._id) {
+      .forEach((option) => {
+        // see if we have it
+        let found = false;
+        form.fields
+          .filter(field => (field.templateFieldId === templateField._id))
+          .forEach((field) => {
+            if (field.optionId === option._id) {
               found = true;
+            } else {
+              (field.optionIds || []).some((optionId) => {
+                if (optionId === option._id) {
+                  found = true;
+                }
+                return found;
+              });
             }
-            return found;
           });
+        if (!found) {
+          result = 'required';
         }
       });
-      if (!found) {
-        result = 'required';
-      }
-    });
   }
   return result;
 }
@@ -115,24 +115,26 @@ export function calculateTotal(formTemplate, form) {
           if (field.templateFieldId === templateField._id) {
             if (templateField.type === 'number' || templateField.type === 'count') {
               total += (parseInt(templateField.value, 10) *
-                parseInt(field.value, 10));
+                parseInt(field.value, 10)) || 0;
             } else if (templateField.type === 'line') {
               if (templateField.discount) {
-                total -= parseInt(field.value, 10);
+                total -= parseInt(field.value, 10) || 0;
               } else {
-                total += parseInt(field.value, 10);
+                total += parseInt(field.value, 10) || 0;
               }
             } else if (templateField.type === 'choice') {
               templateField.options.forEach((option) => {
-                if (field.optionId === option._id && option.value) {
-                  total += parseInt(option.value, 10);
+                if (field.optionId === option._id) {
+                  // old forms might have been migrated poorly, allow for name
+                  total += parseInt(option.value, 10) || parseInt(option.name, 10) || 0;
                 }
               });
             } else if (templateField.type === 'choices') {
               const optionIds = field.optionIds || [];
               templateField.options.forEach((option) => {
-                if (optionIds.indexOf(option._id) !== -1 && option.value) {
-                  total += parseInt(option.value, 10);
+                if (optionIds.indexOf(option._id) !== -1) {
+                  // old forms might have been migrated poorly, allow for name
+                  total += parseInt(option.value, 10) || parseInt(option.name, 10) || 0;
                 }
               });
             }

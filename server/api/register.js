@@ -156,6 +156,7 @@ export default (router, options) => {
             }
           }
         }
+        let payment = false;
         if (req.query.filter) {
           let filter = JSON.parse(req.query.filter);
           if (typeof filter === 'string') {

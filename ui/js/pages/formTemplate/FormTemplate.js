@@ -20,8 +20,6 @@ const FIXED_FIELDS = [
   { name: 'modified', label: 'Updated' },
 ];
 
-const UNSET = '$unset';
-
 class FormTemplate extends Component {
 
   constructor() {
@@ -41,7 +39,7 @@ class FormTemplate extends Component {
 
   componentDidMount() {
     const { dispatch, id } = this.props;
-    dispatch(loadItem('form-templates', id)); // , { full: true }));
+    dispatch(loadItem('form-templates', id, { totals: true }));
     this.setState(this._stateFromProps(this.props), this._load);
     window.addEventListener('scroll', this._onScroll);
   }
@@ -98,9 +96,9 @@ class FormTemplate extends Component {
       filter.created = [fromDate, toDate];
     }
     if (payment) {
-      filter.payment = payment;
+      filter['cost.balance'] = payment === 'unpaid' ? { $gt: 0 } : { $lte: 0 };
     }
-    return { filter, search: searchText, sort: sort || '-created' };
+    return { filter, search: searchText, sort: sort || '-created', totals: true };
   }
 
   _load() {
@@ -145,7 +143,7 @@ class FormTemplate extends Component {
         name: 'balance',
         label: 'Balance',
         monetary: true,
-        total: (formTemplate.totalCost - formTemplate.paidAmount),
+        total: (formTemplate.cost.balance),
       };
       columns.push('balance');
     }
@@ -184,7 +182,7 @@ class FormTemplate extends Component {
       searchParams.push(`toDate=${state.toDate}`);
     }
     if (state.payment) {
-      searchParams.push(`toDate=${state.toDate}`);
+      searchParams.push(`payment=${state.payment}`);
     }
     if (state.sort) {
       searchParams.push(`sort=${state.sort}`);
@@ -240,7 +238,7 @@ class FormTemplate extends Component {
   _onPayment(event) {
     let value = event.target.value;
     if (!value || value.match(/^all$/i)) {
-      value = UNSET;
+      value = undefined;
     }
     this._setLocation({ payment: value });
   }
@@ -309,25 +307,34 @@ class FormTemplate extends Component {
       );
     } else if (templateField.type === 'choice' && field.optionId) {
       const option = optionMap[field.optionId];
-      let suffix = '';
-      if (templateField.monetary) {
-        suffix = ` $ ${option.value}`;
+      if (templateField.monetary && option.value === null) {
+        // older form
+        contents = `$ ${option.name}`;
+      } else {
+        let suffix = '';
+        if (templateField.monetary) {
+          suffix = ` $ ${option.value}`;
+        }
+        contents = `${option.name || ''}${suffix}`;
       }
-      contents = `${option.name || ''}${suffix}`;
     } else if (templateField.type === 'choices' && field.optionIds) {
       contents = field.optionIds.map((optionId) => {
         const option = optionMap[optionId];
+        if (templateField.monetary && option.value === null) {
+          // older form
+          return `$ ${option.name}`;
+        }
         let suffix = '';
         if (templateField.monetary) {
           suffix = ` $ ${option.value}`;
         }
         return `${option.name}${suffix}`;
       })
-      .join(', ');
+        .join(', ');
     } else if (templateField.type === 'date') {
       const date = moment(contents);
       contents = `${date.format('YYYY-MM-DD')} (${date.fromNow(true)})`;
-    } else if (templateField.monetary) {
+    } else if (templateField.monetary && contents) {
       contents = <span><span className="secondary">$ </span>{contents}</span>;
     }
     return contents;
@@ -447,12 +454,9 @@ class FormTemplate extends Component {
       cellMap.modified = modified.format('MMM Do YYYY');
     }
     let unpaid;
-    if (form.totalCost) {
-      const balance = form.totalCost - form.paidAmount;
-      if (balance) {
-        cellMap.balance = `$ ${balance}`;
-        unpaid = true;
-      }
+    if (form.cost && form.cost.balance) {
+      cellMap.balance = `$ ${form.cost.balance}`;
+      unpaid = true;
     }
 
     const cells = columns.map((templateFieldId) => {

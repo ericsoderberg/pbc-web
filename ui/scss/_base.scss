@@ -213,6 +213,10 @@ select {
   border: none;
   border-radius: 0;
   padding: $half-unit;
+
+  &:focus {
+    outline: 2px solid $focus-border-color;
+  }
 }
 
 select {

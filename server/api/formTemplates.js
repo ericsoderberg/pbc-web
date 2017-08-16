@@ -5,7 +5,7 @@ import register from './register';
 import {
   getSession, authorizedForDomain, allowAnyone, requireSomeAdministrator,
 } from './auth';
-import { addFormTotals } from './forms';
+import { addFormCost } from './forms';
 import { unsetDomainIfNeeded } from './domains';
 import { catcher } from './utils';
 
@@ -29,6 +29,13 @@ const unsetReferences = (data) => {
     }
     data.$unset.emailListId = '';
   }
+  if (!data.anotherLabel) {
+    delete data.anotherLabel;
+    if (!data.$unset) {
+      data.$unset = {};
+    }
+    data.$unset.anotherLabel = '';
+  }
   return data;
 };
 
@@ -39,11 +46,11 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
     value = templateField.value * field.value;
   } else if (templateField.type === 'choice' && field.optionId) {
     const option = optionMap[field.optionId];
-    value = option.value;
+    value = option.value || option.name;
   } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
     value = field.optionIds.map((optionId) => {
       const option = optionMap[optionId];
-      return option.value;
+      return option.value || option.name;
     });
     value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
   } else {
@@ -71,7 +78,7 @@ const fieldContents = (field, templateField, optionMap) => {
       }
       return `${option.name}${suffix}`;
     })
-    .join(', ');
+      .join(', ');
   } else if (templateField.type === 'date') {
     const date = moment(contents);
     if (date.isValid()) {
@@ -99,11 +106,13 @@ export const addNewForm = (data, session, linkedFormId) => {
           value: session.userId[field.linkToUserProperty],
         });
       }
-
-      // // pre-fill out fields with a minimum value
-      // if (field.min) {
-      //   form.fields.push({ templateFieldId: field._id, value: field.min });
-      // }
+      // respect any limits
+      if (field.type === 'number' && field.min) {
+        form.fields.push({
+          templateFieldId: field._id,
+          value: field.min,
+        });
+      }
     });
   });
   formTemplate.newForm = form;
@@ -156,63 +165,63 @@ export const addFormTemplateTotals = (data) => {
   const formTemplate = data.toObject ? data.toObject() : data;
   const Form = mongoose.model('Form');
   return Form.find({ formTemplateId: formTemplate._id })
-  .populate({ path: 'paymentIds', select: 'amount' })
-  .exec()
-  .then((forms) => {
-    const { templateFieldMap, optionMap } = initializeTotals(formTemplate);
-    let totalCost = 0;
-    let paidAmount = 0;
+    .populate({ path: 'paymentIds', select: 'amount' })
+    .exec()
+    .then((forms) => {
+      const { templateFieldMap, optionMap } = initializeTotals(formTemplate);
+      let total = 0;
+      let paid = 0;
 
-    // unify all payments
-    const payments = initializePayments(forms);
+      // unify all payments
+      const payments = initializePayments(forms);
 
-    forms.forEach((form) => {
-      addFormTotals(form, formTemplate, payments);
-      totalCost += form.totalCost;
-      paidAmount += form.paidAmount;
+      forms.forEach((form) => {
+        form = addFormCost(form, formTemplate, payments);
+        total += form.cost.total;
+        paid += form.cost.paid;
 
-      form.fields.forEach((field) => {
-        const templateField = templateFieldMap[field.templateFieldId];
-        if (templateField && templateField.total >= 0) {
-          const value = parseFloat(
-            fieldValue(field, templateFieldMap, optionMap), 10);
-          if (value) {
-            templateField.total += value;
+        form.fields.forEach((field) => {
+          const templateField = templateFieldMap[field.templateFieldId];
+          if (templateField && templateField.total >= 0) {
+            const value = parseFloat(
+              fieldValue(field, templateFieldMap, optionMap), 10);
+            if (value) {
+              templateField.total += value;
+            }
           }
-        }
 
-        if (templateField && templateField.remaining !== undefined) {
-          if (templateField.type === 'number' || templateField.type === 'count') {
-            templateField.remaining -= parseFloat(field.value, 10);
-          } else {
-            templateField.remaining -= 1;
+          if (templateField && templateField.remaining !== undefined) {
+            if (templateField.type === 'number' || templateField.type === 'count') {
+              templateField.remaining -= parseFloat(field.value, 10);
+            } else {
+              templateField.remaining -= 1;
+            }
           }
-        }
 
-        if (templateField && templateField.options) {
-          let selectedOptions = [];
-          if (field.optionId) {
-            selectedOptions.push(field.optionId);
-          } else {
-            selectedOptions = selectedOptions.concat(field.optionIds || []);
+          if (templateField && templateField.options) {
+            let selectedOptions = [];
+            if (field.optionId) {
+              selectedOptions.push(field.optionId);
+            } else {
+              selectedOptions = selectedOptions.concat(field.optionIds || []);
+            }
+            templateField.options.filter(o => o.remaining !== undefined)
+              .forEach((option) => {
+                selectedOptions.forEach((optionId) => {
+                  if (option._id.equals(optionId)) {
+                    option.remaining -= 1;
+                  }
+                });
+              });
           }
-          templateField.options.filter(o => o.remaining !== undefined)
-          .forEach((option) => {
-            selectedOptions.forEach((optionId) => {
-              if (option._id.equals(optionId)) {
-                option.remaining -= 1;
-              }
-            });
-          });
-        }
+        });
       });
+
+      const balance = total - paid;
+      formTemplate.cost = { balance, paid, total };
+
+      return formTemplate;
     });
-
-    formTemplate.totalCost = totalCost;
-    formTemplate.paidAmount = paidAmount;
-
-    return formTemplate;
-  });
 };
 
 export const addForms = (data, forSession) => {
@@ -225,30 +234,30 @@ export const addForms = (data, forSession) => {
   }
   // addNewForm(formTemplate, forSession);
   return Form.find(criteria)
-  .populate({ path: 'paymentIds', select: 'amount' })
-  .populate({ path: 'userId', select: 'name' })
-  .sort('-modified')
-  .exec()
-  .then((forms) => {
-    const payments = initializePayments(forms);
-    formTemplate.forms = forms.map(form =>
-      addFormTotals(form, formTemplate, payments));
-    return formTemplate;
-  })
-  .then(() => {
-    if (formTemplate.linkedFormTemplateId) {
-      const linkedId =
-        formTemplate.linkedFormTemplateId._id || formTemplate.linkedFormTemplateId;
-      return FormTemplate.findOne({ _id: linkedId })
-      .exec()
-      .then(linkedData => addForms(linkedData, forSession))
-      .then((linkedFormTemplate) => {
-        formTemplate.linkedFormTemplate = linkedFormTemplate;
-        return formTemplate;
-      });
-    }
-    return formTemplate;
-  });
+    .populate({ path: 'paymentIds', select: 'amount' })
+    .populate({ path: 'userId', select: 'name' })
+    .sort('-modified')
+    .exec()
+    .then((forms) => {
+      const payments = initializePayments(forms);
+      formTemplate.forms = forms.map(form =>
+        addFormCost(form, formTemplate, payments));
+      return formTemplate;
+    })
+    .then(() => {
+      if (formTemplate.linkedFormTemplateId) {
+        const linkedId =
+          formTemplate.linkedFormTemplateId._id || formTemplate.linkedFormTemplateId;
+        return FormTemplate.findOne({ _id: linkedId })
+          .exec()
+          .then(linkedData => addForms(linkedData, forSession))
+          .then((linkedFormTemplate) => {
+            formTemplate.linkedFormTemplate = linkedFormTemplate;
+            return formTemplate;
+          });
+      }
+      return formTemplate;
+    });
 };
 
 const validate = (data) => {
@@ -275,155 +284,130 @@ export default function (router) {
     const FormTemplate = mongoose.model('FormTemplate');
     const Form = mongoose.model('Form');
     getSession(req)
-    .then(requireSomeAdministrator)
-    .then((session) => {
-      const id = req.params.id;
-      return FormTemplate.findOne({ _id: id, ...authorizedForDomain(session) })
-      .exec()
-      .then(formTemplate => ({ formTemplate, session }));
-    })
-    .then((context) => {
-      const { formTemplate, session } = context;
-      if (formTemplate.linkedFormTemplateId) {
-        return FormTemplate.findOne({
-          _id: formTemplate.linkedFormTemplateId,
-          ...authorizedForDomain(session),
-        }).exec()
-        .then(linkedFormTemplate => ({ formTemplate, linkedFormTemplate }));
-      }
-      return context;
-    })
-    .then((context) => {
-      const { formTemplate } = context;
-      const query = Form.find();
-      if (req.query.search) {
-        const exp = new RegExp(req.query.search, 'i');
-        query.find({ name: exp });
-      }
-      if (req.query.filter) {
-        let filter = JSON.parse(req.query.filter);
-        if (typeof filter === 'string') {
-          // need double de-escape,
-          // first to de-string and then to de-stringify
-          filter = JSON.parse(filter);
-        }
-        if (filter.created && Array.isArray(filter.created)) {
-          filter.created = {
-            $gte: new Date(filter.created[0]),
-            $lte: new Date(filter.created[1]),
-          };
-        }
-        query.find(filter);
-      }
-      if (req.query.sort) {
-        query.sort(req.query.sort);
-      }
-      return query.exec()
-      .then((forms) => {
-        const payments = initializePayments(forms);
-        return forms.map(form => addFormTotals(form, formTemplate, payments));
+      .then(requireSomeAdministrator)
+      .then((session) => {
+        const id = req.params.id;
+        return FormTemplate.findOne({ _id: id, ...authorizedForDomain(session) })
+          .exec()
+          .then(formTemplate => ({ formTemplate, session }));
       })
-      .then(forms => ({ ...context, forms }));
-    })
-    .then((context) => {
-      const { linkedFormTemplate } = context;
-      if (linkedFormTemplate) {
-        return Form.find({ formTemplateId: linkedFormTemplate._id }).exec()
-        .then((forms) => {
-          const linkedForms = {};
-          forms.forEach((form) => { linkedForms[form._id] = form; });
-          return { ...context, linkedForms };
-        });
-      }
-      return context;
-    })
-    .then((context) => {
-      const { forms, formTemplate, linkedFormTemplate, linkedForms } = context;
-
-      const fields = [];
-      const fieldNames = [];
-      const templateFieldMap = {};
-      const linkedTemplateFieldIdMap = {};
-      const optionMap = {};
-
-      formTemplate.sections.forEach(section =>
-        section.fields.filter(field => field.type !== 'instructions')
-        .forEach((field) => {
-          templateFieldMap[field._id] = field;
-          field.options.forEach((option) => {
-            optionMap[option._id] = option;
-          });
-          fields.push(`${field._id}`);
-          fieldNames.push(field.name || section.name);
-          if (field.linkedFieldId) {
-            linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
+      .then((context) => {
+        const { formTemplate, session } = context;
+        if (formTemplate.linkedFormTemplateId) {
+          return FormTemplate.findOne({
+            _id: formTemplate.linkedFormTemplateId,
+            ...authorizedForDomain(session),
+          }).exec()
+            .then(linkedFormTemplate => ({ formTemplate, linkedFormTemplate }));
+        }
+        return context;
+      })
+      .then((context) => {
+        const { formTemplate } = context;
+        const query = Form.find();
+        if (req.query.search) {
+          const exp = new RegExp(req.query.search, 'i');
+          query.find({ name: exp });
+        }
+        if (req.query.filter) {
+          let filter = JSON.parse(req.query.filter);
+          if (typeof filter === 'string') {
+            // need double de-escape,
+            // first to de-string and then to de-stringify
+            filter = JSON.parse(filter);
           }
-          if (field.name && field.name.match(/birthday/i)) {
-            field.birthday = true;
-            fields.push('age');
-            fieldNames.push('Age');
+          if (filter.created && Array.isArray(filter.created)) {
+            filter.created = {
+              $gte: new Date(filter.created[0]),
+              $lte: new Date(filter.created[1]),
+            };
           }
-        }));
-
-      if (formTemplate.payable) {
-        fields.push('balance');
-        fieldNames.push('Balance');
-        addFormTemplateTotals(formTemplate);
-      }
-
-      fields.push('created');
-      fieldNames.push('created');
-      fields.push('modified');
-      fieldNames.push('modified');
-
-      if (linkedFormTemplate) {
-        linkedFormTemplate.sections.forEach(section =>
-          section.fields.forEach((field) => {
-            templateFieldMap[field._id] = field;
-            field.options.forEach((option) => {
-              optionMap[option._id] = option;
+          query.find(filter);
+        }
+        if (req.query.sort) {
+          query.sort(req.query.sort);
+        }
+        return query.exec()
+          .then((forms) => {
+            const payments = initializePayments(forms);
+            return forms.map(form => addFormCost(form, formTemplate, payments));
+          })
+          .then(forms => ({ ...context, forms }));
+      })
+      .then((context) => {
+        const { linkedFormTemplate } = context;
+        if (linkedFormTemplate) {
+          return Form.find({ formTemplateId: linkedFormTemplate._id }).exec()
+            .then((forms) => {
+              const linkedForms = {};
+              forms.forEach((form) => { linkedForms[form._id] = form; });
+              return { ...context, linkedForms };
             });
-            fields.push(`${field._id}`);
-            fieldNames.push(field.name || section.name);
-            if (field.name && field.name.match(/birthday/i)) {
-              field.birthday = true;
-              fields.push('age');
-              fieldNames.push('Age');
-            }
-          }));
-      }
+        }
+        return context;
+      })
+      .then((context) => {
+        const { forms, formTemplate, linkedFormTemplate, linkedForms } = context;
 
-      const data = forms.map((form) => {
-        const item = { created: form.created, modified: form.modified };
-        const linkedForm =
-          form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
+        const fields = [];
+        const fieldNames = [];
+        const templateFieldMap = {};
+        const linkedTemplateFieldIdMap = {};
+        const optionMap = {};
 
-        form.fields.forEach((field) => {
-          const templateField = templateFieldMap[field.templateFieldId];
-          item[field.templateFieldId] =
-            fieldContents(field, templateField, optionMap);
-          if (templateField.birthday) {
-            item.age = moment(field.value).fromNow(true);
-          }
-        });
-
-        if (linkedForm) {
-          // look for linked fields
-          Object.keys(linkedTemplateFieldIdMap).forEach((templateFieldId) => {
-            linkedForm.fields.some((linkedField) => {
-              if (linkedField.templateFieldId.equals(
-                linkedTemplateFieldIdMap[templateFieldId])) {
-                const templateField =
-                  templateFieldMap[linkedField.templateFieldId];
-                item[templateFieldId] =
-                  fieldContents(linkedField, templateField, optionMap);
-                return true;
+        formTemplate.sections.forEach(section =>
+          section.fields.filter(field => field.type !== 'instructions')
+            .forEach((field) => {
+              templateFieldMap[field._id] = field;
+              field.options.forEach((option) => {
+                optionMap[option._id] = option;
+              });
+              fields.push(`${field._id}`);
+              fieldNames.push(field.name || section.name);
+              if (field.linkedFieldId) {
+                linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
               }
-              return false;
-            });
-          });
+              if (field.name && field.name.match(/birthday/i)) {
+                field.birthday = true;
+                fields.push('age');
+                fieldNames.push('Age');
+              }
+            }));
 
-          linkedForm.fields.forEach((field) => {
+        if (formTemplate.payable) {
+          fields.push('balance');
+          fieldNames.push('Balance');
+          addFormTemplateTotals(formTemplate);
+        }
+
+        fields.push('created');
+        fieldNames.push('created');
+        fields.push('modified');
+        fieldNames.push('modified');
+
+        if (linkedFormTemplate) {
+          linkedFormTemplate.sections.forEach(section =>
+            section.fields.forEach((field) => {
+              templateFieldMap[field._id] = field;
+              field.options.forEach((option) => {
+                optionMap[option._id] = option;
+              });
+              fields.push(`${field._id}`);
+              fieldNames.push(field.name || section.name);
+              if (field.name && field.name.match(/birthday/i)) {
+                field.birthday = true;
+                fields.push('age');
+                fieldNames.push('Age');
+              }
+            }));
+        }
+
+        const data = forms.map((form) => {
+          const item = { created: form.created, modified: form.modified };
+          const linkedForm =
+            form.linkedFormId ? linkedForms[form.linkedFormId] : undefined;
+
+          form.fields.forEach((field) => {
             const templateField = templateFieldMap[field.templateFieldId];
             item[field.templateFieldId] =
               fieldContents(field, templateField, optionMap);
@@ -431,26 +415,51 @@ export default function (router) {
               item.age = moment(field.value).fromNow(true);
             }
           });
-        }
 
-        if (formTemplate.payable) {
-          const balance = form.totalCost - form.paidAmount;
-          if (balance && balance < 100) {
-            item.balance = `$${balance}`;
+          if (linkedForm) {
+            // look for linked fields
+            Object.keys(linkedTemplateFieldIdMap).forEach((templateFieldId) => {
+              linkedForm.fields.some((linkedField) => {
+                if (linkedField.templateFieldId.equals(
+                  linkedTemplateFieldIdMap[templateFieldId])) {
+                  const templateField =
+                    templateFieldMap[linkedField.templateFieldId];
+                  item[templateFieldId] =
+                    fieldContents(linkedField, templateField, optionMap);
+                  return true;
+                }
+                return false;
+              });
+            });
+
+            linkedForm.fields.forEach((field) => {
+              const templateField = templateFieldMap[field.templateFieldId];
+              item[field.templateFieldId] =
+                fieldContents(field, templateField, optionMap);
+              if (templateField.birthday) {
+                item.age = moment(field.value).fromNow(true);
+              }
+            });
           }
-        }
 
-        return item;
-      });
+          if (formTemplate.payable) {
+            const balance = form.totalCost - form.paidAmount;
+            if (balance && balance < 100) {
+              item.balance = `$${balance}`;
+            }
+          }
 
-      // console.log('!!!', fields, fieldNames);
+          return item;
+        });
 
-      const csv = json2csv({ data, fields, fieldNames });
+        // console.log('!!!', fields, fieldNames);
 
-      res.attachment(`${formTemplate.name}.csv`);
-      res.end(csv);
-    })
-    .catch(error => catcher(error, res));
+        const csv = json2csv({ data, fields, fieldNames });
+
+        res.attachment(`${formTemplate.name}.csv`);
+        res.end(csv);
+      })
+      .catch(error => catcher(error, res));
   });
 
   register(router, {
@@ -481,7 +490,12 @@ export default function (router) {
           formTemplate.modified = moment.utc();
           return addForms(formTemplate,
             (req.query.forSession || !admin) ? session : undefined)
-          .then(data => addFormTemplateTotals(data));
+            .then(data => addFormTemplateTotals(data));
+        }
+        if (req.query.totals && admin) {
+          // reset modified time to now to avoid caching issues when deleting forms
+          formTemplate.modified = moment.utc();
+          return addFormTemplateTotals(formTemplate);
         }
         return formTemplate;
       },

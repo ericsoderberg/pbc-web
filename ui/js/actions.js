@@ -192,6 +192,10 @@ export const loadItem = (category, id, options = {}) =>
       // loads all forms for form template
       params.push(`full=${encodeURIComponent(options.full)}`);
     }
+    if (options.totals) {
+      // loads totals for form template
+      params.push(`totals=${encodeURIComponent(options.totals)}`);
+    }
     if (options.new) {
       // includes a new form
       params.push(`new=${encodeURIComponent(options.new)}`);

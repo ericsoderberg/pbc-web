@@ -4,7 +4,7 @@ import {
   getSession, allowAnyone, authorizedForDomain, requireAdministrator,
   requireSomeAdministrator,
 } from './auth';
-import { addForms, addNewForm, addFormTemplateTotals } from './formTemplates';
+import { addForms, addNewForm } from './formTemplates';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 import { catcher } from './utils';
@@ -48,178 +48,180 @@ const populatePage = (data, session) => {
 
   // Library
   page.sections
-  .filter(section => (section.type === 'library' && section.libraryId))
-  .forEach((section) => {
-    promises.push(
-      Message.findOne({
-        libraryId: section.libraryId,
-        date: { $lt: date.toString() },
-        // series: { $ne: true }
-      })
-      .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
-      .then((message) => {
-        if (message && message.seriesId) {
-          // get series also
-          return Message.findOne({ _id: message.seriesId })
-          .select(PAGE_MESSAGE_FIELDS).exec()
-          .then(series => ({ message, series }));
-        }
-        return message;
-      }),
-    );
-  });
+    .filter(section => (section.type === 'library' && section.libraryId))
+    .forEach((section) => {
+      promises.push(
+        Message.findOne({
+          libraryId: section.libraryId,
+          date: { $lt: date.toString() },
+          // series: { $ne: true }
+        })
+          .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
+          .then((message) => {
+            if (message && message.seriesId) {
+              // get series also
+              return Message.findOne({ _id: message.seriesId })
+                .select(PAGE_MESSAGE_FIELDS).exec()
+                .then(series => ({ message, series }));
+            }
+            return message;
+          }),
+      );
+    });
 
   // Calendar
   page.sections
-  .filter(section => (section.type === 'calendar' && section.calendarId))
-  .forEach((section) => {
-    // un-populate
-    section.calendar = section.calendarId;
-    section.calendarId = section.calendarId._id;
+    .filter(section => (section.type === 'calendar' && section.calendarId))
+    .forEach((section) => {
+      // un-populate
+      section.calendar = section.calendarId;
+      section.calendarId = section.calendarId._id;
 
-    const start = moment(date);
-    const end = moment(start).add(2, 'month');
-    const filter = {
-      calendarId: section.calendarId,
-      $or: [
-        { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-        { dates: { $gte: start.toDate(), $lt: end.toDate() } },
-      ],
-    };
-    if (section.omitRecurring) {
-      filter.dates = { $exists: true, $size: 0 };
-    }
-    promises.push(
-      Event.find(filter)
-      .then((events) => {
-        // sort by which comes next
-        const nextDate = event => (
-          [...event.dates, event.start]
-            .map(d => moment(d))
-            .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0] ||
-            moment(event.start)
-        );
-        events.sort((e1, e2) => {
-          const d1 = nextDate(e1);
-          const d2 = nextDate(e2);
-          return d1.isBefore(d2) ? -1 : d2.isBefore(d1) ? 1 : 0;
-        });
-        return events;
-      }),
-    );
-  });
+      const start = moment(date);
+      const end = moment(start).add(2, 'month');
+      const filter = {
+        calendarId: section.calendarId,
+        $or: [
+          { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
+          { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+        ],
+      };
+      if (section.omitRecurring) {
+        filter.dates = { $exists: true, $size: 0 };
+      }
+      promises.push(
+        Event.find(filter)
+          .then((events) => {
+            // sort by which comes next
+            const nextDate = event => (
+              [...event.dates, event.start]
+                .map(d => moment(d))
+                .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0] ||
+                moment(event.start)
+            );
+            events.sort((e1, e2) => {
+              const d1 = nextDate(e1);
+              const d2 = nextDate(e2);
+              return d1.isBefore(d2) ? -1 : d2.isBefore(d1) ? 1 : 0;
+            });
+            return events;
+          }),
+      );
+    });
 
   // FormTemplate
   page.sections
-  .filter(section => (section.type === 'form' && section.formTemplateId))
-  .forEach((section) => {
-    section.formTemplateId = section.formTemplateId._id; // un-populate
-    promises.push(
-      FormTemplate.findOne({ _id: section.formTemplateId })
-      .exec()
-      .then((formTemplate) => {
-        if (formTemplate) {
-          return addFormTemplateTotals(formTemplate)
-          .then(data2 => addNewForm(data2, session))
-          .then(data2 => (session ? addForms(data2, session) : data2));
-        }
-        return formTemplate;
-      }),
-    );
-  });
+    .filter(section => (section.type === 'form' && section.formTemplateId))
+    .forEach((section) => {
+      section.formTemplateId = section.formTemplateId._id; // un-populate
+      promises.push(
+        FormTemplate.findOne({ _id: section.formTemplateId })
+          .exec()
+          .then((formTemplate) => {
+            if (formTemplate) {
+              if (session) {
+                return addForms(formTemplate, session)
+                  .then(data2 => addNewForm(data2, session));
+              }
+              return addNewForm(formTemplate, session);
+            }
+            return formTemplate;
+          }),
+      );
+    });
 
   return Promise.all(promises)
-  .then((docs) => {
-    let docsIndex = 0;
-    // const pageData = docs[docsIndex].toObject();
-    page.sections.filter(section => section.type === 'library')
-    .forEach((section) => {
-      docsIndex += 1;
-      section.message = docs[docsIndex];
+    .then((docs) => {
+      let docsIndex = 0;
+      // const pageData = docs[docsIndex].toObject();
+      page.sections.filter(section => section.type === 'library')
+        .forEach((section) => {
+          docsIndex += 1;
+          section.message = docs[docsIndex];
+        });
+      page.sections.filter(section => section.type === 'calendar')
+        .forEach((section) => {
+          docsIndex += 1;
+          section.events = docs[docsIndex];
+        });
+      page.sections.filter(section => section.type === 'form')
+        .forEach((section) => {
+          docsIndex += 1;
+          section.formTemplate = docs[docsIndex];
+        });
+      return page;
     });
-    page.sections.filter(section => section.type === 'calendar')
-    .forEach((section) => {
-      docsIndex += 1;
-      section.events = docs[docsIndex];
-    });
-    page.sections.filter(section => section.type === 'form')
-    .forEach((section) => {
-      docsIndex += 1;
-      section.formTemplate = docs[docsIndex];
-    });
-    return page;
-  });
 };
 
 const publicize = (data) => {
   // get site
   const Site = mongoose.model('Site');
   return Site.findOne({})
-  .select('homePageId')
-  .exec()
-  .then(site => ({ site }))
-  // get all pages
-  .then((context) => {
-    const Page = mongoose.model('Page');
-    return Page.find({})
-    .select('name sections')
+    .select('homePageId')
     .exec()
-    .then(pages => ({ ...context, pages }));
-  })
-  // generate an object keyed by page id and containing page references
-  .then((context) => {
-    const { pages } = context;
-    const pageMap = {};
-    pages.forEach((page) => {
-      const children = [];
-      page.sections.filter(s => s.type === 'pages')
-      .forEach((section) => {
-        section.pages.forEach((sectionPage) => {
-          children.push(sectionPage.id.toString());
-        });
+    .then(site => ({ site }))
+    // get all pages
+    .then((context) => {
+      const Page = mongoose.model('Page');
+      return Page.find({})
+        .select('name sections')
+        .exec()
+        .then(pages => ({ ...context, pages }));
+    })
+    // generate an object keyed by page id and containing page references
+    .then((context) => {
+      const { pages } = context;
+      const pageMap = {};
+      pages.forEach((page) => {
+        const children = [];
+        page.sections.filter(s => s.type === 'pages')
+          .forEach((section) => {
+            section.pages.forEach((sectionPage) => {
+              children.push(sectionPage.id.toString());
+            });
+          });
+        pageMap[page._id.toString()] = children;
       });
-      pageMap[page._id.toString()] = children;
-    });
-    return { ...context, pageMap };
-  })
-  // record all page ids descended from the home page
-  .then((context) => {
-    const { pageMap, site } = context;
-    const pagesRelatedToHome = {};
-    const pagesVisited = {};
-    const descend = (id) => {
-      if (id && !pagesVisited[id]) {
-        pagesRelatedToHome[id] = true;
-        pagesVisited[id] = true;
-        const children = pageMap[id];
-        if (children) {
-          children.forEach(childId => descend(childId));
+      return { ...context, pageMap };
+    })
+    // record all page ids descended from the home page
+    .then((context) => {
+      const { pageMap, site } = context;
+      const pagesRelatedToHome = {};
+      const pagesVisited = {};
+      const descend = (id) => {
+        if (id && !pagesVisited[id]) {
+          pagesRelatedToHome[id] = true;
+          pagesVisited[id] = true;
+          const children = pageMap[id];
+          if (children) {
+            children.forEach(childId => descend(childId));
+          }
         }
+      };
+      if (site.homePageId) {
+        descend(site.homePageId.toString());
       }
-    };
-    if (site.homePageId) {
-      descend(site.homePageId.toString());
-    }
-    return { ...context, pagesRelatedToHome };
-  })
-  // update any pages whose public state isn't correct
-  .then((context) => {
-    const { pages, pagesRelatedToHome } = context;
-    const promises = [];
-    pages.forEach((page) => {
-      const publicPage = pagesRelatedToHome[page._id.toString()];
-      if (publicPage !== page.public) {
-        page.public = publicPage;
-        promises.push(page.save());
-      }
+      return { ...context, pagesRelatedToHome };
+    })
+    // update any pages whose public state isn't correct
+    .then((context) => {
+      const { pages, pagesRelatedToHome } = context;
+      const promises = [];
+      pages.forEach((page) => {
+        const publicPage = pagesRelatedToHome[page._id.toString()];
+        if (publicPage !== page.public) {
+          page.public = publicPage;
+          promises.push(page.save());
+        }
+      });
+      return Promise.all(promises);
+    })
+    .then(() => data)
+    .catch((error) => {
+      console.error('!!!', error);
+      return data;
     });
-    return Promise.all(promises);
-  })
-  .then(() => data)
-  .catch((error) => {
-    console.error('!!!', error);
-    return data;
-  });
 };
 
 const preparePage = (data) => {
@@ -244,47 +246,47 @@ const preparePage = (data) => {
 export default function (router) {
   router.get('/pages/:id/map', (req, res) => {
     getSession(req)
-    .then(requireSomeAdministrator)
-    .then(() => {
-      const Page = mongoose.model('Page');
-      return Page.find({})
-      .select('name path sections')
-      .populate({ path: 'sections.pages.id', select: 'name path' })
-      .exec();
-    })
-    .then((docs) => {
-      // generate an object keyed by page id and containing page references
-      const pages = {};
-      docs.forEach((doc) => {
-        const children = [];
-        doc.sections.filter(s => s.type === 'pages')
-        .forEach(s => s.pages.filter(p => p.id)
-          .forEach(p => children.push(p.id._id)));
-        const page = { _id: doc._id, children, name: doc.name };
-        pages[doc._id] = page;
-      });
-      return pages;
-    })
-    .then((pages) => {
-      const id = req.params.id;
-      const map = pages[id];
-      addParents(map, pages);
-      addChildren(map, pages);
-      return map;
-    })
-    .then(map => res.status(200).json(map))
-    .catch(error => catcher(error, res));
+      .then(requireSomeAdministrator)
+      .then(() => {
+        const Page = mongoose.model('Page');
+        return Page.find({})
+          .select('name path sections')
+          .populate({ path: 'sections.pages.id', select: 'name path' })
+          .exec();
+      })
+      .then((docs) => {
+        // generate an object keyed by page id and containing page references
+        const pages = {};
+        docs.forEach((doc) => {
+          const children = [];
+          doc.sections.filter(s => s.type === 'pages')
+            .forEach(s => s.pages.filter(p => p.id)
+              .forEach(p => children.push(p.id._id)));
+          const page = { _id: doc._id, children, name: doc.name };
+          pages[doc._id] = page;
+        });
+        return pages;
+      })
+      .then((pages) => {
+        const id = req.params.id;
+        const map = pages[id];
+        addParents(map, pages);
+        addChildren(map, pages);
+        return map;
+      })
+      .then(map => res.status(200).json(map))
+      .catch(error => catcher(error, res));
   });
 
   router.post('/pages/publicize', (req, res) => {
     getSession(req)
-    .then(requireAdministrator)
-    .then(() => publicize())
-    .then(() => res.status(200).json({}))
-    .catch((error) => {
-      console.error('!!! error', error);
-      res.status(400).json(error);
-    });
+      .then(requireAdministrator)
+      .then(() => publicize())
+      .then(() => res.status(200).json({}))
+      .catch((error) => {
+        console.error('!!! error', error);
+        res.status(400).json(error);
+      });
   });
 
   register(router, {

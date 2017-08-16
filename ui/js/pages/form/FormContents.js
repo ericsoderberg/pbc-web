@@ -91,19 +91,19 @@ class FormContents extends Component {
     }
 
     const sections = (formTemplate.sections || [])
-    .filter(section => (
-      (!section.dependsOnId || fields[section.dependsOnId]) &&
-      (!section.administrative || (full && administrator))
-    ))
-    .map(section => (
-      <FormContentsSection key={section._id || section.id}
-        formTemplateSection={section}
-        fields={fields}
-        linkedForm={linkedForm}
-        linkedFormControl={linkedFormControl}
-        error={error}
-        onChange={this._onChangeField} />
-    ));
+      .filter(section => (
+        (!section.dependsOnId || fields[section.dependsOnId]) &&
+        (!section.administrative || (full && administrator))
+      ))
+      .map(section => (
+        <FormContentsSection key={section._id || section.id}
+          formTemplateSection={section}
+          fields={fields}
+          linkedForm={linkedForm}
+          linkedFormControl={linkedFormControl}
+          error={error}
+          onChange={this._onChangeField} />
+      ));
 
     let admin;
     if (full && administrator) {

@@ -81,8 +81,8 @@ class FormEdit extends Component {
     } else {
       finalizeForm(formTemplate, form, linkedForm);
       putItem('forms', this.state.form)
-      .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
-      .catch(error2 => this.setState({ error2 }));
+        .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
+        .catch(error2 => this.setState({ error2 }));
     }
   }
 
@@ -99,11 +99,11 @@ class FormEdit extends Component {
     const { onDone, history, id } = this.props;
     event.preventDefault();
     deleteItem('forms', id)
-    .then(() => (onDone ? onDone() : history.goBack()))
-    .catch((error) => {
-      console.error('!!!', error);
-      this.setState({ error });
-    });
+      .then(() => (onDone ? onDone() : history.goBack()))
+      .catch((error) => {
+        console.error('!!!', error);
+        this.setState({ error });
+      });
   }
 
   _onChange(form) {

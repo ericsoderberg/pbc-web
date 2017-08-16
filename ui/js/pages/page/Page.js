@@ -52,7 +52,9 @@ class Page extends Component {
     if (page) {
       contents = <Sections align={page.align} sections={page.sections} />;
       if (session && (session.userId.administrator ||
-        session.userId.administratorDomainId === page.domainId)) {
+        (page.domainId &&
+          session.userId.administratorDomainId === page.domainId))) {
+        console.log('!!!', session);
         actions = [
           <Link key="map" to={`/pages/${page._id}/map`}>Map</Link>,
         ];

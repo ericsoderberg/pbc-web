@@ -335,6 +335,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   background-color: $header-background-color;
 
   > .button {
@@ -349,7 +350,8 @@
 
 .page-header__tertiary {
   display: flex;
-  background-color: $secondary-background-color;
+  margin: $unit 0;
+  // background-color: $secondary-background-color;
 
   @media all and (min-width: 700px) {
     flex-direction: row;

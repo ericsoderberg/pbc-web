@@ -32,7 +32,7 @@ class PaymentAdd extends Component {
     let defaultPayment;
     if (form) {
       defaultPayment = {
-        amount: form.totalCost - form.paidAmount,
+        amount: form.balance,
         formIds: [form],
         sent: form.modified,
         received: moment(),

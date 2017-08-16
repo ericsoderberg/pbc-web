@@ -82,7 +82,6 @@ FormItem.defaultProps = {
 };
 
 class FormSection extends Component {
-
   constructor(props) {
     super(props);
     this._nextState = this._nextState.bind(this);
@@ -142,7 +141,7 @@ class FormSection extends Component {
       nextState = ADDING;
     } else if (editId || editForm) {
       nextState = EDITING;
-    } else if (formTemplate.totalCost < formTemplate.paidAmount
+    } else if (formTemplate.forms.filter(f => f.cost.balance > 0).length > 0
       && !formTemplate.anotherLabel) {
       nextState = PAYING;
     } else {
@@ -253,17 +252,13 @@ class FormSection extends Component {
       );
     }
 
-    let totalCost = 0;
-    let paidAmount = 0;
+    let balance = 0;
     forms.forEach((form) => {
-      totalCost += form.totalCost;
-      paidAmount += form.paidAmount;
+      balance += form.cost.balance;
     });
-    const unpaidAmount = totalCost - paidAmount;
 
     let contents;
     switch (state) {
-
       case LOADING: {
         contents = <Loading />;
         break;
@@ -335,8 +330,8 @@ class FormSection extends Component {
 
       case PAYING: {
         contents = (
-          <PaymentPay amount={unpaidAmount}
-            formIds={formTemplate.forms.filter(f => f.totalCost > f.paidAmount)
+          <PaymentPay amount={balance}
+            formIds={formTemplate.forms.filter(f => f.balance > 0)
               .map(f => f._id)}
             formTemplateId={formTemplate._id}
             formTemplateName={formTemplate.name}
@@ -388,11 +383,11 @@ class FormSection extends Component {
         }
 
         let paymentControl;
-        if (unpaidAmount) {
+        if (balance) {
           paymentControl = (
             <Button className="button form-summary__pay"
               secondary={true}
-              label={`Pay current balance of $${unpaidAmount}`}
+              label={`Pay current balance of $${balance}`}
               onClick={this._nextState(PAYING)} />
           );
         } else if (formTemplate.paidAmount) {
@@ -404,7 +399,7 @@ class FormSection extends Component {
         }
 
         let message;
-        if (!unpaidAmount && !anyPending && formTemplate.postSubmitMessage) {
+        if (!balance && !anyPending && formTemplate.postSubmitMessage) {
           message = formTemplate.postSubmitMessage;
         } else {
           message = `## ${formTemplate.name}`;

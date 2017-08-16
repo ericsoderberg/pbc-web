@@ -68,21 +68,21 @@ class FormAdd extends Component {
     } else {
       finalizeForm(formTemplate, form, linkedForm);
       postItem('forms', form)
-      .then((response) => {
-        // if we didn't have a session and we created one as part of adding,
-        // remember it.
-        if (!haveSession() && response.session) {
-          // console.log('!!! FormAdd set session', response);
-          dispatch(setSession(response.session));
-        }
-        return response.form;
-      })
-      .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
-      .catch((error2) => {
-        console.error('!!! FormAdd post error', error2);
-        this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
-      })
-      .catch(error2 => console.error('!!! FormAdd post 2', error2));
+        .then((response) => {
+          // if we didn't have a session and we created one as part of adding,
+          // remember it.
+          if (!haveSession() && response.session) {
+            // console.log('!!! FormAdd set session', response);
+            dispatch(setSession(response.session));
+          }
+          return response.form;
+        })
+        .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
+        .catch((error2) => {
+          console.error('!!! FormAdd post error', error2);
+          this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
+        })
+        .catch(error2 => console.error('!!! FormAdd post 2', error2));
     }
   }
 

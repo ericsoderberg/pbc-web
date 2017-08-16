@@ -346,6 +346,11 @@ const paymentSchema = Schema({
 mongoose.model('Payment', paymentSchema);
 
 const formSchema = Schema({
+  cost: {
+    balance: Number,
+    paid: Number,
+    total: Number,
+  },
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   fields: [{
@@ -522,8 +527,8 @@ mongoose.model('EmailList', emailListSchema);
 
 // Connection
 
-const opts = { user: USER, pass: PASSWORD, auth: { authdb: 'admin' } };
-mongoose.connect(`mongodb://localhost/${DATABASE}`, opts, (error) => {
+const opts = { useMongoClient: true, authSource: 'admin' };
+mongoose.connect(`mongodb://${USER}:${PASSWORD}@localhost/${DATABASE}`, opts, (error) => {
   if (error) {
     console.error('mongoose connect error', error);
   }
