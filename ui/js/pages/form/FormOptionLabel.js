@@ -16,7 +16,8 @@ export default class FormOptionLabel extends Component {
     }
   }
 
-  _toggleHelp() {
+  _toggleHelp(event) {
+    event.preventDefault();
     const helpActive = !this.state.helpActive;
     if (helpActive) {
       document.addEventListener('click', this._toggleHelp);

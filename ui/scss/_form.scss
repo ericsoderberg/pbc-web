@@ -1076,6 +1076,10 @@
   border: 1px solid $border-color;
   background-color: $help-drop-color;
 
+  @media all and (max-width: 699px) {
+    max-width: calc(100vw - #{$unit});
+  }
+
   span {
     display: block;
     cursor: pointer;
