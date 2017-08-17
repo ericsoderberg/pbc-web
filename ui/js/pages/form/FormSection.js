@@ -243,8 +243,7 @@ class FormSection extends Component {
     let formTemplateLink;
     if (session && formTemplate &&
       (session.userId.administrator ||
-        (session.userId.administratorDomainId &&
-          session.userId.administratorDomainId === formTemplate.domainId))) {
+        session.userId.domainIds.some(id => id === formTemplate.domainId))) {
       formTemplateLink = (
         <Link className="form-summary__template"
           to={`/form-templates/${formTemplateId}`}>
@@ -254,7 +253,7 @@ class FormSection extends Component {
     }
 
     let balance = 0;
-    if (formTemplate.monetary) {
+    if (formTemplate && formTemplate.monetary) {
       forms.forEach((form) => {
         balance += form.cost.balance;
       });
@@ -447,7 +446,7 @@ FormSection.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
       _id: PropTypes.string,
     }),
   }),

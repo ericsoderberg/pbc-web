@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import register from './register';
+import { requireSomeAdministrator } from './auth';
 
 mongoose.Promise = global.Promise;
 
@@ -13,7 +14,7 @@ const unsetDomain = (doc) => {
   const promises = modelNames.map((modelName) => {
     const Doc = mongoose.model(modelName);
     return Doc.update({ domainId: doc._id }, { $unset: { domainId: '' } })
-    .exec();
+      .exec();
   });
   return Promise.all(promises).then(() => doc);
 };
@@ -22,6 +23,9 @@ export default function (router) {
   register(router, {
     category: 'domains',
     modelName: 'Domain',
+    index: {
+      authorization: requireSomeAdministrator,
+    },
     delete: {
       deleteRelated: unsetDomain,
     },

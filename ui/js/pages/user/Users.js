@@ -33,7 +33,7 @@ Item.propTypes = {
   className: PropTypes.string,
   item: PropTypes.shape({
     administrator: PropTypes.bool,
-    administratorDomainId: PropTypes.string,
+    domainIds: PropTypes.arrayOf(PropTypes.string),
     email: PropTypes.string,
   }).isRequired,
 };
@@ -47,6 +47,7 @@ export default class Users extends List {}
 Users.defaultProps = {
   ...List.defaultProps,
   category: 'users',
+  adminable: false,
   Item,
   path: '/users',
   sort: '-modified name email',

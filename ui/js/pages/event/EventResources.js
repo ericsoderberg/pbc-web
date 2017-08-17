@@ -26,11 +26,11 @@ export default class EventResources extends Component {
     const { active } = this.state;
     if (active) {
       getResources(event)
-      .then((resources) => {
-        this.setState({ resources });
-        this._scrollNeeded = true;
-      })
-      .catch(error => console.error('!!! EventResources catch', error));
+        .then((resources) => {
+          this.setState({ resources });
+          this._scrollNeeded = true;
+        })
+        .catch(error => console.error('!!! EventResources catch', error));
     }
   }
 

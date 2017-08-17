@@ -74,8 +74,8 @@ class EmailList extends Component {
     return () => {
       const { emailList } = this.props;
       postUnsubscribe(emailList, [address])
-      .then(() => this._load())
-      .catch(error => this.setState({ error }));
+        .then(() => this._load())
+        .catch(error => this.setState({ error }));
     };
   }
 
@@ -89,7 +89,7 @@ class EmailList extends Component {
     } else {
       const actions = [];
       if (session && (session.userId.administrator ||
-        session.userId.administratorDomainId === emailList.domainId)) {
+        session.userId.domainIds.some(id => id === emailList.domainId))) {
         actions.push(
           <Link key="add" to={`/email-lists/${emailList.name}/subscribe`}>
             Subscribe
@@ -177,7 +177,7 @@ EmailList.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
     }),
   }).isRequired,
 };

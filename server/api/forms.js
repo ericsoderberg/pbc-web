@@ -341,8 +341,8 @@ export default function (router, transporter) {
         // determine if the person submitting the form is an administrator
         // for the template
         const admin = session && (session.userId.administrator ||
-          (session.userId.administratorDomainId &&
-          session.userId.administratorDomainId.equals(formTemplate.domainId)));
+          (session.userId.domainIds &&
+            session.userId.domainIds.some(id => id.equals(formTemplate.domainId))));
 
         const data = req.body;
         const userData = pullUserData(formTemplate, data);

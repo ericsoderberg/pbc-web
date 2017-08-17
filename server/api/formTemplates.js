@@ -463,8 +463,8 @@ export default function (router) {
           formTemplate = addNewForm(formTemplate, session, req.query.linkedFormId);
         }
         const admin = (session && (session.userId.administrator ||
-          (session.userId.administratorDomainId &&
-          session.userId.administratorDomainId.equals(formTemplate.domainId))));
+          (session.userId.domainIds &&
+          session.userId.domainIds.some(id => id.equals(formTemplate.domainId)))));
         if (req.query.full && session) {
           // reset modified time to now to avoid caching issues when deleting forms
           formTemplate.modified = moment.utc();

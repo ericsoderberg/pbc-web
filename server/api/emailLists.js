@@ -106,82 +106,82 @@ const populateEmailList = (emailList) => {
   });
 
   return Promise.all(promises)
-  .then((docs) => {
-    const emailListData = docs[0].toObject();
-    emailListData.addresses.forEach((address, index) => {
-      const user = docs[1 + index];
-      if (user) {
-        address.userId = { _id: user._id, name: user.name };
-      }
-    });
-    emailListData.addresses.sort((a, b) => {
-      const aa = a.address.toLowerCase();
-      const ba = b.address.toLowerCase();
-      return (aa < ba ? -1 : (aa > ba ? 1 : 0));
-    });
-    return emailListData;
-  })
-  .then(emailListPopulated => (
-    // determine address state
-    checkAddresses(emailListPopulated.name)
-    .then((disabledAddresses) => {
-      emailListPopulated.addresses = emailListPopulated.addresses.map(address => ({
-        ...address,
-        state: (disabledAddresses.indexOf(address.address) === -1 ?
-          'ok' : 'disabled'),
-      }));
-      return emailListPopulated;
+    .then((docs) => {
+      const emailListData = docs[0].toObject();
+      emailListData.addresses.forEach((address, index) => {
+        const user = docs[1 + index];
+        if (user) {
+          address.userId = { _id: user._id, name: user.name };
+        }
+      });
+      emailListData.addresses.sort((a, b) => {
+        const aa = a.address.toLowerCase();
+        const ba = b.address.toLowerCase();
+        return (aa < ba ? -1 : (aa > ba ? 1 : 0));
+      });
+      return emailListData;
     })
-  ));
+    .then(emailListPopulated => (
+      // determine address state
+      checkAddresses(emailListPopulated.name)
+        .then((disabledAddresses) => {
+          emailListPopulated.addresses = emailListPopulated.addresses.map(address => ({
+            ...address,
+            state: (disabledAddresses.indexOf(address.address) === -1 ?
+              'ok' : 'disabled'),
+          }));
+          return emailListPopulated;
+        })
+    ));
 };
 
 export function subscribe(id, addresses) {
   const EmailList = mongoose.model('EmailList');
   return EmailList.findOne({ _id: id }).exec()
-  .then((emailList) => {
-    let updated = false;
-    addresses.map(a => (typeof a === 'string' ? { address: a } : a))
-    .forEach((address) => {
-      if (!emailList.addresses.some(a =>
-        a.address.toLowerCase() === address.address.toLowerCase())) {
-        emailList.addresses.push({
-          ...address,
-          address: address.address.toLowerCase(),
+    .then((emailList) => {
+      let updated = false;
+      addresses.map(a => (typeof a === 'string' ? { address: a } : a))
+        .forEach((address) => {
+          if (!emailList.addresses.some(a =>
+            a.address.toLowerCase() === address.address.toLowerCase())) {
+            emailList.addresses.push({
+              ...address,
+              address: address.address.toLowerCase(),
+            });
+            updated = true;
+          }
         });
-        updated = true;
+      if (updated) {
+        emailList.modified = new Date();
+        return emailList.save()
+          .then(() => addAddresses(emailList.name, addresses));
       }
+      return emailList;
     });
-    if (updated) {
-      emailList.modified = new Date();
-      return emailList.save()
-      .then(() => addAddresses(emailList.name, addresses));
-    }
-    return emailList;
-  });
 }
 
 export function unsubscribe(id, addresses) {
   const EmailList = mongoose.model('EmailList');
   return EmailList.findOne({ _id: id }).exec()
-  .then((emailList) => {
-    let updated = false;
-    addresses.map(a => (typeof a === 'string' ? { address: a } : a))
-    .forEach((address) => {
-      if (emailList.addresses.some(a =>
-        a.address.toLowerCase() === address.address.toLowerCase())) {
-        emailList.addresses =
-          emailList.addresses.filter(a =>
-            a.address.toLowerCase() !== address.address.toLowerCase());
-        updated = true;
+    .then((emailList) => {
+      let updated = false;
+      addresses.map(a => (typeof a === 'string' ? { address: a } : a))
+        .forEach((address) => {
+          if (emailList.addresses.some(a =>
+            a.address.toLowerCase() === address.address.toLowerCase())) {
+            emailList.addresses =
+              emailList.addresses.filter(a =>
+                a.address.toLowerCase() !== address.address.toLowerCase());
+            updated = true;
+          }
+        });
+      if (updated) {
+        emailList.modified = new Date();
+        return emailList.save()
+          .then(() => removeAddresses(emailList.name, addresses));
       }
+      return emailList;
     });
-    if (updated) {
-      emailList.modified = new Date();
-      return emailList.save()
-      .then(() => removeAddresses(emailList.name, addresses));
-    }
-    return emailList;
-  });
 }
 
 export default function (router) {
@@ -208,7 +208,7 @@ export default function (router) {
       authorization: requireSomeAdministrator,
       transformOut: emailList => (
         addList(emailList.name)
-        .then(() => emailList)
+          .then(() => emailList)
       ),
     },
     put: {
@@ -219,30 +219,30 @@ export default function (router) {
       authorization: requireSomeAdministrator,
       deleteRelated: emailList => (
         removeList(emailList.name)
-        .then(() => emailList)
+          .then(() => emailList)
       ),
     },
   });
 
   router.post('/email-lists/:id/subscribe', (req, res) => {
     getSession(req)
-    .then(requireSession)
-    .then(() => {
-      const id = req.params.id;
-      return subscribe(id, req.body);
-    })
-    .then(() => res.status(200).send())
-    .catch(error => catcher(error, res));
+      .then(requireSession)
+      .then(() => {
+        const id = req.params.id;
+        return subscribe(id, req.body);
+      })
+      .then(() => res.status(200).send())
+      .catch(error => catcher(error, res));
   });
 
   router.post('/email-lists/:id/unsubscribe', (req, res) => {
     getSession(req)
-    .then(requireSession)
-    .then(() => {
-      const id = req.params.id;
-      return unsubscribe(id, req.body);
-    })
-    .then(() => res.status(200).send())
-    .catch(error => catcher(error, res));
+      .then(requireSession)
+      .then(() => {
+        const id = req.params.id;
+        return unsubscribe(id, req.body);
+      })
+      .then(() => res.status(200).send())
+      .catch(error => catcher(error, res));
   });
 }

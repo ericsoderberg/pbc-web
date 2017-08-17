@@ -35,7 +35,7 @@ const processStatus = (response) => {
     return Promise.resolve(response);
   }
   return response.json()
-  .then(json => Promise.reject(json || response.statusText));
+    .then(json => Promise.reject(json || response.statusText));
 };
 
 // Session
@@ -61,6 +61,11 @@ export function initialize() {
   let session;
   if (localStorage.session) {
     session = JSON.parse(localStorage.session);
+    // convert to domainIds
+    if (session.userId.administratorDomainId) {
+      session.userId.domainIds = [session.userId.administratorDomainId];
+      delete session.userId.administratorDomainId;
+    }
     return setSession(session);
   }
   return clearSession();
@@ -69,23 +74,23 @@ export function initialize() {
 export function postSession(session) {
   return fetch('/api/sessions', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 export function postSessionViaToken(session) {
   return fetch('/api/sessions/token', {
     method: 'POST', headers: _headers, body: JSON.stringify(session) })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 export function deleteSession() {
   return fetch(`/api/sessions/${_sessionId}`, {
     method: 'DELETE', headers: _headers })
-  .then(processStatus)
-  .then(clearSession)
-  .catch(clearSession);
+    .then(processStatus)
+    .then(clearSession)
+    .catch(clearSession);
 }
 
 // Generic
@@ -157,14 +162,14 @@ export const loadCategory = (category, options = {}, context) =>
     const q = params.length > 0 ? `?${params.join('&')}` : '';
     return fetch(`/api/${category}${q}`, {
       method: 'GET', headers: _headers })
-    .then(processStatus)
-    .then(response => response.json())
-    .then(items => dispatch({
-      type: CATEGORY_LOAD, payload: { category, items, ...options, context },
-    }))
-    .catch(payload => dispatch({
-      type: CATEGORY_LOAD, error: true, payload,
-    }));
+      .then(processStatus)
+      .then(response => response.json())
+      .then(items => dispatch({
+        type: CATEGORY_LOAD, payload: { category, items, ...options, context },
+      }))
+      .catch(payload => dispatch({
+        type: CATEGORY_LOAD, error: true, payload,
+      }));
   };
 
 export const unloadCategory = category =>
@@ -173,8 +178,8 @@ export const unloadCategory = category =>
 export function postItem(category, item) {
   return fetch(`/api/${category}`, {
     method: 'POST', headers: _headers, body: JSON.stringify(item) })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 export const loadItem = (category, id, options = {}) =>
@@ -210,12 +215,12 @@ export const loadItem = (category, id, options = {}) =>
     const q = params.length > 0 ? `?${params.join('&')}` : '';
     return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
       method: 'GET', headers: _headers })
-    .then(processStatus)
-    .then(response => response.json())
-    .then(item => dispatch({
-      type: ITEM_LOAD, payload: { category, id, item, ...options } }))
-    .catch(error => dispatch({
-      type: ITEM_LOAD, error: true, payload: { id, error } }));
+      .then(processStatus)
+      .then(response => response.json())
+      .then(item => dispatch({
+        type: ITEM_LOAD, payload: { category, id, item, ...options } }))
+      .catch(error => dispatch({
+        type: ITEM_LOAD, error: true, payload: { id, error } }));
   };
 
 export const unloadItem = (category, id) =>
@@ -224,27 +229,27 @@ export const unloadItem = (category, id) =>
 export function putItem(category, item) {
   return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
     method: 'PUT', headers: _headers, body: JSON.stringify(item) })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 export function deleteItem(category, id) {
   return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
     method: 'DELETE', headers: _headers })
-  .then(processStatus);
+    .then(processStatus);
 }
 
 // Page
 
 export function getPageMap(id) {
   return fetch(`/api/pages/${id}/map`, { method: 'GET', headers: _headers })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 export function postPublicize() {
   return fetch('/api/pages/publicize', { method: 'POST', headers: _headers })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 // User
@@ -252,9 +257,9 @@ export function postPublicize() {
 export function postSignUp(user) {
   return fetch('/api/users/sign-up', {
     method: 'POST', headers: _headers, body: JSON.stringify(user) })
-  .then(processStatus)
-  .then(response => response.json())
-  .then(setSession);
+    .then(processStatus)
+    .then(response => response.json())
+    .then(setSession);
 }
 
 export function postVerifyEmail(email, returnPath) {
@@ -263,8 +268,8 @@ export function postVerifyEmail(email, returnPath) {
     headers: _headers,
     body: JSON.stringify({ email, returnPath }),
   })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 // Site
@@ -272,27 +277,27 @@ export function postVerifyEmail(email, returnPath) {
 export function loadSite() {
   return dispatch =>
     fetch('/api/site', { method: 'GET', headers: _headers })
-    .then(response => response.json())
-    .then((site) => {
-      setTimezone(site.timezone);
-      return site;
-    })
-    .then(payload => dispatch({ type: SITE_LOAD, payload }))
-    .catch(payload => dispatch({
-      type: SITE_LOAD, error: true, payload,
-    }));
+      .then(response => response.json())
+      .then((site) => {
+        setTimezone(site.timezone);
+        return site;
+      })
+      .then(payload => dispatch({ type: SITE_LOAD, payload }))
+      .catch(payload => dispatch({
+        type: SITE_LOAD, error: true, payload,
+      }));
 }
 
 export function postSite(site) {
   return dispatch =>
     fetch('/api/site', {
       method: 'POST', headers: _headers, body: JSON.stringify(site) })
-    .then(processStatus)
-    .then(response => response.json())
-    .then(payload => dispatch({ type: SITE_LOAD, payload }))
-    .catch(payload => dispatch({
-      type: SITE_LOAD, error: true, payload,
-    }));
+      .then(processStatus)
+      .then(response => response.json())
+      .then(payload => dispatch({ type: SITE_LOAD, payload }))
+      .catch(payload => dispatch({
+        type: SITE_LOAD, error: true, payload,
+      }));
 }
 
 // Calendar
@@ -320,8 +325,8 @@ export const loadCalendar = (options = {}) =>
     const q = params.length > 0 ? `?${params.join('&')}` : '';
     return fetch(`/api/calendar${q}`, {
       method: 'GET', headers: _headers })
-    .then(response => response.json())
-    .then(payload => dispatch({ type: CALENDAR_LOAD, payload }));
+      .then(response => response.json())
+      .then(payload => dispatch({ type: CALENDAR_LOAD, payload }));
   };
 
 export function unloadCalendar() {
@@ -333,13 +338,13 @@ export function unloadCalendar() {
 export function getResources(event) {
   return fetch('/api/events/resources', {
     method: 'POST', headers: _headers, body: JSON.stringify(event) })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 export function getUnavailableDates(event) {
   return fetch('/api/events/unavailable-dates', {
     method: 'POST', headers: _headers, body: JSON.stringify(event) })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 // Resources
@@ -347,25 +352,25 @@ export function getUnavailableDates(event) {
 export function getResourceCalendar(resource) {
   return fetch(`/api/resources/${resource._id}/calendar`, {
     method: 'GET', headers: _headers })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 export function getResourceEvents(resource) {
   return fetch(`/api/resources/${resource._id}/events`, {
     method: 'GET', headers: _headers })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 export function getResourcesCalendar() {
   return fetch('/api/resources/calendar', {
     method: 'GET', headers: _headers })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 export function getResourcesEvents() {
   return fetch('/api/resources/events', {
     method: 'GET', headers: _headers })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 // Forms
@@ -388,7 +393,7 @@ export function getFormTemplateDownload(id, options) {
       const cd = response.headers.get('Content-Disposition');
       const name = cd && cd.match(/filename="([^"]+)"/)[1];
       response.blob()
-      .then(blob => FileSaver.saveAs(blob, name));
+        .then(blob => FileSaver.saveAs(blob, name));
       // .then((blob) => {
       //   const blobUrl = URL.createObjectURL(blob);
       //   window.location.replace(blobUrl);
@@ -401,15 +406,15 @@ export function getFormTemplateDownload(id, options) {
 export function postNewsletterRender(newsletter) {
   return fetch('/api/newsletters/render', {
     method: 'POST', headers: _headers, body: JSON.stringify(newsletter) })
-  .then(processStatus)
-  .then(response => response.text());
+    .then(processStatus)
+    .then(response => response.text());
 }
 
 export function postNewsletterSend(id, address) {
   return fetch(`/api/newsletters/${id}/send`, {
     method: 'POST', headers: _headers, body: JSON.stringify({ address }) })
-  .then(processStatus)
-  .then(response => response.text());
+    .then(processStatus)
+    .then(response => response.text());
 }
 
 // Map
@@ -420,7 +425,7 @@ export function getGeocode(address) {
     `${window.location.protocol}//nominatim.openstreetmap.org/search${query}`;
   return fetch(url, {
     method: 'GET', headers: { ..._headers, Authorization: undefined } })
-  .then(response => response.json());
+    .then(response => response.json());
 }
 
 // Files
@@ -429,14 +434,14 @@ export function postFile(data) {
   const headers = { ..._headers };
   delete headers['Content-Type'];
   return fetch('/api/files', { method: 'POST', headers, body: data })
-  .then(processStatus)
-  .then(response => response.json());
+    .then(processStatus)
+    .then(response => response.json());
 }
 
 export function deleteFile(id) {
   return fetch(`/api/files/${id}`, {
     method: 'DELETE', headers: _headers })
-  .then(processStatus);
+    .then(processStatus);
 }
 
 // Email lists
@@ -444,13 +449,13 @@ export function deleteFile(id) {
 export function postSubscribe(emailList, addresses) {
   return fetch(`/api/email-lists/${emailList._id}/subscribe`, {
     method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
-  .then(processStatus);
+  . then(processStatus);
 }
 
 export function postUnsubscribe(emailList, addresses) {
   return fetch(`/api/email-lists/${emailList._id}/unsubscribe`, {
     method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
-  .then(processStatus);
+    .then(processStatus);
 }
 
 // Search
@@ -463,12 +468,12 @@ export const loadSearch = searchText =>
       const q = params.length > 0 ? `?${params.join('&')}` : '';
       return fetch(`/api/search${q}`, {
         method: 'GET', headers: _headers })
-      .then(processStatus)
-      .then(response => response.json())
-      .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
-      .catch(payload => dispatch({
-        type: SEARCH_LOAD, error: true, payload,
-      }));
+        .then(processStatus)
+        .then(response => response.json())
+        .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
+        .catch(payload => dispatch({
+          type: SEARCH_LOAD, error: true, payload,
+        }));
     }
     return dispatch({ type: SEARCH_LOAD, payload: {} });
   };
@@ -489,14 +494,14 @@ export const loadAuditLog = (options = {}) =>
     const q = params.length > 0 ? `?${params.join('&')}` : '';
     fetch(`/api/audit-log${q}`, {
       method: 'GET', headers: _headers })
-    .then(processStatus)
-    .then(response => response.json())
-    .then(items => dispatch({
-      type: AUDIT_LOG_LOAD, payload: { items, ...options },
-    }))
-    .catch(payload => dispatch({
-      type: AUDIT_LOG_LOAD, error: true, payload,
-    }));
+      .then(processStatus)
+      .then(response => response.json())
+      .then(items => dispatch({
+        type: AUDIT_LOG_LOAD, payload: { items, ...options },
+      }))
+      .catch(payload => dispatch({
+        type: AUDIT_LOG_LOAD, error: true, payload,
+      }));
   };
 
 export const unloadAuditLog = () => ({ type: AUDIT_LOG_UNLOAD });

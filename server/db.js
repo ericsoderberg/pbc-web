@@ -38,7 +38,9 @@ export const Session = mongoose.model('Session', sessionSchema);
 const userSchema = Schema({
   address: String,
   administrator: Boolean,
+  // administratorDomainId is deprecated
   administratorDomainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  domainIds: [{ type: Schema.Types.ObjectId, ref: 'Domain' }],
   image,
   created: Date,
   email: { type: String, required: true, unique: true },

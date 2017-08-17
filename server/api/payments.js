@@ -51,8 +51,8 @@ const deletePaymentRelated = (doc) => {
 };
 
 const canAdmin = (session, payment = {}) => (
-  session.userId.administrator || (payment.domainId &&
-    payment.domainId.equals(session.userId.administratorDomainId))
+  session.userId.administrator || (payment.domainId && session.userId.domainIds &&
+    session.userId.domainIds.some(id => id.equals(payment.domainId)))
 );
 
 export default function (router) {

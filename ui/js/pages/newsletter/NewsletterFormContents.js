@@ -1,38 +1,22 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import SectionsFormContents from '../../components/SectionsFormContents';
 import DateInput from '../../components/DateInput';
+import DomainIdField from '../../components/DomainIdField';
 
 const SECTION_TYPES = [
   'text', 'image', 'event', 'library', 'pages', 'files',
 ];
 
-class NewsletterFormContents extends Component {
+export default class NewsletterFormContents extends Component {
 
   constructor() {
     super();
     this._onAddEvent = this._onAddEvent.bind(this);
     this._changeEvent = this._changeEvent.bind(this);
     this._removeEvent = this._removeEvent.bind(this);
-  }
-
-  componentDidMount() {
-    const { dispatch, formState, session } = this.props;
-
-    if (session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name' }));
-    } else if (session.userId.administratorDomainId) {
-      formState.change('domainId')(session.userId.administratorDomainId);
-    }
-  }
-
-  componentWillUnmount() {
-    const { dispatch } = this.props;
-    dispatch(unloadCategory('domains'));
   }
 
   _onAddEvent() {
@@ -61,25 +45,8 @@ class NewsletterFormContents extends Component {
   }
 
   render() {
-    const { className, domains, formState, session } = this.props;
+    const { className, formState, session } = this.props;
     const newsletter = formState.object;
-
-    let administeredBy;
-    if (session.userId.administrator) {
-      const options = domains.map(domain => (
-        <option key={domain._id} label={domain.name} value={domain._id} />
-      ));
-      options.unshift(<option key={0} />);
-      administeredBy = (
-        <FormField label="Administered by">
-          <select name="domainId"
-            value={newsletter.domainId || ''}
-            onChange={formState.change('domainId')}>
-            {options}
-          </select>
-        </FormField>
-      );
-    }
 
     return (
       <div className={className}>
@@ -96,7 +63,7 @@ class NewsletterFormContents extends Component {
         </fieldset>
         <SectionsFormContents formState={formState} types={SECTION_TYPES} />
         <fieldset className="form__fields">
-          {administeredBy}
+          <DomainIdField formState={formState} session={session} />
         </fieldset>
       </div>
     );
@@ -105,20 +72,10 @@ class NewsletterFormContents extends Component {
 
 NewsletterFormContents.propTypes = {
   className: PropTypes.string,
-  dispatch: PropTypes.func.isRequired,
-  domains: PropTypes.array,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 NewsletterFormContents.defaultProps = {
   className: undefined,
-  domains: [],
 };
-
-const select = state => ({
-  domains: (state.domains || {}).items || [],
-  session: state.session,
-});
-
-export default connect(select)(NewsletterFormContents);

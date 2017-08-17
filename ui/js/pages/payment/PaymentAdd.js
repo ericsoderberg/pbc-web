@@ -28,15 +28,20 @@ class PaymentAdd extends Component {
   }
 
   render() {
-    const { form, history } = this.props;
+    const { form, history, session } = this.props;
     let defaultPayment;
     if (form) {
       defaultPayment = {
         amount: form.balance,
+        domainId: form.domainId,
         formIds: [form],
         sent: form.modified,
         received: moment(),
         userId: form.userId,
+      };
+    } else if (session && !session.userId.administrator) {
+      defaultPayment = {
+        domainId: session.userId.domainIds[0],
       };
     }
     return (
@@ -54,18 +59,25 @@ PaymentAdd.propTypes = {
   form: PropTypes.object,
   formId: PropTypes.string,
   history: PropTypes.any.isRequired,
+  session: PropTypes.shape({
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
+    }),
+  }),
 };
 
 PaymentAdd.defaultProps = {
   form: undefined,
   formId: undefined,
+  session: undefined,
 };
 
 const select = (state, props) => {
   const query = props.location ? searchToObject(props.location.search) : {};
   const formId = query.formId;
   const form = (formId ? state[formId] : undefined);
-  return { form, formId };
+  return { form, formId, session: state.session };
 };
 
 export default connect(select)(PaymentAdd);

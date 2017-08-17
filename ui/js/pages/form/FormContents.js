@@ -48,7 +48,7 @@ class FormContents extends Component {
     const administrator = (props.session &&
       (props.session.userId.administrator || (
         (props.formTemplate && props.formTemplate.domainId &&
-        props.session.userId.administratorDomainId === props.formTemplate.domainId))));
+        props.session.userId.domainIds.some(id => id === props.formTemplate.domainId)))));
     return { administrator, fields };
   }
 
@@ -212,7 +212,7 @@ FormContents.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
       name: PropTypes.string,
     }),
   }),

@@ -7,6 +7,7 @@ import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
+import DomainIdField from '../../components/DomainIdField';
 import FormSuggestion from '../form/FormSuggestion';
 
 const UserSuggestion = props => (
@@ -26,14 +27,6 @@ UserSuggestion.propTypes = {
 class PaymentFormContents extends Component {
 
   componentDidMount() {
-    const { dispatch, formState, full, session } = this.props;
-
-    if (full && session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name' }));
-    } else if (session.userId.administratorDomainId) {
-      formState.change('domainId')(session.userId.administratorDomainId);
-    }
-
     this._loadForms(this.props);
   }
 
@@ -46,7 +39,6 @@ class PaymentFormContents extends Component {
   componentWillUnmount() {
     const { dispatch, full, session } = this.props;
     if (full && session.userId.administrator) {
-      dispatch(unloadCategory('domains'));
       dispatch(unloadCategory('forms'));
     }
   }
@@ -68,7 +60,7 @@ class PaymentFormContents extends Component {
 
   render() {
     const {
-      className, domains, forms, formState, full, payByCheckInstructions, session,
+      className, forms, formState, full, payByCheckInstructions, session,
     } = this.props;
     const payment = formState.object;
 
@@ -108,27 +100,11 @@ class PaymentFormContents extends Component {
     }
 
     const administrator = (session &&
-      (session.userId.administrator || (payment.domainId &&
-        session.userId.administratorDomainId === payment.domainId)));
+      (session.userId.administrator ||
+        session.userId.domainIds.some(id => id === payment.domainId)));
 
     let admin;
     if (full && administrator) {
-      let administeredBy;
-      if (session.userId.administrator) {
-        const options = domains.map(domain => (
-          <option key={domain._id} label={domain.name} value={domain._id} />
-        ));
-        options.unshift(<option key={0} />);
-        administeredBy = (
-          <FormField label="Administered by">
-            <select name="domainId"
-              value={payment.domainId || ''}
-              onChange={formState.change('domainId')}>
-              {options}
-            </select>
-          </FormField>
-        );
-      }
 
       let formItems;
       if (payment._id && forms && forms.length > 0) {
@@ -180,7 +156,7 @@ class PaymentFormContents extends Component {
               value={(payment.userId || session).name || ''}
               onChange={suggestion => formState.set('userId', suggestion)} />
           </FormField>
-          {administeredBy}
+          <DomainIdField formState={formState} session={session} />
           {formItems}
         </fieldset>
       );
@@ -216,7 +192,6 @@ class PaymentFormContents extends Component {
 PaymentFormContents.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
-  domains: PropTypes.array,
   forms: PropTypes.array,
   formState: PropTypes.object.isRequired,
   payByCheckInstructions: PropTypes.string,
@@ -224,7 +199,7 @@ PaymentFormContents.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
       name: PropTypes.string,
     }),
   }).isRequired,
@@ -232,7 +207,6 @@ PaymentFormContents.propTypes = {
 
 PaymentFormContents.defaultProps = {
   className: undefined,
-  domains: [],
   form: undefined,
   formId: undefined,
   forms: undefined,
@@ -241,7 +215,6 @@ PaymentFormContents.defaultProps = {
 };
 
 const select = (state, props) => ({
-  domains: (state.domains || {}).items,
   form: props.formId ? state[props.formId] : undefined,
   forms: (state.forms || {}).items,
   session: state.session,

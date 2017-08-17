@@ -258,7 +258,7 @@ class List extends Component {
     }
 
     if ((!addIfFilter || (filter || {})[addIfFilter]) && session &&
-      (session.userId.administrator || session.userId.administratorDomainId)) {
+      (session.userId.administrator || session.userId.domainIds.length > 0)) {
       let addPath = `${path}/add`;
       if (addIfFilter) {
         addPath += `?${addIfFilter}=${encodeURIComponent(filter[addIfFilter])}`;
@@ -352,7 +352,7 @@ List.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
     }),
   }),
   sort: PropTypes.string,

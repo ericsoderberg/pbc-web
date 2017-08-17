@@ -8,6 +8,7 @@ import FormFieldAdd from '../../components/FormFieldAdd';
 import SelectSearch from '../../components/SelectSearch';
 import Button from '../../components/Button';
 import TextHelp from '../../components/TextHelp';
+import DomainIdField from '../../components/DomainIdField';
 import DownIcon from '../../icons/DownArrow';
 import UpIcon from '../../icons/UpArrow';
 import BlankIcon from '../../icons/Blank';
@@ -29,12 +30,7 @@ class FormTemplateFormContents extends Component {
   }
 
   componentDidMount() {
-    const { dispatch, formState, session } = this.props;
-    if (session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name', limit: 200 }));
-    } else if (session.userId.administratorDomainId) {
-      formState.change('domainId')(session.userId.administratorDomainId);
-    }
+    const { dispatch } = this.props;
     dispatch(loadCategory('email-lists', { sort: 'name', limit: 200 }));
     this._loadDependency(this.props);
   }
@@ -49,7 +45,6 @@ class FormTemplateFormContents extends Component {
 
   componentWillUnmount() {
     const { dispatch } = this.props;
-    dispatch(unloadCategory('domains'));
     dispatch(unloadCategory('email-lists'));
   }
 
@@ -130,8 +125,7 @@ class FormTemplateFormContents extends Component {
 
   render() {
     const {
-      className, domains, emailLists, errors, formState, linkedToFormTemplate,
-      session,
+      className, emailLists, errors, formState, linkedToFormTemplate, session,
     } = this.props;
     const { expandedSections, detailsActive } = this.state;
     const formTemplate = formState.object;
@@ -209,7 +203,7 @@ class FormTemplateFormContents extends Component {
       );
     });
 
-    let details = [
+    const details = [
       <button key="control"
         type="button"
         className="form__more-control button button-plain"
@@ -351,22 +345,6 @@ class FormTemplateFormContents extends Component {
             onChange={formState.change('notify')} />
         </FormField>,
       );
-
-      if (session.userId.administrator) {
-        const options = domains.map(domain => (
-          <option key={domain._id} label={domain.name} value={domain._id} />
-        ));
-        options.unshift(<option key={0} />);
-        details.push(
-          <FormField key="admin" label="Administered by" error={errors.domainId}>
-            <select name="domainId"
-              value={formTemplate.domainId || ''}
-              onChange={formState.change('domainId')}>
-              {options}
-            </select>
-          </FormField>,
-        );
-      }
     }
 
     return (
@@ -378,6 +356,7 @@ class FormTemplateFormContents extends Component {
               onChange={formState.change('name')} />
           </FormField>
           {details}
+          <DomainIdField formState={formState} session={session} />
         </fieldset>
         {sections}
         <fieldset className="form__fields">
@@ -395,7 +374,6 @@ class FormTemplateFormContents extends Component {
 FormTemplateFormContents.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
-  domains: PropTypes.array,
   emailLists: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
@@ -405,14 +383,12 @@ FormTemplateFormContents.propTypes = {
 
 FormTemplateFormContents.defaultProps = {
   className: undefined,
-  domains: [],
   emailLists: [],
   errors: undefined,
   linkedToFormTemplate: undefined,
 };
 
 const select = state => ({
-  domains: (state.domains || {}).items || [],
   emailLists: (state['email-lists'] || {}).items || [],
   linkedToFormTemplate:
     linkedToFormTemplateId ? state[linkedToFormTemplateId] : undefined,

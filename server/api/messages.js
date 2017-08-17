@@ -20,8 +20,8 @@ const populateMessage = (message) => {
     date: { $gt: message.date },
     series: { $ne: true },
   })
-  .sort('date').limit(1).select(subFields)
-  .exec();
+    .sort('date').limit(1).select(subFields)
+    .exec();
 
   // previousMessage
   const previousPromise = Doc.find({
@@ -29,22 +29,22 @@ const populateMessage = (message) => {
     date: { $lt: message.date },
     series: { $ne: true },
   })
-  .sort('-date').limit(1).select(subFields)
-  .exec();
+    .sort('-date').limit(1).select(subFields)
+    .exec();
 
   // seriesMessages
   const seriesMessagesPromise = Doc.find({ seriesId: message.id })
-  .sort('date').select(subFields).exec();
+    .sort('date').select(subFields).exec();
 
   return Promise.all([Promise.resolve(message), nextPromise,
     previousPromise, seriesMessagesPromise])
-  .then((docs) => {
-    const messageData = docs[0].toObject();
-    messageData.nextMessage = docs[1][0];
-    messageData.previousMessage = docs[2][0];
-    messageData.seriesMessages = docs[3];
-    return messageData;
-  });
+    .then((docs) => {
+      const messageData = docs[0].toObject();
+      messageData.nextMessage = docs[1][0];
+      messageData.previousMessage = docs[2][0];
+      messageData.seriesMessages = docs[3];
+      return messageData;
+    });
 };
 
 const unsetReferences = (data) => {
@@ -65,16 +65,16 @@ const updateSeriesDate = (doc) => {
     const Message = mongoose.model('Message');
     // figure out which message is the latest
     return Message.find({ seriesId: doc.seriesId })
-    .sort('-date').limit(1).exec()
-    .then((messages) => {
-      // ensure series comes before latest message
-      const date = moment(messages[0].date).add(1, 'second');
-      return Message.update(
-        { _id: doc.seriesId },
-        { $set: { date: date.toISOString() } },
-      ).exec();
-    })
-    .then(() => doc);
+      .sort('-date').limit(1).exec()
+      .then((messages) => {
+        // ensure series comes before latest message
+        const date = moment(messages[0].date).add(1, 'second');
+        return Message.update(
+          { _id: doc.seriesId },
+          { $set: { date: date.toISOString() } },
+        ).exec();
+      })
+      .then(() => doc);
   }
   return doc;
 };
@@ -165,10 +165,10 @@ export default function (router) {
     }
 
     query.exec()
-    .then((docs) => {
-      res.setHeader('Cache-Control', 'max-age=0');
-      res.json(docs);
-    })
+      .then((docs) => {
+        res.setHeader('Cache-Control', 'max-age=0');
+        res.json(docs);
+      })
     .catch(error => catcher(error, res));
   });
 }

@@ -15,8 +15,8 @@ export function getSession(req) {
     const token = authorization.split('=')[1];
     const Session = mongoose.model('Session');
     return Session.findOne({ token })
-    .populate('userId', 'email name administrator administratorDomainId')
-    .exec();
+      .populate('userId', 'email name administrator domainIds')
+      .exec();
   }
   return Promise.resolve(undefined);
 }
@@ -32,7 +32,7 @@ export function requireAdministrator(session) {
 
 export function requireSomeAdministrator(session) {
   return (session && (session.userId.administrator ||
-    session.userId.administratorDomainId)) ?
+    session.userId.domainIds.length > 0)) ?
     Promise.resolve(session) : Promise.reject({ status: 403 });
 }
 
@@ -43,30 +43,31 @@ export function allowAnyone(session) {
 export function requireDomainAdministrator(context, domainId) {
   const { session } = context;
   return (session && (session.userId.administrator ||
-    (session.userId.administratorDomainId &&
-      session.userId.administratorDomainId.equals(domainId)))) ?
+    (session.userId.domainIds &&
+      session.userId.domainIds.some(id => id.equals(domainId))))) ?
     Promise.resolve(context) : Promise.reject({ status: 403 });
 }
 
 export function requireDomainAdministratorOrUser(context, domainId, userId) {
   const { session } = context;
   return (session && (session.userId.administrator ||
-    (session.userId.administratorDomainId &&
-      session.userId.administratorDomainId.equals(domainId)) ||
+    (session.userId.domainIds &&
+      session.userId.domainIds.some(id => id.equals(domainId))) ||
     session.userId._id.equals(userId))) ?
     Promise.resolve(context) : Promise.reject({ status: 403 });
 }
 
-export function authorizedAdministrator(session) {
-  if (session && session.userId.administrator) {
-    return {};
-  }
-  return { name: false };
-}
+// export function authorizedAdministrator(session) {
+//   if (session && session.userId.administrator) {
+//     return {};
+//   }
+//   return { name: false };
+// }
 
 export function authorizedDomainAdministrator(session) {
   if (session &&
-    (session.userId.administrator || session.userId.administratorDomainId)) {
+    (session.userId.administrator ||
+      (session.userId.domainIds && session.userId.domainIds.length > 0))) {
     return {};
   }
   return { name: false };
@@ -76,11 +77,8 @@ export function authorizedForDomain(session) {
   if (session) {
     if (session.userId.administrator) {
       return {};
-    } else if (session.userId.administratorDomainId) {
-      return { $or: [
-        { domainId: session.userId.administratorDomainId },
-        { administratorDomainId: session.userId.administratorDomainId },
-      ] };
+    } else if (session.userId.domainIds) {
+      return { domainId: { $in: session.userId.domainIds } };
     }
   }
   return { name: false };
@@ -89,9 +87,9 @@ export function authorizedForDomain(session) {
 export function authorizedForDomainOrSelf(session) {
   if (session && session.userId.administrator) {
     return {};
-  } else if (session && session.userId.administratorDomainId) {
+  } else if (session && session.userId.domainIds) {
     return { $or: [
-      { domainId: session.userId.administratorDomainId },
+      { domainId: { $in: session.userId.domainIds } },
       { userId: session.userId },
     ] };
   } else if (session) {

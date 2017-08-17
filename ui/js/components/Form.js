@@ -158,7 +158,7 @@ Form.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
       name: PropTypes.string,
     }),
   }).isRequired,

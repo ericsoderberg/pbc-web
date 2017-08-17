@@ -10,6 +10,7 @@ import Button from '../../components/Button';
 import DateTimeInput from '../../components/DateTimeInput';
 import SelectSearch from '../../components/SelectSearch';
 import ImageField from '../../components/ImageField';
+import DomainIdField from '../../components/DomainIdField';
 import TrashIcon from '../../icons/Trash';
 import { getLocationParams } from '../../utils/Params';
 
@@ -40,28 +41,29 @@ class EventDetails extends Component {
   }
 
   componentDidMount() {
-    const { formState, session } = this.props;
+    const { formState } = this.props;
     const params = getLocationParams();
     if (params.calendarId) {
       formState.change('calendarId')(params.calendarId);
     }
-    if (session.userId.administratorDomainId) {
-      formState.change('domainId')(session.userId.administratorDomainId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { calendars, formState, session } = nextProps;
+    const event = formState.object;
+    if (!session.userId.administrator && !event.calendarId && calendars.length > 0) {
+      formState.change('calendarId')(calendars[0]._id);
     }
   }
 
   componentWillUnmount() {
     const { dispatch } = this.props;
-    dispatch(unloadCategory('domains'));
     dispatch(unloadCategory('calendars'));
   }
 
   _get() {
-    const { dispatch, session } = this.props;
+    const { dispatch } = this.props;
     dispatch(loadCategory('calendars', { sort: 'name' }));
-    if (session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name' }));
-    }
   }
 
   _onToggle() {
@@ -95,7 +97,7 @@ class EventDetails extends Component {
   }
 
   render() {
-    const { calendars, domains, errors, formState, session } = this.props;
+    const { calendars, errors, formState, session } = this.props;
     const { active } = this.state;
     const event = formState.object;
 
@@ -151,27 +153,12 @@ class EventDetails extends Component {
         );
       }
 
-      let administeredBy;
-      if (session.userId.administrator) {
-        const domainOptions = domains.map(domain => (
-          <option key={domain._id} label={domain.name} value={domain._id} />
-        ));
-        domainOptions.unshift(<option key={0} />);
-        administeredBy = (
-          <FormField label="Administered by" error={errors.domainId}>
-            <select name="domainId"
-              value={event.domainId || ''}
-              onChange={formState.change('domainId')}>
-              {domainOptions}
-            </select>
-          </FormField>
-        );
-      }
-
       const calendarOptions = calendars.map(calendar => (
         <option key={calendar._id} label={calendar.name} value={calendar._id} />
       ));
-      calendarOptions.unshift(<option key={0} />);
+      if (session.userId.administrator) {
+        calendarOptions.unshift(<option key={0} />);
+      }
 
       contents = (
         <fieldset className="form__fields">
@@ -188,14 +175,16 @@ class EventDetails extends Component {
               onChange={formState.change('path')} />
           </FormField>
           <FormField>
-            <input name="public"
+            <input id="public"
+              name="public"
               type="checkbox"
               checked={event.public || false}
               onChange={formState.toggle('public')} />
             <label htmlFor="public">public</label>
           </FormField>
           <FormField key="align">
-            <input name="align"
+            <input id="align"
+              name="align"
               type="checkbox"
               checked={event.align !== 'start'}
               onChange={() => formState.set('align',
@@ -211,7 +200,7 @@ class EventDetails extends Component {
               value={event.color || ''}
               onChange={formState.change('color')} />
           </FormField>
-          {administeredBy}
+          <DomainIdField formState={formState} session={session} />
           {primaryEvent}
           {otherTimes}
           {addOtherTime}
@@ -235,7 +224,6 @@ class EventDetails extends Component {
 EventDetails.propTypes = {
   calendars: PropTypes.array,
   dispatch: PropTypes.func.isRequired,
-  domains: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
@@ -243,14 +231,11 @@ EventDetails.propTypes = {
 
 EventDetails.defaultProps = {
   calendars: [],
-  domains: [],
   errors: {},
 };
 
 const select = state => ({
   calendars: (state.calendars || {}).items || [],
-  domains: (state.domains || {}).items || [],
-  session: state.session,
 });
 
 export default connect(select)(EventDetails);

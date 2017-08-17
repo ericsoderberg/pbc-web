@@ -17,6 +17,8 @@ const DOMAIN_ADMIN_ROUTES = [
   { label: 'Forms', path: '/forms' },
   { label: 'Form Templates', path: '/form-templates' },
   { label: 'Payments', path: '/payments' },
+  { label: 'Calendars', path: '/calendars' },
+  { label: 'Libraries', path: '/libraries' },
   { label: 'Email Lists', path: '/email-lists' },
   { label: 'People', path: '/users' },
 ];
@@ -24,8 +26,6 @@ const DOMAIN_ADMIN_ROUTES = [
 const ADMIN_ROUTES = [
   { label: 'Resources', path: '/resources' },
   { label: 'Domains', path: '/domains' },
-  { label: 'Calendars', path: '/calendars' },
-  { label: 'Libraries', path: '/libraries' },
   { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' },
   { label: 'Audit Log', path: '/audit-log' },
@@ -40,8 +40,8 @@ class MainNav extends Component {
 
   _signOut() {
     deleteSession()
-    .then(() => { window.location = '/'; })
-    .catch(error => console.error('!!! MainNav _signOut catch', error));
+      .then(() => { window.location = '/'; })
+      .catch(error => console.error('!!! MainNav _signOut catch', error));
   }
 
   _renderLinks(routes) {
@@ -81,7 +81,7 @@ class MainNav extends Component {
           Sign Out
         </button>,
       ];
-      if (session.userId.administrator || session.userId.administratorDomainId) {
+      if (session.userId.administrator || session.userId.domainIds.length > 0) {
         domainAdminLinks = this._renderLinks(DOMAIN_ADMIN_ROUTES);
       }
       if (session.userId.administrator) {
@@ -113,7 +113,7 @@ MainNav.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
       name: PropTypes.string,
     }),
   }).isRequired,

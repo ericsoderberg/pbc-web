@@ -22,10 +22,10 @@ class ItemHeader extends Component {
     delete copyItem._id;
     delete copyItem.path;
     postItem(category, copyItem)
-    .then((newItem) => {
-      router.history.push(`/${category}/${newItem._id}/edit`);
-    })
-    .catch(error => console.error('!!! ItemHeader catch', error));
+      .then((newItem) => {
+        router.history.push(`/${category}/${newItem._id}/edit`);
+      })
+      .catch(error => console.error('!!! ItemHeader catch', error));
   }
 
   render() {
@@ -35,8 +35,8 @@ class ItemHeader extends Component {
     let { actions } = this.props;
 
     if (item && session && (session.userId.administrator ||
-      (session.userId.administratorDomainId &&
-        session.userId.administratorDomainId === item.domainId))) {
+      (session.userId.domainIds &&
+        session.userId.domainIds.some(id => id === item.domainId)))) {
       actions = [...actions,
         <a key="copy" href={`/${category}/add`} onClick={this._onCopy}>
           Copy
@@ -68,7 +68,7 @@ ItemHeader.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
     }),
   }),
   title: PropTypes.string,

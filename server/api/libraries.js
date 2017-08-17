@@ -28,10 +28,10 @@ const populateLibrary = (data) => {
   const criteria = { libraryId: library._id };
   const query = Message.distinct('author', criteria);
   return query.exec()
-  .then((authors) => {
-    library.authors = authors.sort();
-    return library;
-  });
+    .then((authors) => {
+      library.authors = authors.sort();
+      return library;
+    });
 };
 
 export default function (router) {
@@ -40,22 +40,22 @@ export default function (router) {
     const id = req.params.id;
     const Library = mongoose.model('Library');
     Library.findOne({ _id: id }).populate('userId', 'name email').exec()
-    .then((library) => {
-      if (library.podcast && library.podcast.image &&
-        library.podcast.image.name === req.params.imageName) {
-        const { podcast: { image: { data, size, type } } } = library;
-        // strip data url aspects. e.g. 'data:image/png;base64,'
-        const string = data.slice(data.indexOf(',') + 1);
-        // decode base64
-        const buffer = new Buffer(string, 'base64');
-        res.set({
-          'Content-Type': type,
-          'Content-Length': size,
-        }).status(200).send(buffer);
-      }
-      return Promise.reject({ error: 'No image' });
-    })
-    .catch(error => res.status(400).json(error));
+      .then((library) => {
+        if (library.podcast && library.podcast.image &&
+          library.podcast.image.name === req.params.imageName) {
+          const { podcast: { image: { data, size, type } } } = library;
+          // strip data url aspects. e.g. 'data:image/png;base64,'
+          const string = data.slice(data.indexOf(',') + 1);
+          // decode base64
+          const buffer = new Buffer(string, 'base64');
+          res.set({
+            'Content-Type': type,
+            'Content-Length': size,
+          }).status(200).send(buffer);
+        }
+        return Promise.reject({ error: 'No image' });
+      })
+      .catch(error => res.status(400).json(error));
   });
 
   register(router, {
@@ -75,7 +75,7 @@ export default function (router) {
       },
     },
     post: {
-      authorization: requireAdministrator,
+      authorization: requireSomeAdministrator,
     },
     put: {
       authorization: requireSomeAdministrator,
@@ -89,7 +89,7 @@ export default function (router) {
       },
     },
     delete: {
-      authorization: requireAdministrator,
+      authorization: requireSomeAdministrator,
     },
   });
 }

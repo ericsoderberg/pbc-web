@@ -22,18 +22,21 @@ class MessageFormContents extends Component {
   }
 
   componentDidMount() {
-    const { dispatch, formState, session } = this.props;
+    const { dispatch } = this.props;
     dispatch(loadCategory('libraries', { sort: 'name' }));
-    if (session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name' }));
-    } else if (session.userId.administratorDomainId) {
-      formState.change('domainId')(session.userId.administratorDomainId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { formState, libraries } = nextProps;
+    const message = formState.object;
+    const library = libraries.filter(lib => lib._id === message.libraryId)[0];
+    if (library && message.domainId !== library.domainId) {
+      formState.change('domainId')(library.domainId);
     }
   }
 
   componentWillUnmount() {
     const { dispatch } = this.props;
-    dispatch(unloadCategory('domains'));
     dispatch(unloadCategory('libraries'));
   }
 
@@ -62,13 +65,13 @@ class MessageFormContents extends Component {
       const data = new FormData();
       data.append('file', files[0]);
       postFile(data)
-      .then((file) => {
-        const nextFiles = (message.files || []).slice(0);
-        nextFiles[index] = file;
-        // console.log('!!! file upload completed', file);
-        this.props.formState.set('files', nextFiles);
-      })
-      .catch(error => console.error('!!! File upload catch', error));
+        .then((file) => {
+          const nextFiles = (message.files || []).slice(0);
+          nextFiles[index] = file;
+          // console.log('!!! file upload completed', file);
+          this.props.formState.set('files', nextFiles);
+        })
+        .catch(error => console.error('!!! File upload catch', error));
     };
   }
 
@@ -138,9 +141,7 @@ class MessageFormContents extends Component {
   }
 
   render() {
-    const {
-      className, domains, errors, formState, libraries, session,
-    } = this.props;
+    const { className, errors, formState, libraries, session } = this.props;
     const message = formState.object;
 
     let files;
@@ -207,23 +208,6 @@ class MessageFormContents extends Component {
       );
     }
 
-    let administeredBy;
-    if (session.userId.administrator) {
-      const domainOptions = domains.map(domain => (
-        <option key={domain._id} label={domain.name} value={domain._id} />
-      ));
-      domainOptions.unshift(<option key={0} />);
-      administeredBy = (
-        <FormField label="Administered by" error={errors.domainId}>
-          <select name="domainId"
-            value={message.domainId || ''}
-            onChange={formState.change('domainId')}>
-            {domainOptions}
-          </select>
-        </FormField>
-      );
-    }
-
     const libraryOptions = libraries.map(library => (
       <option key={library._id} label={library.name} value={library._id} />
     ));
@@ -286,7 +270,6 @@ class MessageFormContents extends Component {
               value={message.path || ''}
               onChange={formState.change('path')} />
           </FormField>
-          {administeredBy}
         </fieldset>
       </div>
     );
@@ -296,7 +279,6 @@ class MessageFormContents extends Component {
 MessageFormContents.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
-  domains: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   libraries: PropTypes.array,
@@ -305,13 +287,11 @@ MessageFormContents.propTypes = {
 
 MessageFormContents.defaultProps = {
   className: undefined,
-  domains: [],
   errors: {},
   libraries: [],
 };
 
 const select = state => ({
-  domains: (state.domains || {}).items || [],
   libraries: (state.libraries || {}).items || [],
   session: state.session,
 });

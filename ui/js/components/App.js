@@ -11,15 +11,15 @@ import MainNav from './MainNav';
 const PrivateRoute = ({ component, ...rest }) => (
   <Route {...rest}
     render={props => (
-    haveSession() ? (
-      React.createElement(component, props)
-    ) : (
-      <Redirect to={{
-        pathname: '/sign-in',
-        state: { nextPathname: props.location.pathname },
-      }} />
-    )
-  )} />
+      haveSession() ? (
+        React.createElement(component, props)
+      ) : (
+        <Redirect to={{
+          pathname: '/sign-in',
+          state: { nextPathname: props.location.pathname },
+        }} />
+      )
+    )} />
 );
 
 PrivateRoute.propTypes = {
@@ -63,7 +63,7 @@ class App extends Component {
     const { session } = props;
     return {
       navigable: (session &&
-        (session.userId.administrator || session.userId.administratorDomainId)),
+        (session.userId.administrator || session.userId.domainIds.length > 0)),
     };
   }
 
@@ -130,7 +130,7 @@ App.propTypes = {
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
-      administratorDomainId: PropTypes.string,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
     }),
   }),
 };

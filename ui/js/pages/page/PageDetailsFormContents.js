@@ -1,49 +1,24 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { loadCategory, unloadCategory } from '../../actions';
 import FormField from '../../components/FormField';
 import Button from '../../components/Button';
+import DomainIdField from '../../components/DomainIdField';
 
-class PageDetailsFormContents extends Component {
+export default class PageDetailsFormContents extends Component {
 
   constructor() {
     super();
     this._onToggle = this._onToggle.bind(this);
-    this.state = { active: false, domains: [] };
-  }
-
-  componentDidMount() {
-    const { formState, session } = this.props;
-    if (session.userId.administratorDomainId) {
-      formState.change('domainId')(session.userId.administratorDomainId);
-    }
-  }
-
-  componentWillUnmount() {
-    const { dispatch } = this.props;
-    dispatch(unloadCategory('domains'));
-  }
-
-  _get() {
-    const { dispatch, session } = this.props;
-    if (session.userId.administrator) {
-      dispatch(loadCategory('domains', { sort: 'name' }));
-    }
+    this.state = { active: false };
   }
 
   _onToggle() {
-    const { domains } = this.props;
-    const active = !this.state.active;
-    if (active && domains.length === 0) {
-      this._get();
-    }
     this.setState({ active: !this.state.active });
   }
 
   render() {
-    const { domains, formState, errors, session } = this.props;
+    const { formState, errors, session } = this.props;
     const { active } = this.state;
     const page = formState.object;
 
@@ -51,7 +26,8 @@ class PageDetailsFormContents extends Component {
     if (active) {
       contents = [
         <FormField key="align" error={errors.align}>
-          <input name="align"
+          <input id="align"
+            name="align"
             type="checkbox"
             checked={page.align !== 'start'}
             onChange={() => formState.set('align',
@@ -76,27 +52,8 @@ class PageDetailsFormContents extends Component {
             value={page.pathAlias || ''}
             onChange={formState.change('pathAlias')} />
         </FormField>,
+        <DomainIdField key="domain" formState={formState} session={session} />,
       ];
-
-      let administeredBy;
-      if (session.userId.administrator) {
-        const options = domains.map(domain => (
-          <option key={domain._id} label={domain.name} value={domain._id} />
-        ));
-        options.unshift(<option key={0} />);
-        administeredBy = (
-          <FormField key="admin"
-            label="Administered by"
-            error={errors.domainId}>
-            <select name="domainId"
-              value={page.domainId || ''}
-              onChange={formState.change('domainId')}>
-              {options}
-            </select>
-          </FormField>
-        );
-        contents.push(administeredBy);
-      }
     }
 
     return (
@@ -113,21 +70,11 @@ class PageDetailsFormContents extends Component {
 }
 
 PageDetailsFormContents.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-  domains: PropTypes.array,
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   session: PropTypes.object.isRequired,
 };
 
 PageDetailsFormContents.defaultProps = {
-  domains: [],
   errors: {},
 };
-
-const select = state => ({
-  domains: (state.domains || {}).items || [],
-  session: state.session,
-});
-
-export default connect(select)(PageDetailsFormContents);
