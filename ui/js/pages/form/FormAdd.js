@@ -19,7 +19,7 @@ class FormAdd extends Component {
     this._onChange = this._onChange.bind(this);
     this.state = {};
     if (props.formTemplate) {
-      this.state.form = { ...props.formTemplate.newForm };
+      this.state.form = { ...(props.formTemplate.newForm || { fields: [] }) };
     }
   }
 
