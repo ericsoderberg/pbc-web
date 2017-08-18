@@ -141,7 +141,7 @@ class FormSection extends Component {
       nextState = ADDING;
     } else if (editId || editForm) {
       nextState = EDITING;
-    } else if (formTemplate.monetary &&
+    } else if (formTemplate.payable &&
       formTemplate.forms.filter(f => f.cost.balance > 0).length > 0
       && !formTemplate.anotherLabel) {
       nextState = PAYING;
@@ -253,7 +253,7 @@ class FormSection extends Component {
     }
 
     let balance = 0;
-    if (formTemplate && formTemplate.monetary) {
+    if (formTemplate && formTemplate.payable) {
       forms.forEach((form) => {
         balance += form.cost.balance;
       });

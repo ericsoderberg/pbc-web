@@ -345,6 +345,9 @@ class FormTemplateFormContents extends Component {
             onChange={formState.change('notify')} />
         </FormField>,
       );
+      details.push(
+        <DomainIdField key="domain"formState={formState} session={session} />
+      );
     }
 
     return (
@@ -356,7 +359,6 @@ class FormTemplateFormContents extends Component {
               onChange={formState.change('name')} />
           </FormField>
           {details}
-          <DomainIdField formState={formState} session={session} />
         </fieldset>
         {sections}
         <fieldset className="form__fields">
