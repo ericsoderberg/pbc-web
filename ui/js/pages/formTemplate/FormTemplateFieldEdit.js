@@ -11,7 +11,7 @@ import BlankIcon from '../../icons/Blank';
 import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateOptionEdit from './FormTemplateOptionEdit';
-import { dependableFields } from './FormTemplateUtils';
+import { dependableFieldsAndOptions } from './FormTemplateUtils';
 
 const LINK_TO_USER_FIELDS = {
   name: /name/i,
@@ -258,12 +258,12 @@ export default class FormTemplateFieldEdit extends Component {
     }
 
     let dependsOn;
-    const dependsOnOptions = dependableFields(formTemplate, undefined, field)
-    .map(dependableField => (
-      <option key={dependableField._id || dependableField.id}
-        label={dependableField.name}
-        value={dependableField.id} />
-    ));
+    const dependsOnOptions = dependableFieldsAndOptions(formTemplate, undefined, field)
+      .map(dependableField => (
+        <option key={dependableField._id || dependableField.id}
+          label={dependableField.name}
+          value={dependableField.id} />
+      ));
     if (dependsOnOptions.length > 0) {
       dependsOnOptions.unshift(<option key={0} />);
       dependsOn = (

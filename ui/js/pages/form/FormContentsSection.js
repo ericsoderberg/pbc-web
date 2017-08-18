@@ -17,12 +17,14 @@ import FormContentsField from './FormContentsField';
 const FormContentsSection = (props) => {
   const {
     error, fields, formTemplateSection, linkedForm, linkedFormControl, onChange,
+    options,
   } = props;
 
   const formTemplateFields = (formTemplateSection.fields || [])
-  .filter(formTemplateField => (
-    !formTemplateField.dependsOnId || fields[formTemplateField.dependsOnId]
-  ));
+    .filter(formTemplateField => (
+      !formTemplateField.dependsOnId || fields[formTemplateField.dependsOnId] ||
+      options[formTemplateField.dependsOnId]
+    ));
 
   let name;
   if (formTemplateSection.name) {
@@ -63,6 +65,7 @@ FormContentsSection.propTypes = {
   linkedForm: PropTypes.object,
   linkedFormControl: PropTypes.element,
   onChange: PropTypes.func.isRequired,
+  options: PropTypes.object.isRequired,
 };
 
 FormContentsSection.defaultProps = {

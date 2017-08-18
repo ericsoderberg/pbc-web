@@ -10,7 +10,7 @@ import BlankIcon from '../../icons/Blank';
 import TrashIcon from '../../icons/Trash';
 import FormState from '../../utils/FormState';
 import FormTemplateFieldEdit from './FormTemplateFieldEdit';
-import { dependableFields } from './FormTemplateUtils';
+import { dependableFieldsAndOptions } from './FormTemplateUtils';
 
 const FIELD_TYPES = [
   'line', 'lines', 'choice', 'choices', 'number',
@@ -67,23 +67,23 @@ export default class FormTemplateSectionEdit extends Component {
       let details;
 
       if (detailsActive) {
-        const dependsOnOptions = dependableFields(formTemplate, section)
-        .map(dependableField => (
-          <option key={dependableField.id}
-            label={dependableField.name}
-            value={dependableField.id} />
-        ));
+        const dependsOnOptions = dependableFieldsAndOptions(formTemplate, section)
+          .map(dependableField => (
+            <option key={dependableField.id}
+              label={dependableField.name}
+              value={dependableField.id} />
+          ));
         dependsOnOptions.unshift(<option key={0} />);
 
         details = [
-          <FormField label="Depends on">
+          <FormField key="dependsOn" label="Depends on">
             <select name="dependsOnId"
               value={section.dependsOnId || ''}
               onChange={formState.change('dependsOnId')}>
               {dependsOnOptions}
             </select>
           </FormField>,
-          <FormField>
+          <FormField key="administrative">
             <input name="administrative"
               type="checkbox"
               checked={section.administrative || false}

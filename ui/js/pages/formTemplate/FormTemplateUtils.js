@@ -1,5 +1,5 @@
 
-export function dependableFields(formTemplate, templateSection, templateField) {
+export function dependableFieldsAndOptions(formTemplate, templateSection, templateField) {
   const result = [];
   (formTemplate.sections || []).some((section) => {
     if (templateSection &&
@@ -12,7 +12,15 @@ export function dependableFields(formTemplate, templateSection, templateField) {
         return true;
       }
       if (field.type !== 'instructions') {
-        result.push({ id: field._id || field.id, name: field.name });
+        result.push({ id: field._id || field.id, name: field.name || field.type });
+        if (field.type === 'choice' || field.type === 'choices') {
+          field.options.forEach((option) => {
+            result.push({
+              id: option._id || option.id,
+              name: `${field.name || ''} - ${option.name || option.value}`,
+            });
+          });
+        }
       }
       return false;
     });

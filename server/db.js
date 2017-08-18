@@ -273,7 +273,7 @@ const formTemplateOptionSchema = Schema({
 });
 
 const formTemplateFieldSchema = Schema({
-  dependsOnId: ObjectId,
+  dependsOnId: ObjectId, // form field or field option
   discount: Boolean, // negates form field value
   help: String,
   limit: Number,
@@ -300,7 +300,7 @@ const formTemplateFieldSchema = Schema({
 const formTemplateSectionSchema = Schema({
   administrative: Boolean,
   child: Boolean,
-  dependsOnId: ObjectId,
+  dependsOnId: ObjectId, // form field or field option
   fields: [formTemplateFieldSchema],
   name: String,
   oldId: Number,

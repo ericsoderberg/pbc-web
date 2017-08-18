@@ -39,17 +39,27 @@ class FormContents extends Component {
   }
 
   _stateFromProps(props) {
+    const { form, formTemplate, session } = props;
     const fields = {};
-    props.form.fields.forEach((field) => {
+    const options = {};
+    form.fields.forEach((field) => {
       if (isFieldSet(field)) {
         fields[field.templateFieldId] = field;
+        if (field.optionId) {
+          options[field.optionId] = field.optionId;
+        }
+        if (field.optionIds) {
+          field.optionIds.forEach((optionId) => {
+            options[optionId] = optionId;
+          });
+        }
       }
     });
-    const administrator = (props.session &&
-      (props.session.userId.administrator || (
-        (props.formTemplate && props.formTemplate.domainId &&
-        props.session.userId.domainIds.some(id => id === props.formTemplate.domainId)))));
-    return { administrator, fields };
+    const administrator = (session &&
+      (session.userId.administrator || (
+        (formTemplate && formTemplate.domainId &&
+        session.userId.domainIds.some(id => id === formTemplate.domainId)))));
+    return { administrator, fields, options };
   }
 
   _onChangeField(field) {
@@ -83,7 +93,7 @@ class FormContents extends Component {
     const {
       form, formTemplate, full, error, linkedForm, linkedFormControl, session,
     } = this.props;
-    const { administrator, fields } = this.state;
+    const { administrator, fields, options } = this.state;
 
     let formError;
     if (error) {
@@ -92,13 +102,15 @@ class FormContents extends Component {
 
     const sections = (formTemplate.sections || [])
       .filter(section => (
-        (!section.dependsOnId || fields[section.dependsOnId]) &&
+        (!section.dependsOnId || fields[section.dependsOnId] ||
+          options[section.dependsOnId]) &&
         (!section.administrative || (full && administrator))
       ))
       .map(section => (
         <FormContentsSection key={section._id || section.id}
           formTemplateSection={section}
           fields={fields}
+          options={options}
           linkedForm={linkedForm}
           linkedFormControl={linkedFormControl}
           error={error}
