@@ -31,15 +31,15 @@ const UserContentsBase = (props) => {
       <div className="associated">
         <Link className="associated-link"
           to={`/payments?userId=${user._id}&userId-name=${user.name}`}>
-          payments
+          Payments
         </Link>
         <Link className="associated-link"
           to={`/forms?userId=${encodeURIComponent(user._id)}&userId-name=${user.name}`}>
-          forms
+          Forms
         </Link>
         <Link className="associated-link"
           to={`/email-lists?addresses.address=${user.email}&addresses-name=${user.email}`}>
-          email lists
+          Email Lists
         </Link>
       </div>
     );

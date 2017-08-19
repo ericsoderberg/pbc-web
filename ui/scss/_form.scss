@@ -1129,14 +1129,18 @@
 
 .associated {
   margin-top: $quadruple-unit;
-  padding: $unit;
   background-color: $secondary-background-color;
 }
 
 .associated-link {
   display: block;
+  padding: $unit;
   text-align: center;
-  margin: $unit 0;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $hover-background;
+  }
 }
 
 .newsletter-header {

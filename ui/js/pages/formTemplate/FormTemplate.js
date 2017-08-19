@@ -628,13 +628,23 @@ class FormTemplate extends Component {
     }
 
     let payments;
-    if (formTemplate) {
+    if (formTemplate && formTemplate.payable) {
       payments = (
         <Link className="associated-link"
           to={`/payments?formTemplateId=${formTemplate._id}&` +
           `formTemplateId-name=${formTemplate.name}`}>
-          payments
+          Payments
         </Link>
+      );
+    }
+
+    let associated;
+    if (linkedForm || payments) {
+      associated = (
+        <div className="associated">
+          {linkedForm}
+          {payments}
+        </div>
       );
     }
 
@@ -649,8 +659,7 @@ class FormTemplate extends Component {
           filters={filterItems} />
         {contents}
         {more}
-        {linkedForm}
-        {payments}
+        {associated}
         <PageContext filter={{ 'sections.formTemplateId': id }} />
       </main>
     );
