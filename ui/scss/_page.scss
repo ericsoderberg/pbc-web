@@ -673,6 +673,14 @@ a.event-section__text {
 .event-times__label {
   display: inline-block;
   white-space: nowrap;
+
+  @media all and (max-width: 699px) {
+    white-space: normal;
+
+    &.event-times__label-times {
+      white-space: nowrap;
+    }
+  }
 }
 
 .footer {

@@ -11,9 +11,9 @@ const TimesSet = (props) => {
     (start.isSameOrAfter(noon) && end.isSameOrAfter(noon)));
   return (
     <span className="event-times__set">
-      <span className="event-times__label">{formatTime(start, !sameAmpm)}</span>
+      <span className="event-times__label event-times__label-times">{formatTime(start, !sameAmpm)}</span>
       <span className="event-times__separator">-</span>
-      <span className="event-times__label">{formatTime(end)}</span>
+      <span className="event-times__label event-times__label-times">{formatTime(end)}</span>
     </span>
   );
 };
@@ -105,7 +105,7 @@ const EventTimes = (props) => {
             <span className="event-times__label">{formatTimes(start, end)}</span>
           </div>,
           <div key={3} className="event-times__set">
-            <span className="event-times__label">
+            <span className="event-times__label event-times__label-times">
               {formatTimes(moment(secondTime.start), moment(secondTime.end))}
             </span>
           </div>,
