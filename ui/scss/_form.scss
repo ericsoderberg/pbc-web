@@ -124,6 +124,18 @@
   }
 }
 
+.form-section__item-button {
+  > span {
+    margin-right: $unit;
+  }
+
+  &:hover {
+    > span {
+      color: $control-hover-color;
+    }
+  }
+}
+
 .form-error + .form__fields {
   margin-top: 0;
 }

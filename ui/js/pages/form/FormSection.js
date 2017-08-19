@@ -44,7 +44,7 @@ const FormItem = (props) => {
     message = `${form.name}`;
   } else {
     const date = moment(form.modified).format('MMM Do YYYY');
-    timestamp = <span className="tertiary">{date}</span>;
+    timestamp = <span className="secondary">{date}</span>;
     if (distinguish) {
       message = `${verb} ${form.name}`;
     } else {
@@ -56,8 +56,11 @@ const FormItem = (props) => {
     <div className={classNames.join(' ')}>
       <div className="item item--full">
         <div>
-          <button className="button button-plain" onClick={onClick}>
-            {message} {timestamp} <RightIcon className="button__indicator" />
+          <button className="button button-plain form-section__item-button"
+            onClick={onClick}>
+            <span>{message}</span>
+            {timestamp}
+            <RightIcon className="button__indicator" />
           </button>
         </div>
       </div>
