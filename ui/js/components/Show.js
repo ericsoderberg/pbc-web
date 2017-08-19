@@ -80,7 +80,6 @@ Show.contextTypes = {
 const select = (state, props) => ({
   id: props.match.params.id,
   item: state[props.match.params.id],
-  session: state.session,
 });
 
 export default connect(select)(Show);

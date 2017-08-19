@@ -36,20 +36,11 @@ class UserEdit extends Component {
 
   render() {
     const { id, user } = this.props;
-    const name = encodeURIComponent((user || {}).name);
-    const email = encodeURIComponent((user || {}).email);
-    const formsPath = `/forms?userId=${encodeURIComponent(id)}&userId-name=${name}`;
-    const emailListsPath = `/email-lists?addresses.address=${email}&addresses-name=${email}`;
-    const actions = [
-      <Link key="forms" to={formsPath}>Forms</Link>,
-      <Link key="email" to={emailListsPath}>Email lists</Link>,
-    ];
     return (
       <Edit title="Edit Account"
         category="users"
         id={id}
         item={user}
-        actions={actions}
         FormContents={UserFormContents} />
     );
   }

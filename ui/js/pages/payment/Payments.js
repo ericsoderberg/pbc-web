@@ -34,6 +34,13 @@ export default class Payments extends List {}
 Payments.defaultProps = {
   ...List.defaultProps,
   category: 'payments',
+  filters: [{
+    property: 'formTemplateId',
+    category: 'form-templates',
+    allLabel: 'All templates',
+  }, {
+    property: 'userId', category: 'users', allLabel: 'Anyone',
+  }],
   Item,
   path: '/payments',
   populate: true,

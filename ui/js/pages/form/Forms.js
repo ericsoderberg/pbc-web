@@ -41,15 +41,19 @@ const Forms = (props) => {
   ];
 
   return (
-    <List history={history} location={location}
-      category="forms" title="Forms" path="/forms"
+    <List history={history}
+      location={location}
+      category="forms"
+      title="Forms"
+      path="/forms"
       filters={[{
         property: 'formTemplateId',
         category: 'form-templates',
         allLabel: 'All templates',
       }, {
         property: 'userId', category: 'users', allLabel: 'Anyone',
-      }]} sort="-modified"
+      }]}
+      sort="-modified"
       populate={populate}
       addIfFilter="formTemplateId"
       Item={Item} />

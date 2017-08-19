@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import Show from '../../components/Show';
 import Section from '../../components/Section';
 import Text from '../../components/Text';
 import Image from '../../components/Image';
 
-const UserContents = (props) => {
+const UserContentsBase = (props) => {
+  const { session } = props;
   const user = props.item;
 
   let image;
@@ -19,6 +22,26 @@ const UserContents = (props) => {
       <Section full={false}>
         <Text text={user.text} />
       </Section>
+    );
+  }
+
+  let associated;
+  if (session && session.userId.administrator) {
+    associated = (
+      <div className="associated">
+        <Link className="associated-link"
+          to={`/payments?userId=${user._id}&userId-name=${user.name}`}>
+          payments
+        </Link>
+        <Link className="associated-link"
+          to={`/forms?userId=${encodeURIComponent(user._id)}&userId-name=${user.name}`}>
+          forms
+        </Link>
+        <Link className="associated-link"
+          to={`/email-lists?addresses.address=${user.email}&addresses-name=${user.email}`}>
+          email lists
+        </Link>
+      </div>
     );
   }
 
@@ -36,14 +59,30 @@ const UserContents = (props) => {
         </div>
       </Section>
       {text}
+      {associated}
     </div>
   );
 };
 
-
-UserContents.propTypes = {
+UserContentsBase.propTypes = {
   item: PropTypes.object.isRequired,
+  session: PropTypes.shape({
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
+    }),
+  }),
 };
+
+UserContentsBase.defaultProps = {
+  session: undefined,
+};
+
+const select = state => ({
+  session: state.session,
+});
+
+const UserContents = connect(select)(UserContentsBase);
 
 export default class User extends Show {}
 

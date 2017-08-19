@@ -1127,9 +1127,16 @@
   }
 }
 
-.linked-form-link {
+.associated {
+  margin-top: $quadruple-unit;
+  padding: $unit;
+  background-color: $secondary-background-color;
+}
+
+.associated-link {
   display: block;
   text-align: center;
+  margin: $unit 0;
 }
 
 .newsletter-header {

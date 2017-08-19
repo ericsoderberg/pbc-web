@@ -128,6 +128,7 @@ export default function (router) {
         data.name = useUser.name || useUser.email;
         if (forms && forms.length > 0) {
           data.domainId = forms[0].domainId;
+          data.formTemplateId = forms[0].formTemplateId;
         }
         const payment = new Payment(data);
         return payment.save().then(doc => ({ doc, ...context }));
@@ -166,7 +167,7 @@ export default function (router) {
       })
       .then(loadPaymentForms)
       .then((context) => {
-        const { data, session, payment, user } = context;
+        const { data, forms, session, payment, user } = context;
         // Allow an administrator to set the userId. Otherwise, set it to
         // the current session user
         if (!data.userId || !canAdmin(session, payment)) {
@@ -175,6 +176,10 @@ export default function (router) {
         const useUser = user || session.userId;
         data.name = useUser.name || useUser.email;
         data.modified = new Date();
+        if (forms && forms.length > 0) {
+          data.domainId = forms[0].domainId;
+          data.formTemplateId = forms[0].formTemplateId;
+        }
         // Have to use update in case non-admin edits something, don't want
         // to overwrite admin fields.
         return payment.update(unsetDomainIfNeeded(data, session))

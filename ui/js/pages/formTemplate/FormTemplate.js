@@ -620,9 +620,20 @@ class FormTemplate extends Component {
     let linkedForm;
     if (formTemplate && formTemplate.linkedFormTemplateId) {
       linkedForm = (
-        <Link className="linked-form-link"
+        <Link className="associated-link"
           to={`/form-templates/${formTemplate.linkedFormTemplateId._id}`}>
           {formTemplate.linkedFormTemplateId.name}
+        </Link>
+      );
+    }
+
+    let payments;
+    if (formTemplate) {
+      payments = (
+        <Link className="associated-link"
+          to={`/payments?formTemplateId=${formTemplate._id}&` +
+          `formTemplateId-name=${formTemplate.name}`}>
+          payments
         </Link>
       );
     }
@@ -639,6 +650,7 @@ class FormTemplate extends Component {
         {contents}
         {more}
         {linkedForm}
+        {payments}
         <PageContext filter={{ 'sections.formTemplateId': id }} />
       </main>
     );
