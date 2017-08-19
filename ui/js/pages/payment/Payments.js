@@ -7,6 +7,10 @@ import List from '../../components/List';
 const Item = (props) => {
   const { className, item: payment } = props;
   const classNames = ['item__container', className];
+  const amountClassNames = ['payment__item-amount'];
+  if (!payment.received) {
+    amountClassNames.push('error');
+  }
   return (
     <Link className={classNames.join(' ')}
       to={`/payments/${payment._id}/edit`}>
@@ -15,8 +19,11 @@ const Item = (props) => {
           <span>{payment.name}</span>
           <span className="tertiary">{(payment.formTemplateId || {}).name}</span>
         </span>
-        <span className="secondary">
-          {moment(payment.sent).format('MMM Do YYYY')}
+        <span className="box--row">
+          <span className="secondary">
+            {moment(payment.sent).format('MMM Do YYYY')}
+          </span>
+          <span className={amountClassNames.join(' ')}>$ {payment.amount}</span>
         </span>
       </div>
     </Link>
