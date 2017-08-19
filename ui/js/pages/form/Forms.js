@@ -13,8 +13,8 @@ const Item = (props) => {
       to={`/forms/${form._id}/edit`}>
       <div className="item">
         <span className="box--row">
-          <span>{form.formTemplateId.name}</span>
           <span>{form.name || (form.userId || {}).name}</span>
+          <span className="tertiary">{form.formTemplateId.name}</span>
         </span>
         <span className="secondary">
           {moment(form.modified).format('MMM Do YYYY')}

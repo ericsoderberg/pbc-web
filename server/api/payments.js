@@ -65,6 +65,7 @@ export default function (router) {
       filterAuthorized: authorizedForDomainOrSelf,
       populate: [
         { path: 'userId', select: 'name' },
+        { path: 'formTemplateId', select: 'name' },
       ],
     },
   });
@@ -77,7 +78,10 @@ export default function (router) {
         const id = req.params.id;
         const Payment = mongoose.model('Payment');
         return Payment.findOne({ _id: id })
-          .populate({ path: 'userId', select: 'name' })
+          .populate([
+            { path: 'userId', select: 'name' },
+            { path: 'formTemplateId', select: 'name' },
+          ])
           .exec()
           .then(payment => ({ payment, session }));
       })

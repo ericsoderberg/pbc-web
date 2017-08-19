@@ -11,7 +11,10 @@ const Item = (props) => {
     <Link className={classNames.join(' ')}
       to={`/payments/${payment._id}/edit`}>
       <div className="item">
-        <span className="item__name">{payment.name}</span>
+        <span className="box--row">
+          <span>{payment.name}</span>
+          <span className="tertiary">{(payment.formTemplateId || {}).name}</span>
+        </span>
         <span className="secondary">
           {moment(payment.sent).format('MMM Do YYYY')}
         </span>
