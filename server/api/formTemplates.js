@@ -45,11 +45,11 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
   if (templateField.type === 'count' || templateField.type === 'number') {
     value = templateField.value * field.value;
   } else if (templateField.type === 'choice' && field.optionId) {
-    const option = optionMap[field.optionId];
+    const option = optionMap[field.optionId] || {}; // in case removed
     value = option.value || option.name;
   } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
     value = field.optionIds.map((optionId) => {
-      const option = optionMap[optionId];
+      const option = optionMap[optionId] || {}; // in case removed
       return option.value || option.name;
     });
     value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);

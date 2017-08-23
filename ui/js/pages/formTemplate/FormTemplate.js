@@ -284,11 +284,11 @@ class FormTemplate extends Component {
     if (templateField.type === 'count' || templateField.type === 'number') {
       value = templateField.value * field.value;
     } else if (templateField.type === 'choice' && field.optionId) {
-      const option = optionMap[field.optionId];
+      const option = optionMap[field.optionId] || {};
       value = option.value;
     } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
       value = field.optionIds.map((optionId) => {
-        const option = optionMap[optionId];
+        const option = optionMap[optionId] || {};
         return option.value;
       });
       value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
@@ -313,7 +313,7 @@ class FormTemplate extends Component {
         </span>
       );
     } else if (templateField.type === 'choice' && field.optionId) {
-      const option = optionMap[field.optionId];
+      const option = optionMap[field.optionId] || {};
       if (templateField.monetary) {
         if (option.value === null || option.value === option.name) {
           contents = `$ ${option.name}`;
@@ -325,7 +325,7 @@ class FormTemplate extends Component {
       }
     } else if (templateField.type === 'choices' && field.optionIds) {
       contents = field.optionIds.map((optionId) => {
-        const option = optionMap[optionId];
+        const option = optionMap[optionId] || {};
         if (templateField.monetary) {
           if (option.value === null || option.value === option.name) {
             return `$ ${option.name}`;
