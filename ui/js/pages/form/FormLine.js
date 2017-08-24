@@ -7,18 +7,25 @@ const FormLine = (props) => {
     error, field, formTemplateField, linkedField, linkedFormControl, onChange,
   } = props;
 
+  let type = 'text';
+  if (formTemplateField.name && formTemplateField.name.match(/^email/i)) {
+    type = 'email';
+  } else if (formTemplateField.name && formTemplateField.name.match(/^phone/i)) {
+    type = 'tel';
+  }
+
   let contents;
   if (linkedField) {
     contents = (
       <input name={formTemplateField.name}
-        type="text"
+        type={type}
         value={linkedField.value || ''}
         disabled={true} />
     );
   } else {
     contents = (
       <input name={formTemplateField.name}
-        type="text"
+        type={type}
         value={field.value || ''}
         onChange={event => onChange({
           templateFieldId: formTemplateField._id,

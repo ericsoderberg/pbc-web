@@ -19,9 +19,10 @@ const FormNumber = (props) => {
   let contents = (
     <input name={formTemplateField.name}
       type="number"
+      pattern="\d*"
       min={min}
       max={max}
-      value={field.value || min}
+      value={field.value}
       onChange={event =>
         onChange({
           templateFieldId: formTemplateField._id,
