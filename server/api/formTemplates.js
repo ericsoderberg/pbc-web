@@ -62,11 +62,12 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
 const fieldContents = (field, templateField, optionMap) => {
   let contents = field.value;
   if (templateField.type === 'count' || templateField.type === 'number') {
-    let prefix = '';
-    if (templateField.monetary) {
-      prefix = '$';
-    }
-    contents = `${prefix}${templateField.value || ''} x ${field.value}`;
+    // let prefix = '';
+    // if (templateField.value) {
+    //   prefix = `${templateField.monetary ? '$ ' : ''}${templateField.value || ''} x`;
+    // }
+    // contents = `${prefix}${field.value}`;
+    contents = field.value;
   } else if (templateField.type === 'choice' && field.optionId) {
     contents = (optionMap[field.optionId] || {}).name || '';
   } else if (templateField.type === 'choices' && field.optionIds) {

@@ -282,7 +282,7 @@ class FormTemplate extends Component {
     const templateField = templateFieldMap[field.templateFieldId];
     let value;
     if (templateField.type === 'count' || templateField.type === 'number') {
-      value = templateField.value * field.value;
+      value = (templateField.value || 1) * field.value;
     } else if (templateField.type === 'choice' && field.optionId) {
       const option = optionMap[field.optionId] || {};
       value = option.value;
@@ -303,15 +303,14 @@ class FormTemplate extends Component {
     let contents = field.value;
     if (templateField.type === 'count' || templateField.type === 'number') {
       let prefix;
-      if (templateField.monetary) {
-        prefix = '$ ';
+      if (templateField.value) {
+        prefix = (
+          <span className="secondary">
+            {`${templateField.monetary ? '$ ' : ''}${templateField.value} x `}
+          </span>
+        );
       }
-      contents = (
-        <span>
-          <span className="secondary">{prefix}{templateField.value} x </span>
-          {field.value}
-        </span>
-      );
+      contents = <span>{prefix}{field.value}</span>;
     } else if (templateField.type === 'choice' && field.optionId) {
       const option = optionMap[field.optionId] || {};
       if (templateField.monetary) {
