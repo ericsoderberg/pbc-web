@@ -40,17 +40,17 @@ const unsetReferences = (data) => {
 };
 
 const fieldValue = (field, templateFieldMap, optionMap) => {
-  const templateField = templateFieldMap[field.templateFieldId];
+  const templateField = templateFieldMap[field.templateFieldId] || {};
   let value;
   if (templateField.type === 'count' || templateField.type === 'number') {
-    value = templateField.value * field.value;
+    value = (templateField.value || 1) * field.value;
   } else if (templateField.type === 'choice' && field.optionId) {
     const option = optionMap[field.optionId] || {}; // in case removed
-    value = option.value || option.name;
+    value = option.value || option.name || '';
   } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
     value = field.optionIds.map((optionId) => {
       const option = optionMap[optionId] || {}; // in case removed
-      return option.value || option.name;
+      return option.value || option.name || '';
     });
     value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
   } else {
@@ -62,21 +62,21 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
 const fieldContents = (field, templateField, optionMap) => {
   let contents = field.value;
   if (templateField.type === 'count' || templateField.type === 'number') {
-    let prefix;
+    let prefix = '';
     if (templateField.monetary) {
       prefix = '$';
     }
-    contents = `${prefix}${templateField.value} x ${field.value}`;
+    contents = `${prefix}${templateField.value || ''} x ${field.value}`;
   } else if (templateField.type === 'choice' && field.optionId) {
-    contents = optionMap[field.optionId].name;
+    contents = (optionMap[field.optionId] || {}).name || '';
   } else if (templateField.type === 'choices' && field.optionIds) {
     contents = field.optionIds.map((optionId) => {
-      const option = optionMap[optionId];
+      const option = optionMap[optionId] || {}; // in case removed
       let suffix = '';
       if (templateField.monetary) {
-        suffix = ` $${option.value}`;
+        suffix = ` $${option.value || '?'}`;
       }
-      return `${option.name}${suffix}`;
+      return `${option.name || ''}${suffix}`;
     })
       .join(', ');
   } else if (templateField.type === 'date') {
@@ -287,7 +287,6 @@ export default function (router) {
         return context;
       })
       .then((context) => {
-        const { formTemplate } = context;
         const query = Form.find();
         if (req.query.search) {
           const exp = new RegExp(req.query.search, 'i');
