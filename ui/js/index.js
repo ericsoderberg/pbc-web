@@ -1,6 +1,8 @@
+import 'whatwg-fetch';
+import { polyfill as promisePolyfill } from 'es6-promise';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { Provider } from 'react-redux';
 import reduxThunk from 'redux-thunk';
@@ -12,6 +14,8 @@ import App from './components/App';
 
 require('leaflet/dist/leaflet.css');
 // require('../scss/index.scss');
+
+promisePolyfill();
 
 const history = createBrowserHistory();
 
