@@ -30,12 +30,12 @@
     position: absolute;
     z-index: 100;
     top: 0;
-    right: -$sidebar-width;
+    left: 100vw;
     bottom: 0;
     width: $sidebar-width;
     padding-top: $triple-unit;
     overflow: hidden;
-    transition: right 0.3s;
+    transition: left 0.3s;
   }
 
   @media screen and (max-width: 699px) {
@@ -69,7 +69,7 @@
 .home__menu--active {
 
   @media all and (min-width: 700px) {
-    right: 0px;
+    left: calc(100vw - #{$sidebar-width});
   }
 }
 
