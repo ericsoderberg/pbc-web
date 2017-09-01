@@ -27,7 +27,7 @@ class Home extends Component {
     this._showMenu = this._showMenu.bind(this);
     this._hideMenu = this._hideMenu.bind(this);
     this._onSearch = this._onSearch.bind(this);
-    this.state = { menuHeight: 0, menuReady: false, showMenu: false };
+    this.state = { menuHeight: 115, menuReady: false, showMenu: false };
   }
 
   componentDidMount() {
@@ -38,7 +38,8 @@ class Home extends Component {
     }
     window.addEventListener('resize', this._onResize);
     // delay readiness of menu to avoid initial style animation on mobile
-    this._readyTimer = setTimeout(() => this.setState({ menuReady: true }), 1000);
+    this._readyTimer = setTimeout(() => this.setState({ menuReady: true }), 500);
+    this._layoutNeeded = true;
   }
 
   componentWillReceiveProps(nextProps) {

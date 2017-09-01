@@ -1,6 +1,7 @@
 import express from 'express';
 import ejs from 'ejs';
 import fs from 'fs';
+import path from 'path';
 import mongoose from 'mongoose';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
@@ -16,7 +17,8 @@ import App from '../dist/./ui/js/components/App';
 mongoose.Promise = global.Promise;
 
 const router = express.Router();
-const templateString = fs.readFileSync('./dist/./ui/index-iso.html', 'utf-8');
+const templateString =
+  fs.readFileSync(path.resolve(path.join(__dirname, '/../dist/./index-iso.html')), 'utf-8');
 
 router.get('/*', (req, res, next) => {
   const context = {};

@@ -10,6 +10,7 @@ const DEVELOPMENT = (mode === 'development');
 const plugins = [
   new CopyWebpackPlugin([
     { from: './ui/index.html' },
+    { from: './ui/index-iso.html' },
     { from: './ui', to: 'ui' },
     { from: './*.png' },
   ]),

@@ -1,6 +1,15 @@
 
 .home--ready {
-  transition: transform 1s;
+  opacity: 1;
+  transition: transform 1s, opacity 1s;
+}
+
+.home:not(.home--ready) {
+  .home__menu {
+    @media screen and (max-width: 699px) {
+      opacity: 0;
+    }
+  }
 }
 
 .home__header {
