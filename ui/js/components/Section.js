@@ -109,7 +109,8 @@ export default class Section extends Component {
 Section.propTypes = {
   align: PropTypes.oneOf(['center', 'start', 'end']),
   backgroundImage: PropTypes.shape({
-    data: PropTypes.string.isRequired,
+    data: PropTypes.string,
+    path: PropTypes.string,
   }),
   children: PropTypes.any.isRequired,
   className: PropTypes.string,

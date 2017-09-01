@@ -54,6 +54,25 @@ const loadSite = (store) => {
     });
 };
 
+const removeImageData = (page) => {
+  // remove image data so we render url instead
+  page.sections.forEach((section) => {
+    if (section.backgroundImage) {
+      section.backgroundImage.path =
+        `/api/pages/${page._id}/${section._id}/${section.backgroundImage.name}`;
+      delete section.backgroundImage.data;
+    }
+    if (section.eventId) {
+      const event = section.eventId;
+      if (event.image) {
+        event.image.path = `/api/events/${event._id}/${event.image.name}`;
+        delete event.image.data;
+      }
+    }
+  });
+  return page;
+};
+
 // Home page
 router.get('/', (req, res, next) => {
   const context = {};
@@ -70,6 +89,7 @@ router.get('/', (req, res, next) => {
         .forEach(p => query.populate(p));
       return query.exec()
         .then(page => populatePage(page, false))
+        .then(removeImageData)
         .then((page) => {
           store.dispatch({
             type: ITEM_LOAD, payload: { category: 'pages', id, item: page } });
@@ -198,6 +218,7 @@ router.get('/:id', (req, res, next) => {
       return query.exec()
         .then(page => page || Promise.reject('none'))
         .then(page => populatePage(page, false))
+        .then(removeImageData)
         .then((page) => {
           title = page.name;
           store.dispatch({

@@ -54,15 +54,15 @@ class CalendarSection extends Component {
     let result;
     if (events && events.length > 0) {
       result = events
-      .filter(event => excludeEventIds.indexOf(event._id) === -1)
-      .map(event => (
-        <Section key={event._id}
-          align="center"
-          full={true}
-          backgroundImage={event.image}>
-          <EventSection key={event._id} id={event} />
-        </Section>
-      ));
+        .filter(event => excludeEventIds.indexOf(event._id) === -1)
+        .map(event => (
+          <Section key={event._id}
+            align="center"
+            full={true}
+            backgroundImage={event.image}>
+            <EventSection key={event._id} id={event} />
+          </Section>
+        ));
     } else if (calendar) {
       result = (
         <Button path={`/calendars/${calendar.path || calendar._id}`}

@@ -17,7 +17,7 @@ const Image = (props) => {
   return (
     <img className={classes.join(' ')}
       alt=""
-      src={image ? image.data : ''}
+      src={image ? (image.data || image.path) : ''}
       style={style} />
   );
 };

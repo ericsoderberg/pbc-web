@@ -7,7 +7,7 @@ import {
 import { addForms, addNewForm } from './formTemplates';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
-import { catcher } from './utils';
+import { catcher, sendImage } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -307,6 +307,23 @@ export default function (router) {
         console.error('!!! error', error);
         res.status(400).json(error);
       });
+  });
+
+  router.get('/pages/:id/:sectionId/:imageName', (req, res) => {
+    const Page = mongoose.model('Page');
+    const id = req.params.id;
+    const sectionId = req.params.sectionId;
+    const imageName = req.params.imageName;
+    Page.findOne({ _id: id }).exec()
+      .then((page) => {
+        const section = page.sections.filter(s => s._id.equals(sectionId))[0];
+        if (section && section.backgroundImage.name === imageName) {
+          sendImage(section.backgroundImage, res);
+        } else {
+          res.status(404).send();
+        }
+      })
+      .catch(error => catcher(error, res));
   });
 
   register(router, {

@@ -23,12 +23,12 @@ const EventContents = (props) => {
   let upcoming;
   const today = moment().startOf('day');
   const upcomingDates = (event.dates || []).sort().map(date => moment(date))
-  .filter(date => date.isAfter(today)).slice(0, 3)
-  .map(date => (
-    <li key={date} className={`item item--${align}`}>
-      {date.format('MMMM Do YYYY')}
-    </li>
-  ));
+    .filter(date => date.isAfter(today)).slice(0, 3)
+    .map(date => (
+      <li key={date} className={`item item--${align}`}>
+        {date.format('MMMM Do YYYY')}
+      </li>
+    ));
   if (upcomingDates.length > 0) {
     upcoming = (
       <Section align={align} full={false}>
