@@ -5,7 +5,7 @@ import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
 
-const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
+export const ID_REGEXP = /^[0-9a-fA-F]{24}$/;
 
 // Generic
 

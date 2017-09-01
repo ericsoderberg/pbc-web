@@ -10,7 +10,7 @@ mongoose.Promise = global.Promise;
 
 // Messages
 
-const populateMessage = (message) => {
+export const populateMessage = (message) => {
   const Doc = mongoose.model('Message');
   const subFields = 'name verses date path author';
 
@@ -79,6 +79,11 @@ const updateSeriesDate = (doc) => {
   return doc;
 };
 
+export const messagePopulations = [
+  { path: 'seriesId', select: 'name path' },
+  { path: 'libraryId', select: 'name path' },
+];
+
 export default function (router) {
   register(router, {
     category: 'messages',
@@ -86,10 +91,7 @@ export default function (router) {
     omit: ['index'],
     get: {
       authorization: allowAnyone,
-      populate: [
-        { path: 'seriesId', select: 'name path' },
-        { path: 'libraryId', select: 'name path' },
-      ],
+      populate: messagePopulations,
       transformOut: (message, req) => {
         if (message && req.query.populate) {
           return populateMessage(message);
@@ -169,6 +171,6 @@ export default function (router) {
         res.setHeader('Cache-Control', 'max-age=0');
         res.json(docs);
       })
-    .catch(error => catcher(error, res));
+      .catch(error => catcher(error, res));
   });
 }

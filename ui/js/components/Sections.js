@@ -29,7 +29,7 @@ export default class Sections extends Component {
         // exclude events already in sections
         const excludeEventIds =
           sections.filter(s => s.type === 'event')
-          .map(s => s.eventId._id || s.eventId);
+            .map(s => s.eventId._id || s.eventId);
         contents = (
           <CalendarSection key={section._id || section.id}
             id={section.calendarId}

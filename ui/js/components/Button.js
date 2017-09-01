@@ -73,6 +73,7 @@ export default class Button extends Component {
       arrow = (
         <svg viewBox="0 0 24 24"
           preserveAspectRatio="none"
+          width="24"
           className="button__arrow">
           <path d="M24,0 L24,24 L0,12 Z" />
         </svg>
@@ -88,6 +89,7 @@ export default class Button extends Component {
       arrow = (
         <svg viewBox="0 0 24 24"
           preserveAspectRatio="none"
+          width="24"
           className="button__arrow">
           <path d="M0,0 L24,12 L0,24 Z" />
         </svg>
