@@ -37,7 +37,7 @@ function addChildren(page, pages) {
 const PAGE_MESSAGE_FIELDS =
   'path name verses author date image series seriesId';
 
-const populatePage = (data, session) => {
+export const populatePage = (data, session) => {
   const Message = mongoose.model('Message');
   const Event = mongoose.model('Event');
   const FormTemplate = mongoose.model('FormTemplate');
@@ -109,26 +109,30 @@ const populatePage = (data, session) => {
       );
     });
 
-  // FormTemplate
-  page.sections
-    .filter(section => (section.type === 'form' && section.formTemplateId))
-    .forEach((section) => {
-      section.formTemplateId = section.formTemplateId._id; // un-populate
-      promises.push(
-        FormTemplate.findOne({ _id: section.formTemplateId })
-          .exec()
-          .then((formTemplate) => {
-            if (formTemplate) {
-              if (session) {
-                return addForms(formTemplate, session)
-                  .then(data2 => addNewForm(data2, session));
+  // Don't load formTemplate when rendering on the server, we don't have
+  // a session.
+  if (session !== false) {
+    // FormTemplate
+    page.sections
+      .filter(section => (section.type === 'form' && section.formTemplateId))
+      .forEach((section) => {
+        section.formTemplateId = section.formTemplateId._id; // un-populate
+        promises.push(
+          FormTemplate.findOne({ _id: section.formTemplateId })
+            .exec()
+            .then((formTemplate) => {
+              if (formTemplate) {
+                if (session) {
+                  return addForms(formTemplate, session)
+                    .then(data2 => addNewForm(data2, session));
+                }
+                return addNewForm(formTemplate, session);
               }
-              return addNewForm(formTemplate, session);
-            }
-            return formTemplate;
-          }),
-      );
-    });
+              return formTemplate;
+            }),
+        );
+      });
+  }
 
   return Promise.all(promises)
     .then((docs) => {
@@ -243,6 +247,22 @@ const preparePage = (data) => {
   return data;
 };
 
+export const pagePopulations = [
+  { path: 'sections.pages.id', select: 'name path', model: 'Page' },
+  { path: 'sections.people.id', select: 'name image', model: 'User' },
+  {
+    path: 'sections.eventId',
+    select: 'name path start end dates times address location ' +
+      'image color',
+    model: 'Event',
+  },
+  { path: 'sections.libraryId', select: 'name path', model: 'Library' },
+  { path: 'sections.calendarId', select: 'name path', model: 'Calendar' },
+  { path: 'sections.formTemplateId',
+    select: 'name',
+    model: 'FormTemplate' },
+];
+
 export default function (router) {
   router.get('/pages/:id/map', (req, res) => {
     getSession(req)
@@ -301,21 +321,7 @@ export default function (router) {
     get: {
       pathAlias: true,
       authorization: allowAnyone,
-      populate: [
-        { path: 'sections.pages.id', select: 'name path', model: 'Page' },
-        { path: 'sections.people.id', select: 'name image', model: 'User' },
-        {
-          path: 'sections.eventId',
-          select: 'name path start end dates times address location ' +
-            'image color',
-          model: 'Event',
-        },
-        { path: 'sections.libraryId', select: 'name path', model: 'Library' },
-        { path: 'sections.calendarId', select: 'name path', model: 'Calendar' },
-        { path: 'sections.formTemplateId',
-          select: 'name',
-          model: 'FormTemplate' },
-      ],
+      populate: pagePopulations,
       transformOut: (page, req, session) => {
         if (page && req.query.populate) {
           return populatePage(page, session);

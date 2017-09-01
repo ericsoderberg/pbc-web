@@ -11,41 +11,41 @@ const redirectFile = (res, fileName, oldMessageId) => {
   const Message = mongoose.model('Message');
   // look for a message with the file
   Message.findOne({ 'files.name': fileName }).exec()
-  .then((message) => {
-    if (message) {
-      let path;
-      // find a file that matches
-      message.files.some((file) => {
-        if (file.name === fileName) {
-          path = `/files/${file._id}/${file.name}`;
-          return true;
+    .then((message) => {
+      if (message) {
+        let path;
+        // find a file that matches
+        message.files.some((file) => {
+          if (file.name === fileName) {
+            path = `/files/${file._id}/${file.name}`;
+            return true;
+          }
+          return false;
+        });
+        // if no file matches, at least match the message
+        if (!path && message.oldId === oldMessageId) {
+          path = `/messages/${message._id}`;
         }
-        return false;
-      });
-      // if no file matches, at least match the message
-      if (!path && message.oldId === oldMessageId) {
-        path = `/messages/${message._id}`;
-      }
-      if (path) {
-        res.redirect(301, path);
-      } else {
-        // at least send them to the library
-        res.redirect(301, '/libraries/sermon');
-      }
-    } else if (oldMessageId) {
-      // we didn't find a file match, check for old message id
-      Message.findOne({ oldId: oldMessageId }).exec()
-      .then((message2) => {
-        if (message2) {
-          res.redirect(301, `/messages/${message2._id}`);
+        if (path) {
+          res.redirect(301, path);
         } else {
+          // at least send them to the library
           res.redirect(301, '/libraries/sermon');
         }
-      });
-    } else {
-      res.redirect(301, '/libraries/sermon');
-    }
-  });
+      } else if (oldMessageId) {
+        // we didn't find a file match, check for old message id
+        Message.findOne({ oldId: oldMessageId }).exec()
+          .then((message2) => {
+            if (message2) {
+              res.redirect(301, `/messages/${message2._id}`);
+            } else {
+              res.redirect(301, '/libraries/sermon');
+            }
+          });
+      } else {
+        res.redirect(301, '/libraries/sermon');
+      }
+    });
 };
 
 // /dp/stedman/romans2/3518.html
@@ -102,13 +102,13 @@ router.get('/library/series.html', (req, res) => {
   const oldId = req.query.series;
   const Message = mongoose.model('Message');
   Message.findOne({ oldId }).exec()
-  .then((message) => {
-    if (message) {
-      res.redirect(301, `/messages/${message._id}`);
-    } else {
-      res.redirect(301, '/libraries/sermon');
-    }
-  });
+    .then((message) => {
+      if (message) {
+        res.redirect(301, `/messages/${message._id}`);
+      } else {
+        res.redirect(301, '/libraries/sermon');
+      }
+    });
 });
 
 module.exports = router;

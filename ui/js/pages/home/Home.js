@@ -68,8 +68,8 @@ class Home extends Component {
   _signOut() {
     const { history } = this.props;
     deleteSession()
-    .then(() => history.go('/'))
-    .catch(error => console.error('!!! Home _signOut catch', error));
+      .then(() => history.go('/'))
+      .catch(error => console.error('!!! Home _signOut catch', error));
   }
 
   _onResize() {
@@ -126,14 +126,14 @@ class Home extends Component {
     ];
     if (page) {
       page.sections.filter(section => section.type === 'pages')
-      .forEach((section) => {
-        section.pages.forEach((sectionPage) => {
-          const actualPage = sectionPage.id; // how the backend returns it
-          const path = actualPage.path ? `/${actualPage.path}` :
-            `/pages/${actualPage._id}`;
-          links.push(<Link key={path} to={path}>{actualPage.name}</Link>);
+        .forEach((section) => {
+          section.pages.forEach((sectionPage) => {
+            const actualPage = sectionPage.id; // how the backend returns it
+            const path = actualPage.path ? `/${actualPage.path}` :
+              `/pages/${actualPage._id}`;
+            links.push(<Link key={path} to={path}>{actualPage.name}</Link>);
+          });
         });
-      });
 
       const calendarSections =
         page.sections.filter(section => section.type === 'calendar');
@@ -147,11 +147,11 @@ class Home extends Component {
       }
 
       page.sections.filter(section => section.type === 'library')
-      .forEach((section) => {
-        const library = section.libraryId;
-        const path = `/libraries/${library.path || library._id}`;
-        links.push(<Link key={path} to={path}>Library</Link>);
-      });
+        .forEach((section) => {
+          const library = section.libraryId;
+          const path = `/libraries/${library.path || library._id}`;
+          links.push(<Link key={path} to={path}>Library</Link>);
+        });
     }
 
     if (session && session.token) {

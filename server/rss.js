@@ -24,18 +24,18 @@ function renderRSS(urlBase, library, messages) {
 
   const items = messages.map((message) => {
     const enclosures = message.files
-    .filter(file => FILE_TYPE_REGEXP.test(file.type))
-    .map((file) => {
-      if (!file.size) {
-        const filePath = `${FILES_PATH}/${file._id}/${file.name}`;
-        const stat = fs.statSync(filePath);
-        file.size = stat.size;
-      }
-      return (
-      `<enclosure url="${urlBase}/api/files/${file._id}/${file.name}"
-length="${file.size}" type="${file.type}" />`
-      );
-    }).join('\n');
+      .filter(file => FILE_TYPE_REGEXP.test(file.type))
+      .map((file) => {
+        if (!file.size) {
+          const filePath = `${FILES_PATH}/${file._id}/${file.name}`;
+          const stat = fs.statSync(filePath);
+          file.size = stat.size;
+        }
+        return (
+          `<enclosure url="${urlBase}/api/files/${file._id}/${file.name}"
+    length="${file.size}" type="${file.type}" />`
+        );
+      }).join('\n');
 
     return `
     <item>
@@ -105,39 +105,39 @@ router.get('/:id.rss', (req, res) => {
   const Library = mongoose.model('Library');
   const criteria = ID_REGEXP.test(id) ? { _id: id } : { path: id };
   Library.findOne(criteria).populate('userId', 'name email').exec()
-  .then((library) => {
-    // do we have a podcast for this library?
-    if (!library || !library.podcast || !library.podcast.title) {
-      return Promise.reject({ status: 404 });
-    }
-    const promises = [Promise.resolve(library)];
+    .then((library) => {
+      // do we have a podcast for this library?
+      if (!library || !library.podcast || !library.podcast.title) {
+        return Promise.reject({ status: 404 });
+      }
+      const promises = [Promise.resolve(library)];
 
-    // Get the latest messages
-    const Message = mongoose.model('Message');
-    const today = moment();
-    promises.push(
-      Message.find({
-        libraryId: library._id,
-        date: { $lte: today.toDate() },
-        'files.type': { $regex: /^audio/ },
-      })
-      .sort('-date').limit(10)
-      .exec(),
-    );
+      // Get the latest messages
+      const Message = mongoose.model('Message');
+      const today = moment();
+      promises.push(
+        Message.find({
+          libraryId: library._id,
+          date: { $lte: today.toDate() },
+          'files.type': { $regex: /^audio/ },
+        })
+          .sort('-date').limit(10)
+          .exec(),
+      );
 
-    return Promise.all(promises);
-  })
-  .then((docs) => {
-    // build RSS
-    const library = docs[0];
-    const messages = docs[1];
-    const rss = renderRSS(urlBase, library, messages);
-    res.status(200).send(rss);
-  })
-  .catch((error) => {
-    console.error('!!!', error);
-    res.status(error.status || 400).json(error);
-  });
+      return Promise.all(promises);
+    })
+    .then((docs) => {
+      // build RSS
+      const library = docs[0];
+      const messages = docs[1];
+      const rss = renderRSS(urlBase, library, messages);
+      res.status(200).send(rss);
+    })
+    .catch((error) => {
+      console.error('!!!', error);
+      res.status(error.status || 400).json(error);
+    });
 });
 
 module.exports = router;

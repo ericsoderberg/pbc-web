@@ -8,7 +8,11 @@ const PRODUCTION = (mode === 'production');
 const DEVELOPMENT = (mode === 'development');
 
 const plugins = [
-  new CopyWebpackPlugin([{ from: './ui/index.html' }]),
+  new CopyWebpackPlugin([
+    { from: './ui/index.html' },
+    { from: './ui', to: 'ui' },
+    { from: './*.png' },
+  ]),
   new webpack.ProvidePlugin({
     fetch:
       'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch',

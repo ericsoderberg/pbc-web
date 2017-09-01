@@ -43,8 +43,8 @@ const transporter = nodemailer.createTransport(TRANSPORT_OPTIONS);
 transporter.use('compile', markdown());
 
 transporter.verify()
-.then(() => console.log('Email is sendable'))
-.catch(error => console.error('!!! Email verification error', error));
+  .then(() => console.log('Email is sendable'))
+  .catch(error => console.error('!!! Email verification error', error));
 
 const router = express.Router();
 

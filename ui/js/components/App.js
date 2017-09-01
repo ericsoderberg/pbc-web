@@ -42,8 +42,10 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(loadSite());
+    const { dispatch, site } = this.props;
+    if (!site) {
+      dispatch(loadSite());
+    }
     // this._hideNavControl();
   }
 
@@ -133,10 +135,12 @@ App.propTypes = {
       domainIds: PropTypes.arrayOf(PropTypes.string),
     }),
   }),
+  site: PropTypes.object,
 };
 
 App.defaultProps = {
   session: undefined,
+  site: undefined,
 };
 
 App.contextTypes = {
@@ -145,6 +149,7 @@ App.contextTypes = {
 
 const select = state => ({
   session: state.session,
+  site: state.site,
 });
 
 export default connect(select, null, null, { pure: false })(App);
