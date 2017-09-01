@@ -83,7 +83,7 @@ export const populatePage = (data, session) => {
         calendarId: section.calendarId,
         $or: [
           { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-          { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+          { dates: { $elemMatch: { $gte: start.toDate(), $lt: end.toDate() } } },
         ],
       };
       if (section.omitRecurring) {

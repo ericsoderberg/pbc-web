@@ -212,7 +212,7 @@ export default function (router) {
         // find events withing the time window
         const dateCriteria = [
           { end: { $gte: start.toDate() }, start: { $lt: end.toDate() } },
-          { dates: { $gte: start.toDate(), $lt: end.toDate() } },
+          { dates: { $elemMatch: { $gte: start.toDate(), $lt: end.toDate() } } },
         ];
         query.find({ $or: dateCriteria });
 
