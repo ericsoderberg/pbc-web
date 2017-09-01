@@ -16,7 +16,7 @@ export default class Video extends Component {
     if (url) {
       let match = url.match(VIMEO_ALBUM_REGEXP);
       if (match) {
-        const src = `${window.location.protocol}//player.vimeo.com/hubnut/album/` +
+        const src = `//player.vimeo.com/hubnut/album/` +
           `${match[1]}?title=0&byline=0&portrait=0`;
         contents = (
           <iframe src={src}
@@ -30,7 +30,7 @@ export default class Video extends Component {
       }
       match = url.match(VIMEO_REGEXP);
       if (match) {
-        let src = `${window.location.protocol}//player.vimeo.com/video/` +
+        let src = `//player.vimeo.com/video/` +
           `${match[1]}?title=0&byline=0&portrait=0`;
         if (autoplay) {
           src += '&autoplay=1';
@@ -47,7 +47,7 @@ export default class Video extends Component {
       }
       match = url.match(YOUTUBE_REGEXP);
       if (match) {
-        const src = `${window.location.protocol}//www.youtube.com/embed/` +
+        const src = `//www.youtube.com/embed/` +
           `${match[1] || match[2]}`;
         contents = (
           <iframe className="video youtube-player"
