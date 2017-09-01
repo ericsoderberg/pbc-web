@@ -535,7 +535,7 @@ a.event-section__text {
 
 .people-summaries {
   @media all and (min-width: 700px) {
-    align-items: start;
+    align-items: flex-start;
     margin: 0 auto;
 
     .section__container--center & {

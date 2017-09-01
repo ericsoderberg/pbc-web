@@ -25,7 +25,7 @@ const router = express.Router();
 const templateString =
   fs.readFileSync(path.resolve(path.join(__dirname, '/../dist/./index-iso.html')), 'utf-8');
 
-const renderAndRespond = (req, res, context, store) => {
+const renderAndRespond = (req, res, context, store, title) => {
   const app = React.createElement(App, null, null);
   const provider = React.createElement(Provider, { store }, app);
   const root = React.createElement(StaticRouter, { location: req.url, context }, provider);
@@ -37,7 +37,7 @@ const renderAndRespond = (req, res, context, store) => {
     res.writeHead(301, { Location: context.url });
     res.end();
   } else {
-    const markup = ejs.render(templateString, { content, preloadedState });
+    const markup = ejs.render(templateString, { content, preloadedState, title });
     res.send(markup);
     res.end();
   }
@@ -58,9 +58,11 @@ const loadSite = (store) => {
 router.get('/', (req, res, next) => {
   const context = {};
   const store = createStore(reducers, applyMiddleware(reduxThunk));
+  let title;
 
   loadSite(store)
     .then((site) => {
+      title = site.name;
       const id = site.homePageId._id;
       const Page = mongoose.model('Page');
       const query = Page.findOne({ _id: id });
@@ -73,7 +75,7 @@ router.get('/', (req, res, next) => {
             type: ITEM_LOAD, payload: { category: 'pages', id, item: page } });
         });
     })
-    .then(() => renderAndRespond(req, res, context, store))
+    .then(() => renderAndRespond(req, res, context, store, title))
     .catch((error) => {
       console.warn(error);
       next();
@@ -84,6 +86,7 @@ router.get('/', (req, res, next) => {
 router.get('/events/:id', (req, res, next) => {
   const context = {};
   const store = createStore(reducers, applyMiddleware(reduxThunk));
+  let title;
 
   loadSite(store)
     .then(() => {
@@ -96,11 +99,12 @@ router.get('/events/:id', (req, res, next) => {
         .then(event => event || Promise.reject('none'))
         .then(event => populateEvent(event, false))
         .then((event) => {
+          title = event.name;
           store.dispatch({
             type: ITEM_LOAD, payload: { category: 'events', id, item: event } });
         });
     })
-    .then(() => renderAndRespond(req, res, context, store))
+    .then(() => renderAndRespond(req, res, context, store, title))
     .catch((error) => {
       if (error !== 'none') console.warn(error);
       next();
@@ -111,6 +115,7 @@ router.get('/events/:id', (req, res, next) => {
 router.get('/libraries/:id', (req, res, next) => {
   const context = {};
   const store = createStore(reducers, applyMiddleware(reduxThunk));
+  let title;
 
   loadSite(store)
     .then(() => {
@@ -121,6 +126,7 @@ router.get('/libraries/:id', (req, res, next) => {
       return query.exec()
         .then(library => library || Promise.reject('none'))
         .then((library) => {
+          title = library.name;
           store.dispatch({
             type: ITEM_LOAD, payload: { category: 'libraries', id, item: library } });
           return library;
@@ -138,7 +144,7 @@ router.get('/libraries/:id', (req, res, next) => {
             type: CATEGORY_LOAD, payload: { category: 'messages', items: messages } });
         });
     })
-    .then(() => renderAndRespond(req, res, context, store))
+    .then(() => renderAndRespond(req, res, context, store, title))
     .catch((error) => {
       if (error !== 'none') console.warn(error);
       next();
@@ -149,6 +155,7 @@ router.get('/libraries/:id', (req, res, next) => {
 router.get('/messages/:id', (req, res, next) => {
   const context = {};
   const store = createStore(reducers, applyMiddleware(reduxThunk));
+  let title;
 
   loadSite(store)
     .then(() => {
@@ -161,11 +168,12 @@ router.get('/messages/:id', (req, res, next) => {
         .then(message => message || Promise.reject('none'))
         .then(message => populateMessage(message))
         .then((message) => {
+          title = message.name;
           store.dispatch({
             type: ITEM_LOAD, payload: { category: 'messages', id, item: message } });
         });
     })
-    .then(() => renderAndRespond(req, res, context, store))
+    .then(() => renderAndRespond(req, res, context, store, title))
     .catch((error) => {
       if (error !== 'none') console.warn(error);
       next();
@@ -176,6 +184,7 @@ router.get('/messages/:id', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const context = {};
   const store = createStore(reducers, applyMiddleware(reduxThunk));
+  let title;
 
   loadSite(store)
     .then(() => {
@@ -190,12 +199,13 @@ router.get('/:id', (req, res, next) => {
         .then(page => page || Promise.reject('none'))
         .then(page => populatePage(page, false))
         .then((page) => {
+          title = page.name;
           store.dispatch({
             type: ITEM_LOAD, payload: { category: 'pages', id, item: page } });
         });
       // return Promise.reject(`No isomorphic for ${req.path}`);
     })
-    .then(() => renderAndRespond(req, res, context, store))
+    .then(() => renderAndRespond(req, res, context, store, title))
     .catch((error) => {
       if (error !== 'none') console.warn(error);
       next();

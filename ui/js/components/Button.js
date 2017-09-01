@@ -127,7 +127,7 @@ export default class Button extends Component {
       <Tag ref={(ref) => { this._componentRef = ref; }}
         className={classNames.join(' ')}
         href={href}
-        type={type}
+        type={Tag === 'button' ? type : undefined}
         onClick={onClick}
         style={style}>
         {contents}
