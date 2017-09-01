@@ -20,6 +20,8 @@ import App from '../dist/./ui/js/components/App';
 mongoose.Promise = global.Promise;
 
 const router = express.Router();
+// WARNING: See the following for security issues around embedding JSON in HTML:
+// http://redux.js.org/docs/recipes/ServerRendering.html#security-considerations
 const templateString =
   fs.readFileSync(path.resolve(path.join(__dirname, '/../dist/./index-iso.html')), 'utf-8');
 
@@ -36,7 +38,7 @@ const renderAndRespond = (req, res, context, store) => {
     res.end();
   } else {
     const markup = ejs.render(templateString, { content, preloadedState });
-    res.write(markup);
+    res.send(markup);
     res.end();
   }
 };
