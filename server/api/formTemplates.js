@@ -5,7 +5,6 @@ import register from './register';
 import {
   getSession, authorizedForDomain, allowAnyone, requireSomeAdministrator,
 } from './auth';
-import { addFormCost } from './forms';
 import { unsetDomainIfNeeded } from './domains';
 import { catcher } from './utils';
 

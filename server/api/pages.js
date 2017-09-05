@@ -148,11 +148,13 @@ export const populatePage = (data, session) => {
           docsIndex += 1;
           section.events = docs[docsIndex];
         });
-      page.sections.filter(section => section.type === 'form')
-        .forEach((section) => {
-          docsIndex += 1;
-          section.formTemplate = docs[docsIndex];
-        });
+      if (session !== false) {
+        page.sections.filter(section => section.type === 'form')
+          .forEach((section) => {
+            docsIndex += 1;
+            section.formTemplate = docs[docsIndex];
+          });
+      }
       return page;
     });
 };
