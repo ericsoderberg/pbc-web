@@ -81,15 +81,31 @@
 
 .search__link {
   display: block;
-  font-size: 1.5em;
-  padding: $half-unit $unit;
-  background-color: $secondary-background-color;
   text-decoration: none;
 
   &:hover {
-    background-color: $control-hover-background;
-    color: $control-hover-color;
+    background-color: $hover-background;
+
+    .search__heading {
+      background-color: transparent;
+    }
   }
+}
+
+.search__text {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-size: 1rem;
+  }
+}
+
+.search__heading {
+  font-size: 1.5em;
+  margin: 0;
+  padding: $half-unit $unit;
+  background-color: $secondary-background-color;
 }
 
 .search__item {

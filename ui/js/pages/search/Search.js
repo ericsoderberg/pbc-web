@@ -12,9 +12,11 @@ import { getLocationParams } from '../../utils/Params';
 const Item = props => (
   <div className="search__item">
     <Link className="search__link" to={props.path}>
-      {props.item.name}
+      <h2 className="search__heading">{props.item.name}</h2>
+      <div className="search__text">
+        {props.children}
+      </div>
     </Link>
-    {props.children}
   </div>
 );
 

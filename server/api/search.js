@@ -36,13 +36,23 @@ export default function (router) {
             .map((section) => {
               // prune text down to just snippet with first match
               const index = section.text.search(exp);
-              const fromIndex =
-                Math.max(0, section.text.lastIndexOf(' ', Math.max(0, index - 80)));
-              const toIndex = section.text.indexOf(' ', index + 80);
+              let fromIndex =
+                Math.max(0, section.text.lastIndexOf('\n', index));
+              if (fromIndex < (index - 80)) {
+                fromIndex = section.text.lastIndexOf(' ', index - 80);
+              }
+              let toIndex = section.text.indexOf('\n', index);
+              if (toIndex === -1) {
+                toIndex = section.text.length - 1;
+              }
+              if (toIndex > (index + 80)) {
+                toIndex = section.text.indexOf(' ', index + 80);
+              }
+              toIndex += 1;
 
               section.text = section.text
                 .slice(fromIndex, toIndex)
-                .replace(exp, `**${req.query.search}**`);
+                .replace(exp, '**$&**');
 
               return section;
             });
