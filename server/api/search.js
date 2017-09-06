@@ -4,7 +4,6 @@ import { getSession } from './auth';
 import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
-mongoose.set('debug', true);
 
 // /api/search
 
