@@ -11,6 +11,7 @@ EventAdd.defaultProps = {
   default: {
     start: moment().startOf('hour').add(1, 'hour'),
     end: moment().startOf('hour').add(2, 'hour'),
+    public: true,
   },
   FormContents: EventFormContents,
   Preview: EventPreview,

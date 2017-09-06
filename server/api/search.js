@@ -4,6 +4,7 @@ import { getSession } from './auth';
 import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
+mongoose.set('debug', true);
 
 // /api/search
 
@@ -60,16 +61,16 @@ export default function (router) {
       // check events too
       .then((context) => {
         const Event = mongoose.model('Event');
-        // const recently = moment().subtract(1, 'week');
-        // const dateCriteria = [
-        //   { end: { $gte: recently.toDate() } },
-        //   { dates: { $gte: recently.toDate() } },
-        // ];
+        const recently = moment().subtract(1, 'week');
+        const dateCriteria = [
+          { end: { $gte: recently.toDate() } },
+          { dates: { $gte: recently.toDate() } },
+        ];
         return Event.find(
           {
             $text: { $search: req.query.search },
             public: true,
-            // $or: dateCriteria,
+            $or: dateCriteria,
           },
           { score: { $meta: 'textScore' } },
         )

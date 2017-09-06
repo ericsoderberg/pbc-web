@@ -135,11 +135,8 @@ export default (router, options) => {
           }
           if (req.query.search) {
             if (indexOpts.textSearch) {
-              // This isn't working :(
-              query.find(
-                { $text: { $search: req.query.search } },
-                { score: { $meta: 'textScore' } },
-              );
+              query.find({ $text: { $search: req.query.search } });
+              query.select({ score: { $meta: 'textScore' } });
               query.sort({ score: { $meta: 'textScore' }, modified: -1 });
             } else {
               const exp = new RegExp(req.query.search, 'i');
