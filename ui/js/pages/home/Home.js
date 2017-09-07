@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loadItem, deleteSession } from '../../actions';
+import { loadItem, unloadItem, deleteSession } from '../../actions';
 import Sections from '../../components/Sections';
 import Section from '../../components/Section';
 import FacebookIcon from '../../icons/Facebook';
@@ -60,7 +60,10 @@ class Home extends Component {
   }
 
   componentWillUnmount() {
-    // don't unload the home page
+    const { dispatch, page } = this.props;
+    if (page) {
+      dispatch(unloadItem('pages', page._id));
+    }
     window.removeEventListener('resize', this._onResize);
     clearTimeout(this._resizeTimer);
     clearTimeout(this._readyTimer);
