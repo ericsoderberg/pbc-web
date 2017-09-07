@@ -27,12 +27,12 @@ export default class NewsletterContents extends Component {
   _load(props) {
     if (props.item.name || props.item.text) {
       postNewsletterRender(props.item)
-      .then((rendered) => {
-        if (!this._unmounted) {
-          this.setState({ rendered });
-        }
-      })
-      .catch(error => console.error('!!! NewsletterContents catch', error));
+        .then((rendered) => {
+          if (!this._unmounted) {
+            this.setState({ rendered });
+          }
+        })
+        .catch(error => console.error('!!! NewsletterContents catch', error));
     }
   }
 

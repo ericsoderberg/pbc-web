@@ -493,6 +493,7 @@ const newsletterSectionSchema = Schema({
 const newsletterSchema = Schema({
   // address: String,
   // calendarId: { type: Schema.Types.ObjectId, ref: 'Calendar' },
+  color: String,
   created: Date,
   date: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },

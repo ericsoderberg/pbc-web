@@ -60,6 +60,11 @@ export default class NewsletterFormContents extends Component {
             <DateInput value={newsletter.date || ''}
               onChange={formState.change('date')} />
           </FormField>
+          <FormField label="Color">
+            <input name="color"
+              value={newsletter.color || ''}
+              onChange={formState.change('color')} />
+          </FormField>
         </fieldset>
         <SectionsFormContents formState={formState} types={SECTION_TYPES} />
         <fieldset className="form__fields">

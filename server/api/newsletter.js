@@ -1,16 +1,17 @@
 import moment from 'moment-timezone';
 import { markdown } from 'markdown';
 
+const BACKGROUND_COLOR = '#cccccc';
+
+function sectionBackground(section) {
+  return (section.color ? ` background-color: ${section.color}` : '');
+}
+
 function markupText(text, section) {
-  let contents = markdown.toHTML(text || '');
-  if (section.color) {
-    contents = `
-<div style="padding: 1px 24px; margin: 24px 0px; background-color: ${section.color}">
-${contents}
-</div>
-    `;
-  }
-  return contents;
+  const contents = markdown.toHTML(text || '');
+  return `<div style="padding: 1px 24px;${sectionBackground(section)}">
+  ${contents}
+  </div>`;
 }
 
 // TODO: combine with code in EventTimes
@@ -119,8 +120,8 @@ function renderDates(event) {
     } else {
       // irreguler
       const datesString = dates.filter(date => date.isSameOrAfter(now))
-      .slice(0, 4)
-      .map(date => formatDate(date, false)).join(', ');
+        .slice(0, 4)
+        .map(date => formatDate(date, false)).join(', ');
       result = `${datesString}`;
       if (!event.allDay) {
         result += ` @ ${formatTimes(start, end)}`;
@@ -145,17 +146,17 @@ function renderDates(event) {
   return result;
 }
 
-function markupEvent(event, urlBase) {
+function markupEvent(event, section, urlBase) {
   const dates = renderDates(event);
   const url = `${urlBase}/events/${event.path || event._id}`;
   let image = '';
   if (event.image) {
     image = `
-<a href="${url}"><img style="max-width: 432px; padding-top: 24px;"
+<a href="${url}" style="display: block; font-size: 0;"><img style="max-width: 480px;"
 src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   `;
   }
-  const at = `<div style="padding-bottom: 6px;">${dates}</div>`;
+  const at = `<div style="padding: 6px 24px;">${dates}</div>`;
   let location = '';
   if (event.location) {
     location = `<div style="color: #999999;">${event.location}</div>`;
@@ -166,20 +167,22 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   }
   let text;
   if (event.text) {
-    text = `<div>${markdown.toHTML(event.text)}</div>`;
+    text = `<div style="padding: 24px;">${markdown.toHTML(event.text)}</div>`;
   } else {
     text = '<div style="padding-bottom: 24px;"></div>';
   }
   return `
-<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+<div style="padding-bottom: 24px;${sectionBackground(section)}">
   ${image}
-  <a style="display: block; padding-top: 24px; padding-bottom: 24px;
-  font-size: 18px; font-weight: 600;" href="${url}">${event.name}</a>
+  <a style="display: block; padding: 24px;
+  font-size: 24px; font-weight: 600;" href="${url}">
+   ${event.name}</a>
   <div>${at}</div>
   ${location}
   ${address}
   ${text}
-</a>
+  </a>
+</div>
   `;
 }
 
@@ -195,8 +198,8 @@ function markupMessage(label, message, urlBase) {
   }
   return `
 <div>
-  <h2 style="font-weight: 100;">${label}</h2>
-  <a style="font-size: 18px; font-weight: 600;" href="${url}">${message.name}</a>
+  <h3 style="font-weight: 100; margin-top: 0;">${label}</h3>
+  <a style="font-size: 24px; font-weight: 600;" href="${url}">${message.name}</a>
   ${verses}
   ${author}
 </div>
@@ -209,23 +212,23 @@ function markupPage(page, section, urlBase) {
   let image = '';
   if (section.backgroundImage) {
     image = `
-<a href="${url}"><img style="max-width: 432px; padding-top: 24px;"
+<a href="${url}" style="display: block; font-size: 0;"><img style="max-width: 480px;"
 src="${section.backgroundImage.data}" /></a>
   `;
   }
   return `
-<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+<div style="${sectionBackground(section)}">
   ${image}
-  <a style="display: block; padding-top: 24px; padding-bottom: 24px;
-  font-size: 18px; font-weight: 600;" href="${url}">${page.name}</a>
-</a>
+  <a style="display: block; padding: 24px;
+  font-size: 24px; font-weight: 600;" href="${url}">${page.name}</a>
+</div>
   `;
 }
 
 function markupFile(file, section, urlBase) {
   const url = `${urlBase}/file/${file._id}/${file.name}`;
   return `
-<div style="margin-bottom: 24px; border-top: solid 1px #cccccc;">
+<div style="margin-bottom: 24px;${sectionBackground(section)}">
   <a style="display: block; padding-top: 24px; padding-bottom: 24px;
   font-size: 18px; font-weight: 600;" href="${url}">${file.name}</a>
 </a>
@@ -239,13 +242,14 @@ export function render(newsletter, urlBase, address) {
         return markupText(section.text, section);
 
       case 'image':
-        return '<img style="max-width: 432px;" ' +
-          `src="${urlBase}/api/newsletters/${newsletter._id}/${section.image.name}" />`;
+        return '<div><img style="max-width: 480px;" ' +
+          `src="${urlBase}/api/newsletters/${newsletter._id}/${section.image.name}" />
+          </div>`;
 
       case 'event': {
         const event = section.eventId;
         if (event) {
-          return markupEvent(event.toObject(), urlBase);
+          return markupEvent(event.toObject(), section, urlBase);
         }
         return '';
       }
@@ -256,7 +260,7 @@ export function render(newsletter, urlBase, address) {
         const previousMessageMarkup = section.previousMessage ?
           markupMessage('Last week', section.previousMessage, urlBase) : '';
         return `
-<div style="padding-bottom: 24px; border-top: solid 1px #cccccc;">
+<div style="padding: 24px;${sectionBackground(section)}">
 ${nextMessageMarkup}
 ${previousMessageMarkup}
 </div>
@@ -277,23 +281,28 @@ ${previousMessageMarkup}
   return `
 <html>
 <head></head>
-<body>
-<div style="background-color: #f2f2f2; padding: 24px;">
-<div style="padding: 24px; max-width: 480px; margin: 0 auto;
+<body style="margin: 0; padding: 0;
+background-color: ${newsletter.color || BACKGROUND_COLOR};">
+<div style="background-color: ${newsletter.color || BACKGROUND_COLOR};
+padding: 0;">
+<div style="max-width: 480px; margin: 0 auto;
 box-sizing: border-box;
 background-color: #ffffff; color: #333333;
 font-family: 'Work Sans', Arial, sans-serif; font-size: 18px;">
-<table style="max-width: 432px; width: 100%; margin-bottom: 24px;
-font-size: 20px;">
+<table style="max-width: 480px; width: 100%; padding: 12px 24px;
+font-size: 20px; ${newsletter.color ? `background-color: ${newsletter.color}` : ''}">
 <tbody><tr>
 <td><strong>${newsletter.name}</strong></td>
-<td style="text-align: right; color: #999999;">
+<td style="text-align: right; color: #666666;">
 ${moment(newsletter.date).format('MMM Do YYYY')}
 </td>
 </tr></tbody>
 </table>
 ${sections}
 </div>
+<div style="padding: 24px; box-sizing: border-box;
+max-width: 480px; margin: 0 auto;
+background-color: ${newsletter.color || BACKGROUND_COLOR};">
 <a style="font-size: 12px;"
 href="${urlBase}/email-lists/${address.split('@')[0]}/unsubscribe">
 unsubscribe

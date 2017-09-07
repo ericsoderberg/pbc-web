@@ -44,8 +44,8 @@ class Newsletter extends Component {
     const { address } = this.state;
     event.preventDefault();
     postNewsletterSend(id, address)
-    .then(() => this.setState({ sendState: SENT }))
-    .catch(() => this.setState({ sendState: ERROR }));
+      .then(() => this.setState({ sendState: SENT }))
+      .catch(() => this.setState({ sendState: ERROR }));
   }
 
   render() {
