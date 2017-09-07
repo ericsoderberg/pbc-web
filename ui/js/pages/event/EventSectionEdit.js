@@ -55,7 +55,7 @@ export default class EventSectionEdit extends Component {
         <FormField name="summary" label="Summary" help={<TextHelp />}>
           <textarea name="summary"
             value={section.summary || ''}
-            rows={8}
+            rows={4}
             onChange={formState.change('summary')} />
         </FormField>
         <FormField>

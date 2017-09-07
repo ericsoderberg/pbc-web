@@ -152,6 +152,9 @@ export default function (router, transporter) {
         { path: 'sections.libraryId',
           select: 'name',
           model: 'Library' },
+        { path: 'sections.pages.id',
+          select: 'name',
+          model: 'Page' },
       ],
     },
     post: {

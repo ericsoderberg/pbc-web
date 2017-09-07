@@ -208,11 +208,11 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   if (event.address) {
     location = `<div style="color: #999999; padding: 0 24px;">${event.address}</div>`;
   }
-  let text;
+  let summary;
   if (section.summary) {
-    text = `<div style="padding: 0 24px;">${markdown.toHTML(section.summary)}</div>`;
+    summary = `<div style="padding: 0 24px;">${markdown.toHTML(section.summary)}</div>`;
   } else {
-    text = '<div style="padding-bottom: 24px;"></div>';
+    summary = '<div style="padding-bottom: 24px;"></div>';
   }
   let contents = `
 <div style="padding-bottom: 24px; ${backgroundColor(section.color)}">
@@ -223,7 +223,7 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   <div>${at}</div>
   ${location}
   ${address}
-  ${text}
+  ${summary}
   </a>
 </div>
   `;
@@ -270,7 +270,8 @@ ${previousMessageMarkup}
   return contents;
 }
 
-function markupPage(page, section, urlBase) {
+function markupPage(sectionPage, section, urlBase) {
+  const page = sectionPage.page;
   const url = `${urlBase}/${page.path || `pages/${page._id}`}`;
   // TODO: revisit this when aligning event and page images and colors
   let image = '';
@@ -281,13 +282,22 @@ function markupPage(page, section, urlBase) {
 src="${section.backgroundImage.data}" /></a>
   `;
   }
-  return `
+  let summary = '';
+  if (sectionPage.summary) {
+    summary = `<div style="padding: 0 24px;">${markdown.toHTML(sectionPage.summary)}</div>`;
+  }
+  let contents = `
 <div style="${backgroundColor(section.color)}">
   ${image}
   <a style="display: block; padding: 24px;
   font-size: 24px; font-weight: 600;" href="${url}">${page.name}</a>
+  ${summary}
 </div>
   `;
+  if (!section.full) {
+    contents = `<div style="margin: 24px;">${contents}</div>`;
+  }
+  return contents;
 }
 
 function markupFile(file, section, urlBase) {
@@ -331,7 +341,7 @@ export function render(newsletter, urlBase, address) {
         return markupLibrary(section, urlBase);
 
       case 'pages': return section.pages.filter(page => page).map(page =>
-        (page.page ? markupPage(page.page, section, urlBase) : ''));
+        (page.page ? markupPage(page, section, urlBase) : '')).join('');
 
       case 'files': return section.files.filter(file => file).map(file =>
         (file ? markupFile(file, section, urlBase) : ''));

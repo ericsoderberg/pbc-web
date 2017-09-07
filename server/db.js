@@ -103,6 +103,7 @@ const pagesSectionDef = {
   pages: [{
     id: { type: Schema.Types.ObjectId, ref: 'Page' },
     image,
+    summary: String,
   }],
 };
 const filesSectionDef = {
