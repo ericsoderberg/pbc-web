@@ -202,11 +202,11 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   const at = `<div style="padding: 6px 24px;">${dates}</div>`;
   let location = '';
   if (event.location) {
-    location = `<div style="color: #999999;">${event.location}</div>`;
+    location = `<div style="color: #999999; padding: 0 24px;">${event.location}</div>`;
   }
   const address = '';
   if (event.address) {
-    location = `<div style="color: #999999;">${event.address}</div>`;
+    location = `<div style="color: #999999; padding: 0 24px;">${event.address}</div>`;
   }
   let text;
   if (section.summary) {
