@@ -35,7 +35,11 @@ function addChildren(page, pages) {
 }
 
 const PAGE_MESSAGE_FIELDS =
-  'path name verses author date image series seriesId';
+  'path name verses author date image series seriesId modified';
+
+function latestDate(date1, date2) {
+  return moment(date1).isAfter(moment(date2)) ? date1 : date2;
+}
 
 export const populatePage = (data, session) => {
   const Message = mongoose.model('Message');
@@ -43,6 +47,13 @@ export const populatePage = (data, session) => {
   const FormTemplate = mongoose.model('FormTemplate');
   const date = moment().subtract(1, 'day');
   const page = data.toObject();
+
+  // Updated modified based on events modified
+  page.sections
+    .filter(section => (section.type === 'event' && section.eventId))
+    .forEach((section) => {
+      page.modified = latestDate(page.modified, section.eventId.modified);
+    });
 
   const promises = [Promise.resolve(page)];
 
@@ -142,17 +153,22 @@ export const populatePage = (data, session) => {
         .forEach((section) => {
           docsIndex += 1;
           section.message = docs[docsIndex];
+          page.modified = latestDate(page.modified, section.message.modified);
         });
       page.sections.filter(section => section.type === 'calendar')
         .forEach((section) => {
           docsIndex += 1;
           section.events = docs[docsIndex];
+          page.modified = latestDate(page.modified,
+            section.events.map(e => e.modified)
+              .reduce((d1, d2) => latestDate(d1, d2)));
         });
       if (session !== false) {
         page.sections.filter(section => section.type === 'form')
           .forEach((section) => {
             docsIndex += 1;
             section.formTemplate = docs[docsIndex];
+            page.modified = latestDate(page.modified, section.formTemplate.modified);
           });
       }
       return page;
@@ -255,7 +271,7 @@ export const pagePopulations = [
   {
     path: 'sections.eventId',
     select: 'name path start end dates times address location ' +
-      'image color',
+      'image color modified',
     model: 'Event',
   },
   { path: 'sections.libraryId', select: 'name path', model: 'Library' },

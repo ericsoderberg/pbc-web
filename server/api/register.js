@@ -72,7 +72,7 @@ export default (router, options) => {
           if (doc.modified) {
             res.setHeader('Last-Modified',
               moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'));
-            res.setHeader('Cache-Control', 'max-age=0');
+            res.setHeader('Cache-Control', 'max-age=0, must-revalidate');
           }
           res.json(doc);
         })
