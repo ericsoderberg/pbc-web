@@ -44,9 +44,12 @@ function latestDate(date1, date2) {
 export const populatePage = (data, session) => {
   const Message = mongoose.model('Message');
   const Event = mongoose.model('Event');
-  const FormTemplate = mongoose.model('FormTemplate');
+  // const FormTemplate = mongoose.model('FormTemplate');
   const date = moment().subtract(1, 'day');
   const page = data.toObject();
+
+  // We changed the caching behavior on Sep 7 2017
+  page.modified = latestDate(page.modified, moment('2017-09-07'));
 
   // Updated modified based on events modified
   page.sections
@@ -122,28 +125,28 @@ export const populatePage = (data, session) => {
 
   // Don't load formTemplate when rendering on the server, we don't have
   // a session.
-  if (session !== false) {
-    // FormTemplate
-    page.sections
-      .filter(section => (section.type === 'form' && section.formTemplateId))
-      .forEach((section) => {
-        section.formTemplateId = section.formTemplateId._id; // un-populate
-        promises.push(
-          FormTemplate.findOne({ _id: section.formTemplateId })
-            .exec()
-            .then((formTemplate) => {
-              if (formTemplate) {
-                if (session) {
-                  return addForms(formTemplate, session)
-                    .then(data2 => addNewForm(data2, session));
-                }
-                return addNewForm(formTemplate, session);
-              }
-              return formTemplate;
-            }),
-        );
-      });
-  }
+  // if (session !== false) {
+  //   // FormTemplate
+  //   page.sections
+  //     .filter(section => (section.type === 'form' && section.formTemplateId))
+  //     .forEach((section) => {
+  //       section.formTemplateId = section.formTemplateId._id; // un-populate
+  //       promises.push(
+  //         FormTemplate.findOne({ _id: section.formTemplateId })
+  //           .exec()
+  //           .then((formTemplate) => {
+  //             if (formTemplate) {
+  //               if (session) {
+  //                 return addForms(formTemplate, session)
+  //                   .then(data2 => addNewForm(data2, session));
+  //               }
+  //               return addNewForm(formTemplate, session);
+  //             }
+  //             return formTemplate;
+  //           }),
+  //       );
+  //     });
+  // }
 
   return Promise.all(promises)
     .then((docs) => {
@@ -163,14 +166,18 @@ export const populatePage = (data, session) => {
             section.events.map(e => e.modified)
               .reduce((d1, d2) => latestDate(d1, d2)));
         });
-      if (session !== false) {
-        page.sections.filter(section => section.type === 'form')
-          .forEach((section) => {
-            docsIndex += 1;
-            section.formTemplate = docs[docsIndex];
-            page.modified = latestDate(page.modified, section.formTemplate.modified);
-          });
-      }
+      // if (session !== false) {
+      //   page.sections.filter(section => section.type === 'form')
+      //     .forEach((section) => {
+      //       docsIndex += 1;
+      //       section.formTemplate = docs[docsIndex];
+      //       page.modified = latestDate(page.modified, section.formTemplate.modified);
+      //     });
+      //   // also update modified if the session is newer
+      //   if (session) {
+      //     page.modified = latestDate(page.modified, session.loginAt);
+      //   }
+      // }
       return page;
     });
 };
@@ -276,9 +283,9 @@ export const pagePopulations = [
   },
   { path: 'sections.libraryId', select: 'name path', model: 'Library' },
   { path: 'sections.calendarId', select: 'name path', model: 'Calendar' },
-  { path: 'sections.formTemplateId',
-    select: 'name',
-    model: 'FormTemplate' },
+  // { path: 'sections.formTemplateId',
+  //   select: 'name',
+  //   model: 'FormTemplate' },
 ];
 
 export default function (router) {
