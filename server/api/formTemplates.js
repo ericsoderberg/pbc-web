@@ -459,6 +459,8 @@ export default function (router) {
       transformOut: (formTemplate, req, session) => {
         // only add forms and totals if there is a session
         if (req.query.new) {
+          // reset modified time to now to avoid caching issues with sessions
+          formTemplate.modified = moment.utc();
           formTemplate = addNewForm(formTemplate, session, req.query.linkedFormId);
         }
         const admin = (session && (session.userId.administrator ||
