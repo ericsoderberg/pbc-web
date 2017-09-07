@@ -31,8 +31,8 @@ const populateNewsletterForRendering = (newsletter) => {
       case 'image': return section;
 
       case 'event': return Event.findOne({ _id: section.eventId })
-      .select(eventFields).exec()
-      .then(event => ({ ...section.toObject(), eventId: event }));
+        .select(eventFields).exec()
+        .then(event => ({ ...section.toObject(), eventId: event }));
 
       case 'library': return Promise.all([
         Message.find({
@@ -40,50 +40,50 @@ const populateNewsletterForRendering = (newsletter) => {
           date: { $gt: newsletter.date },
           series: { $ne: true },
         }).sort('date').limit(1).select(messageFields)
-        .exec(),
+          .exec(),
         Message.find({
           libraryId: section.libraryId,
           date: { $lt: newsletter.date },
           series: { $ne: true },
         }).sort('-date').limit(1).select(messageFields)
-        .exec(),
+          .exec(),
       ])
-      .then(docs => ({
-        ...section.toObject(),
-        nextMessage: docs[0][0],
-        previousMessage: docs[1][0],
-      }));
+        .then(docs => ({
+          ...section.toObject(),
+          nextMessage: docs[0][0],
+          previousMessage: docs[1][0],
+        }));
 
       case 'pages': return Promise.all(section.pages.map(pageRef =>
         Page.findOne({ _id: pageRef.id }).select(pageFields).exec()))
-      .then(pages => ({
-        ...section.toObject(),
-        pages: section.pages.map((page, index) => ({
-          ...page.toObject(),
-          page: pages[index],
-        })),
-      }));
+        .then(pages => ({
+          ...section.toObject(),
+          pages: section.pages.map((page, index) => ({
+            ...page.toObject(),
+            page: pages[index],
+          })),
+        }));
 
       case 'files': return section;
 
       default: return section;
     }
   }))
-  .then(sections => ({ ...newsletter.toObject(), sections }));
+    .then(sections => ({ ...newsletter.toObject(), sections }));
 };
 
 export default function (router, transporter) {
   router.post('/newsletters/render', (req, res) => {
     const Newsletter = mongoose.model('Newsletter');
     getSession(req)
-    .then(requireSomeAdministrator)
-    .then(() => {
-      const newsletter = new Newsletter(req.body);
-      return populateNewsletterForRendering(newsletter);
-    })
-    .then(newsletter => renderNewsletter(newsletter, `${req.headers.origin}`, ''))
-    .then(markup => res.send(markup))
-    .catch(error => catcher(error, res));
+      .then(requireSomeAdministrator)
+      .then(() => {
+        const newsletter = new Newsletter(req.body);
+        return populateNewsletterForRendering(newsletter);
+      })
+      .then(newsletter => renderNewsletter(newsletter, `${req.headers.origin}`, ''))
+      .then(markup => res.send(markup))
+      .catch(error => catcher(error, res));
   });
 
   router.post('/newsletters/:id/send', (req, res) => {
@@ -92,30 +92,30 @@ export default function (router, transporter) {
     const id = req.params.id;
     const address = req.body.address;
     getSession(req)
-    .then(requireSomeAdministrator)
-    .then(() => Newsletter.findOne({ _id: id }).exec())
-    .then(newsletter => populateNewsletterForRendering(newsletter))
-    .then((newsletter) => {
-      const markup = renderNewsletter(newsletter, `${req.headers.origin}`, address);
-      return { newsletter, markup };
-    })
-    .then(context => Site.findOne({}).exec()
-      .then(site => ({ ...context, site })))
-    .then((context) => {
-      const { newsletter, markup, site } = context;
-      return new Promise((resolve, reject) => {
-        transporter.sendMail({
-          from: site.email,
-          to: address,
-          subject: newsletter.name,
-          html: markup,
-        }, (err, info) => {
-          if (err) { reject(err); } else { resolve(info); }
+      .then(requireSomeAdministrator)
+      .then(() => Newsletter.findOne({ _id: id }).exec())
+      .then(newsletter => populateNewsletterForRendering(newsletter))
+      .then((newsletter) => {
+        const markup = renderNewsletter(newsletter, `${req.headers.origin}`, address);
+        return { newsletter, markup };
+      })
+      .then(context => Site.findOne({}).exec()
+        .then(site => ({ ...context, site })))
+      .then((context) => {
+        const { newsletter, markup, site } = context;
+        return new Promise((resolve, reject) => {
+          transporter.sendMail({
+            from: site.email,
+            to: address,
+            subject: newsletter.name,
+            html: markup,
+          }, (err, info) => {
+            if (err) { reject(err); } else { resolve(info); }
+          });
         });
-      });
-    })
-    .then(() => res.status(200).json({}))
-    .catch(error => catcher(error, res));
+      })
+      .then(() => res.status(200).json({}))
+      .catch(error => catcher(error, res));
   });
 
   router.get('/newsletters/:id/:imageName', (req, res) => {
@@ -123,17 +123,17 @@ export default function (router, transporter) {
     const id = req.params.id;
     const imageName = req.params.imageName;
     Newsletter.findOne({ _id: id }).exec()
-    .then((newsletter) => {
-      // look for the image requested
-      const section = newsletter.sections.filter(s =>
-        (s.type === 'image' && s.image.name === imageName))[0];
-      if (section) {
-        sendImage(section.image, res);
-      } else {
-        res.status(404).send();
-      }
-    })
-    .catch(error => catcher(error, res));
+      .then((newsletter) => {
+        // look for the image requested
+        const section = newsletter.sections.filter(s =>
+          (s.type === 'image' && s.image.name === imageName))[0];
+        if (section) {
+          sendImage(section.image, res);
+        } else {
+          res.status(404).send();
+        }
+      })
+      .catch(error => catcher(error, res));
   });
 
   register(router, {
@@ -146,7 +146,12 @@ export default function (router, transporter) {
     get: {
       authorization: requireSomeAdministrator,
       populate: [
-        { path: 'eventIds', select: 'name path' },
+        { path: 'sections.eventId',
+          select: 'name',
+          model: 'Event' },
+        { path: 'sections.libraryId',
+          select: 'name',
+          model: 'Library' },
       ],
     },
     post: {

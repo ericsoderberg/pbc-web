@@ -3,15 +3,57 @@ import { markdown } from 'markdown';
 
 const BACKGROUND_COLOR = '#cccccc';
 
-function sectionBackground(section) {
-  return (section.color ? ` background-color: ${section.color}` : '');
+const COLOR_HASH_SHORT_REGEXP = /#([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})/;
+const COLOR_HASH_REGEXP = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})/;
+const COLOR_RGB_REGEXP = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/;
+const COLOR_RGBA_REGEXP = /rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/;
+
+export function isDarkBackground(color) {
+  // convert to RGB elements
+  const match = color.match(COLOR_RGB_REGEXP) ||
+    color.match(COLOR_RGBA_REGEXP) || color.match(COLOR_HASH_REGEXP) ||
+    color.match(COLOR_HASH_SHORT_REGEXP);
+  let result = false;
+  if (match) {
+    const [red, green, blue] = match.slice(1).map(n => parseInt(n, 16));
+    // http://www.had2know.com/technology/
+    //  color-contrast-calculator-web-design.html
+    const brightness = (
+      (299 * red) + (587 * green) + (114 * blue)
+    ) / 1000;
+    if (brightness < 125) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+function backgroundColor(color) {
+  let result = '';
+  if (color) {
+    result = `background-color: ${color};`;
+    if (isDarkBackground(color)) {
+      result += ' color: #F2F2F2;';
+    }
+  // } else {
+  //   result = 'border-top: 1px solid #CCCCCC; border-bottom: 1px solid #CCCCCC;';
+  }
+  return result;
+}
+
+function imageWidth(section) {
+  return `max-width: ${section.full ? 480 : 432}px;`;
 }
 
 function markupText(text, section) {
-  const contents = markdown.toHTML(text || '');
-  return `<div style="padding: 1px 24px;${sectionBackground(section)}">
+  let contents = markdown.toHTML(text || '');
+  contents = `<div style="padding: 1px 24px; ${backgroundColor(section.color)}">
   ${contents}
   </div>`;
+  if (!section.full) {
+    contents = `<div style="margin: 24px;">${contents}</div>`;
+  }
+  return contents;
 }
 
 // TODO: combine with code in EventTimes
@@ -152,7 +194,8 @@ function markupEvent(event, section, urlBase) {
   let image = '';
   if (event.image) {
     image = `
-<a href="${url}" style="display: block; font-size: 0;"><img style="max-width: 480px;"
+<a href="${url}" style="display: block; font-size: 0;">
+<img style="${imageWidth(section)} margin-bottom: -4px;"
 src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   `;
   }
@@ -166,13 +209,13 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
     location = `<div style="color: #999999;">${event.address}</div>`;
   }
   let text;
-  if (event.text) {
-    text = `<div style="padding: 24px;">${markdown.toHTML(event.text)}</div>`;
+  if (section.summary) {
+    text = `<div style="padding: 0 24px;">${markdown.toHTML(section.summary)}</div>`;
   } else {
     text = '<div style="padding-bottom: 24px;"></div>';
   }
-  return `
-<div style="padding-bottom: 24px;${sectionBackground(section)}">
+  let contents = `
+<div style="padding-bottom: 24px; ${backgroundColor(section.color)}">
   ${image}
   <a style="display: block; padding: 24px;
   font-size: 24px; font-weight: 600;" href="${url}">
@@ -184,9 +227,13 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
   </a>
 </div>
   `;
+  if (!section.full) {
+    contents = `<div style="margin: 24px;">${contents}</div>`;
+  }
+  return contents;
 }
 
-function markupMessage(label, message, urlBase) {
+function markupMessage(label, message, first, urlBase) {
   const url = `${urlBase}/messages/${message.path || message._id}`;
   let verses = '';
   if (message.verses) {
@@ -197,13 +244,30 @@ function markupMessage(label, message, urlBase) {
     author = `<div style="padding-top: 6px; color: #999999">${message.author}</div>`;
   }
   return `
-<div>
-  <h3 style="font-weight: 100; margin-top: 0;">${label}</h3>
+<div style="${first ? '' : 'margin-top: 24px;'}">
+  <h3 style="font-size: 28px; font-weight: 100; margin-top: 0;">${label}</h3>
   <a style="font-size: 24px; font-weight: 600;" href="${url}">${message.name}</a>
   ${verses}
   ${author}
 </div>
   `;
+}
+
+function markupLibrary(section, urlBase) {
+  const nextMessageMarkup = section.nextMessage ?
+    markupMessage('This week', section.nextMessage, true, urlBase) : '';
+  const previousMessageMarkup = section.previousMessage ?
+    markupMessage('Last week', section.previousMessage, false, urlBase) : '';
+  let contents = `
+<div style="padding: 24px; ${backgroundColor(section.color)}">
+${nextMessageMarkup}
+${previousMessageMarkup}
+</div>
+  `;
+  if (!section.full) {
+    contents = `<div style="margin: 24px;">${contents}</div>`;
+  }
+  return contents;
 }
 
 function markupPage(page, section, urlBase) {
@@ -212,12 +276,13 @@ function markupPage(page, section, urlBase) {
   let image = '';
   if (section.backgroundImage) {
     image = `
-<a href="${url}" style="display: block; font-size: 0;"><img style="max-width: 480px;"
+<a href="${url}" style="display: block; font-size: 0;">
+<img style="${imageWidth(section)} margin-bottom: -4px;"
 src="${section.backgroundImage.data}" /></a>
   `;
   }
   return `
-<div style="${sectionBackground(section)}">
+<div style="${backgroundColor(section.color)}">
   ${image}
   <a style="display: block; padding: 24px;
   font-size: 24px; font-weight: 600;" href="${url}">${page.name}</a>
@@ -228,11 +293,21 @@ src="${section.backgroundImage.data}" /></a>
 function markupFile(file, section, urlBase) {
   const url = `${urlBase}/file/${file._id}/${file.name}`;
   return `
-<div style="margin-bottom: 24px;${sectionBackground(section)}">
+<div style="margin-bottom: 24px; ${backgroundColor(section.color)}">
   <a style="display: block; padding-top: 24px; padding-bottom: 24px;
   font-size: 18px; font-weight: 600;" href="${url}">${file.name}</a>
 </a>
   `;
+}
+
+function markupImage(image, section, newsletter, urlBase) {
+  let contents = `<div><img style="${imageWidth(section)} margin-bottom: -4px;"
+    src="${urlBase}/api/newsletters/${newsletter._id}/${image.name}" />
+    </div>`;
+  if (!section.full) {
+    contents = `<div style="margin: 24px;">${contents}</div>`;
+  }
+  return contents;
 }
 
 export function render(newsletter, urlBase, address) {
@@ -242,9 +317,7 @@ export function render(newsletter, urlBase, address) {
         return markupText(section.text, section);
 
       case 'image':
-        return '<div><img style="max-width: 480px;" ' +
-          `src="${urlBase}/api/newsletters/${newsletter._id}/${section.image.name}" />
-          </div>`;
+        return markupImage(section.image, section, newsletter, urlBase);
 
       case 'event': {
         const event = section.eventId;
@@ -254,18 +327,8 @@ export function render(newsletter, urlBase, address) {
         return '';
       }
 
-      case 'library': {
-        const nextMessageMarkup = section.nextMessage ?
-          markupMessage('This week', section.nextMessage, urlBase) : '';
-        const previousMessageMarkup = section.previousMessage ?
-          markupMessage('Last week', section.previousMessage, urlBase) : '';
-        return `
-<div style="padding: 24px;${sectionBackground(section)}">
-${nextMessageMarkup}
-${previousMessageMarkup}
-</div>
-        `;
-      }
+      case 'library':
+        return markupLibrary(section, urlBase);
 
       case 'pages': return section.pages.filter(page => page).map(page =>
         (page.page ? markupPage(page.page, section, urlBase) : ''));
@@ -282,18 +345,17 @@ ${previousMessageMarkup}
 <html>
 <head></head>
 <body style="margin: 0; padding: 0;
-background-color: ${newsletter.color || BACKGROUND_COLOR};">
-<div style="background-color: ${newsletter.color || BACKGROUND_COLOR};
-padding: 0;">
+${backgroundColor(newsletter.color || BACKGROUND_COLOR)}">
+<div style="padding: 0; ${backgroundColor(newsletter.color || BACKGROUND_COLOR)}">
 <div style="max-width: 480px; margin: 0 auto;
 box-sizing: border-box;
 background-color: #ffffff; color: #333333;
 font-family: 'Work Sans', Arial, sans-serif; font-size: 18px;">
 <table style="max-width: 480px; width: 100%; padding: 12px 24px;
-font-size: 20px; ${newsletter.color ? `background-color: ${newsletter.color}` : ''}">
+font-size: 20px; ${backgroundColor(newsletter.color || BACKGROUND_COLOR)}">
 <tbody><tr>
 <td><strong>${newsletter.name}</strong></td>
-<td style="text-align: right; color: #666666;">
+<td style="text-align: right; font-weight: 100;">
 ${moment(newsletter.date).format('MMM Do YYYY')}
 </td>
 </tr></tbody>
@@ -302,8 +364,8 @@ ${sections}
 </div>
 <div style="padding: 24px; box-sizing: border-box;
 max-width: 480px; margin: 0 auto;
-background-color: ${newsletter.color || BACKGROUND_COLOR};">
-<a style="font-size: 12px;"
+${backgroundColor(newsletter.color || BACKGROUND_COLOR)}">
+<a style="font-size: 12px; color: inherit;"
 href="${urlBase}/email-lists/${address.split('@')[0]}/unsubscribe">
 unsubscribe
 </a>

@@ -84,6 +84,7 @@ const eventSectionDef = {
   eventId: { type: Schema.Types.ObjectId, ref: 'Event' },
   includeMap: Boolean,
   navigable: Boolean,
+  summary: String,
 };
 const librarySectionDef = {
   libraryId: { type: Schema.Types.ObjectId, ref: 'Library' },

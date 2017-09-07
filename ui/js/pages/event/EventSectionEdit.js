@@ -5,6 +5,7 @@ import FormField from '../../components/FormField';
 import SelectSearch from '../../components/SelectSearch';
 import FormState from '../../utils/FormState';
 import SectionEdit from '../../components/SectionEdit';
+import TextHelp from '../../components/TextHelp';
 
 const Suggestion = props => (
   <div className="box--between">
@@ -50,6 +51,12 @@ export default class EventSectionEdit extends Component {
             onChange={suggestion =>
               formState.change('eventId')({
                 _id: suggestion._id, name: suggestion.name })} />
+        </FormField>
+        <FormField name="summary" label="Summary" help={<TextHelp />}>
+          <textarea name="summary"
+            value={section.summary || ''}
+            rows={8}
+            onChange={formState.change('summary')} />
         </FormField>
         <FormField>
           <input name="includeMap"
