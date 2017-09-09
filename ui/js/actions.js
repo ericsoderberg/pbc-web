@@ -57,7 +57,7 @@ export function clearSession() {
   return { type: SESSION_UNLOAD, payload: undefined };
 }
 
-export function initialize() {
+export function loadSession() {
   let session;
   if (localStorage.session) {
     session = JSON.parse(localStorage.session);

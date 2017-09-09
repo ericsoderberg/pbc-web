@@ -138,9 +138,11 @@ class FormContents extends Component {
             payment
           </Link>
         ));
-      } else {
+      } else if (formTemplate.payable) {
         payments =
           <Link to={`/payments/add?formId=${form._id}`}>Add payment</Link>;
+      } else {
+        payments = <span />;
       }
 
       let linkTo;

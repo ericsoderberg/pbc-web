@@ -21,7 +21,7 @@ export default class SessionSection extends Component {
   }
 
   render() {
-    const { className, onCancel, returnPath } = this.props;
+    const { className, email, onCancel, returnPath } = this.props;
     const { state } = this.state;
 
     const classes = ['session-section__container'];
@@ -35,9 +35,10 @@ export default class SessionSection extends Component {
       case SIGN_IN: {
         contents = (
           <SignIn inline={true}
+            email={email}
             onCancel={onCancel}
             onVerifyEmail={this._nextState(VERIFY_EMAIL)}
-            onSignUp={this._nextState(SIGN_UP)} />
+            onSignUp={email ? undefined : this._nextState(SIGN_UP)} />
         );
         break;
       }
@@ -53,9 +54,10 @@ export default class SessionSection extends Component {
       case VERIFY_EMAIL: {
         contents = (
           <VerifyEmail inline={true}
+            email={email}
             onCancel={onCancel}
             onSignIn={this._nextState(SIGN_IN)}
-            onSignUp={this._nextState(SIGN_UP)}
+            onSignUp={email ? undefined : this._nextState(SIGN_UP)}
             returnPath={returnPath} />
         );
         break;
@@ -72,11 +74,13 @@ export default class SessionSection extends Component {
 
 SessionSection.propTypes = {
   className: PropTypes.string,
+  email: PropTypes.string,
   onCancel: PropTypes.func,
   returnPath: PropTypes.string.isRequired,
 };
 
 SessionSection.defaultProps = {
   className: undefined,
+  email: '',
   onCancel: undefined,
 };

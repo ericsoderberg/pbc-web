@@ -9,7 +9,7 @@ import reduxThunk from 'redux-thunk';
 // import reduxLogger from 'redux-logger';
 import { createStore, applyMiddleware } from 'redux';
 import reducers from './reducers';
-import { initialize } from './actions';
+import { loadSession } from './actions';
 import App from './components/App';
 
 require('leaflet/dist/leaflet.css');
@@ -26,7 +26,7 @@ delete window.__PRELOADED_STATE__;
 
 const store = createStore(reducers, preloadedState, applyMiddleware(reduxThunk));
 // , reduxLogger));
-store.dispatch(initialize());
+store.dispatch(loadSession());
 
 const main = (
   <Router history={history}>

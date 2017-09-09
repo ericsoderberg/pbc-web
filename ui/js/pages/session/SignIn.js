@@ -18,16 +18,20 @@ class SignIn extends Component {
     this._onCancel = this._onCancel.bind(this);
     this._onSignIn = this._onSignIn.bind(this);
     this._setSession = this._setSession.bind(this);
-    const session = { email: '', password: '' };
+    const session = { email: props.email, password: '' };
     this.state = { formState: new FormState(session, this._setSession) };
   }
 
   componentDidMount() {
-    const { inline } = this.props;
+    const { email, inline } = this.props;
     if (!inline) {
       document.title = TITLE;
     }
-    this._emailRef.focus();
+    if (email) {
+      this._passwordRef.focus();
+    } else {
+      this._emailRef.focus();
+    }
   }
 
   _onCancel() {
@@ -39,13 +43,13 @@ class SignIn extends Component {
     const { dispatch, history, inline } = this.props;
     event.preventDefault();
     postSession(this.state.formState.object)
-    .then((session) => {
-      dispatch(setSession(session));
-      if (!inline) {
-        history.push('/');
-      }
-    })
-    .catch(error => this.setState({ error }));
+      .then((session) => {
+        dispatch(setSession(session));
+        if (!inline) {
+          history.push('/');
+        }
+      })
+      .catch(error => this.setState({ error }));
   }
 
   _setSession(session) {
@@ -71,9 +75,11 @@ class SignIn extends Component {
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
       verifyEmailControl = <a onClick={onVerifyEmail}>Forgot password?</a>;
-      signUpControl = (
-        <Button secondary={true} label="Sign up" onClick={onSignUp} />
-      );
+      if (onSignUp) {
+        signUpControl = (
+          <Button secondary={true} label="Sign up" onClick={onSignUp} />
+        );
+      }
     } else {
       const actions = [
         <button key="cancel"
@@ -88,6 +94,18 @@ class SignIn extends Component {
       signUpControl = (
         <Button secondary={true} label="Sign up" path="/sign-up" />
       );
+    }
+
+    let signUpFooter;
+    if (signUpControl) {
+      signUpFooter = [
+        <div key="sep" className="form__footer-separator">
+          <span>or</span>
+        </div>,
+        <footer key="control" className="form__footer">
+          {signUpControl}
+        </footer>,
+      ];
     }
 
     return (
@@ -105,7 +123,8 @@ class SignIn extends Component {
                   onChange={formState.change('email')} />
               </FormField>
               <FormField name="password" label="Password">
-                <input name="password"
+                <input ref={(ref) => { this._passwordRef = ref; }}
+                  name="password"
                   type="password"
                   value={session.password || ''}
                   onChange={formState.change('password')} />
@@ -122,12 +141,7 @@ class SignIn extends Component {
             <footer className="form__footer">
               {verifyEmailControl}
             </footer>
-            <div className="form__footer-separator">
-              <span>or</span>
-            </div>
-            <footer className="form__footer">
-              {signUpControl}
-            </footer>
+            {signUpFooter}
           </div>
         </form>
       </div>
@@ -137,7 +151,8 @@ class SignIn extends Component {
 
 SignIn.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  history: PropTypes.any.isRequired,
+  email: PropTypes.string,
+  history: PropTypes.any,
   inline: PropTypes.bool,
   onCancel: PropTypes.func,
   onSignUp: PropTypes.func,
@@ -145,6 +160,8 @@ SignIn.propTypes = {
 };
 
 SignIn.defaultProps = {
+  email: '',
+  history: undefined,
   inline: false,
   onCancel: undefined,
   onSignUp: undefined,

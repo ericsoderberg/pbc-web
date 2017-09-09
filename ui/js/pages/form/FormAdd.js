@@ -19,7 +19,9 @@ class FormAdd extends Component {
     this._onChange = this._onChange.bind(this);
     this.state = {};
     if (props.formTemplate) {
-      this.state.form = { ...(props.formTemplate.newForm || { fields: [] }) };
+      this.state.form = {
+        ...(props.form || props.formTemplate.newForm || { fields: [] }),
+      };
     }
   }
 
@@ -33,7 +35,7 @@ class FormAdd extends Component {
       this.setState({ form: undefined });
       this._load(nextProps);
     } else if (formTemplate && !this.state.form) {
-      this.setState({ form: { ...formTemplate.newForm } });
+      this.setState({ form: { ...(nextProps.form || formTemplate.newForm) } });
     }
   }
 
@@ -45,13 +47,15 @@ class FormAdd extends Component {
   }
 
   _load(props) {
-    const { dispatch, formTemplate, formTemplateId, linkedForm } = props;
+    const { dispatch, form, formTemplate, formTemplateId, linkedForm } = props;
     if (!formTemplate) {
       const options = { new: true };
       if (linkedForm) {
         options.linkedFormId = linkedForm._id;
       }
       dispatch(loadItem('form-templates', formTemplateId, options));
+    } else if (form) {
+      this.setState({ form });
     } else if (formTemplate.newForm) {
       this.setState({ form: { ...formTemplate.newForm } });
     }
@@ -59,7 +63,9 @@ class FormAdd extends Component {
 
   _onAdd(event) {
     event.preventDefault();
-    const { dispatch, formTemplate, history, linkedForm, onDone } = this.props;
+    const {
+      dispatch, formTemplate, history, linkedForm, onDone, onSignIn,
+    } = this.props;
     const { form } = this.state;
     const error = setFormError(formTemplate, form);
 
@@ -79,8 +85,14 @@ class FormAdd extends Component {
         })
         .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
         .catch((error2) => {
-          console.error('!!! FormAdd post error', error2);
-          this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
+          if (error2.code === 'userExists' && onSignIn) {
+            // The form had an email address tied to the session but
+            // either the current user isn't signed in or is signed in with
+            // a different account. Typical case is not signed in.
+            onSignIn(form);
+          } else {
+            this.setState({ error: error2, showSignIn: error2.code === 'userExists' });
+          }
         })
         .catch(error2 => console.error('!!! FormAdd post 2', error2));
     }
@@ -187,6 +199,7 @@ class FormAdd extends Component {
 FormAdd.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
+  form: PropTypes.object, // if add needs sign in, re-use what was filled out already
   formTemplateId: PropTypes.string.isRequired,
   formTemplate: PropTypes.object,
   full: PropTypes.bool,
@@ -197,11 +210,13 @@ FormAdd.propTypes = {
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
   onLinkedForm: PropTypes.func,
+  onSignIn: PropTypes.func,
   signInControl: PropTypes.element,
 };
 
 FormAdd.defaultProps = {
   className: undefined,
+  form: undefined,
   formTemplate: undefined,
   full: true,
   history: undefined,
@@ -212,6 +227,7 @@ FormAdd.defaultProps = {
   onCancel: undefined,
   onDone: undefined,
   onLinkedForm: undefined,
+  onSignIn: undefined,
   signInControl: undefined,
 };
 

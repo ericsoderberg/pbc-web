@@ -1178,3 +1178,10 @@
   font-size: 1.25rem;
   text-align: center;
 }
+
+.form-prompt {
+  max-width: $form-width;
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: $unit;
+}

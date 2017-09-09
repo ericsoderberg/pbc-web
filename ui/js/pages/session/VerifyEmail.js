@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { postVerifyEmail, postSessionViaToken, setSession } from '../../actions';
+import {
+  postVerifyEmail, postSessionViaToken, loadSession, haveSession, setSession,
+} from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import FormField from '../../components/FormField';
 import FormError from '../../components/FormError';
@@ -128,7 +130,7 @@ class VerifyEmail extends Component {
     this._onCancel = this._onCancel.bind(this);
     this._onSendLink = this._onSendLink.bind(this);
     this.state = {
-      email: '',
+      email: props.email,
       errors: {},
       state: 'prompt',
     };
@@ -142,18 +144,22 @@ class VerifyEmail extends Component {
       const { token, returnPath } = query;
       if (token) {
         postSessionViaToken({ token })
-        .then((session) => {
-          this.setState({ state: 'done', returnPath });
-          dispatch(setSession(session));
-        })
-        .catch((error) => {
-          console.error('!!! Reset catch', error);
-          this.setState({ state: 'prompt', errorMessage: error });
-        });
+          .then((session) => {
+            this.setState({ state: 'done', returnPath });
+            dispatch(setSession(session));
+          })
+          .catch((error) => {
+            console.error('!!! Reset catch', error);
+            this.setState({ state: 'prompt', errorMessage: error });
+          });
       } else {
         this._emailRef.focus();
       }
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.sessionTimer);
   }
 
   _onCancel() {
@@ -171,11 +177,25 @@ class VerifyEmail extends Component {
       this.setState({ errors: { email: 'not an email address' } });
     } else {
       postVerifyEmail(email, returnPath)
-      .then(() => this.setState({ state: 'pending' }))
-      .catch((error) => {
-        console.error('!!! VerifyEmail error', error);
-        this.setState({ state: 'prompt', errorMessage: error.error });
-      });
+        .then(() => this.setState({ state: 'pending' }))
+        .then(() => {
+          this.sessionTimer = setInterval(() => this._checkSession(), 1000);
+        })
+        .catch((error) => {
+          console.error('!!! VerifyEmail error', error);
+          this.setState({ state: 'prompt', errorMessage: error.error });
+        });
+    }
+  }
+
+  _checkSession() {
+    const { dispatch, onCancel } = this.props;
+    dispatch(loadSession());
+    if (haveSession()) {
+      clearInterval(this.sessionTimer);
+      if (onCancel) {
+        onCancel();
+      }
     }
   }
 
@@ -197,9 +217,11 @@ class VerifyEmail extends Component {
         <Button secondary={true} label="Cancel" onClick={onCancel} />
       );
       signInControl = <a onClick={onSignIn}>Sign in</a>;
-      signUpControl = (
-        <Button secondary={true} label="Sign up" onClick={onSignUp} />
-      );
+      if (onSignUp) {
+        signUpControl = (
+          <Button secondary={true} label="Sign up" onClick={onSignUp} />
+        );
+      }
     } else {
       const actions = [
         <button key="cancel"
@@ -212,6 +234,18 @@ class VerifyEmail extends Component {
       header = <PageHeader title={TITLE} actions={actions} />;
       signInControl = <Link to="/sign-in">Sign in</Link>;
       signUpControl = <Link to="/sign-up">Sign up</Link>;
+    }
+
+    let signUpFooter;
+    if (signUpControl) {
+      signUpFooter = [
+        <div key="sep" className="form__footer-separator">
+          <span>or</span>
+        </div>,
+        <footer key="control" className="form__footer">
+          {signUpControl}
+        </footer>,
+      ];
     }
 
     return (
@@ -246,12 +280,7 @@ class VerifyEmail extends Component {
             <footer className="form__footer">
               {signInControl}
             </footer>
-            <div className="form__footer-separator">
-              <span>or</span>
-            </div>
-            <footer className="form__footer">
-              {signUpControl}
-            </footer>
+            {signUpFooter}
           </div>
         </form>
       </div>
@@ -283,9 +312,10 @@ class VerifyEmail extends Component {
 
 VerifyEmail.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  history: PropTypes.any.isRequired,
+  email: PropTypes.string,
+  history: PropTypes.any,
   inline: PropTypes.bool,
-  location: PropTypes.object.isRequired,
+  location: PropTypes.object,
   onCancel: PropTypes.func,
   onSignIn: PropTypes.func,
   onSignUp: PropTypes.func,
@@ -294,6 +324,8 @@ VerifyEmail.propTypes = {
 };
 
 VerifyEmail.defaultProps = {
+  email: '',
+  history: undefined,
   inline: false,
   location: undefined,
   onCancel: undefined,

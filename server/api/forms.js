@@ -336,7 +336,7 @@ export default function (router, transporter) {
         const { session, formTemplate } = context;
         // AUTH
         if (!session && formTemplate.authenticate) {
-          return Promise.reject({ status: 403 });
+          return Promise.reject({ status: 403 }); // not authorized
         }
         // determine if the person submitting the form is an administrator
         // for the template
@@ -346,17 +346,27 @@ export default function (router, transporter) {
 
         const data = req.body;
         const userData = pullUserData(formTemplate, data);
-        if (admin && userData.email !== session.userId.email) {
-          // admin submitting for another user
-          return findOrCreateUser(userData)
-            .then(formUser => ({ ...context, admin, formUser }));
-        } else if (session) {
-          return ({ ...context, admin, formUser: session.userId });
+        if (!session) {
+          // no session, create one
+          return createUserAndSession(userData)
+            .then(({ session: newSession, user: formUser }) => ({
+              ...context, admin, session: newSession, formUser }));
         }
-        // no session, create one
-        return createUserAndSession(userData)
-          .then(({ session: newSession, user: formUser }) => ({
-            ...context, admin, session: newSession, formUser }));
+        if (userData.email !== session.userId.email) {
+          // Person submitting form isn't the same as what's in the form
+          if (admin) {
+            // admin submitting for another user
+            return findOrCreateUser(userData)
+              .then(formUser => ({ ...context, admin, formUser }));
+          }
+          return Promise.reject({
+            status: 403,
+            code: 'userMismatch',
+            message: `The email ${userData.email} does not match the
+              one used to sign in ${session.userId.email}.`,
+          }); // not authorized
+        }
+        return ({ ...context, admin, formUser: session.userId });
       })
       // save form
       .then((context) => {

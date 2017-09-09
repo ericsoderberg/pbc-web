@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import BackIcon from '../icons/Back';
 import Search from './Search';
@@ -66,9 +67,9 @@ class PageHeader extends Component {
           navClasses.push('button-plain');
         }
         navControl = (
-          <button className={navClasses.join(' ')} onClick={this._onHome}>
+          <Link className={navClasses.join(' ')} to="/">
             {contents}
-          </button>
+          </Link>
         );
       }
     } else if (back) {

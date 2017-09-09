@@ -84,6 +84,26 @@ FormItem.defaultProps = {
   verb: undefined,
 };
 
+function extractEmail(formTemplate, form) {
+  let fieldId;
+  let result;
+  if (formTemplate.sections.some(section =>
+    section.fields.some((field) => {
+      if (field.linkToUserProperty === 'email') {
+        fieldId = field._id;
+      }
+      return fieldId;
+    }))) {
+    form.fields.some((field) => {
+      if (field.templateFieldId === fieldId) {
+        result = field.value;
+      }
+      return result;
+    })
+  }
+  return result;
+}
+
 class FormSection extends Component {
   constructor(props) {
     super(props);
@@ -95,7 +115,6 @@ class FormSection extends Component {
 
   componentDidMount() {
     this._load(this.props);
-    this._resetState(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -119,6 +138,8 @@ class FormSection extends Component {
       if (!formTemplate) {
         dispatch(loadItem('form-templates', formTemplateId,
           { full: true, forSession: true, new: true }));
+      } else {
+        this._resetState(props);
       }
     }
   }
@@ -152,7 +173,13 @@ class FormSection extends Component {
       nextState = SUMMARY;
     }
 
-    this.setState({ activeFormTemplate, state: nextState });
+    const nextJustSignedIn = (session && !this.props.session);
+
+    this.setState({
+      activeFormTemplate,
+      state: nextState,
+      justSignedIn: nextJustSignedIn,
+    });
   }
 
   _add(linkedForm) {
@@ -209,7 +236,12 @@ class FormSection extends Component {
 
   _onDone() {
     const { dispatch, formTemplateId } = this.props;
-    this.setState({ editId: undefined, editForm: undefined, state: LOADING });
+    this.setState({
+      addingForm: undefined,
+      editId: undefined,
+      editForm: undefined,
+      state: LOADING,
+    });
     dispatch(loadItem('form-templates', formTemplateId,
       { full: true, forSession: true, new: true }));
   }
@@ -217,7 +249,13 @@ class FormSection extends Component {
   render() {
     const { className, formTemplate, formTemplateId, session } = this.props;
     const {
-      activeFormTemplate, editForm, linkedForm, linkedFormTemplate, state,
+      activeFormTemplate,
+      addingForm,
+      editForm,
+      justSignedIn,
+      linkedForm,
+      linkedFormTemplate,
+      state,
     } = this.state;
 
     // determine which set of forms to show
@@ -262,6 +300,27 @@ class FormSection extends Component {
       });
     }
 
+    let prompt;
+    let addingEmail;
+    if (addingForm && state === SESSION) {
+      addingEmail = extractEmail(formTemplate, addingForm);
+      prompt = [
+        <span key="1">
+          {`We need some confirmation. It looks like your email adddress has
+            been used on this site but you aren't currently signed in with it.`}
+        </span>,
+        <p key="2">
+          Please sign in.
+        </p>,
+        <span key="3" className="secondary">
+          {`If you don't know your password, click 'Forgot password' and we'll
+            sign you in via email.`}
+        </span>,
+      ];
+    } else if (justSignedIn) {
+      prompt = 'Thanks for signing in.';
+    }
+
     let contents;
     switch (state) {
       case LOADING: {
@@ -283,7 +342,8 @@ class FormSection extends Component {
 
       case SESSION: {
         contents = (
-          <SessionSection onCancel={this._nextState(AUTHENTICATION_NEEDED)}
+          <SessionSection email={addingEmail}
+            onCancel={this._nextState(addingForm ? ADDING : AUTHENTICATION_NEEDED)}
             returnPath={window.location.pathname} />
         );
         break;
@@ -294,6 +354,7 @@ class FormSection extends Component {
         contents = (
           <FormAdd full={false}
             inline={true}
+            form={addingForm}
             formTemplate={activeFormTemplate}
             formTemplateId={activeFormTemplate._id}
             linkedForm={linkedForm}
@@ -306,6 +367,10 @@ class FormSection extends Component {
               linkedForm: undefined,
               linkedFormTemplate: undefined,
               state: EDITING })}
+            onSignIn={form => this.setState({
+              state: SESSION,
+              addingForm: form,
+            })}
             signInControl={<Button label="Sign In"
               secondary={true}
               onClick={this._nextState(SESSION)} />} />
@@ -430,8 +495,18 @@ class FormSection extends Component {
         contents = <Loading />;
     }
 
+    let prompter;
+    if (prompt) {
+      prompter = (
+        <div className="form-prompt">
+          {prompt}
+        </div>
+      );
+    }
+
     return (
       <div className={classes.join(' ')}>
+        {prompter}
         <div>
           {contents}
         </div>
