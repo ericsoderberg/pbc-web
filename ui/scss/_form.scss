@@ -1181,7 +1181,6 @@
 
 .form-prompt {
   max-width: $form-width;
-  margin: 0 auto;
+  margin: 0 auto $unit;
   text-align: left;
-  margin-bottom: $unit;
 }

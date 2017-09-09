@@ -59,7 +59,8 @@
   align-items: flex-start;
   text-align: left;
 
-  form.form {
+  form.form,
+  .form-prompt__container {
     max-width: $form-width;
   }
 

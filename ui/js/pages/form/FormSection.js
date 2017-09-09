@@ -99,7 +99,7 @@ function extractEmail(formTemplate, form) {
         result = field.value;
       }
       return result;
-    })
+    });
   }
   return result;
 }
@@ -124,6 +124,16 @@ class FormSection extends Component {
       this._load(nextProps);
     } else {
       this._resetState(nextProps);
+    }
+  }
+
+  componentDidUpdate() {
+    if (this._scrollNeeded) {
+      // scroll to top if we changed states and we're too low
+      this._scrollNeeded = false;
+      if (this._ref.getBoundingClientRect().top < 0) {
+        this._ref.scrollIntoView(true);
+      }
     }
   }
 
@@ -175,6 +185,8 @@ class FormSection extends Component {
 
     const nextJustSignedIn = (session && !this.props.session);
 
+    this._scrollNeeded = (this.state.state !== nextState);
+
     this.setState({
       activeFormTemplate,
       state: nextState,
@@ -189,6 +201,7 @@ class FormSection extends Component {
       while (formTemplate.linkedFormTemplate && !linkedForm) {
         formTemplate = formTemplate.linkedFormTemplate;
       }
+      this._scrollNeeded = true;
       this.setState({
         state: ADDING,
         activeFormTemplate: formTemplate,
@@ -213,6 +226,7 @@ class FormSection extends Component {
           return false;
         });
       }
+      this._scrollNeeded = true;
       this.setState({
         editForm: form, linkedForm, linkedFormTemplate, state: EDITING,
       });
@@ -230,6 +244,7 @@ class FormSection extends Component {
 
   _nextState(state) {
     return () => {
+      this._scrollNeeded = (this.state.state !== state);
       this.setState({ state, editForm: undefined, paymentFormId: undefined });
     };
   }
@@ -361,16 +376,22 @@ class FormSection extends Component {
             linkedFormTemplate={linkedFormTemplate}
             onDone={this._onDone}
             onCancel={onCancel}
-            onLinkedForm={() => this.setState({
-              activeFormTemplate: linkedFormTemplate,
-              editForm: linkedForm,
-              linkedForm: undefined,
-              linkedFormTemplate: undefined,
-              state: EDITING })}
-            onSignIn={form => this.setState({
-              state: SESSION,
-              addingForm: form,
-            })}
+            onLinkedForm={() => {
+              this._scrollNeeded = true;
+              this.setState({
+                activeFormTemplate: linkedFormTemplate,
+                editForm: linkedForm,
+                linkedForm: undefined,
+                linkedFormTemplate: undefined,
+                state: EDITING });
+            }}
+            onSignIn={(form) => {
+              this._scrollNeeded = true;
+              this.setState({
+                state: SESSION,
+                addingForm: form,
+              });
+            }}
             signInControl={<Button label="Sign In"
               secondary={true}
               onClick={this._nextState(SESSION)} />} />
@@ -389,11 +410,14 @@ class FormSection extends Component {
             linkedFormTemplate={linkedFormTemplate}
             onDone={this._onDone}
             onCancel={this._nextState(SUMMARY)}
-            onLinkedForm={() => this.setState({
-              activeFormTemplate: linkedFormTemplate,
-              editForm: linkedForm,
-              linkedForm: undefined,
-              linkedFormTemplate: undefined })} />
+            onLinkedForm={() => {
+              this._scrollNeeded = true;
+              this.setState({
+                activeFormTemplate: linkedFormTemplate,
+                editForm: linkedForm,
+                linkedForm: undefined,
+                linkedFormTemplate: undefined });
+            }} />
         );
         break;
       }
@@ -498,14 +522,16 @@ class FormSection extends Component {
     let prompter;
     if (prompt) {
       prompter = (
-        <div className="form-prompt">
-          {prompt}
+        <div className="form-prompt__container">
+          <div className="form-prompt">
+            {prompt}
+          </div>
         </div>
       );
     }
 
     return (
-      <div className={classes.join(' ')}>
+      <div ref={(ref) => { this._ref = ref; }} className={classes.join(' ')}>
         {prompter}
         <div>
           {contents}
