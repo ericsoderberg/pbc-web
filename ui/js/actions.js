@@ -65,6 +65,8 @@ export function initialize() {
     if (session.userId.administratorDomainId) {
       session.userId.domainIds = [session.userId.administratorDomainId];
       delete session.userId.administratorDomainId;
+    } else if (!session.userId.domainIds) {
+      session.userId.domainIds = [];
     }
     return setSession(session);
   }
