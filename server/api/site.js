@@ -8,7 +8,9 @@ mongoose.Promise = global.Promise;
 export const ICON_DIR = `${__dirname}/../../`;
 
 if (process.env.PAYPAL_CLIENT_ID) {
+  /* eslint-disable no-console */
   console.log('PayPal available');
+  /* elsint-enable no-console */
 } else {
   console.warn('PayPal unavailable, set PAYPAL_CLIENT_ID environment variable');
 }
