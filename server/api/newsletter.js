@@ -190,13 +190,14 @@ function renderDates(event) {
 
 function markupEvent(event, section, urlBase) {
   const dates = renderDates(event);
-  const url = `${urlBase}/events/${event.path || event._id}`;
+  const url = `${urlBase}/events/${encodeURIComponent(event.path || event._id)}`;
   let image = '';
   if (event.image) {
+    const src = `${urlBase}/api/events/${event._id}/${encodeURIComponent(event.image.name)}`;
     image = `
 <a href="${url}" style="display: block; font-size: 0;">
 <img style="${imageWidth(section)} margin-bottom: -4px;"
-src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
+src="${src}" /></a>
   `;
   }
   const at = `<div style="padding: 6px 24px;">${dates}</div>`;
@@ -234,7 +235,7 @@ src="${urlBase}/api/events/${event._id}/${event.image.name}" /></a>
 }
 
 function markupMessage(label, message, first, urlBase) {
-  const url = `${urlBase}/messages/${message.path || message._id}`;
+  const url = `${urlBase}/messages/${encodeURIComponent(message.path || message._id)}`;
   let verses = '';
   if (message.verses) {
     verses = `<div style="padding-top: 6px; color: #999999">${message.verses}</div>`;
@@ -272,7 +273,7 @@ ${previousMessageMarkup}
 
 function markupPage(sectionPage, section, urlBase) {
   const page = sectionPage.page;
-  const url = `${urlBase}/${page.path || `pages/${page._id}`}`;
+  const url = `${urlBase}/${encodeURIComponent(page.path) || `pages/${page._id}`}`;
   // TODO: revisit this when aligning event and page images and colors
   let image = '';
   if (section.backgroundImage) {
@@ -301,7 +302,7 @@ src="${section.backgroundImage.data}" /></a>
 }
 
 function markupFile(file, section, urlBase) {
-  const url = `${urlBase}/file/${file._id}/${file.name}`;
+  const url = `${urlBase}/file/${file._id}/${encodeURIComponent(file.name)}`;
   return `
 <div style="margin-bottom: 24px; ${backgroundColor(section.color)}">
   <a style="display: block; padding-top: 24px; padding-bottom: 24px;
@@ -311,8 +312,9 @@ function markupFile(file, section, urlBase) {
 }
 
 function markupImage(image, section, newsletter, urlBase) {
+  const src = `${urlBase}/api/newsletters/${newsletter._id}/${encodeURIComponent(image.name)}`;
   let contents = `<div><img style="${imageWidth(section)} margin-bottom: -4px;"
-    src="${urlBase}/api/newsletters/${newsletter._id}/${image.name}" />
+    src="${src}" />
     </div>`;
   if (!section.full) {
     contents = `<div style="margin: 24px;">${contents}</div>`;
