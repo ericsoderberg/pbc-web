@@ -5,6 +5,7 @@ import {
   requireSomeAdministrator,
 } from './auth';
 import { unsetDomainIfNeeded } from './domains';
+import { catcher, sendImage } from './utils';
 
 mongoose.Promise = global.Promise;
 
@@ -43,19 +44,12 @@ export default function (router) {
       .then((library) => {
         if (library.podcast && library.podcast.image &&
           library.podcast.image.name === req.params.imageName) {
-          const { podcast: { image: { data, size, type } } } = library;
-          // strip data url aspects. e.g. 'data:image/png;base64,'
-          const string = data.slice(data.indexOf(',') + 1);
-          // decode base64
-          const buffer = new Buffer(string, 'base64');
-          res.set({
-            'Content-Type': type,
-            'Content-Length': size,
-          }).status(200).send(buffer);
+          sendImage(library.podcast.image, res);
+        } else {
+          res.status(404).send();
         }
-        return Promise.reject({ error: 'No image' });
       })
-      .catch(error => res.status(400).json(error));
+      .catch(error => catcher(error, res));
   });
 
   register(router, {

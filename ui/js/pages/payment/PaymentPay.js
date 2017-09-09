@@ -42,7 +42,7 @@ class PaymentPay extends Component {
         }
       }, 1000);
     } else {
-      this._renderPaypal();
+      setTimeout(() => this._renderPaypal(), 10);
     }
   }
 
@@ -52,8 +52,8 @@ class PaymentPay extends Component {
 
   _renderPaypal() {
     const { site } = this.props;
-    if (!this._paypalRendered) {
-      this._paypalRendered = true;
+    const { paypalRendered } = this.state;
+    if (!paypalRendered) {
       const client = {};
       client[site.paypalEnv] = site.paypalClientId;
       paypal.Button.render({
@@ -64,6 +64,7 @@ class PaymentPay extends Component {
         onAuthorize: this._onAuthorize,
         style: { size: 'medium', shape: 'rect' },
       }, '#paypalButton');
+      this.setState({ paypalRendered: true });
     }
   }
 
@@ -155,7 +156,7 @@ class PaymentPay extends Component {
 
   render() {
     const { payByCheckInstructions, session } = this.props;
-    const { formState, error } = this.state;
+    const { formState, error, paypalRendered } = this.state;
     const payment = formState.object;
 
     let submitButton;
@@ -173,8 +174,8 @@ class PaymentPay extends Component {
       //     accept payment, hopefully within a few days.
       //   </div>
       // );
-      if (!this._paypalRendered) {
-        submitButton = <Loading />;
+      if (!paypalRendered) {
+        submitButton = <Loading small={true} />;
       }
     }
 
