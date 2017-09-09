@@ -458,14 +458,16 @@
 }
 
 .confirm-remove__confirm {
-  position: absolute;
-  bottom: 0;
-  right: 0;
   flex-direction: column;
   display: none;
 
+  @media all and (min-width: 700px) {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
   @media all and (max-width: 699px) {
-    margin: $unit 0;
     width: 100%;
   }
 
@@ -481,12 +483,24 @@
 }
 
 .confirm-remove--confirming {
+
   .confirm-remove__remove {
-    visibility: hidden;
+    @media all and (min-width: 700px) {
+      visibility: hidden;
+    }
+
+    @media all and (max-width: 699px) {
+      display: none;
+    }
   }
 
   .confirm-remove__confirm {
     display: flex;
+
+    @media all and (max-width: 699px) {
+      flex-direction: column-reverse;
+      margin-top: $unit;
+    }
   }
 }
 
