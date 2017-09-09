@@ -48,7 +48,8 @@ const loadSite = (store) => {
   return Site.findOne({})
     .populate({ path: 'homePageId', select: 'name' })
     .exec()
-    .then((site) => {
+    .then((doc) => {
+      const site = doc.toObject();
       site.paypalClientId = process.env.PAYPAL_CLIENT_ID;
       site.paypalEnv = process.env.NODE_ENV === 'development' ? 'sandbox' : 'production';
       store.dispatch({ type: SITE_LOAD, payload: site });
