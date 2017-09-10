@@ -125,14 +125,34 @@
 }
 
 .form-section__item-button {
+  display: flex;
+  flex-direction: row;
+
+  > .button__indicator.control-icon {
+    flex: 0 0 auto;
+    margin-left: $unit;
+    height: $double-unit + $half-unit;
+  }
+
+  &:hover {
+    .form-section__item-button-text > span {
+      color: $control-hover-color;
+    }
+  }
+}
+
+.form-section__item-button-text {
+  flex: 1 1 auto;
+  line-height: $unit + $half-unit;
+  padding: $half-unit 0;
+
   > span {
     margin-right: $unit;
   }
 
-  &:hover {
-    > span {
-      color: $control-hover-color;
-    }
+  > .secondary {
+    white-space: nowrap;
+    font-size: 1rem;
   }
 }
 

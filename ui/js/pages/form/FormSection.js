@@ -38,17 +38,24 @@ const FormItem = (props) => {
     className, distinguish, intermediate, item: form, onClick, verb,
   } = props;
   const classNames = ['item__container', className];
-  let message;
+  let text;
   let timestamp;
   if (intermediate) {
-    message = `${form.name}`;
+    text = <span>{form.name}</span>;
   } else {
     const date = moment(form.modified).format('MMM Do YYYY');
-    timestamp = <span className="secondary">{date}</span>;
+    timestamp = <span key="t" className="secondary">{date}</span>;
     if (distinguish) {
-      message = `${verb} ${form.name}`;
+      text = [
+        <div key="n">{form.name}</div>,
+        <span key="v" className="secondary">{verb}</span>,
+        timestamp,
+      ];
     } else {
-      message = `${verb}`;
+      text = [
+        <span key="v">{verb}</span>,
+        timestamp,
+      ];
     }
   }
 
@@ -58,8 +65,9 @@ const FormItem = (props) => {
         <div>
           <button className="button button-plain form-section__item-button"
             onClick={onClick}>
-            <span>{message}</span>
-            {timestamp}
+            <div className="form-section__item-button-text">
+              {text}
+            </div>
             <RightIcon className="button__indicator" />
           </button>
         </div>
