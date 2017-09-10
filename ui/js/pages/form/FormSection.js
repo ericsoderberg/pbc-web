@@ -153,7 +153,8 @@ class FormSection extends Component {
   _load(props) {
     const { dispatch, formTemplate, formTemplateId } = props;
     if (formTemplateId) {
-      if (!formTemplate) {
+      // Handle server rendering where just name is populated
+      if (!formTemplate || !formTemplate.sections) {
         dispatch(loadItem('form-templates', formTemplateId,
           { full: true, forSession: true, new: true }));
       } else {
