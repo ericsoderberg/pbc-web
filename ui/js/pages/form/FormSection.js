@@ -169,7 +169,7 @@ class FormSection extends Component {
 
     let nextState;
     let activeFormTemplate = formTemplate;
-    if (!formTemplate) {
+    if (!formTemplate || !formTemplate.sections) {
       nextState = LOADING;
     } else if (!session && formTemplate.authenticate) {
       nextState = AUTHENTICATION_NEEDED;
