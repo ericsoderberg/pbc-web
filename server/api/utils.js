@@ -37,3 +37,16 @@ export const sendImage = (image, res) => {
   });
   res.end(img);
 };
+
+export const unsetEmptyFields = (data, fieldNames) => {
+  fieldNames.forEach((name) => {
+    if (!data[name]) {
+      delete data[name];
+      if (!data.$unset) {
+        data.$unset = {};
+      }
+      data.$unset[name] = '';
+    }
+  });
+  return data;
+};

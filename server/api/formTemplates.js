@@ -5,38 +5,17 @@ import register from './register';
 import {
   getSession, authorizedForDomain, allowAnyone, requireSomeAdministrator,
 } from './auth';
-import { unsetDomainIfNeeded } from './domains';
-import { catcher } from './utils';
+import { catcher, unsetEmptyFields } from './utils';
 
 mongoose.Promise = global.Promise;
 
 // /api/form-templates
 
-const unsetReferences = (data) => {
-  data = unsetDomainIfNeeded(data);
-  if (!data.linkedFormTemplateId) {
-    delete data.linkedFormTemplateId;
-    if (!data.$unset) {
-      data.$unset = {};
-    }
-    data.$unset.linkedFormTemplateId = '';
-  }
-  if (!data.emailListId) {
-    delete data.emailListId;
-    if (!data.$unset) {
-      data.$unset = {};
-    }
-    data.$unset.emailListId = '';
-  }
-  if (!data.anotherLabel) {
-    delete data.anotherLabel;
-    if (!data.$unset) {
-      data.$unset = {};
-    }
-    data.$unset.anotherLabel = '';
-  }
-  return data;
-};
+const UNSETTABLE_FIELDS = [
+  'acknowledgeMessage', 'anotherLabel', 'domainId', 'emailListId',
+  'linkedFormTemplateId', 'payable', 'payByCheckInstructions',
+  'postSubmitMessage', 'submitLabel',
+];
 
 const fieldValue = (field, templateFieldMap, optionMap) => {
   const templateField = templateFieldMap[field.templateFieldId] || {};
@@ -490,7 +469,7 @@ export default function (router) {
     },
     put: {
       authorization: requireSomeAdministrator,
-      transformIn: unsetReferences,
+      transformIn: data => unsetEmptyFields(data, UNSETTABLE_FIELDS),
       transformOut: (formTemplate) => {
         // update all Forms for this formTemplate to have the same domain
         const Form = mongoose.model('Form');

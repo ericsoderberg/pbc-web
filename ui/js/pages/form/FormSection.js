@@ -154,7 +154,7 @@ class FormSection extends Component {
     const { dispatch, formTemplate, formTemplateId } = props;
     if (formTemplateId) {
       // Handle server rendering where just name is populated
-      if (!formTemplate || !formTemplate.sections) {
+      if (!formTemplate) {
         dispatch(loadItem('form-templates', formTemplateId,
           { full: true, forSession: true, new: true }));
       } else {
@@ -169,7 +169,7 @@ class FormSection extends Component {
 
     let nextState;
     let activeFormTemplate = formTemplate;
-    if (!formTemplate || !formTemplate.sections) {
+    if (!formTemplate) {
       nextState = LOADING;
     } else if (!session && formTemplate.authenticate) {
       nextState = AUTHENTICATION_NEEDED;

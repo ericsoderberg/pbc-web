@@ -204,7 +204,7 @@ router.get('/messages/:id', (req, res, next) => {
 });
 
 // pages
-router.get('/:id', (req, res, next) => {
+router.get(['/:id', '/pages/:id'], (req, res, next) => {
   const context = {};
   const store = createStore(reducers, applyMiddleware(reduxThunk));
   let title;

@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 mongoose.Promise = global.Promise;
 
 const ALLOWED_POST_ORIGINS =
-  ['https://www.pbc.org', 'https://test.pbc.org', 'http://localhost:8765'];
+  ['https://www.pbc.org', 'https://test.pbc.org', 'http://localhost:8765',
+    'http://localhost:8091'];
 
 export function getSession(req) {
   // verify Origin, to avoid CSRF
