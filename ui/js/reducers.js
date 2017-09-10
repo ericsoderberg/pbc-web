@@ -85,6 +85,7 @@ const handlers = {
       const { id, item } = action.payload;
       nextState[id] = item;
     } else {
+      console.error(action.payload.error);
       nextState.notFound[action.payload.id] = true;
       nextState.error = action.payload.error;
     }

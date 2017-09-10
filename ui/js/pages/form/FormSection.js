@@ -319,9 +319,11 @@ class FormSection extends Component {
 
     let balance = 0;
     if (formTemplate && formTemplate.payable) {
-      forms.forEach((form) => {
-        balance += form.cost.balance;
-      });
+      // some forms might be from the linked template, which might not be payable
+      forms.filter(f => f.formTemplateId === formTemplate._id)
+        .forEach((form) => {
+          balance += form.cost.balance;
+        });
     }
 
     let prompt;
