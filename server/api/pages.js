@@ -4,7 +4,7 @@ import {
   getSession, allowAnyone, authorizedForDomain, requireAdministrator,
   requireSomeAdministrator,
 } from './auth';
-import { addForms, addNewForm } from './formTemplates';
+// import { addForms, addNewForm } from './formTemplates';
 import { unsetDomainIfNeeded } from './domains';
 import register from './register';
 import { catcher, sendImage } from './utils';
@@ -283,9 +283,9 @@ export const pagePopulations = [
   },
   { path: 'sections.libraryId', select: 'name path', model: 'Library' },
   { path: 'sections.calendarId', select: 'name path', model: 'Calendar' },
-  // { path: 'sections.formTemplateId',
-  //   select: 'name',
-  //   model: 'FormTemplate' },
+  { path: 'sections.formTemplateId', // need this for page editing
+    select: 'name',
+    model: 'FormTemplate' },
 ];
 
 export default function (router) {

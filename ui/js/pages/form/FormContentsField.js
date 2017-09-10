@@ -25,10 +25,12 @@ const FormContentsField = (props) => {
   } = props;
   const Component = TYPE_COMPONENT[formTemplateField.type];
   let linkedField;
+  let linkedControl;
   if (formTemplateField.linkedFieldId && linkedForm) {
     linkedForm.fields.some((field2) => {
       if (field2.templateFieldId === formTemplateField.linkedFieldId) {
         linkedField = field2;
+        linkedControl = linkedFormControl;
       }
       return linkedField;
     });
@@ -38,7 +40,7 @@ const FormContentsField = (props) => {
       formTemplateField={formTemplateField}
       field={field}
       linkedField={linkedField}
-      linkedFormControl={linkedFormControl}
+      linkedFormControl={linkedControl}
       onChange={onChange}
       error={error} />
   );

@@ -213,12 +213,10 @@ export const addFormTemplateTotals = (data) => {
 export const addForms = (data, forSession) => {
   const formTemplate = data.toObject ? data.toObject() : data;
   const Form = mongoose.model('Form');
-  const FormTemplate = mongoose.model('FormTemplate');
   const criteria = { formTemplateId: formTemplate._id };
   if (forSession) {
     criteria.userId = forSession.userId._id;
   }
-  // addNewForm(formTemplate, forSession);
   return Form.find(criteria)
     .populate({ path: 'paymentIds', select: 'amount' })
     .populate({ path: 'userId', select: 'name' })
@@ -227,21 +225,25 @@ export const addForms = (data, forSession) => {
     .then((forms) => {
       formTemplate.forms = forms;
       return formTemplate;
-    })
-    .then(() => {
-      if (formTemplate.linkedFormTemplateId) {
-        const linkedId =
-          formTemplate.linkedFormTemplateId._id || formTemplate.linkedFormTemplateId;
-        return FormTemplate.findOne({ _id: linkedId })
-          .exec()
-          .then(linkedData => addForms(linkedData, forSession))
-          .then((linkedFormTemplate) => {
-            formTemplate.linkedFormTemplate = linkedFormTemplate;
-            return formTemplate;
-          });
-      }
-      return formTemplate;
     });
+};
+
+export const addLinkedFormTemplate = (data, forSession) => {
+  const formTemplate = data.toObject ? data.toObject() : data;
+  const FormTemplate = mongoose.model('FormTemplate');
+  if (formTemplate.linkedFormTemplateId) {
+    const linkedId =
+      formTemplate.linkedFormTemplateId._id || formTemplate.linkedFormTemplateId;
+    return FormTemplate.findOne({ _id: linkedId })
+      .exec()
+      .then(linkedData => addForms(linkedData, forSession))
+      .then(linkedData => addNewForm(linkedData, forSession))
+      .then((linkedFormTemplate) => {
+        formTemplate.linkedFormTemplate = linkedFormTemplate;
+        return formTemplate;
+      });
+  }
+  return formTemplate;
 };
 
 const validate = (data) => {
@@ -469,9 +471,10 @@ export default function (router) {
         if (req.query.full && session) {
           // reset modified time to now to avoid caching issues when deleting forms
           formTemplate.modified = moment.utc();
-          return addForms(formTemplate,
-            (req.query.forSession || !admin) ? session : undefined)
-            .then(data => addFormTemplateTotals(data));
+          const forSession = ((req.query.forSession || !admin) ? session : undefined);
+          return addForms(formTemplate, forSession)
+            .then(data => addFormTemplateTotals(data))
+            .then(data => addLinkedFormTemplate(data, forSession));
         }
         if (req.query.totals && admin) {
           // reset modified time to now to avoid caching issues when deleting forms
