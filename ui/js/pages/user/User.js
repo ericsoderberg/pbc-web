@@ -26,21 +26,33 @@ const UserContentsBase = (props) => {
   }
 
   let associated;
-  if (session && session.userId.administrator) {
-    associated = (
-      <div className="associated">
-        <Link className="associated-link"
-          to={`/payments?userId=${user._id}&userId-name=${user.name}`}>
-          Payments
-        </Link>
-        <Link className="associated-link"
-          to={`/forms?userId=${encodeURIComponent(user._id)}&userId-name=${user.name}`}>
-          Forms
-        </Link>
-        <Link className="associated-link"
+  if (session && (session.userId.administrator || session.userId._id === user._id)) {
+    associated = [
+      <Link key="forms"
+        className="associated-link"
+        to={`/forms?userId=${encodeURIComponent(user._id)}&userId-name=${user.name}`}>
+        Forms
+      </Link>,
+      <Link key="payments"
+        className="associated-link"
+        to={`/payments?userId=${user._id}&userId-name=${user.name}`}>
+        Payments
+      </Link>,
+    ];
+
+    if (session.userId.administrator) {
+      associated.push(
+        <Link key="email"
+          className="associated-link"
           to={`/email-lists?addresses.address=${user.email}&addresses-name=${user.email}`}>
           Email Lists
-        </Link>
+        </Link>,
+      );
+    }
+
+    associated = (
+      <div className="associated">
+        {associated}
       </div>
     );
   }

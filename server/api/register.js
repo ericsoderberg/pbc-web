@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment-timezone';
-import { getSession, requireAdministrator, authorizedForDomain } from './auth';
+import { getSession, requireAdministrator, authorizedForDomainOrSelf } from './auth';
 import { catcher } from './utils';
 
 mongoose.Promise = global.Promise;
@@ -129,7 +129,7 @@ export default (router, options) => {
           const searchProperties = indexOpts.searchProperties || 'name';
           const query = Doc.find();
           if (req.query.adminable) {
-            query.find(authorizedForDomain(session));
+            query.find(authorizedForDomainOrSelf(session));
           } else if (indexOpts.filterAuthorized) {
             query.find(indexOpts.filterAuthorized(session));
           }

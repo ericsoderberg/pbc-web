@@ -200,6 +200,9 @@ class List extends Component {
     let { actions } = this.props;
     const { searchText, filter, filterNames, loading, loadingMore } = this.state;
 
+    const admin = (session &&
+      (session.userId.administrator || session.userId.domainIds.length > 0));
+
     const descending = (sort && sort[0] === '-');
     let markerIndex = -1;
     const contents = (items || []).map((item, index) => {
@@ -213,7 +216,7 @@ class List extends Component {
 
       return (
         <li key={item._id}>
-          <Item item={item} />
+          <Item item={item} session={session} />
         </li>
       );
     });
@@ -229,7 +232,7 @@ class List extends Component {
     }
 
     const filterItems = [];
-    if (filters) {
+    if (filters && admin) {
       filters.forEach((aFilter) => {
         let value = (filter || {})[aFilter.property] || '';
         if (aFilter.options) {
@@ -257,8 +260,7 @@ class List extends Component {
       });
     }
 
-    if ((!addIfFilter || (filter || {})[addIfFilter]) && session &&
-      (session.userId.administrator || session.userId.domainIds.length > 0)) {
+    if ((!addIfFilter || (filter || {})[addIfFilter]) && admin) {
       let addPath = `${path}/add`;
       if (addIfFilter) {
         addPath += `?${addIfFilter}=${encodeURIComponent(filter[addIfFilter])}`;

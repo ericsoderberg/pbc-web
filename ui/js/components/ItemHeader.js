@@ -34,17 +34,25 @@ class ItemHeader extends Component {
     } = this.props;
     let { actions } = this.props;
 
-    if (item && session && (session.userId.administrator ||
-      (session.userId.domainIds &&
-        session.userId.domainIds.some(id => id === item.domainId)))) {
-      actions = [...actions,
-        <a key="copy" href={`/${category}/add`} onClick={this._onCopy}>
-          Copy
-        </a>,
-        <Link key="edit" to={`/${category}/${item._id}/edit`}>
-          Edit
-        </Link>,
-      ];
+    if (item && session) {
+      if (session.userId.administrator ||
+        (session.userId.domainIds &&
+          session.userId.domainIds.some(id => id === item.domainId))) {
+        actions = [...actions,
+          <a key="copy" href={`/${category}/add`} onClick={this._onCopy}>
+            Copy
+          </a>,
+          <Link key="edit" to={`/${category}/${item._id}/edit`}>
+            Edit
+          </Link>,
+        ];
+      } else if (item._id === session.userId._id) {
+        actions = [
+          <Link key="edit" to={`/${category}/${item._id}/edit`}>
+            Edit
+          </Link>,
+        ];
+      }
     }
 
     return (

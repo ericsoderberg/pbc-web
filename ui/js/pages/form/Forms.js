@@ -6,16 +6,27 @@ import moment from 'moment-timezone';
 import List from '../../components/List';
 
 const Item = (props) => {
-  const { className, item: form } = props;
+  const { className, item: form, session } = props;
   const classNames = ['item__container', className];
+  let name;
+  if (session.userId.administrator ||
+    (session.userId.domainIds && session.userId.domainIds.length > 0)) {
+    name = (
+      <span className="box--row">
+        <span>{form.name || (form.userId || {}).name}</span>
+        <span className="tertiary">{(form.formTemplateId || {}).name}</span>
+      </span>
+    );
+  } else {
+    name = (
+      <span>{(form.formTemplateId || { name: '?' }).name}</span>
+    );
+  }
   return (
     <Link className={classNames.join(' ')}
       to={`/forms/${form._id}/edit`}>
       <div className="item">
-        <span className="box--row">
-          <span>{form.name || (form.userId || {}).name}</span>
-          <span className="tertiary">{(form.formTemplateId || {}).name}</span>
-        </span>
+        {name}
         <span className="secondary">
           {moment(form.modified).format('MMM Do YYYY')}
         </span>
@@ -27,6 +38,7 @@ const Item = (props) => {
 Item.propTypes = {
   className: PropTypes.string,
   item: PropTypes.object.isRequired,
+  session: PropTypes.object.isRequired,
 };
 
 Item.defaultProps = {

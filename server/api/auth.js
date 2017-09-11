@@ -54,7 +54,7 @@ export function requireDomainAdministratorOrUser(context, domainId, userId) {
   return (session && (session.userId.administrator ||
     (session.userId.domainIds &&
       session.userId.domainIds.some(id => id.equals(domainId))) ||
-    session.userId._id.equals(userId))) ?
+    session.userId._id.equals(userId._id || userId))) ?
     Promise.resolve(context) : Promise.reject({ status: 403 });
 }
 
