@@ -289,7 +289,7 @@ class List extends Component {
       if (loading) {
         message = <Loading />;
       } else {
-        const text = searchText ? 'No matches' : 'Awaiting your input';
+        const text = searchText ? 'No matches' : 'None';
         message = <div className="list__message">{text}</div>;
       }
     }
