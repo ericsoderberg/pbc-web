@@ -104,7 +104,9 @@
     position: relative;
     left: 50%;
     transform: translateX(-50%);
+    padding: $unit 0;
     min-width: 100%;
+    min-height: 0;
     max-height: 600px;
     object-fit: cover;
   }
@@ -175,6 +177,11 @@
         }
       }
     }
+  }
+
+  .image.section {
+    padding: 0;
+    max-width: none;
   }
 
   .library-summary {
