@@ -14,7 +14,7 @@ const Item = (props) => {
       <div className="item">
         <span className="box--row">
           <span>{form.name || (form.userId || {}).name}</span>
-          <span className="tertiary">{form.formTemplateId.name}</span>
+          <span className="tertiary">{(form.formTemplateId || {}).name}</span>
         </span>
         <span className="secondary">
           {moment(form.modified).format('MMM Do YYYY')}

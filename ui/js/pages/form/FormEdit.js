@@ -34,21 +34,23 @@ class FormEdit extends Component {
 
   componentWillReceiveProps(nextProps) {
     const {
-      dispatch, form, formTemplate, id, linkedForm, linkedFormTemplate,
+      dispatch, form, formTemplate, formTemplateNotFound, id,
+      linkedForm, linkedFormNotFound, linkedFormTemplate,
     } = nextProps;
     if (id && id !== this.props.id && !form) {
       this.setState({ form: undefined });
       this._load(nextProps);
     } else if (form && (!this.state.form || form._id !== this.props.form._id)) {
       this.setState({ form: { ...form }, loadedLinkedTemplate: false });
-      if (!formTemplate) {
+      if (!formTemplate && form.formTemplateId && !formTemplateNotFound) {
         dispatch(loadItem('form-templates', form.formTemplateId._id));
       }
-      if (form.linkedFormId && !linkedForm) {
+      if (form.linkedFormId && !linkedForm && linkedFormNotFound) {
         dispatch(loadItem('forms', form.linkedFormId));
       }
     } else if (linkedForm && !linkedFormTemplate &&
-      !this.state.loadedLinkedTemplate) {
+      !this.state.loadedLinkedTemplate && linkedForm.formTemplateId &&
+      !linkedFormNotFound) {
       this.setState({ loadedLinkedTemplate: true });
       dispatch(loadItem('form-templates', linkedForm.formTemplateId._id));
     }
@@ -115,8 +117,8 @@ class FormEdit extends Component {
 
   render() {
     const {
-      className, formTemplate, full, inline, linkedForm, linkedFormTemplate,
-      onLinkedForm,
+      className, formTemplate, formTemplateNotFound, full, inline,
+      linkedForm, linkedFormTemplate, onLinkedForm,
     } = this.props;
     const { form, error } = this.state;
     const classNames = ['form'];
@@ -125,7 +127,7 @@ class FormEdit extends Component {
     }
 
     let result;
-    if (form && formTemplate) {
+    if (form && (formTemplate || formTemplateNotFound || !form.formTemplateId)) {
       const submitLabel = 'Update';
       // if (formTemplate.payable && form.paymentIds.length === 0) {
       //   submitLabel = 'Pay';
@@ -142,7 +144,7 @@ class FormEdit extends Component {
           </button>,
         ];
         header = (
-          <PageHeader title={formTemplate.name} actions={cancelControl} />
+          <PageHeader title={(formTemplate || {}).name} actions={cancelControl} />
         );
       }
 
@@ -167,12 +169,9 @@ class FormEdit extends Component {
         }
       }
 
-      result = (
-        <form className={classNames.join(' ')}
-          action={`/forms/${form._id}`}
-          onSubmit={this._onUpdate}
-          noValidate={true}>
-          {header}
+      let formContents;
+      if (formTemplate) {
+        formContents = (
           <FormContents form={form}
             formTemplate={formTemplate}
             linkedForm={linkedForm}
@@ -180,6 +179,18 @@ class FormEdit extends Component {
             full={full}
             onChange={this._onChange}
             error={error} />
+        );
+      } else {
+        formContents = <div className="form-error error">Missing form template</div>;
+      }
+
+      result = (
+        <form className={classNames.join(' ')}
+          action={`/forms/${form._id}`}
+          onSubmit={this._onUpdate}
+          noValidate={true}>
+          {header}
+          {formContents}
           <footer className="form__footer">
             <button type="submit" className="button">{submitLabel}</button>
             <ConfirmRemove onConfirm={this._onRemove} />
@@ -207,11 +218,13 @@ FormEdit.propTypes = {
   dispatch: PropTypes.func.isRequired,
   form: PropTypes.object,
   formTemplate: PropTypes.object,
+  formTemplateNotFound: PropTypes.bool,
   full: PropTypes.bool,
   history: PropTypes.any,
   id: PropTypes.string,
   inline: PropTypes.bool,
   linkedForm: PropTypes.object,
+  linkedFormNotFound: PropTypes.bool,
   linkedFormTemplate: PropTypes.object,
   onCancel: PropTypes.func,
   onDone: PropTypes.func,
@@ -222,11 +235,13 @@ FormEdit.defaultProps = {
   className: undefined,
   form: undefined,
   formTemplate: undefined,
+  formTemplateNotFound: undefined,
   full: true,
   history: undefined,
   id: undefined,
   inline: false,
   linkedForm: undefined,
+  linkedFormNotFound: undefined,
   linkedFormTemplate: undefined,
   onCancel: undefined,
   onDone: undefined,
@@ -237,17 +252,22 @@ const select = (state, props) => {
   const id = props.match ? props.match.params.id : props.id;
   const form = props.form || state[id];
   let linkedForm = props.linkedForm;
+  let linkedFormNotFound;
   if (!linkedForm && form && (form.linkedForm || form.linkedFormId)) {
     linkedForm = form.linkedForm || state[form.linkedFormId];
+    linkedFormNotFound = state.notFound[form.linkedFormId];
   }
   return {
     id,
     form,
     formTemplate: props.formTemplate ||
-      (form ? state[form.formTemplateId._id] : undefined),
+      (form ? state[(form.formTemplateId || {})._id] : undefined),
+    formTemplateNotFound:
+      (form ? state.notFound[(form.formTemplateId || {})._id] : undefined),
     linkedForm,
+    linkedFormNotFound,
     linkedFormTemplate: props.linkedFormTemplate ||
-      (linkedForm ? state[linkedForm.formTemplateId._id] : undefined),
+      (linkedForm ? state[(linkedForm.formTemplateId || {})._id] : undefined),
     notFound: id ? state.notFound[id] : undefined,
     session: state.session,
   };

@@ -271,16 +271,22 @@ const getFormContext = (session, id, populate = []) => {
     // Get corresponding form template
     .then((context) => {
       const { form } = context;
-      // Get the FormTemplate so we can check the domainId for authorization.
-      const FormTemplate = mongoose.model('FormTemplate');
-      return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
-        .then(formTemplate => ({ ...context, formTemplate }));
+      if (!form) {
+        return Promise.reject({ status: 404 });
+      }
+      if (form.formTemplateId) {
+        // Get the FormTemplate so we can check the domainId for authorization.
+        const FormTemplate = mongoose.model('FormTemplate');
+        return FormTemplate.findOne({ _id: form.formTemplateId }).exec()
+          .then(formTemplate => ({ ...context, formTemplate }));
+      }
+      return context;
     })
     // authorize for this form
     .then((context) => {
       const { form, formTemplate } = context;
       return requireDomainAdministratorOrUser(
-        context, formTemplate.domainId,
+        context, (formTemplate || {}).domainId,
         form.userId ? form.userId._id || form.userId : undefined);
     });
 };
@@ -455,7 +461,7 @@ export default function (router, transporter) {
       // unsubscribe from email list, if any
       .then((context) => {
         const { formTemplate, form } = context;
-        if (formTemplate.emailListId && form.userId) {
+        if (formTemplate && formTemplate.emailListId && form.userId) {
           return unsubscribe(formTemplate.emailListId, [form.userId.email])
             .then(() => context);
         }
