@@ -19,7 +19,7 @@ const UserContentsBase = (props) => {
   let text;
   if (user.text) {
     text = (
-      <Section full={false}>
+      <Section full={false} align="start">
         <Text text={user.text} />
       </Section>
     );
