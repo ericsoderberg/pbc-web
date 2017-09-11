@@ -171,7 +171,8 @@ class FormAdd extends Component {
       result = (
         <form className={classNames.join(' ')}
           action={'/forms'}
-          onSubmit={this._onAdd}>
+          onSubmit={this._onAdd}
+          noValidate={true}>
           {header}
           <FormContents form={form}
             formTemplate={formTemplate}

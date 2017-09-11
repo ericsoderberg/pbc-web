@@ -356,8 +356,11 @@ export default function (router, transporter) {
           // Person submitting form isn't the same as what's in the form
           if (admin) {
             // admin submitting for another user
-            return findOrCreateUser(userData)
-              .then(formUser => ({ ...context, admin, formUser }));
+            if (userData.email.indexOf('@') !== -1) {
+              return findOrCreateUser(userData)
+                .then(formUser => ({ ...context, admin, formUser }));
+            }
+            return { ...context, admin };
           }
           return Promise.reject({
             status: 403,
@@ -376,7 +379,7 @@ export default function (router, transporter) {
         data.created = new Date();
         data.modified = data.created;
         // Allow an administrator to set the userId.
-        if (!admin || !data.userId) {
+        if (!admin || (!data.userId && formUser)) {
           data.userId = formUser._id;
         }
         addFormCost(data, formTemplate);
@@ -452,7 +455,7 @@ export default function (router, transporter) {
       // unsubscribe from email list, if any
       .then((context) => {
         const { formTemplate, form } = context;
-        if (formTemplate.emailListId) {
+        if (formTemplate.emailListId && form.userId) {
           return unsubscribe(formTemplate.emailListId, [form.userId.email])
             .then(() => context);
         }

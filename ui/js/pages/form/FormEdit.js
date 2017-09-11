@@ -170,7 +170,8 @@ class FormEdit extends Component {
       result = (
         <form className={classNames.join(' ')}
           action={`/forms/${form._id}`}
-          onSubmit={this._onUpdate}>
+          onSubmit={this._onUpdate}
+          noValidate={true}>
           {header}
           <FormContents form={form}
             formTemplate={formTemplate}
