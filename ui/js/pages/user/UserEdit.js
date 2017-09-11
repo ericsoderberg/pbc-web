@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { loadItem, unloadItem } from '../../actions';
 import Edit from '../../components/Edit';
 import UserFormContents from './UserFormContents';
@@ -41,7 +40,8 @@ class UserEdit extends Component {
         category="users"
         id={id}
         item={user}
-        FormContents={UserFormContents} />
+        FormContents={UserFormContents}
+        postRemovePath="/users" />
     );
   }
 }

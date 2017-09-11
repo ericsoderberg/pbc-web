@@ -46,28 +46,28 @@ class Edit extends Component {
     const { category, onUpdate } = this.props;
     const { router } = this.context;
     putItem(category, item)
-    .then((response) => {
-      if (onUpdate) {
-        return onUpdate(item);
-      }
-      return response;
-    })
-    .then(() => router.history.goBack())
-    .catch(error => this.setState({ error }));
+      .then((response) => {
+        if (onUpdate) {
+          return onUpdate(item);
+        }
+        return response;
+      })
+      .then(() => router.history.goBack())
+      .catch(error => this.setState({ error }));
   }
 
   _onRemove() {
     const { category, id, postRemovePath } = this.props;
     const { router } = this.context;
     deleteItem(category, id)
-    .then(() => {
-      if (postRemovePath) {
-        router.history.push(postRemovePath);
-      } else {
-        router.history.go(-1);
-      }
-    })
-    .catch(error => this.setState({ error }));
+      .then(() => {
+        if (postRemovePath) {
+          router.history.push(postRemovePath);
+        } else {
+          router.history.go(-1);
+        }
+      })
+      .catch(error => this.setState({ error }));
   }
 
   _onCancel() {
