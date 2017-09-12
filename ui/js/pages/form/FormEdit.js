@@ -7,6 +7,7 @@ import { loadItem, putItem, deleteItem, unloadItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import ConfirmRemove from '../../components/ConfirmRemove';
 import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
@@ -117,7 +118,7 @@ class FormEdit extends Component {
 
   render() {
     const {
-      className, formTemplate, formTemplateNotFound, full, inline,
+      className, formNotFound, formTemplate, formTemplateNotFound, full, inline,
       linkedForm, linkedFormTemplate, onLinkedForm,
     } = this.props;
     const { form, error } = this.state;
@@ -126,27 +127,27 @@ class FormEdit extends Component {
       classNames.push(className);
     }
 
+    let header;
+    if (!inline) {
+      const cancelControl = [
+        <button key="cancel"
+          type="button"
+          className="button"
+          onClick={this._onCancel}>
+          Cancel
+        </button>,
+      ];
+      header = (
+        <PageHeader title={(formTemplate || {}).name} actions={cancelControl} />
+      );
+    }
+
     let result;
     if (form && (formTemplate || formTemplateNotFound || !form.formTemplateId)) {
       const submitLabel = 'Update';
       // if (formTemplate.payable && form.paymentIds.length === 0) {
       //   submitLabel = 'Pay';
       // }
-
-      let header;
-      if (!inline) {
-        const cancelControl = [
-          <button key="cancel"
-            type="button"
-            className="button"
-            onClick={this._onCancel}>
-            Cancel
-          </button>,
-        ];
-        header = (
-          <PageHeader title={(formTemplate || {}).name} actions={cancelControl} />
-        );
-      }
 
       let linkedFormControl;
       if (linkedForm && linkedFormTemplate) {
@@ -206,8 +207,20 @@ class FormEdit extends Component {
       if (!inline) {
         result = <div className="form__container">{result}</div>;
       }
+    } else if (formNotFound) {
+      result = (
+        <div>
+          {header}
+          <NotFound />
+        </div>
+      );
     } else {
-      result = <Loading />;
+      result = (
+        <div>
+          {header}
+          <Loading />
+        </div>
+      );
     }
     return result;
   }
@@ -217,6 +230,7 @@ FormEdit.propTypes = {
   className: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   form: PropTypes.object,
+  formNotFound: PropTypes.bool,
   formTemplate: PropTypes.object,
   formTemplateNotFound: PropTypes.bool,
   full: PropTypes.bool,
@@ -234,6 +248,7 @@ FormEdit.propTypes = {
 FormEdit.defaultProps = {
   className: undefined,
   form: undefined,
+  formNotFound: undefined,
   formTemplate: undefined,
   formTemplateNotFound: undefined,
   full: true,
@@ -260,6 +275,7 @@ const select = (state, props) => {
   return {
     id,
     form,
+    formNotFound: state.notFound[id],
     formTemplate: props.formTemplate ||
       (form ? state[(form.formTemplateId || {})._id] : undefined),
     formTemplateNotFound:

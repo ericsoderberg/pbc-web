@@ -12,6 +12,7 @@ import ItemHeader from '../../components/ItemHeader';
 import Filter from '../../components/Filter';
 import DateInput from '../../components/DateInput';
 import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
 import PageContext from '../page/PageContext';
 import { searchToObject } from '../../utils/Params';
 
@@ -553,7 +554,7 @@ class FormTemplate extends Component {
   }
 
   render() {
-    const { forms, formTemplate, id, mightHaveMore } = this.props;
+    const { forms, formTemplate, id, mightHaveMore, notFound } = this.props;
     const { fromDate, toDate, loadingMore, payment, searchText } = this.state;
 
     const actions = [];
@@ -603,6 +604,8 @@ class FormTemplate extends Component {
     if (formTemplate) {
       title = formTemplate.name;
       contents = this._renderTable();
+    } else if (notFound) {
+      contents = <NotFound />;
     } else {
       contents = <Loading />;
     }
@@ -673,12 +676,14 @@ FormTemplate.propTypes = {
   id: PropTypes.string.isRequired,
   location: PropTypes.object.isRequired,
   mightHaveMore: PropTypes.bool,
+  notFound: PropTypes.bool,
 };
 
 FormTemplate.defaultProps = {
   forms: undefined,
   formTemplate: undefined,
   mightHaveMore: false,
+  notFound: false,
 };
 
 const select = (state, props) => {

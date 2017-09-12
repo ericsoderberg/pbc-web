@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { loadItem, postUnsubscribe, unloadItem } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
 import TrashIcon from '../../icons/Trash';
 import { searchToObject } from '../../utils/Params';
 
@@ -80,13 +81,11 @@ class EmailList extends Component {
   }
 
   render() {
-    const { emailList, session } = this.props;
+    const { emailList, notFound, session } = this.props;
     const { addresses, loading, searchText } = this.state;
 
     let result;
-    if (!emailList) {
-      result = <Loading />;
-    } else {
+    if (emailList) {
       const actions = [];
       if (session && (session.userId.administrator ||
         session.userId.domainIds.some(id => id === emailList.domainId))) {
@@ -164,7 +163,12 @@ class EmailList extends Component {
           {message}
         </main>
       );
+    } else if (notFound) {
+      result = <NotFound />;
+    } else {
+      result = <Loading />;
     }
+
     return result;
   }
 }
@@ -174,6 +178,7 @@ EmailList.propTypes = {
   emailList: PropTypes.object,
   history: PropTypes.any.isRequired,
   id: PropTypes.string.isRequired,
+  notFound: PropTypes.bool,
   session: PropTypes.shape({
     userId: PropTypes.shape({
       administrator: PropTypes.bool,
@@ -184,6 +189,7 @@ EmailList.propTypes = {
 
 EmailList.defaultProps = {
   emailList: undefined,
+  notFound: false,
 };
 
 const select = (state, props) => {

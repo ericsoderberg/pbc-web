@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { loadCategory, loadItem, unloadCategory, unloadItem } from '../../actions';
 import List from '../../components/List';
 import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
 import MessageItem from '../message/MessageItem';
 
 class LibraryMessageItem extends MessageItem {}
@@ -71,12 +72,10 @@ class Library extends Component {
   }
 
   render() {
-    const { history, library, location, pages, session } = this.props;
+    const { history, library, location, notFound, pages, session } = this.props;
 
     let result;
-    if (!library) {
-      result = <Loading />;
-    } else {
+    if (library) {
       const controls = pages.map(page => (
         <Link key={page.name} to={page.path || `/pages/${page._id}`}>
           {page.name}
@@ -120,7 +119,12 @@ class Library extends Component {
           actions={controls}
           history={history} />
       );
+    } else if (notFound) {
+      result = <NotFound />;
+    } else {
+      result = <Loading />;
     }
+
     return result;
   }
 }
@@ -131,6 +135,7 @@ Library.propTypes = {
   id: PropTypes.string.isRequired,
   library: PropTypes.object,
   location: PropTypes.object.isRequired,
+  notFound: PropTypes.bool,
   pages: PropTypes.array,
   session: PropTypes.shape({
     userId: PropTypes.shape({
@@ -142,6 +147,7 @@ Library.propTypes = {
 
 Library.defaultProps = {
   library: undefined,
+  notFound: false,
   pages: [],
   session: undefined,
 };
@@ -151,6 +157,7 @@ const select = (state, props) => {
   return {
     id,
     library: state[id],
+    notFound: state.notFound[id],
     pages: state.pages,
     session: state.session,
   };

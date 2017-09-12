@@ -6,6 +6,7 @@ import FormState from '../utils/FormState';
 import Button from './Button';
 import ConfirmRemove from './ConfirmRemove';
 import Loading from './Loading';
+import NotFound from './NotFound';
 
 export default class Form extends Component {
 
@@ -49,7 +50,8 @@ export default class Form extends Component {
   render() {
     const {
       action, contentsProps, error, footerActions, FormContents,
-      inline, loading, onCancel, onRemove, Preview, session, submitLabel, title,
+      inline, loading, notFound, onCancel, onRemove, Preview, session,
+      submitLabel, title,
     } = this.props;
     let { actions } = this.props;
     const { formState } = this.state;
@@ -100,6 +102,8 @@ export default class Form extends Component {
     let contents;
     if (loading) {
       contents = <Loading />;
+    } else if (notFound) {
+      contents = <NotFound />;
     } else {
       const errors = {};
       Object.keys(error.errors || {}).forEach((key) => {
@@ -150,6 +154,7 @@ Form.propTypes = {
   item: PropTypes.object,
   inline: PropTypes.bool,
   loading: PropTypes.bool,
+  notFound: PropTypes.bool,
   onCancel: PropTypes.func.isRequired,
   onChange: PropTypes.func,
   onRemove: PropTypes.func,
@@ -175,6 +180,7 @@ Form.defaultProps = {
   item: undefined,
   inline: false,
   loading: false,
+  notFound: false,
   onChange: undefined,
   onRemove: undefined,
   Preview: undefined,

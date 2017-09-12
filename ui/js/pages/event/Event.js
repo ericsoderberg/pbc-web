@@ -7,6 +7,7 @@ import moment from 'moment-timezone';
 import { loadItem, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
 import PageContext from '../page/PageContext';
 import EventContents from './EventContents';
 
@@ -43,7 +44,7 @@ class Event extends Component {
   }
 
   render() {
-    const { event } = this.props;
+    const { event, notFound } = this.props;
 
     let actions;
     let contents;
@@ -73,6 +74,8 @@ class Event extends Component {
         <PageContext align="center"
           filter={filter} />
       );
+    } else if (notFound) {
+      contents = <NotFound />;
     } else {
       contents = <Loading />;
     }

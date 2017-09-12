@@ -78,7 +78,7 @@ class Edit extends Component {
   render() {
     const {
       actions, category, footerActions, FormContents, id, item,
-      onChange, Preview, session, submitLabel, title,
+      notFound, onChange, Preview, session, submitLabel, title,
     } = this.props;
     const { error } = this.state;
     return (
@@ -87,7 +87,8 @@ class Edit extends Component {
         footerActions={footerActions}
         submitLabel={submitLabel}
         session={session}
-        loading={!item}
+        loading={!item && !notFound}
+        notFound={notFound}
         action={`/api/${category}/${id}`}
         FormContents={FormContents}
         Preview={Preview}
@@ -109,6 +110,7 @@ Edit.propTypes = {
   footerActions: PropTypes.node,
   id: PropTypes.string.isRequired,
   item: PropTypes.object,
+  notFound: PropTypes.bool,
   onChange: PropTypes.func,
   onUpdate: PropTypes.func,
   Preview: PropTypes.func,
@@ -122,6 +124,7 @@ Edit.defaultProps = {
   actions: undefined,
   footerActions: undefined,
   item: undefined,
+  notFound: false,
   onChange: undefined,
   onUpdate: undefined,
   Preview: undefined,
@@ -139,6 +142,7 @@ const select = (state, props) => {
   return {
     id,
     item: state[id],
+    notFound: state.notFound[id],
     session: state.session,
   };
 };
