@@ -120,11 +120,14 @@ export default function (router, transporter) {
         }
         const title = `Email verification for ${site.name}`;
         const message =
-  `The link below is valid for 2 hours from the time this message was sent.
-  It will sign you in to the ${site.name} web site.`;
+`## ${title}
+
+The link below is valid for 2 hours from the time this message was sent.
+It will sign you in to the ${site.name} web site.
+`;
         const url =
           `${req.headers.origin}/verify-email?${params.join('&')}`;
-        const contents = renderNotification(title, message, 'Verify email', url);
+        const contents = renderNotification(message, 'Verify email', url);
 
         transporter.sendMail({
           from: site.email,

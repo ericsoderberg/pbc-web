@@ -89,10 +89,15 @@ const sendEmails = (req, transporter, update = false) => (
             if (formTemplate.anotherLabel && form.name) {
               suffix = `${update ? ' for' : ''} ${form.name}`;
             }
-            message = `Thank you for ${gerund}${suffix}.`;
+            message =
+`## ${title}
+
+Thank you for ${gerund}${suffix}.
+
+`;
           }
           const url = `${req.headers.origin}/forms/${form._id}/edit`;
-          const contents = renderNotification(title, message, 'Review', url);
+          const contents = renderNotification(message, 'Review', url);
 
           transporter.sendMail({
             from: site.email,
@@ -123,9 +128,12 @@ const sendEmails = (req, transporter, update = false) => (
             suffix = `${update ? ' for' : ''} ${form.name}`;
           }
           const message =
-  `${session.userId.name} (${session.userId.email}) ${past}${suffix}.`;
+`## ${title}
+
+${session.userId.name} (${session.userId.email}) ${past}${suffix}.
+`;
           const url = `${req.headers.origin}/forms/${form._id}/edit`;
-          const contents = renderNotification(title, message, 'Review', url);
+          const contents = renderNotification(message, 'Review', url);
           transporter.sendMail({
             from: site.email,
             to: formTemplate.notify,

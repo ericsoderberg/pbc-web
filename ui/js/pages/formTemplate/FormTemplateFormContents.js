@@ -257,7 +257,7 @@ class FormTemplateFormContents extends Component {
         details.push(
           <FormField key="ackMessage"
             label="Acknowledgement message"
-            help="Customize the acknowledgement message"
+            help={<TextHelp />}
             error={errors.acknowledgeMessage}>
             <textarea name="acknowledgeMessage"
               value={formTemplate.acknowledgeMessage || ''}
