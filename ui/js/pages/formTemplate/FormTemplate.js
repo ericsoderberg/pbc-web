@@ -568,6 +568,13 @@ class FormTemplate extends Component {
     );
 
     actions.push(
+      <Link key="email"
+        to={`/form-templates/${id}/email`}>
+        Email
+      </Link>,
+    );
+
+    actions.push(
       <Link key="add"
         to={`/forms/add?formTemplateId=${encodeURIComponent(id)}`}>
         Add

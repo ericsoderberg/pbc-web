@@ -403,6 +403,20 @@ export function getFormTemplateDownload(id, options) {
     });
 }
 
+export function postFormTemplateEmailRender(email) {
+  return fetch('/api/email/render', {
+    method: 'POST', headers: _headers, body: JSON.stringify(email) })
+    .then(processStatus)
+    .then(response => response.text());
+}
+
+export function postFormTemplateEmailSend(id, email) {
+  return fetch(`/api/form-templates/${id}/email`, {
+    method: 'POST', headers: _headers, body: JSON.stringify(email) })
+    .then(processStatus)
+    .then(response => response.text());
+}
+
 // Newsletter
 
 export function postNewsletterRender(newsletter) {

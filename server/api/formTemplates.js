@@ -5,6 +5,7 @@ import register from './register';
 import {
   getSession, authorizedForDomain, allowAnyone, requireSomeAdministrator,
 } from './auth';
+import { renderEmail } from './email';
 import { catcher, unsetEmptyFields } from './utils';
 
 mongoose.Promise = global.Promise;
@@ -198,7 +199,7 @@ export const addForms = (data, forSession) => {
   }
   return Form.find(criteria)
     .populate({ path: 'paymentIds', select: 'amount' })
-    .populate({ path: 'userId', select: 'name' })
+    .populate({ path: 'userId', select: 'name email' })
     .sort('-modified')
     .exec()
     .then((forms) => {
@@ -244,7 +245,7 @@ const validate = (data) => {
     or have a required field tied to the session user email.`);
 };
 
-export default function (router) {
+export default function (router, transporter) {
   router.get('/form-templates/:id.csv', (req, res) => {
     const FormTemplate = mongoose.model('FormTemplate');
     const Form = mongoose.model('Form');
@@ -419,6 +420,48 @@ export default function (router) {
         res.attachment(`${formTemplate.name}.csv`);
         res.end(csv);
       })
+      .catch(error => catcher(error, res));
+  });
+
+  router.post('/form-templates/:id/email', (req, res) => {
+    const FormTemplate = mongoose.model('FormTemplate');
+    const Site = mongoose.model('Site');
+    const id = req.params.id;
+    const contents = req.body.contents;
+    getSession(req)
+      .then(requireSomeAdministrator)
+      .then(session =>
+        FormTemplate.findOne({ _id: id }).exec()
+          .then(addForms)
+          .then(formTemplate => ({ session, formTemplate })))
+      .then((context) => {
+        const markup = renderEmail(contents);
+        return { ...context, markup };
+      })
+      .then((context) => {
+        const { formTemplate } = context;
+        // generate array of email addresses
+        const addresses = formTemplate.forms.map(f => f.userId.email);
+        return { ...context, addresses };
+      })
+      .then(context => Site.findOne({}).exec()
+        .then(site => ({ ...context, site })))
+      .then((context) => {
+        const { addresses, formTemplate, markup, session, site } = context;
+        return new Promise((resolve, reject) => {
+          transporter.sendMail({
+            from: site.email,
+            to: session.userId.email,
+            bcc: addresses,
+            subject: formTemplate.name,
+            html: markup,
+            text: contents,
+          }, (err, info) => {
+            if (err) { reject(err); } else { resolve(info); }
+          });
+        });
+      })
+      .then(() => res.status(200).json({}))
       .catch(error => catcher(error, res));
   });
 

@@ -26,6 +26,7 @@ import FormTemplates from './pages/formTemplate/FormTemplates';
 import FormTemplateAdd from './pages/formTemplate/FormTemplateAdd';
 import FormTemplate from './pages/formTemplate/FormTemplate';
 import FormTemplateEdit from './pages/formTemplate/FormTemplateEdit';
+import FormTemplateEmail from './pages/formTemplate/FormTemplateEmail';
 import Libraries from './pages/library/Libraries';
 import LibraryAdd from './pages/library/LibraryAdd';
 import Library from './pages/library/Library';
@@ -104,6 +105,7 @@ export default [
   { path: '/form-templates/add', component: FormTemplateAdd, private: true },
   { path: '/form-templates/:id', component: FormTemplate, exact: true, private: true },
   { path: '/form-templates/:id/edit', component: FormTemplateEdit, private: true },
+  { path: '/form-templates/:id/email', component: FormTemplateEmail, private: true },
 
   { path: '/libraries', component: Libraries, exact: true, private: true },
   { path: '/libraries/add', component: LibraryAdd, private: true },
