@@ -20,6 +20,7 @@ function rfc822(date) {
 
 function renderRSS(urlBase, library, messages) {
   const { podcast } = library;
+  const url = `${urlBase}/${library.path || library.id}`;
   const path = `/libraries/${library.path || library._id}`;
 
   const items = messages.map((message) => {
@@ -66,8 +67,9 @@ function renderRSS(urlBase, library, messages) {
     <lastBuildDate>${rfc822(messages[0].modified)}</lastBuildDate>
     <pubDate>${rfc822(messages[0].date)}</pubDate>
     <docs>http://blogs.law.harvard.edu/tech/rss</docs>
-    <webMaster>${library.userId.email}</webMaster>
+    <webMaster>${library.userId.email} (${library.userId.name})</webMaster>
 
+    <atom:link href="${url}" rel="self" type="application/rss+xml" />
     <itunes:subtitle>${podcast.subtitle}</itunes:subtitle>
     <itunes:summary>${podcast.summary}</itunes:summary>
 
@@ -89,7 +91,8 @@ function renderRSS(urlBase, library, messages) {
   `;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   ${channel}
 </rss>
   `;
@@ -132,6 +135,7 @@ router.get('/:id.rss', (req, res) => {
       const library = docs[0];
       const messages = docs[1];
       const rss = renderRSS(urlBase, library, messages);
+      res.header('Content-Type', 'application/rss+xml');
       res.status(200).send(rss);
     })
     .catch((error) => {
