@@ -12,10 +12,20 @@ const LibraryFormContents = (props) => {
 
   let podcast;
   if (library.podcast) {
-    podcast = (
-      <PodcastEdit podcast={library.podcast}
-        onChange={formState.change('podcast')} />
-    );
+    const url = `${window.location.origin}/${library.path || library.id}.rss`;
+    podcast = [
+      <p key="loc" className="form__text secondary">
+        Published at: {url}<br />
+        <a href={`https://validator.w3.org/feed/check.cgi?url=${encodeURIComponent(url)}`}>
+          Test
+        </a> <a href="https://help.apple.com/itc/podcasts_connect/#/itcd88ea40b9">
+          Submit
+        </a>
+      </p>,
+      <PodcastEdit key="podcast"
+        podcast={library.podcast}
+        onChange={formState.change('podcast')} />,
+    ];
   }
 
   return (
