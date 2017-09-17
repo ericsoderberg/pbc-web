@@ -42,7 +42,7 @@ border: 1px solid transparent;
 box-sizing: border-box;
 background-color: #ffffff; color: #333333;
 font-family: 'Work Sans', Arial, sans-serif; font-size: 18px;">
-  ${markdown.toHTML(contents || '')}
+  ${markdown.toHTML(contents || '*awaiting some content*')}
 </div>
 </div>
 </body>

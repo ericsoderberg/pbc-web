@@ -17,6 +17,12 @@ const FormContents = ({ className, formState }) => (
           onChange={formState.change('contents')} />
       </FormField>
     </fieldset>
+    <fieldset className="form__fields">
+      <p className="form__text">
+        It will be sent TO your email address and will be BCC to all users
+        who have submitted this form.
+      </p>
+    </fieldset>
   </div>
 );
 
