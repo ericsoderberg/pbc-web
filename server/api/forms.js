@@ -365,7 +365,7 @@ export default function (router, transporter) {
             .then(({ session: newSession, user: formUser }) => ({
               ...context, admin, session: newSession, formUser }));
         }
-        if (userData.email !== session.userId.email) {
+        if (userData.email && userData.email !== session.userId.email) {
           // Person submitting form isn't the same as what's in the form
           if (admin) {
             // admin submitting for another user
