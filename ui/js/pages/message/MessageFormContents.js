@@ -9,6 +9,7 @@ import ImageField from '../../components/ImageField';
 import DateInput from '../../components/DateInput';
 import SelectSearch from '../../components/SelectSearch';
 import TextHelp from '../../components/TextHelp';
+import Loading from '../../components/Loading';
 import TrashIcon from '../../icons/Trash';
 
 class MessageFormContents extends Component {
@@ -19,6 +20,7 @@ class MessageFormContents extends Component {
     this._renderFile = this._renderFile.bind(this);
     this._changeFileProperty = this._changeFileProperty.bind(this);
     this._onChangeSeries = this._onChangeSeries.bind(this);
+    this.state = { uploading: [] };
   }
 
   componentDidMount() {
@@ -60,18 +62,29 @@ class MessageFormContents extends Component {
 
   _changeFile(index) {
     return (event) => {
+      const startUploading = [...this.state.uploading];
+      startUploading[index] = true;
+      this.setState({ uploading: startUploading });
       const message = this.props.formState.object;
       const files = event.target.files;
       const data = new FormData();
       data.append('file', files[0]);
       postFile(data)
         .then((file) => {
+          const endUploading = [...this.state.uploading];
+          delete endUploading[index];
+          this.setState({ uploading: endUploading });
           const nextFiles = (message.files || []).slice(0);
           nextFiles[index] = file;
           // console.log('!!! file upload completed', file);
           this.props.formState.set('files', nextFiles);
         })
-        .catch(error => console.error('!!! File upload catch', error));
+        .catch((error) => {
+          console.error('!!! File upload catch', error);
+          const errorUploading = [...this.state.uploading];
+          errorUploading[index] = error;
+          this.setState({ uploading: errorUploading });
+        });
     };
   }
 
@@ -97,6 +110,7 @@ class MessageFormContents extends Component {
   }
 
   _renderFile(file, index) {
+    const uploading = this.state.uploading[index];
     const closeControl = (
       <button type="button"
         className="button-icon"
@@ -105,32 +119,42 @@ class MessageFormContents extends Component {
       </button>
     );
 
-    let fileField;
+    let contents;
     if (file._id) {
-      fileField = (
-        <FormField name={`file-${index}`}
-          label="File"
-          closeControl={closeControl}>
-          <div className="box--row">
-            <span className="input">{file.name || file._id}</span>
-          </div>
-        </FormField>
+      contents = (
+        <div className="box--row">
+          <span className="input">{file.name || file._id}</span>
+        </div>
+      );
+    } else if (uploading === true) {
+      contents = (
+        <div className="box--row">
+          <span className="input">Uploading</span>
+          <Loading small={true} />
+        </div>
+      );
+    } else if (uploading) {
+      // error
+      contents = (
+        <div className="box--row">
+          <span className="input">{uploading}</span>
+        </div>
       );
     } else {
-      fileField = (
-        <FormField name={`file-${index}`}
-          label="File"
-          closeControl={closeControl}>
-          <input name={`file-${index}`}
-            type="file"
-            onChange={this._changeFile(index)} />
-        </FormField>
+      contents = (
+        <input name={`file-${index}`}
+          type="file"
+          onChange={this._changeFile(index)} />
       );
     }
 
     return (
       <div key={index}>
-        {fileField}
+        <FormField name={`file-${index}`}
+          label="File"
+          closeControl={closeControl}>
+          {contents}
+        </FormField>
         <FormField label="Label">
           <input name={`label-${index}`}
             value={file.label || ''}
@@ -141,7 +165,7 @@ class MessageFormContents extends Component {
   }
 
   render() {
-    const { className, errors, formState, libraries, session } = this.props;
+    const { className, errors, formState, libraries } = this.props;
     const message = formState.object;
 
     let files;
@@ -282,7 +306,6 @@ MessageFormContents.propTypes = {
   errors: PropTypes.object,
   formState: PropTypes.object.isRequired,
   libraries: PropTypes.array,
-  session: PropTypes.object.isRequired,
 };
 
 MessageFormContents.defaultProps = {
@@ -293,7 +316,6 @@ MessageFormContents.defaultProps = {
 
 const select = state => ({
   libraries: (state.libraries || {}).items || [],
-  session: state.session,
 });
 
 export default connect(select)(MessageFormContents);

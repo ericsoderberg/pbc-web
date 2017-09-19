@@ -26,7 +26,7 @@ const DOMAIN_ADMIN_ROUTES = [
 const ADMIN_ROUTES = [
   { label: 'Resources', path: '/resources' },
   { label: 'Domains', path: '/domains' },
-  { label: 'Files', path: '/files' },
+  // { label: 'Files', path: '/files' },
   { label: 'Site', path: '/site' },
   { label: 'Audit Log', path: '/audit-log' },
 ];

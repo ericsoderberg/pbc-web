@@ -69,28 +69,29 @@ export default function (router) {
 
   router.delete('/files/:id', (req, res) => {
     getSession(req)
-    .then(requireSomeAdministrator)
-    .then(() => {
-      const id = req.params.id;
-      rmdir(`${FILES_PATH}/${id}`, (error) => {
-        if (error) {
-          res.status(400).json(error);
-        } else {
-          res.status(200).send();
-        }
-      });
-    })
-    .catch(error => catcher(error, res));
+      .then(requireSomeAdministrator)
+      .then(() => {
+        const id = req.params.id;
+        rmdir(`${FILES_PATH}/${id}`, (error) => {
+          if (error) {
+            res.status(400).json(error);
+          } else {
+            res.status(200).send();
+          }
+        });
+      })
+      .catch(error => catcher(error, res));
   });
 
   router.get('/files', (req, res) => {
     getSession(req)
-    .then(requireAdministrator)
-    .then(() => {
-      fs.readdir(`${FILES_PATH}`, (error, files) => {
-        if (error) {
-          res.status(400).json(error);
-        } else {
+      .then(requireAdministrator)
+      .then(() => {
+        fs.readdir(`${FILES_PATH}`, (error, files) => {
+          if (error) {
+            return Promise.reject({ status: 400, error });
+          }
+          // sort by modification time
           let start = 0;
           if (req.query.skip) {
             start = parseInt(req.query.skip, 10);
@@ -98,33 +99,33 @@ export default function (router) {
           files = files.slice(start, start + 20);
           files = files.map(id => ({ _id: id }));
           res.status(200).json(files);
-        }
-      });
-    })
-    .catch(error => catcher(error, res));
+          return Promise.resolve();
+        });
+      })
+      .catch(error => catcher(error, res));
   });
 
   router.post('/files', (req, res) => {
     getSession(req)
-    .then(requireSomeAdministrator)
-    .then(() => {
-      const id = new mongoose.Types.ObjectId();
-      let fstream;
-      req.busboy.on('file',
-        (fieldname, file, filename, encoding, mimetype) => {
-          const dir = `${FILES_PATH}/${id}`;
-          fs.mkdir(dir, () => {
-            const path = `${dir}/${filename}`;
-            fstream = fs.createWriteStream(path);
-            file.pipe(fstream);
-            fstream.on('close', () => {
-              const stat = fs.statSync(path);
-              res.json({ _id: id, name: filename, size: stat.size, type: mimetype });
+      .then(requireSomeAdministrator)
+      .then(() => {
+        const id = new mongoose.Types.ObjectId();
+        let fstream;
+        req.busboy.on('file',
+          (fieldname, file, filename, encoding, mimetype) => {
+            const dir = `${FILES_PATH}/${id}`;
+            fs.mkdir(dir, () => {
+              const path = `${dir}/${filename}`;
+              fstream = fs.createWriteStream(path);
+              file.pipe(fstream);
+              fstream.on('close', () => {
+                const stat = fs.statSync(path);
+                res.json({ _id: id, name: filename, size: stat.size, type: mimetype });
+              });
             });
           });
-        });
-      req.pipe(req.busboy);
-    })
-    .catch(error => catcher(error, res));
+        req.pipe(req.busboy);
+      })
+      .catch(error => catcher(error, res));
   });
 }
