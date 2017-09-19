@@ -378,6 +378,11 @@
   position: relative;
 }
 
+.page-header__dropper-control {
+  background-color: transparent;
+  color: inherit;
+}
+
 .page-header__drop {
   position: absolute;
   z-index: 10;

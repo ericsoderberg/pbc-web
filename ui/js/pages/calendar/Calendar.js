@@ -280,7 +280,8 @@ class Calendar extends Component {
       } else {
         actions.push(
           <span key="filter" className="page-header__dropper">
-            <Button label="Calendars"
+            <Button className="page-header__dropper-control"
+              label="Calendars"
               onClick={() => this.setState({
                 filterActive: !this.state.filterActive })} />
             {filter}

@@ -37,6 +37,10 @@
   }
 }
 
+.calendar {
+  padding: 0 $unit;
+}
+
 .calendar__week {
   @media all and (min-width: 700px) {
     display: flex;
@@ -61,6 +65,8 @@
 }
 
 .calendar__day {
+  padding-bottom: $unit;
+
   @media all and (min-width: 700px) {
     flex: 1;
     text-align: left;
@@ -79,6 +85,7 @@
   background-color: $header-background-color;
   border: 1px solid $background-color;
   text-decoration: none;
+  margin-bottom: $half-unit;
 
   // &:hover {
   //   background-color: $control-hover-background;
