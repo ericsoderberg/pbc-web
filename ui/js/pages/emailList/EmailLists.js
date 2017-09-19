@@ -25,13 +25,34 @@ Item.defaultProps = {
   className: undefined,
 };
 
+const Suggestion = ({ item: { name, email } }) => (
+  <div className="box--between">
+    <span>{name}</span>
+    <span className="secondary">{email}</span>
+  </div>
+);
+
+Suggestion.propTypes = {
+  item: PropTypes.shape({
+    email: PropTypes.string,
+    name: PropTypes.string,
+  }).isRequired,
+};
+
 export default class EmailLists extends List {}
 
 EmailLists.defaultProps = {
   ...List.defaultProps,
   category: 'email-lists',
   filters: [
-    { property: 'addresses.address', category: 'users', allLabel: 'All' },
+    {
+      property: 'addresses.address',
+      suggestionProperty: 'email',
+      category: 'users',
+      allLabel: 'All',
+      select: 'name email',
+      Suggestion,
+    },
   ],
   Item,
   path: '/email-lists',

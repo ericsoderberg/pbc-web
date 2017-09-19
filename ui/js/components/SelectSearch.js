@@ -33,7 +33,7 @@ class SelectSearch extends Component {
     const { exclude, items } = nextProps;
     if (items) {
       const suggestions = items
-      .filter(item => !(exclude || []).some(item2 => item._id === item2._id));
+        .filter(item => !(exclude || []).some(item2 => item._id === item2._id));
       this.setState({ suggestions });
     }
   }

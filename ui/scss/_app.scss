@@ -350,8 +350,7 @@
 
 .page-header__tertiary {
   display: flex;
-  margin: $unit 0;
-  // background-color: $secondary-background-color;
+  background-color: $secondary-background-color;
 
   @media all and (min-width: 700px) {
     flex-direction: row;
@@ -366,7 +365,12 @@
 
   @media all and (max-width: 699px) {
     flex-direction: column;
-    align-items: flex-end;
+    align-items: stretch;
+    padding-left: $half-unit;
+  }
+
+  input {
+    background-color: transparent;
   }
 }
 

@@ -105,8 +105,11 @@ class List extends Component {
         if (options[property]) {
           if (options[property] !== UNSET) {
             if (typeof options[property] === 'object') {
-              value = options[property]._id;
+              value = options[property][filter.suggestionProperty || '_id'];
               name = options[property].name;
+              if (filter.suggestionProperty) {
+                name += ` (${value})`;
+              }
             } else {
               value = options[property];
             }
@@ -250,9 +253,10 @@ class List extends Component {
           filterItems.push(
             <SelectSearch key={aFilter.property}
               category={aFilter.category}
-              options={{ select: 'name', sort: 'name' }}
+              options={{ select: (aFilter.select || 'name'), sort: 'name' }}
               clearable={true}
               placeholder={aFilter.allLabel}
+              Suggestion={aFilter.Suggestion}
               value={value}
               onChange={this._select(aFilter.property)} />,
           );
@@ -335,6 +339,9 @@ List.propTypes = {
       }),
     ])),
     property: PropTypes.string.isRequired,
+    select: PropTypes.string,
+    Suggestion: PropTypes.any,
+    suggestionProperty: PropTypes.string,
   })),
   history: PropTypes.any.isRequired,
   homer: PropTypes.bool,
