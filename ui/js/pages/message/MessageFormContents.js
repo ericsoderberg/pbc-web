@@ -168,6 +168,10 @@ class MessageFormContents extends Component {
     const { className, errors, formState, libraries } = this.props;
     const message = formState.object;
 
+    const libraryId =
+      (message.libraryId && typeof message.libraryId === 'object' ?
+        message.libraryId._id : message.libraryId);
+
     let files;
     if (message.files) {
       files = message.files.map(this._renderFile);
@@ -198,7 +202,7 @@ class MessageFormContents extends Component {
           <FormField name="seriesId" label="In Series" error={errors.seriesId}>
             <SelectSearch category="messages"
               clearable={true}
-              options={{ filter: { series: true } }}
+              options={{ filter: { series: true, libraryId } }}
               value={(message.seriesId || {}).name || ''}
               onChange={this._onChangeSeries} />
           </FormField>
@@ -236,9 +240,6 @@ class MessageFormContents extends Component {
       <option key={library._id} label={library.name} value={library._id} />
     ));
     libraryOptions.unshift(<option key={0} />);
-    const libraryId =
-      (message.libraryId && typeof message.libraryId === 'object' ?
-        message.libraryId._id : message.libraryId);
 
     return (
       <div className={className}>

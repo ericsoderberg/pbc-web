@@ -66,6 +66,7 @@ export const populatePage = (data, session) => {
     .forEach((section) => {
       promises.push(
         Message.findOne({
+          series: { $exists: false },
           libraryId: section.libraryId,
           date: { $lt: date.toString() },
           // series: { $ne: true }
@@ -156,7 +157,7 @@ export const populatePage = (data, session) => {
         .forEach((section) => {
           docsIndex += 1;
           section.message = docs[docsIndex];
-          page.modified = latestDate(page.modified, section.message.modified);
+          page.modified = latestDate(page.modified, (section.message || {}).modified);
         });
       page.sections.filter(section => section.type === 'calendar')
         .forEach((section) => {
