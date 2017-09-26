@@ -30,9 +30,12 @@ class FormTemplateFormContents extends Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, formState, session } = this.props;
     dispatch(loadCategory('email-lists', { sort: 'name', limit: 200 }));
     this._loadDependency(this.props);
+    if (session && !session.userId.administrator) {
+      formState.set('domainId', session.userId.domainIds[0]);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -346,7 +349,7 @@ class FormTemplateFormContents extends Component {
         </FormField>,
       );
       details.push(
-        <DomainIdField key="domain"formState={formState} session={session} />
+        <DomainIdField key="domain"formState={formState} session={session} />,
       );
     }
 
