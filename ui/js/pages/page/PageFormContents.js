@@ -16,7 +16,7 @@ export default class PageFormContents extends Component {
 
   componentDidMount() {
     const { formState, session } = this.props;
-    if (!session.userId.administrator) {
+    if (!session.userId.administrator && !formState.object.domainId) {
       formState.change('domainId')(session.userId.domainIds[0]);
     }
   }
