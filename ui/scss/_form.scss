@@ -219,6 +219,31 @@
   margin: 0 auto;
   margin-bottom: -1px;
 
+  .dark-background &,
+  .section__container.dark-background & {
+    background-color: rgba(#333, 0.3);
+    border-color: rgba(#eee, 0.5);
+
+    &.form-field--focus {
+      border-color: $focus-border-color;
+    }
+
+    input,
+    select,
+    textarea {
+      color: $color-on-dark;
+    }
+
+    .form-field__label,
+    .form-field__help {
+      color: rgba($color-on-dark, 0.8);
+    }
+
+    .form-field__error {
+      color: #ff9999;
+    }
+  }
+
   .section__container & {
     background-color: rgba($background-color, 0.9);
 
