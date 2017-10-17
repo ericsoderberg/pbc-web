@@ -324,7 +324,7 @@ export default function (router, transporter) {
                 optionMap[option._id] = option;
               });
               fields.push(`${field._id}`);
-              fieldNames.push(field.name || section.name);
+              fieldNames.push(field.name || section.name || '');
               if (field.linkedFieldId) {
                 linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
               }
@@ -354,7 +354,7 @@ export default function (router, transporter) {
                 optionMap[option._id] = option;
               });
               fields.push(`${field._id}`);
-              fieldNames.push(field.name || section.name);
+              fieldNames.push(field.name || section.name || '');
               if (field.name && field.name.match(/birthday/i)) {
                 field.birthday = true;
                 fields.push('age');
@@ -399,10 +399,12 @@ export default function (router, transporter) {
 
             linkedForm.fields.forEach((field) => {
               const templateField = templateFieldMap[field.templateFieldId];
-              item[field.templateFieldId] =
-                fieldContents(field, templateField, optionMap);
-              if (templateField.birthday) {
-                item.age = moment(field.value).fromNow(true);
+              if (templateField) {
+                item[field.templateFieldId] =
+                  fieldContents(field, templateField, optionMap);
+                if (templateField.birthday) {
+                  item.age = moment(field.value).fromNow(true);
+                }
               }
             });
           }
