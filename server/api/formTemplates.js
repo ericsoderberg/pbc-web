@@ -370,10 +370,12 @@ export default function (router, transporter) {
 
           form.fields.forEach((field) => {
             const templateField = templateFieldMap[field.templateFieldId];
-            item[field.templateFieldId] =
-              fieldContents(field, templateField, optionMap);
-            if (templateField.birthday) {
-              item.age = moment(field.value).fromNow(true);
+            if (templateField) {
+              item[field.templateFieldId] =
+                fieldContents(field, templateField, optionMap);
+              if (templateField.birthday) {
+                item.age = moment(field.value).fromNow(true);
+              }
             }
           });
 
@@ -385,8 +387,10 @@ export default function (router, transporter) {
                   linkedTemplateFieldIdMap[templateFieldId])) {
                   const templateField =
                     templateFieldMap[linkedField.templateFieldId];
-                  item[templateFieldId] =
-                    fieldContents(linkedField, templateField, optionMap);
+                  if (templateField) {
+                    item[templateFieldId] =
+                      fieldContents(linkedField, templateField, optionMap);
+                  }
                   return true;
                 }
                 return false;
