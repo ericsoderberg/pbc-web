@@ -158,7 +158,7 @@ class FormContents extends Component {
                 sort: '-created',
               }}
               Suggestion={FormSuggestion}
-              value={(form.linkedFormId ?
+              value={((form.linkedFormId && form.linkedFormId.formTemplateId) ?
                 `${form.linkedFormId.formTemplateId.name} ${form.linkedFormId.name}` : '')}
               onChange={(suggestion) => {
                 const nextForm = { ...form };

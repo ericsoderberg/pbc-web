@@ -58,7 +58,7 @@ const config = {
     publicPath: '/',
   },
 
-  devtool: DEVELOPMENT ? 'eval' : undefined,
+  devtool: DEVELOPMENT ? 'eval' : 'source-map',
   devServer: DEVELOPMENT ? {
     hot: true,
     proxy: {
