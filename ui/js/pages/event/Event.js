@@ -25,7 +25,7 @@ class Event extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.id !== this.props.id && !nextProps.event) {
+    if (nextProps.id !== this.props.id || !nextProps.event) {
       this._load(nextProps);
     }
     if (nextProps.event) {

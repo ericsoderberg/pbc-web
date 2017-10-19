@@ -14,7 +14,7 @@ class Show extends Component {
 
   componentWillReceiveProps(nextProps) {
     if ((nextProps.category !== this.props.category ||
-      nextProps.id !== this.props.id)) {
+      nextProps.id !== this.props.id || !nextProps.item)) {
       this._load(nextProps);
     }
     if (nextProps.item) {
@@ -28,7 +28,9 @@ class Show extends Component {
   }
 
   _load(props) {
-    const { category, dispatch, id, item } = props;
+    const {
+      category, dispatch, id, item,
+    } = props;
     if (item) {
       document.title = item.name;
     } else {
@@ -37,7 +39,9 @@ class Show extends Component {
   }
 
   render() {
-    const { actions, category, Contents, item, notFound, title } = this.props;
+    const {
+      actions, category, Contents, item, notFound, title,
+    } = this.props;
 
     let contents;
     if (item) {

@@ -24,10 +24,13 @@ class Edit extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { onChange } = nextProps;
-    if (nextProps.id !== this.props.id) {
+    if (nextProps.id !== this.props.id || !nextProps.item) {
       this._load(nextProps);
     } else if (nextProps.item && onChange) {
       onChange(nextProps.item);
+    }
+    if (nextProps.item) {
+      document.title = `Edit ${nextProps.item.name}`;
     }
   }
 
@@ -37,7 +40,9 @@ class Edit extends Component {
   }
 
   _load(props) {
-    const { category, dispatch, id, title } = props;
+    const {
+      category, dispatch, id, title,
+    } = props;
     document.title = title;
     dispatch(loadItem(category, id));
   }
