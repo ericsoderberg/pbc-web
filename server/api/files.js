@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
 import rmdir from 'rimraf';
-import mime from 'mime';
+import mime from 'mime-types';
 import { getSession, requireAdministrator, requireSomeAdministrator } from './auth';
 import { catcher } from './utils';
 

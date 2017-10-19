@@ -42,7 +42,7 @@
     "leaflet": "^1.2.0",
     "markdown": "^0.5.0",
     "markdown-to-jsx": "^5.4.2",
-    "mime": "^2.0.3",
+    "mime-types": "^2.1.17",
     "moment": "^2.19.1",
     "moment-timezone": "^0.5.13",
     "mongodb": "^2.2.33",
