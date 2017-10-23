@@ -31,7 +31,7 @@ class FormAdd extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { formTemplateId, formTemplate } = nextProps;
-    if (formTemplateId !== this.props.formTemplateId) {
+    if (formTemplateId !== this.props.formTemplateId || !formTemplate) {
       this.setState({ form: undefined });
       this._load(nextProps);
     } else if (formTemplate && !this.state.form) {
