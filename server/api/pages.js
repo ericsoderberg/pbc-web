@@ -41,7 +41,7 @@ function latestDate(date1, date2) {
   return moment(date1).isAfter(moment(date2)) ? date1 : date2;
 }
 
-export const populatePage = (data, session) => {
+export const populatePage = (data) => { // , session) => {
   const Message = mongoose.model('Message');
   const Event = mongoose.model('Event');
   // const FormTemplate = mongoose.model('FormTemplate');
@@ -64,24 +64,22 @@ export const populatePage = (data, session) => {
   page.sections
     .filter(section => (section.type === 'library' && section.libraryId))
     .forEach((section) => {
-      promises.push(
-        Message.findOne({
-          series: { $exists: false },
-          libraryId: section.libraryId,
-          date: { $lt: date.toString() },
-          // series: { $ne: true }
-        })
-          .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
-          .then((message) => {
-            if (message && message.seriesId) {
-              // get series also
-              return Message.findOne({ _id: message.seriesId })
-                .select(PAGE_MESSAGE_FIELDS).exec()
-                .then(series => ({ message, series }));
-            }
-            return message;
-          }),
-      );
+      promises.push(Message.findOne({
+        series: { $exists: false },
+        libraryId: section.libraryId,
+        date: { $lt: date.toString() },
+        // series: { $ne: true }
+      })
+        .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
+        .then((message) => {
+          if (message && message.seriesId) {
+            // get series also
+            return Message.findOne({ _id: message.seriesId })
+              .select(PAGE_MESSAGE_FIELDS).exec()
+              .then(series => ({ message, series }));
+          }
+          return message;
+        }));
     });
 
   // Calendar
@@ -104,24 +102,22 @@ export const populatePage = (data, session) => {
       if (section.omitRecurring) {
         filter.dates = { $exists: true, $size: 0 };
       }
-      promises.push(
-        Event.find(filter)
-          .then((events) => {
-            // sort by which comes next
-            const nextDate = event => (
-              [...event.dates, event.start]
-                .map(d => moment(d))
-                .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0] ||
-                moment(event.start)
-            );
-            events.sort((e1, e2) => {
-              const d1 = nextDate(e1);
-              const d2 = nextDate(e2);
-              return d1.isBefore(d2) ? -1 : d2.isBefore(d1) ? 1 : 0;
-            });
-            return events;
-          }),
-      );
+      promises.push(Event.find(filter)
+        .then((events) => {
+          // sort by which comes next
+          const nextDate = event => (
+            [...event.dates, event.start]
+              .map(d => moment(d))
+              .filter(d => d.isSameOrAfter(start) && d.isSameOrBefore(end))[0] ||
+              moment(event.start)
+          );
+          events.sort((e1, e2) => {
+            const d1 = nextDate(e1);
+            const d2 = nextDate(e2);
+            return d1.isBefore(d2) ? -1 : d2.isBefore(d1) ? 1 : 0;
+          });
+          return events;
+        }));
     });
 
   // Don't load formTemplate when rendering on the server, we don't have
@@ -163,9 +159,11 @@ export const populatePage = (data, session) => {
         .forEach((section) => {
           docsIndex += 1;
           section.events = docs[docsIndex];
-          page.modified = latestDate(page.modified,
+          page.modified = latestDate(
+            page.modified,
             section.events.map(e => e.modified)
-              .reduce((d1, d2) => latestDate(d1, d2)));
+              .reduce((d1, d2) => latestDate(d1, d2)),
+          );
         });
       // if (session !== false) {
       //   page.sections.filter(section => section.type === 'form')
@@ -284,9 +282,8 @@ export const pagePopulations = [
   },
   { path: 'sections.libraryId', select: 'name path', model: 'Library' },
   { path: 'sections.calendarId', select: 'name path', model: 'Calendar' },
-  { path: 'sections.formTemplateId', // need this for page editing
-    select: 'name',
-    model: 'FormTemplate' },
+  // need this for page editing
+  { path: 'sections.formTemplateId', select: 'name', model: 'FormTemplate' },
 ];
 
 export default function (router) {
@@ -314,7 +311,7 @@ export default function (router) {
         return pages;
       })
       .then((pages) => {
-        const id = req.params.id;
+        const { params: { id } } = req;
         const map = pages[id];
         addParents(map, pages);
         addChildren(map, pages);
@@ -337,9 +334,7 @@ export default function (router) {
 
   router.get('/pages/:id/:sectionId/:imageName', (req, res) => {
     const Page = mongoose.model('Page');
-    const id = req.params.id;
-    const sectionId = req.params.sectionId;
-    const imageName = req.params.imageName;
+    const { params: { id, sectionId, imageName } } = req;
     Page.findOne({ _id: id }).exec()
       .then((page) => {
         const section = page.sections.filter(s => s._id.equals(sectionId))[0];
@@ -357,9 +352,11 @@ export default function (router) {
     modelName: 'Page',
     index: {
       authorization: allowAnyone,
-      filterAuthorized: session => ({ $or: [
-        { public: true }, authorizedForDomain(session),
-      ] }),
+      filterAuthorized: session => ({
+        $or: [
+          { public: true }, authorizedForDomain(session),
+        ],
+      }),
     },
     get: {
       pathAlias: true,

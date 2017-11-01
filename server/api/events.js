@@ -5,7 +5,7 @@ import {
 } from './auth';
 import { unsetDomainIfNeeded } from './domains';
 import { unsetCalendarIfNeeded } from './calendars';
-import { addForms, addNewForm } from './formTemplates';
+// import { addForms, addNewForm } from './formTemplates';
 import register from './register';
 import { catcher, sendImage } from './utils';
 
@@ -73,9 +73,10 @@ function resourceIdsWithEvents(events) {
         if (!resourceIdsEvents[stringId]) {
           resourceIdsEvents[stringId] = [];
         }
-        resourceIdsEvents[stringId].push(
-          { _id: event2._id, name: event2.name },
-        );
+        resourceIdsEvents[stringId].push({
+          _id: event2._id,
+          name: event2.name,
+        });
       });
     }
   });
@@ -168,9 +169,9 @@ const unsetReferences = (data) => {
 const PAGE_MESSAGE_FIELDS =
   'path name verses author date image series seriesId';
 
-export const populateEvent = (data, session) => {
+export const populateEvent = (data) => { // , session) => {
   const Message = mongoose.model('Message');
-  const FormTemplate = mongoose.model('FormTemplate');
+  // const FormTemplate = mongoose.model('FormTemplate');
   const date = moment().subtract(1, 'day');
   const page = data.toObject();
 
@@ -180,48 +181,44 @@ export const populateEvent = (data, session) => {
   page.sections
     .filter(section => (section.type === 'library' && section.libraryId))
     .forEach((section) => {
-      promises.push(
-        Message.findOne({
-          libraryId: section.libraryId,
-          date: { $lt: date.toString() },
-          // series: { $ne: true }
-        })
-          .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
-          .then((message) => {
-            if (message && message.seriesId) {
-              // get series also
-              return Message.findOne({ _id: message.seriesId })
-                .select(PAGE_MESSAGE_FIELDS).exec()
-                .then(series => ({ message, series }));
-            }
-            return message;
-          }),
-      );
+      promises.push(Message.findOne({
+        libraryId: section.libraryId,
+        date: { $lt: date.toString() },
+        // series: { $ne: true }
+      })
+        .sort('-date').select(PAGE_MESSAGE_FIELDS).exec()
+        .then((message) => {
+          if (message && message.seriesId) {
+            // get series also
+            return Message.findOne({ _id: message.seriesId })
+              .select(PAGE_MESSAGE_FIELDS).exec()
+              .then(series => ({ message, series }));
+          }
+          return message;
+        }));
     });
 
-  // Don't load formTemplate when rendering on the server, we don't have
-  // a session.
-  if (session !== false) {
-    // FormTemplate
-    page.sections
-      .filter(section => (section.type === 'form' && section.formTemplateId))
-      .forEach((section) => {
-        section.formTemplateId = section.formTemplateId._id; // un-populate
-        promises.push(
-          FormTemplate.findOne({ _id: section.formTemplateId })
-            .exec()
-            .then((formTemplate) => {
-              if (formTemplate) {
-                formTemplate = addNewForm(formTemplate, session);
-                if (session) {
-                  return addForms(formTemplate, session);
-                }
-              }
-              return formTemplate;
-            }),
-        );
-      });
-  }
+  // // Don't load formTemplate when rendering on the server, we don't have
+  // // a session.
+  // if (session !== false) {
+  //   // FormTemplate
+  //   page.sections
+  //     .filter(section => (section.type === 'form' && section.formTemplateId))
+  //     .forEach((section) => {
+  //       section.formTemplateId = section.formTemplateId._id; // un-populate
+  //       promises.push(FormTemplate.findOne({ _id: section.formTemplateId })
+  //         .exec()
+  //         .then((formTemplate) => {
+  //           if (formTemplate) {
+  //             formTemplate = addNewForm(formTemplate, session);
+  //             if (session) {
+  //               return addForms(formTemplate, session);
+  //             }
+  //           }
+  //           return formTemplate;
+  //         }));
+  //     });
+  // }
 
   return Promise.all(promises)
     .then((docs) => {
@@ -249,12 +246,8 @@ export const populateEvent = (data, session) => {
 export const eventPopulations = [
   { path: 'primaryEventId', select: 'name path' },
   { path: 'calendarId', select: 'name path' },
-  { path: 'sections.formTemplateId',
-    select: 'name',
-    model: 'FormTemplate' },
-  { path: 'sections.libraryId',
-    select: 'name',
-    model: 'Library' },
+  { path: 'sections.formTemplateId', select: 'name', model: 'FormTemplate' },
+  { path: 'sections.libraryId', select: 'name', model: 'Library' },
   { path: 'sections.people.id', select: 'name image', model: 'User' },
 ];
 
@@ -284,7 +277,7 @@ export default function (router) {
         const event = new Event(req.body);
 
         const hours = eventInHours(event);
-        const resourceIds = event.resourceIds;
+        const { resourceIds } = event;
 
         // Find all events using the resources this event is using at the same
         // times of day.
@@ -310,8 +303,7 @@ export default function (router) {
 
   router.get('/events/:id/:imageName', (req, res) => {
     const Event = mongoose.model('Event');
-    const id = req.params.id;
-    const imageName = req.params.imageName;
+    const { params: { id, imageName } } = req;
     Event.findOne({ _id: id }).exec()
       .then((event) => {
         if (event.image && event.image.name === imageName) {
