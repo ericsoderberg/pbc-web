@@ -31,7 +31,7 @@ export default (router, options) => {
       getSession(req)
         .then(getOpts.authorization || options.authorization || requireAdministrator)
         .then((session) => {
-          const id = req.params.id;
+          const { params: { id } } = req;
           let criteria;
           if (ID_REGEXP.test(id)) {
             criteria = { _id: id };
@@ -70,8 +70,10 @@ export default (router, options) => {
         })
         .then((doc) => {
           if (doc.modified) {
-            res.setHeader('Last-Modified',
-              moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'));
+            res.setHeader(
+              'Last-Modified',
+              moment.utc(doc.modified).format('ddd, DD MMM YYYY HH:mm:ss [GMT]'),
+            );
             res.setHeader('Cache-Control', 'max-age=0, must-revalidate');
           }
           res.json(doc);
@@ -83,7 +85,7 @@ export default (router, options) => {
   if (methods.indexOf('put') >= 0) {
     const putOpts = options.put || {};
     router.put(`/${category}/:id`, (req, res) => {
-      const id = req.params.id;
+      const { params: { id } } = req;
       getSession(req)
         .then(putOpts.authorization || options.authorization || requireAdministrator)
         .then((session) => {
@@ -96,8 +98,10 @@ export default (router, options) => {
           putOpts.transformIn(data, req) : data))
         .then(data => (putOpts.validate ?
           putOpts.validate(data, req) : data))
-        .then(data => Doc.findOneAndUpdate({ _id: id }, data,
-          { new: true, runValidators: true }).exec())
+        .then(data => Doc.findOneAndUpdate(
+          { _id: id }, data,
+          { new: true, runValidators: true },
+        ).exec())
         .then(doc => (putOpts.transformOut ?
           putOpts.transformOut(doc, req) : doc))
         .then(doc => res.status(200).json(doc))
@@ -108,7 +112,7 @@ export default (router, options) => {
   if (methods.indexOf('delete') >= 0) {
     const deleteOpts = options.delete || {};
     router.delete(`/${category}/:id`, (req, res) => {
-      const id = req.params.id;
+      const { params: { id } } = req;
       getSession(req)
         .then(deleteOpts.authorization || options.authorization || requireAdministrator)
         .then(() => Doc.findById(id).exec())
