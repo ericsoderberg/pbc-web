@@ -91,7 +91,9 @@ class FormTemplate extends Component {
 
   _actionOptions() {
     const { id } = this.props;
-    const { fromDate, toDate, payment, searchText, sort } = this.state;
+    const {
+      fromDate, toDate, payment, searchText, sort,
+    } = this.state;
     const filter = { formTemplateId: id };
     if (fromDate && toDate) {
       filter.created = [fromDate, toDate];
@@ -106,7 +108,9 @@ class FormTemplate extends Component {
         filter['cost.balance'] = { $lte: 0 };
       }
     }
-    return { filter, search: searchText, sort: sort || '-created', totals: true };
+    return {
+      filter, search: searchText, sort: sort || '-created', totals: true,
+    };
   }
 
   _load() {
@@ -362,7 +366,9 @@ class FormTemplate extends Component {
   }
 
   _renderHeaderCells() {
-    const { columns, templateFieldMap, sortFieldId, sortReverse } = this.state;
+    const {
+      columns, templateFieldMap, sortFieldId, sortReverse,
+    } = this.state;
     const cells = columns.map((fieldId) => {
       const field = templateFieldMap[fieldId];
       const classes = [];
@@ -403,7 +409,7 @@ class FormTemplate extends Component {
       let classes = '';
       if ((!fromDate && !toDate && !payment && !searchText) || fieldId === 'balance') {
         const field = templateFieldMap[fieldId];
-        const total = field.total;
+        const { total } = field;
         if (total > 0) {
           classes = 'total';
           contents = total;
@@ -423,7 +429,7 @@ class FormTemplate extends Component {
 
     const cellMap = {};
     form.fields.forEach((field) => {
-      const templateFieldId = field.templateFieldId;
+      const { templateFieldId } = field;
       const templateField = templateFieldMap[templateFieldId] || {};
       if (linkedForm && templateField.linkedFieldId) {
         linkedForm.fields.some((linkedField) => {
@@ -554,8 +560,12 @@ class FormTemplate extends Component {
   }
 
   render() {
-    const { forms, formTemplate, id, mightHaveMore, notFound } = this.props;
-    const { fromDate, toDate, loadingMore, payment, searchText } = this.state;
+    const {
+      forms, formTemplate, id, mightHaveMore, notFound,
+    } = this.props;
+    const {
+      fromDate, toDate, loadingMore, payment, searchText,
+    } = this.state;
 
     const actions = [];
 
@@ -700,9 +710,11 @@ const select = (state, props) => {
   if (formsState.items && formTemplate && formTemplate.payable) {
     const cost = { total: 0, paid: 0, received: 0 };
     formsState.items.forEach((form) => {
-      cost.total += form.cost.total;
-      cost.paid += form.cost.paid;
-      cost.received += form.cost.received;
+      if (form.cost) {
+        cost.total += form.cost.total;
+        cost.paid += form.cost.paid;
+        cost.received += form.cost.received;
+      }
     });
     cost.balance = cost.total - cost.paid;
     cost.unreceived = cost.total - cost.received;
