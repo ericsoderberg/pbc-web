@@ -40,7 +40,7 @@ class FormTemplate extends Component {
 
   componentDidMount() {
     const { dispatch, id } = this.props;
-    dispatch(loadItem('form-templates', id, { totals: true }));
+    dispatch(loadItem('form-templates', id, { totals: true, full: true }));
     this.setState(this._stateFromProps(this.props), this._load);
     window.addEventListener('scroll', this._onScroll);
   }
@@ -248,7 +248,7 @@ class FormTemplate extends Component {
   }
 
   _onPayment(event) {
-    let value = event.target.value;
+    let { target: { value } } = event;
     if (!value || value.match(/^all$/i)) {
       value = undefined;
     }
@@ -290,7 +290,7 @@ class FormTemplate extends Component {
       value = (templateField.value || 1) * field.value;
     } else if (templateField.type === 'choice' && field.optionId) {
       const option = optionMap[field.optionId] || {};
-      value = option.value;
+      ({ value } = option);
     } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
       value = field.optionIds.map((optionId) => {
         const option = optionMap[optionId] || {};
@@ -298,7 +298,7 @@ class FormTemplate extends Component {
       });
       value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
     } else {
-      value = field.value;
+      ({ value } = field);
     }
     return value;
   }

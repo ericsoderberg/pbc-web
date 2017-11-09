@@ -33,7 +33,7 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
     });
     value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
   } else {
-    value = field.value;
+    ({ value } = field);
   }
   return value;
 };
@@ -149,7 +149,9 @@ export const addFormTemplateTotals = (data) => {
           const templateField = templateFieldMap[field.templateFieldId];
           if (templateField && templateField.total >= 0) {
             const value = parseFloat(
-              fieldValue(field, templateFieldMap, optionMap), 10);
+              fieldValue(field, templateFieldMap, optionMap),
+              10,
+            );
             if (value) {
               templateField.total += value;
             }
@@ -184,7 +186,9 @@ export const addFormTemplateTotals = (data) => {
 
       const balance = total - paid;
       const unreceived = total - received;
-      formTemplate.cost = { balance, paid, received, total, unreceived };
+      formTemplate.cost = {
+        balance, paid, received, total, unreceived,
+      };
 
       return formTemplate;
     });
@@ -252,7 +256,7 @@ export default function (router, transporter) {
     getSession(req)
       .then(requireSomeAdministrator)
       .then((session) => {
-        const id = req.params.id;
+        const { params: { id } } = req;
         return FormTemplate.findOne({ _id: id, ...authorizedForDomain(session) })
           .exec()
           .then(formTemplate => ({ formTemplate, session }));
@@ -308,7 +312,9 @@ export default function (router, transporter) {
         return context;
       })
       .then((context) => {
-        const { forms, formTemplate, linkedFormTemplate, linkedForms } = context;
+        const {
+          forms, formTemplate, linkedFormTemplate, linkedForms,
+        } = context;
 
         const fields = [];
         const fieldNames = [];
@@ -432,8 +438,8 @@ export default function (router, transporter) {
   router.post('/form-templates/:id/email', (req, res) => {
     const FormTemplate = mongoose.model('FormTemplate');
     const Site = mongoose.model('Site');
-    const id = req.params.id;
-    const contents = req.body.contents;
+    const { params: { id } } = req;
+    const { body: { contents } } = req;
     getSession(req)
       .then(requireSomeAdministrator)
       .then(session =>
@@ -453,7 +459,9 @@ export default function (router, transporter) {
       .then(context => Site.findOne({}).exec()
         .then(site => ({ ...context, site })))
       .then((context) => {
-        const { addresses, formTemplate, markup, session, site } = context;
+        const {
+          addresses, formTemplate, markup, session, site,
+        } = context;
         return new Promise((resolve, reject) => {
           transporter.sendMail({
             from: site.email,
@@ -522,8 +530,10 @@ export default function (router, transporter) {
       transformOut: (formTemplate) => {
         // update all Forms for this formTemplate to have the same domain
         const Form = mongoose.model('Form');
-        return Form.update({ formTemplateId: formTemplate._id },
-          { $set: { domainId: formTemplate.domainId } }, { multi: true }).exec()
+        return Form.update(
+          { formTemplateId: formTemplate._id },
+          { $set: { domainId: formTemplate.domainId } }, { multi: true },
+        ).exec()
           .then(() => formTemplate);
       },
       validate,

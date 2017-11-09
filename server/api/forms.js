@@ -258,23 +258,21 @@ export const updateFormCosts = (query) => {
     });
 };
 
-const addFullness = context =>
-  Promise.resolve()
-    .then(() => {
-      const { form } = context;
-      if (form.linkedFormId) {
-        const Form = mongoose.model('Form');
-        return Form.findOne({ _id: form.linkedFormId })
-          .populate({ path: 'formTemplateId', select: 'name domainId' })
-          .exec()
-          .then((linkedForm) => {
-            const formObject = form.toObject();
-            formObject.linkedForm = linkedForm;
-            return formObject;
-          });
-      }
-      return form;
-    });
+const addFullness = (context) => {
+  const { form } = context;
+  if (form.linkedFormId) {
+    const Form = mongoose.model('Form');
+    return Form.findOne({ _id: form.linkedFormId })
+      .populate({ path: 'formTemplateId', select: 'name domainId' })
+      .exec()
+      .then((linkedForm) => {
+        const formObject = form.toObject();
+        formObject.linkedForm = linkedForm;
+        return formObject;
+      });
+  }
+  return form;
+};
 
 const getFormContext = (session, id, populate = []) => {
   // Get current form
@@ -320,6 +318,9 @@ export default function (router, transporter) {
         { path: 'paymentIds', select: 'amount' },
         { path: 'userId', select: 'name' },
       ],
+      // load any linked forms
+      transformOut: forms =>
+        Promise.all(forms.map(form => addFullness({ form }))),
     },
   });
 
