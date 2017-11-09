@@ -155,8 +155,10 @@ class FormSection extends Component {
     if (formTemplateId) {
       // Handle server rendering where just name is populated
       if (!formTemplate) {
-        dispatch(loadItem('form-templates', formTemplateId,
-          { full: true, forSession: true, new: true }));
+        dispatch(loadItem(
+          'form-templates', formTemplateId,
+          { full: true, forSession: true, new: true },
+        ));
       } else {
         this._resetState(props);
       }
@@ -226,7 +228,7 @@ class FormSection extends Component {
       let linkedForm;
       let linkedFormTemplate;
       if (form.linkedFormId) {
-        linkedFormTemplate = formTemplate.linkedFormTemplate;
+        ({ linkedFormTemplate } = formTemplate);
         linkedFormTemplate.forms.some((form2) => {
           if (form2._id === form.linkedFormId) {
             linkedForm = form2;
@@ -243,18 +245,13 @@ class FormSection extends Component {
   }
 
   _onCancel() {
-    this.setState({
-      adding: undefined,
-      editForm: undefined,
-      paymentFormId: undefined,
-      // layoutNeeded: true,
-    });
+    this.setState({ editForm: undefined });
   }
 
   _nextState(state) {
     return () => {
       this._scrollNeeded = (this.state.state !== state);
-      this.setState({ state, editForm: undefined, paymentFormId: undefined });
+      this.setState({ state, editForm: undefined });
     };
   }
 
@@ -266,12 +263,16 @@ class FormSection extends Component {
       editForm: undefined,
       state: LOADING,
     });
-    dispatch(loadItem('form-templates', formTemplateId,
-      { full: true, forSession: true, new: true }));
+    dispatch(loadItem(
+      'form-templates', formTemplateId,
+      { full: true, forSession: true, new: true },
+    ));
   }
 
   render() {
-    const { className, formTemplate, formTemplateId, session } = this.props;
+    const {
+      className, formTemplate, formTemplateId, session,
+    } = this.props;
     const {
       activeFormTemplate,
       addingForm,
@@ -394,7 +395,8 @@ class FormSection extends Component {
                 editForm: linkedForm,
                 linkedForm: undefined,
                 linkedFormTemplate: undefined,
-                state: EDITING });
+                state: EDITING,
+              });
             }}
             onSignIn={(form) => {
               this._scrollNeeded = true;
@@ -427,7 +429,8 @@ class FormSection extends Component {
                 activeFormTemplate: linkedFormTemplate,
                 editForm: linkedForm,
                 linkedForm: undefined,
-                linkedFormTemplate: undefined });
+                linkedFormTemplate: undefined,
+              });
             }} />
         );
         break;
@@ -480,9 +483,11 @@ class FormSection extends Component {
           another = (
             <Button className="button form-summary__another"
               plain={true}
-              label={<span>
-                {formTemplate.anotherLabel} <RightIcon className="button__indicator" />
-              </span>}
+              label={
+                <span>
+                  {formTemplate.anotherLabel} <RightIcon className="button__indicator" />
+                </span>
+              }
               onClick={this._add()} />
           );
         }
@@ -580,7 +585,7 @@ const select = (state, props) => {
     if (typeof props.formTemplateId === 'object') {
       formTemplateId = props.formTemplateId._id;
     } else {
-      formTemplateId = props.formTemplateId;
+      ({ formTemplateId } = props);
     }
   }
 

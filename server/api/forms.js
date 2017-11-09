@@ -74,7 +74,9 @@ const sendEmails = (req, transporter, update = false) => (
       })
       .then((emailContext) => {
         // send acknowledgement, if needed
-        const { session, formTemplate, form, site } = emailContext;
+        const {
+          session, formTemplate, form, site,
+        } = emailContext;
         if (formTemplate.acknowledge) {
           const title = formTemplate.name;
           let message = formTemplate.acknowledgeMessage;
@@ -114,7 +116,9 @@ Thank you for ${gerund}${suffix}.
       })
       .then((emailContext) => {
         // send notification, if needed
-        const { session, formTemplate, form, site } = emailContext;
+        const {
+          session, formTemplate, form, site,
+        } = emailContext;
         if (formTemplate.notify) {
           const title = formTemplate.name;
           let past;
@@ -151,7 +155,7 @@ ${session.userId.name} (${session.userId.email}) ${past}${suffix}.
 );
 
 export const addFormCost = (data, formTemplate, payments = {}) => {
-  const form = data; // data.toObject ? data.toObject() : data;
+  const form = data;
   let total = 0;
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((templateField) => {
@@ -207,7 +211,7 @@ export const addFormCost = (data, formTemplate, payments = {}) => {
       payment2.allocated += amount;
       receivedDate = payment2.received;
     } else {
-      amount = payment.amount;
+      ({ amount } = payment);
       receivedDate = payment.received;
     }
     paid += amount;
@@ -219,7 +223,9 @@ export const addFormCost = (data, formTemplate, payments = {}) => {
   total = Math.max(0, total);
   const balance = total - paid;
   const unreceived = total - received;
-  form.cost = { balance, paid, received, total, unreceived };
+  form.cost = {
+    balance, paid, received, total, unreceived,
+  };
 
   return form;
 };
@@ -262,8 +268,9 @@ const addFullness = context =>
           .populate({ path: 'formTemplateId', select: 'name domainId' })
           .exec()
           .then((linkedForm) => {
-            form.linkedForm = linkedForm;
-            return form;
+            const formObject = form.toObject();
+            formObject.linkedForm = linkedForm;
+            return formObject;
           });
       }
       return form;
@@ -294,7 +301,9 @@ const getFormContext = (session, id, populate = []) => {
     .then((context) => {
       const { form, formTemplate } = context;
       return requireDomainAdministratorOrUser(
-        context, (formTemplate || {}).domainId, form.userId);
+        context,
+        (formTemplate || {}).domainId, form.userId,
+      );
     });
 };
 
@@ -363,7 +372,8 @@ export default function (router, transporter) {
           // no session, create one
           return createUserAndSession(userData)
             .then(({ session: newSession, user: formUser }) => ({
-              ...context, admin, session: newSession, formUser }));
+              ...context, admin, session: newSession, formUser,
+            }));
         }
         if (userData.email && userData.email !== session.userId.email) {
           // Person submitting form isn't the same as what's in the form
@@ -426,7 +436,7 @@ export default function (router, transporter) {
 
   router.put('/forms/:id', (req, res) => {
     const Form = mongoose.model('Form');
-    const id = req.params.id;
+    const { params: { id } } = req;
     getSession(req)
       .then(requireSession)
       // get form and template and authorize
@@ -441,8 +451,10 @@ export default function (router, transporter) {
         }
         data.modified = new Date();
         data = unsetDomainIfNeeded(data, session);
-        return Form.findOneAndUpdate({ _id: id }, data,
-          { new: true, runValidators: true }).exec()
+        return Form.findOneAndUpdate(
+          { _id: id }, data,
+          { new: true, runValidators: true },
+        ).exec()
           .then(formUpdated => ({ ...context, form: formUpdated }));
       })
       // update costs

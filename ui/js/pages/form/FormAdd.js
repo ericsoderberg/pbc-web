@@ -47,7 +47,9 @@ class FormAdd extends Component {
   }
 
   _load(props) {
-    const { dispatch, form, formTemplate, formTemplateId, linkedForm } = props;
+    const {
+      dispatch, form, formTemplate, formTemplateId, linkedForm,
+    } = props;
     if (!formTemplate) {
       const options = { new: true };
       if (linkedForm) {
@@ -170,7 +172,7 @@ class FormAdd extends Component {
 
       result = (
         <form className={classNames.join(' ')}
-          action={'/forms'}
+          action="/forms"
           onSubmit={this._onAdd}
           noValidate={true}>
           {header}
@@ -224,7 +226,7 @@ FormAdd.defaultProps = {
   inline: false,
   linkedForm: undefined,
   linkedFormTemplate: undefined,
-  location: undefined,
+  // location: undefined,
   onCancel: undefined,
   onDone: undefined,
   onLinkedForm: undefined,
