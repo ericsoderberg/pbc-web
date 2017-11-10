@@ -4,7 +4,7 @@ import Markdown from 'markdown-to-jsx';
 
 const FormInstructions = props => (
   <div className="form__text">
-    <Markdown>{props.formTemplateField.help}</Markdown>
+    <Markdown>{props.formTemplateField.help || ''}</Markdown>
   </div>
 );
 
