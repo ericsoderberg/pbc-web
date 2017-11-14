@@ -8,7 +8,9 @@ const FormLine = (props) => {
   } = props;
 
   let type = 'text';
-  if (formTemplateField.name && formTemplateField.name.match(/^email/i)) {
+  if (formTemplateField.monetary) {
+    type = 'number';
+  } else if (formTemplateField.name && formTemplateField.name.match(/^email/i)) {
     type = 'email';
   } else if (formTemplateField.name && formTemplateField.name.match(/^phone/i)) {
     type = 'tel';
