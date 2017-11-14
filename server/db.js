@@ -169,8 +169,10 @@ const pageSchema = Schema({
 // pageSections.discriminator('files', Schema(filesSectionDef, { _id: false }));
 
 pageSchema.index({ modified: 1, name: 1 });
-pageSchema.index({ name: 'text', 'sections.text': 'text' },
-  { weights: { name: 5, 'sections.text': 1 } });
+pageSchema.index(
+  { name: 'text', 'sections.text': 'text' },
+  { weights: { name: 5, 'sections.text': 1 } },
+);
 
 const Page = mongoose.model('Page', pageSchema);
 Page.on('index', () => console.log('Page index ready'));
@@ -247,8 +249,10 @@ const eventSchema = Schema({
 // eventSections.discriminator('files',
 //   Schema(filesSectionDef, { _id: false }));
 
-eventSchema.index({ name: 'text', 'sections.text': 'text' },
-  { weights: { name: 5, 'sections.text': 1 } });
+eventSchema.index(
+  { name: 'text', 'sections.text': 'text' },
+  { weights: { name: 5, 'sections.text': 1 } },
+);
 
 const Event = mongoose.model('Event', eventSchema);
 Event.on('index', () => console.log('Event index ready'));
@@ -410,8 +414,10 @@ const librarySchema = Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
-librarySchema.index({ name: 'text', text: 'text' },
-  { weights: { name: 5, text: 1 } });
+librarySchema.index(
+  { name: 'text', text: 'text' },
+  { weights: { name: 5, text: 1 } },
+);
 
 const Library = mongoose.model('Library', librarySchema);
 Library.on('index', () => console.log('Library index ready'));
@@ -444,8 +450,10 @@ const messageSchema = Schema({
   verses: String,
 });
 
-messageSchema.index({ author: 'text', name: 'text', text: 'text', verses: 'text' },
-  { weights: { author: 15, name: 5, text: 1, verses: 10 } });
+messageSchema.index(
+  { author: 'text', name: 'text', text: 'text', verses: 'text' },
+  { weights: { author: 15, name: 5, text: 1, verses: 10 } },
+);
 
 const Message = mongoose.model('Message', messageSchema);
 Message.on('index', () => console.log('Message index ready'));
@@ -514,14 +522,16 @@ mongoose.model('Newsletter', newsletterSchema);
 const emailListSchema = Schema({
   addresses: [{
     address: String,
-    state: { type: String,
+    state: {
+      type: String,
       enum: ['pending', 'ok', 'disabled'],
     },
   }],
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
   modified: Date,
-  name: { type: String,
+  name: {
+    type: String,
     required: true,
     unique: true,
     validate: {

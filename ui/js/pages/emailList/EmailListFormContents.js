@@ -8,11 +8,13 @@ const EmailListFormContents = (props) => {
   const { className, errors, formState, session } = props;
   const emailList = formState.object;
 
+  // Can't rename an email list because it's complicated in mailman
   return (
     <div className={className}>
       <fieldset className="form__fields">
         <FormField label="Name" error={errors.name}>
           <input name="name"
+            disabled={emailList._id}
             value={emailList.name || ''}
             onChange={formState.change('name')} />
         </FormField>
@@ -33,7 +35,8 @@ const EmailListFormContents = (props) => {
             onChange={formState.change('path')} />
         </FormField>
         <FormField>
-          <input name="public"
+          <input id="public"
+            name="public"
             type="checkbox"
             checked={emailList.public || false}
             onChange={formState.toggle('public')} />

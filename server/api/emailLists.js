@@ -16,7 +16,8 @@ const MAILMAN_ADMIN_PASSWORD = process.env.MAILMAN_ADMIN_PASSWORD || '12345678';
 
 const addList = listName => (
   new Promise((resolve, reject) => {
-    execFile('newlist',
+    execFile(
+      'newlist',
       ['-a', listName, MAILMAN_ADMIN, MAILMAN_ADMIN_PASSWORD],
       (error, stdout, stderr) => {
         if (error) {
@@ -24,7 +25,8 @@ const addList = listName => (
           return reject(error);
         }
         return resolve();
-      });
+      },
+    );
   })
 );
 
@@ -71,11 +73,11 @@ const removeAddresses = (listName, addresses) => (
 );
 
 const checkAddresses = listName => (
-  new Promise((resolve, reject) => {
+  new Promise((resolve) => {
     execFile('list_members', ['-n', listName], (error, stdout, stderr) => {
       if (error) {
         console.error('!!! check error', error, stderr);
-        return reject(error);
+        return resolve([]);
       }
       return resolve(stdout.split('\n').filter(a => a));
     });
@@ -228,7 +230,7 @@ export default function (router) {
     getSession(req)
       .then(requireSession)
       .then(() => {
-        const id = req.params.id;
+        const { params: { id } } = req;
         return subscribe(id, req.body);
       })
       .then(() => res.status(200).send())
@@ -239,7 +241,7 @@ export default function (router) {
     getSession(req)
       .then(requireSession)
       .then(() => {
-        const id = req.params.id;
+        const { params: { id } } = req;
         return unsubscribe(id, req.body);
       })
       .then(() => res.status(200).send())
