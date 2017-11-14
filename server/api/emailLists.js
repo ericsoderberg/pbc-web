@@ -187,6 +187,23 @@ export function unsubscribe(id, addresses) {
 }
 
 export default function (router) {
+  router.get('/email-lists/:id.txt', (req, res) => {
+    const EmailList = mongoose.model('EmailList');
+    getSession(req)
+      .then(requireSomeAdministrator)
+      .then((session) => {
+        const { params: { id } } = req;
+        return EmailList.findOne({ _id: id, ...authorizedForDomain(session) })
+          .exec()
+          .then(emailList => ({ emailList, session }));
+      })
+      .then(({ emailList }) => {
+        res.attachment(`${emailList.name}.txt`);
+        res.end(emailList.addresses.map(a => a.address).join('\n'));
+      })
+      .catch(error => catcher(error, res));
+  });
+
   register(router, {
     category: 'email-lists',
     modelName: 'EmailList',

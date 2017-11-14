@@ -474,6 +474,17 @@ export function postUnsubscribe(emailList, addresses) {
     .then(processStatus);
 }
 
+export function getEmailListDownload(emailList) {
+  return fetch(`/api/email-lists/${emailList._id}.txt`, {
+    method: 'GET', headers: _headers })
+    .then((response) => {
+      const cd = response.headers.get('Content-Disposition');
+      const name = cd && cd.match(/filename="([^"]+)"/)[1];
+      response.blob()
+        .then(blob => FileSaver.saveAs(blob, name));
+    });
+}
+
 // Search
 
 export const loadSearch = searchText =>

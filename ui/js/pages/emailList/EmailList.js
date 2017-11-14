@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { loadItem, postUnsubscribe, unloadItem } from '../../actions';
+import { loadItem, postUnsubscribe, unloadItem, getEmailListDownload } from '../../actions';
 import PageHeader from '../../components/PageHeader';
 import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
@@ -15,6 +15,7 @@ class EmailList extends Component {
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
+    this._onDownload = this._onDownload.bind(this);
     this.state = { addresses: [], searchText: '' };
   }
 
@@ -80,6 +81,12 @@ class EmailList extends Component {
     };
   }
 
+  _onDownload(event) {
+    const { emailList } = this.props;
+    event.preventDefault();
+    getEmailListDownload(emailList);
+  }
+
   render() {
     const { emailList, notFound, session } = this.props;
     const { addresses, loading, searchText } = this.state;
@@ -93,6 +100,11 @@ class EmailList extends Component {
           <Link key="add" to={`/email-lists/${emailList.name}/subscribe`}>
             Subscribe
           </Link>,
+          <a key="download"
+            href={`/api/email-lists/${emailList._id}.txt`}
+            onClick={this._onDownload}>
+            Download
+          </a>,
           <Link key="edit" to={`/email-lists/${emailList._id}/edit`}>
             Edit
           </Link>,
