@@ -124,6 +124,11 @@
   }
 
   &.text {
+    .text-contents {
+      display: inline-block;
+      padding: $unit;
+    }
+
     ul {
       padding: 0;
       list-style-type: none;

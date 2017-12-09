@@ -47,7 +47,7 @@ export default class Section extends Component {
 
   render() {
     const {
-      align, backgroundImage, className, color, footer, full, plain,
+      align, backgroundColor, backgroundImage, className, footer, full, plain,
     } = this.props;
     let { style } = this.props;
     const { active } = this.state;
@@ -67,14 +67,16 @@ export default class Section extends Component {
       if (active) {
         classNames.push('section__container--active');
       }
-      if (color) {
-        style = { ...style, backgroundColor: color };
-        classNames.push('section__container--colored');
-        if (isDarkBackground(color)) {
+      if (backgroundImage) {
+        if (backgroundImage.dark) {
           classNames.push('dark-background');
         }
-      } else if (backgroundImage && backgroundImage.dark) {
-        classNames.push('dark-background');
+      } else if (backgroundColor) {
+        style = { ...style, backgroundColor };
+        classNames.push('section__container--colored');
+        if (isDarkBackground(backgroundColor)) {
+          classNames.push('dark-background');
+        }
       }
       if (align) {
         classNames.push(`section__container--${align}`);
@@ -89,8 +91,10 @@ export default class Section extends Component {
           <Image className="section__background" image={backgroundImage} />;
       }
 
-      child = React.cloneElement(child, {
-        className: `${child.props.className || ''} section` });
+      child = React.cloneElement(
+        child,
+        { className: `${child.props.className || ''} section` },
+      );
 
       result = (
         <div ref={(ref) => { this._componentRef = ref; }}
@@ -108,13 +112,13 @@ export default class Section extends Component {
 
 Section.propTypes = {
   align: PropTypes.oneOf(['center', 'start', 'end']),
+  backgroundColor: PropTypes.string,
   backgroundImage: PropTypes.shape({
     data: PropTypes.string,
     path: PropTypes.string,
   }),
   children: PropTypes.any.isRequired,
   className: PropTypes.string,
-  color: PropTypes.string,
   footer: PropTypes.bool,
   full: PropTypes.bool,
   plain: PropTypes.bool,
@@ -123,9 +127,9 @@ Section.propTypes = {
 
 Section.defaultProps = {
   align: 'center',
+  backgroundColor: undefined,
   backgroundImage: undefined,
   className: undefined,
-  color: undefined,
   footer: false,
   full: false,
   plain: false,

@@ -34,7 +34,7 @@ class EventSection extends Component {
   }
 
   render() {
-    const { className, color, event, includeMap, navigable } = this.props;
+    const { className, backgroundColor, event, includeMap, navigable } = this.props;
 
     const classes = ['event-section'];
     if (className) {
@@ -51,8 +51,8 @@ class EventSection extends Component {
         );
       }
       let style;
-      if (color) {
-        style = { backgroundColor: color };
+      if (backgroundColor) {
+        style = { backgroundColor };
       }
 
       if (navigable === false) {
@@ -105,8 +105,8 @@ class EventSection extends Component {
 }
 
 EventSection.propTypes = {
+  backgroundColor: PropTypes.string,
   className: PropTypes.string,
-  color: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   event: PropTypes.object,
   id: PropTypes.string,
@@ -115,8 +115,8 @@ EventSection.propTypes = {
 };
 
 EventSection.defaultProps = {
+  backgroundColor: undefined,
   className: undefined,
-  color: undefined,
   event: undefined,
   id: undefined,
   includeMap: false,

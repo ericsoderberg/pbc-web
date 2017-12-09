@@ -19,10 +19,9 @@ export default class Sections extends Component {
     const { align, sections } = this.props;
     const elements = sections.map((section) => {
       let contents;
-      let backgroundImage = section.backgroundImage;
-      let color = section.color;
+      let { color: backgroundColor, backgroundImage } = section;
       if (section.type === 'text') {
-        contents = <Text text={section.text} />;
+        contents = <Text text={section.text} backgroundColor={backgroundColor} />;
       } else if (section.type === 'image') {
         contents = <Image image={section.image} />;
       } else if (section.type === 'calendar') {
@@ -47,14 +46,14 @@ export default class Sections extends Component {
           <EventSection id={section.eventId}
             includeMap={section.includeMap}
             navigable={section.navigable}
-            color={innerColor}
+            backgroundColor={innerColor}
             includeBackground={section.backgroundImage === undefined} />
         );
         if (!backgroundImage && section.eventId) {
           backgroundImage = section.eventId.image;
         }
-        if (!color && section.eventId) {
-          color = section.eventId.color;
+        if (!backgroundColor && section.eventId) {
+          backgroundColor = section.eventId.color;
         }
       } else if (section.type === 'library') {
         contents =
@@ -87,7 +86,7 @@ export default class Sections extends Component {
           <Section key={section._id || section.id}
             align={align}
             full={section.full}
-            color={color}
+            backgroundColor={backgroundColor}
             backgroundImage={backgroundImage}
             plain={section.plain}>
             {contents}

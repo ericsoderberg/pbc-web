@@ -185,7 +185,7 @@ export default class MessageContents extends Component {
     return (
       <div>
         {video || image}
-        <Section align={align} color={message.color}>
+        <Section align={align} backgroundColor={message.color}>
           <div className="message__header">
             <h1>{message.name}</h1>
             <div className="secondary">{message.verses}</div>

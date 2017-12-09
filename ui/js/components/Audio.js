@@ -187,7 +187,7 @@ export default class Audio extends Component {
     }
 
     return (
-      <Section color={color} full={full} plain={plain}>
+      <Section backgroundColor={color} full={full} plain={plain}>
         <div className={classes.join(' ')}>
           <audio ref={(ref) => { this._audioRef = ref; }} preload="metadata">
             <source src={path} type={'audio/mpeg' || file.type} />

@@ -52,8 +52,8 @@ const EventContents = (props) => {
       <Section full={false}
         align={event.align || 'center'}
         backgroundImage={event.image}
-        color={event.color}>
-        <EventSection id={event} navigable={false} color={innerColor} />
+        backgroundColor={event.color}>
+        <EventSection id={event} navigable={false} backgroundColor={innerColor} />
       </Section>
       <Sections align={align} sections={event.sections} />
       {text}
