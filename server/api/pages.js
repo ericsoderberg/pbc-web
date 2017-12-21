@@ -277,7 +277,7 @@ export const pagePopulations = [
   {
     path: 'sections.eventId',
     select: 'name path start end dates times address location ' +
-      'image color modified',
+      'image color modified allDay',
     model: 'Event',
   },
   { path: 'sections.libraryId', select: 'name path', model: 'Library' },
