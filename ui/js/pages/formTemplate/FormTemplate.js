@@ -392,7 +392,7 @@ class FormTemplate extends Component {
         <th key={fieldId}
           className={classes.join(' ')}
           onClick={onClick}>
-          {field.label || field.name}
+          {field.label || field.name || field.type}
         </th>
       );
     });

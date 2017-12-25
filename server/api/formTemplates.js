@@ -26,19 +26,26 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
   } else if (templateField.type === 'choice' && field.optionId) {
     const option = optionMap[field.optionId] || {}; // in case removed
     value = option.value || option.name || '';
+    if (templateField.monetary) {
+      value = `$${parseFloat(value, 10)}`;
+    }
   } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
     value = field.optionIds.map((optionId) => {
       const option = optionMap[optionId] || {}; // in case removed
       return option.value || option.name || '';
     });
-    value = value.reduce((t, v) => (t + parseFloat(v, 10)), 0);
+    if (templateField.monetary) {
+      value = `$${value.reduce((t, v) => (t + parseFloat(v, 10)), 0)}`;
+    } else {
+      value = value.join(',');
+    }
   } else {
     ({ value } = field);
   }
   return value;
 };
 
-const fieldContents = (field, templateField, optionMap) => {
+const fieldContents = (field, templateField, optionMap, value=false) => {
   let contents = field.value;
   if (templateField.type === 'count' || templateField.type === 'number') {
     // let prefix = '';
@@ -48,17 +55,18 @@ const fieldContents = (field, templateField, optionMap) => {
     // contents = `${prefix}${field.value}`;
     contents = field.value;
   } else if (templateField.type === 'choice' && field.optionId) {
-    contents = (optionMap[field.optionId] || {}).name || '';
+    const option = optionMap[field.optionId] || {};
+    contents = value ? `$${(option.value || 0)}` : (option.name || '');
   } else if (templateField.type === 'choices' && field.optionIds) {
     contents = field.optionIds.map((optionId) => {
       const option = optionMap[optionId] || {}; // in case removed
-      let suffix = '';
-      if (templateField.monetary) {
-        suffix = ` $${option.value || '?'}`;
-      }
-      return `${option.name || ''}${suffix}`;
-    })
-      .join(', ');
+      return value ? (option.value || 0) : (option.name || '');
+    });
+    if (value) {
+      return `$${contents.reduce((t, v) => (t + parseFloat(v, 10)), 0)}`;
+    } else {
+      return contents.join(', ');
+    }
   } else if (templateField.type === 'date') {
     const date = moment(contents);
     if (date.isValid()) {
@@ -330,7 +338,11 @@ export default function (router, transporter) {
                 optionMap[option._id] = option;
               });
               fields.push(`${field._id}`);
-              fieldNames.push(field.name || section.name || '');
+              fieldNames.push(field.name || field.type);
+              if (field.monetary && (field.type === 'choice' || field.type === 'choices')) {
+                fields.push(`${field._id}-amount`);
+                fieldNames.push(`${field.name || field.type} amount`);
+              }
               if (field.linkedFieldId) {
                 linkedTemplateFieldIdMap[field._id] = field.linkedFieldId;
               }
@@ -379,6 +391,10 @@ export default function (router, transporter) {
             if (templateField) {
               item[field.templateFieldId] =
                 fieldContents(field, templateField, optionMap);
+              if (templateField.monetary) {
+                item[`${field.templateFieldId}-amount`] =
+                  fieldContents(field, templateField, optionMap, true);
+              }
               if (templateField.birthday) {
                 item.age = moment(field.value).fromNow(true);
               }
@@ -396,6 +412,10 @@ export default function (router, transporter) {
                   if (templateField) {
                     item[templateFieldId] =
                       fieldContents(linkedField, templateField, optionMap);
+                    if (templateField.monetary) {
+                      item[`${templateFieldId}-amount`] =
+                        fieldContents(linkedField, templateField, optionMap, true);
+                    }
                   }
                   return true;
                 }
@@ -408,6 +428,10 @@ export default function (router, transporter) {
               if (templateField) {
                 item[field.templateFieldId] =
                   fieldContents(field, templateField, optionMap);
+                if (templateField.monetary) {
+                  item[`${field.templateFieldId}-amount`] =
+                    fieldContents(field, templateField, optionMap, true);
+                }
                 if (templateField.birthday) {
                   item.age = moment(field.value).fromNow(true);
                 }
@@ -416,8 +440,8 @@ export default function (router, transporter) {
           }
 
           if (formTemplate.payable) {
-            const balance = form.totalCost - form.paidAmount;
-            if (balance && balance < 100) {
+            const balance = form.cost.total - form.cost.paid;
+            if (balance) {
               item.balance = `$${balance}`;
             }
           }
