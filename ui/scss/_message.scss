@@ -2,6 +2,12 @@
 .message-item {
   line-height: 1.5;
 
+  > div:not(.message-item__series-header):first-child {
+    @media all and (min-width: 700px) {
+      text-align: left;
+    }
+  }
+
   > div:last-child:not(:first-child) {
     margin-top: 0;
 
@@ -14,6 +20,7 @@
 .message-item__series-header {
   h2 {
     margin-top: 0;
+    font-size: 1.2rem;
   }
 }
 

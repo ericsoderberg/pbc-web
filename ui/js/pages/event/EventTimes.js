@@ -11,7 +11,9 @@ const TimesSet = (props) => {
     (start.isSameOrAfter(noon) && end.isSameOrAfter(noon)));
   return (
     <span className="event-times__set">
-      <span className="event-times__label event-times__label-times">{formatTime(start, !sameAmpm)}</span>
+      <span className="event-times__label event-times__label-times">
+        {formatTime(start, !sameAmpm)}
+      </span>
       <span className="event-times__separator">-</span>
       <span className="event-times__label event-times__label-times">{formatTime(end)}</span>
     </span>
@@ -118,11 +120,11 @@ const EventTimes = (props) => {
           </div>,
         ];
         if (!event.allDay) {
-          contents.push(
+          contents.push((
             <div key={2} className="event-times__set">
               <span className="event-times__label">{formatTimes(start, end)}</span>
-            </div>,
-          );
+            </div>
+          ));
         }
       }
     } else if (sameDayOfWeek && dates.length > 4) {
@@ -145,17 +147,17 @@ const EventTimes = (props) => {
         </div>,
       ];
       if (!event.allDay) {
-        contents.push(
+        contents.push((
           <div key={2} className="event-times__set">
             <span className="event-times__label">{formatTimes(start, end)}</span>
-          </div>,
-        );
+          </div>
+        ));
       }
     } else {
       // irreguler
       const datesString = dates.filter(date => date.isSameOrAfter(today))
-      .slice(0, 4)
-      .map(date => formatDate(date, false)).join(', ');
+        .slice(0, 4)
+        .map(date => formatDate(date, false)).join(', ');
 
       contents = [
         <div key={1} className="event-times__set">
@@ -201,11 +203,11 @@ const EventTimes = (props) => {
       </div>,
     ];
     if (!event.allDay) {
-      contents.push(
+      contents.push((
         <div key={2} className="event-times__set">
           <span className="event-times__label">{formatTimes(start, end)}</span>
-        </div>,
-      );
+        </div>
+      ));
     }
   }
 

@@ -51,13 +51,15 @@ class MessageItem extends Component {
       );
     } else {
       const verses = (message.name !== message.verses ? message.verses : undefined);
+      const showYear = date.isBefore(moment().subtract(3, 'months')) ||
+        date.isAfter(moment().add(6, 'months'));
       linkContents = [
         <div key="1">
           <div className="item__name">{message.name}</div>
           <div className="secondary">{verses}</div>
         </div>,
         <div key="2">
-          <div className="tertiary">{date.format('MMM Do YYYY')}</div>
+          <div className="tertiary">{date.format(`MMM Do${showYear ? ' YYYY' : ''}`)}</div>
           <div className="secondary">{message.author}</div>
         </div>,
       ];

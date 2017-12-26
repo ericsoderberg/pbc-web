@@ -226,7 +226,7 @@ class Home extends Component {
     }
 
     return (
-      <Section key="footer" className="home__footer">
+      <Section key="footer" className="home__footer" align="start">
         <div>
           <div className="footer__links">
             <div className="home__brand">

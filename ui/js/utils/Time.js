@@ -3,8 +3,8 @@ import moment from 'moment-timezone';
 export const formatDate = (date, dayOfWeek = true) => {
   const showYear = date.isBefore(moment().subtract(3, 'months')) ||
     date.isAfter(moment().add(6, 'months'));
-  return date.format(`${dayOfWeek ? 'dddd ' : ''}MMMM Do${showYear ? ' YYYY' : ''}`);
-}
+  return date.format(`${dayOfWeek ? 'dddd MMM' : 'MMMM'} Do${showYear ? ' YYYY' : ''}`);
+};
 
 export const formatTime = (date, ampm = true) =>
   date.format(`${date.minute() === 0 ? 'h' : 'h:mm'}${ampm ? ' a' : ''}`);
