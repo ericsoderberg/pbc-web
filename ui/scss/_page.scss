@@ -425,8 +425,10 @@ a.event-section__text {
 @import 'audio';
 
 .library-summary {
-  text-align: center;
   @include section-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   @media all and (min-width: 700px) {
     // max-width: $page-width;
@@ -434,15 +436,21 @@ a.event-section__text {
   }
 }
 
+.library-summary__container {
+  display: flex;
+  flex-direction: column;
+  max-width: $unit * 24;
+}
+
 .library-summary__library {
 
   a {
     position: relative;
     display: inline-block;
-    align-items: center;
+    // align-items: center;
     text-decoration: none;
-    padding-left: $double-unit;
-    padding-right: $double-unit;
+    // padding-left: $double-unit;
+    // padding-right: $double-unit;
 
     @media all and (min-width: 700px) {
       &:hover {
@@ -452,16 +460,23 @@ a.event-section__text {
   }
 
   h2 {
-    display: inline-block;
+    // display: inline-block;
     font-size: 1.75rem;
+    padding-left: $unit;
+    padding-right: $double-unit;
   }
 }
 
 .library-summary__message {
-  .item__container {
-    width: auto;
-    display: inline-block;
+  a {
+    @media all and (min-width: 700px) {
+      text-align: left;
+    }
   }
+  // .item__container {
+  //   width: auto;
+  //   display: inline-block;
+  // }
 }
 
 .person-summary {
@@ -684,7 +699,8 @@ a.event-section__text {
 
 .event-times__separator {
   margin: 0 $half-unit;
-  color: $tertiary-color;
+  // color: $tertiary-color;
+  font-size: 0.8em;
 }
 
 .event-times__label {

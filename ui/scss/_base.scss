@@ -38,7 +38,7 @@ a,
 
 .anchor__indicator.control-icon {
   position: absolute;
-  right: $half-unit;
+  right: $half-unit + $quarter-unit;
   top: 50%;
   transform: translateY(-50%);
   width: $third-unit + $third-unit;

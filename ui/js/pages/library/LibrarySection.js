@@ -75,17 +75,19 @@ class LibrarySection extends Component {
 
     return (
       <div className={classes.join(' ')}>
-        <div className="library-summary__library">
-          <Link to={`/libraries/${library.path || library._id}`}>
-            <h2>{library.name} Library</h2>
-            <RightIcon className="anchor__indicator" />
-          </Link>
-        </div>
-        <div className="library-summary__message">
-          {messageItem}
-        </div>
-        <div className="library-summary__message">
-          {seriesItem}
+        <div className="library-summary__container">
+          <div className="library-summary__library">
+            <Link to={`/libraries/${library.path || library._id}`}>
+              <h2>{library.name} Library</h2>
+              <RightIcon className="anchor__indicator" />
+            </Link>
+          </div>
+          <div className="library-summary__message">
+            {messageItem}
+          </div>
+          <div className="library-summary__message">
+            {seriesItem}
+          </div>
         </div>
       </div>
     );
