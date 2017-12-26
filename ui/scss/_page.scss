@@ -429,7 +429,7 @@ a.event-section__text {
   @include section-content;
 
   @media all and (min-width: 700px) {
-    max-width: $page-width;
+    // max-width: $page-width;
     margin: 0 auto;
   }
 }
@@ -486,7 +486,7 @@ a.event-section__text {
   @media all and (min-width: 700px) {
     flex-direction: row;
     flex-wrap: wrap;
-    max-width: $page-width;
+    // max-width: $page-width;
 
     > * {
       padding: $unit;
