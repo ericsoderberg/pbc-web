@@ -61,7 +61,10 @@ export default class Sections extends Component {
       } else if (section.type === 'people') {
         contents = <PeopleSection people={section.people} />;
       } else if (section.type === 'pages') {
-        contents = <PagesSection pages={section.pages} />;
+        contents = (
+          <PagesSection pages={section.pages}
+            backgroundColor={backgroundImage ? backgroundColor : undefined} />
+        );
       } else if (section.type === 'video') {
         contents = <Video url={section.url} autoplay={false} />;
       } else if (section.type === 'form') {

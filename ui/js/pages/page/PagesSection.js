@@ -9,7 +9,7 @@ import RightIcon from '../../icons/Right';
 export default class PagesSection extends Component {
 
   render() {
-    const { className, pages } = this.props;
+    const { backgroundColor, className, pages } = this.props;
 
     const classes = ['pages-section'];
     if (className) {
@@ -38,13 +38,17 @@ export default class PagesSection extends Component {
             </Link>
           );
         } else if (pages.length === 1) {
+          let innerStyle;
+          if (backgroundColor) {
+            innerStyle = { backgroundColor };
+          }
           link = (
             <Button key={key}
               className="pages-section__page"
               plain={true}
               path={path}
               style={style}>
-              <div className="pages-section__name">
+              <div className="pages-section__name" style={innerStyle}>
                 <h2>{page.name}</h2>
                 <RightIcon className="anchor__indicator" />
               </div>
@@ -73,11 +77,13 @@ export default class PagesSection extends Component {
 }
 
 PagesSection.propTypes = {
+  backgroundColor: PropTypes.string,
   className: PropTypes.string,
   pages: PropTypes.array,
 };
 
 PagesSection.defaultProps = {
+  backgroundColor: undefined,
   className: undefined,
   pages: [],
 };

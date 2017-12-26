@@ -34,7 +34,9 @@ class EventSection extends Component {
   }
 
   render() {
-    const { className, backgroundColor, event, includeMap, navigable } = this.props;
+    const {
+      className, backgroundColor, event, includeMap, navigable,
+    } = this.props;
 
     const classes = ['event-section'];
     if (className) {
