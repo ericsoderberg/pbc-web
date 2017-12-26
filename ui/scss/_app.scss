@@ -415,15 +415,16 @@
 
 .filter {
 
-  @media all and (min-width: 700px) {
+  // @media all and (min-width: 700px) {
     .filter__control {
       display: none;
     }
-  }
+  // }
 
   @media all and (max-width: 699px) {
     .filter__select {
-      display: none;
+      // display: none;
+      width: 100%;
     }
   }
 }
