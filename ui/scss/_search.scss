@@ -82,6 +82,8 @@
 .search__link {
   display: block;
   text-decoration: none;
+  margin: $quarter-unit $unit;
+  border-radius: $border-radius;
 
   &:hover {
     background-color: $hover-background;
