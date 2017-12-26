@@ -380,6 +380,7 @@
 .form-item__controls {
   margin-top: $unit;
   background-color: rgba($control-background-color, 0.1);
+  border-radius: $border-radius;
 }
 
 .form-item__control {
@@ -1201,7 +1202,7 @@
 
 .associated {
   margin-top: $quadruple-unit;
-  background-color: $secondary-background-color;
+  padding: 0 $unit;
 }
 
 .associated-link {
@@ -1211,6 +1212,7 @@
   text-decoration: none;
 
   &:hover {
+    border-radius: $border-radius;
     background-color: $hover-background;
   }
 }

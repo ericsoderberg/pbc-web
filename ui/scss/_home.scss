@@ -238,6 +238,7 @@
     border-style: solid;
     width: 100%;
     flex: 1 1 auto;
+    border-radius: $border-radius;
 
     &:focus {
       border-color: $brand-color;

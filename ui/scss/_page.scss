@@ -127,6 +127,7 @@
     .text-contents {
       display: inline-block;
       padding: $unit;
+      border-radius: $border-radius;
     }
 
     ul {
@@ -341,6 +342,7 @@
 .event-section__text {
   display: inline-block;
   padding: $unit;
+  border-radius: $border-radius;
 
   h1,
   h2,
@@ -455,6 +457,7 @@ a.event-section__text {
     text-decoration: none;
     // padding-left: $double-unit;
     // padding-right: $double-unit;
+    border-radius: $border-radius;
 
     @media all and (min-width: 700px) {
       &:hover {
@@ -555,6 +558,7 @@ a.event-section__text {
   display: inline-block;
   padding-left: $double-unit;
   padding-right: $double-unit;
+  border-radius: $border-radius;
 
   &:hover {
     background-color: $hover-background;

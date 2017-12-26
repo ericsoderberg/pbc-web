@@ -2,7 +2,7 @@
 .list {
   list-style-type: none;
   margin: 0;
-  padding: 0;
+  padding: $half-unit $unit;
 }
 
 .list__marker {
@@ -39,6 +39,7 @@ button.item__container {
   cursor: pointer;
   margin: 0;
   width: 100%;
+  border-radius: $border-radius;
 
   &:hover {
     background-color: $hover-background;

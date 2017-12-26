@@ -78,10 +78,12 @@ a,
   font-size: 1.25rem;
   text-align: center;
   text-decoration: none;
+  border-radius: $border-radius;
 
   &:hover {
     background-color: $control-hover-background;
     color: $control-hover-color;
+    border-radius: $border-radius;
   }
 }
 
@@ -177,6 +179,8 @@ a,
 
 .button-right {
   margin-right: $unit;
+  border-top-left-radius: $border-radius;
+  border-bottom-left-radius: $border-radius;
 
   .button__arrow {
     right: -$unit;
@@ -185,6 +189,8 @@ a,
 
 .button-left {
   margin-left: $unit;
+  border-top-right-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
 
   .button__arrow {
     left: -$unit;
@@ -194,6 +200,7 @@ a,
 .button--secondary {
   background-color: rgba($control-background-color, 0.1);
   color: $secondary-color;
+  border-radius: $border-radius;
 }
 
 .button__indicator.control-icon {

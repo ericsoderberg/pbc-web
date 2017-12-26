@@ -129,9 +129,11 @@
   padding: $half-unit $unit;
   height: 100%;
   width: auto;
+  border-radius: $border-radius;
+  margin-right: $quarter-unit;
 
   @media all and (min-width: 700px) {
-    line-height: $double-unit;
+    line-height: $double-unit - $half-unit;
   }
 
   // @media all and (max-width: 699px) {
@@ -192,6 +194,7 @@
       justify-content: flex-end;
       align-items: center;
       height: $triple-unit;
+      padding: $quarter-unit 0;
     }
 
     @media screen and (max-width: 699px) {
@@ -337,6 +340,8 @@
   align-items: center;
   justify-content: space-between;
   background-color: $header-background-color;
+  border-radius: $border-radius;
+  margin: $half-unit $unit;
 
   > .button {
     @include page-header-input();
@@ -351,6 +356,8 @@
 .page-header__tertiary {
   display: flex;
   background-color: $secondary-background-color;
+  border-radius: $border-radius;
+  margin: $half-unit $unit;
 
   @media all and (min-width: 700px) {
     flex-direction: row;

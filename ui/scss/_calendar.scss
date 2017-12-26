@@ -221,6 +221,7 @@
     display: block;
     color: #333;
     text-decoration: none;
+    border-radius: $border-radius;
 
     &:hover {
       background-color: $control-hover-background;
