@@ -9,10 +9,10 @@ import {
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import CalendarGrid from '../../components/CalendarGrid';
+import ItemContext from '../../components/ItemContext';
 import Loading from '../../components/Loading';
 import LeftIcon from '../../icons/Left';
 import RightIcon from '../../icons/Right';
-import PageContext from '../page/PageContext';
 import { searchToObject } from '../../utils/Params';
 
 const LEFT_KEY = 37;
@@ -318,10 +318,10 @@ class Calendar extends Component {
         more = <Button plain={true} onClick={this._onMore}>more</Button>;
       }
 
-      let pageContext;
+      let itemContext;
       if (id && calendar) {
-        pageContext = (
-          <PageContext filter={{ 'sections.calendarId': calendar._id }} />
+        itemContext = (
+          <ItemContext filter={{ 'sections.calendarId': calendar._id }} />
         );
       }
 
@@ -356,7 +356,7 @@ class Calendar extends Component {
           </div>
           {grid}
           {more}
-          {pageContext}
+          {itemContext}
         </main>
       );
     } else {

@@ -673,6 +673,10 @@ a.event-section__text {
     text-align: right;
   }
 
+  .item.item--center &:last-child {
+    text-align: center;
+  }
+
   > .event-times__separator {
     display: block;
   }

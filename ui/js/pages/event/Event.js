@@ -8,7 +8,7 @@ import { loadItem, unloadItem } from '../../actions';
 import ItemHeader from '../../components/ItemHeader';
 import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
-import PageContext from '../page/PageContext';
+import ItemContext from '../../components/ItemContext';
 import EventContents from './EventContents';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -71,8 +71,7 @@ class Event extends Component {
       }
 
       context = (
-        <PageContext align="center"
-          filter={filter} />
+        <ItemContext align="center" filter={filter} />
       );
     } else if (notFound) {
       contents = <NotFound />;

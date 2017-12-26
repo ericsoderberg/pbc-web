@@ -162,7 +162,7 @@ export const populatePage = (data) => { // , session) => {
           page.modified = latestDate(
             page.modified,
             section.events.map(e => e.modified)
-              .reduce((d1, d2) => latestDate(d1, d2)),
+              .reduce((d1, d2) => latestDate(d1, d2), page.modified),
           );
         });
       // if (session !== false) {

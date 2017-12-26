@@ -13,7 +13,7 @@ import Filter from '../../components/Filter';
 import DateInput from '../../components/DateInput';
 import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
-import PageContext from '../page/PageContext';
+import ItemContext from '../../components/ItemContext';
 import { searchToObject } from '../../utils/Params';
 
 const FIXED_FIELDS = [
@@ -679,7 +679,7 @@ class FormTemplate extends Component {
         {contents}
         {more}
         {associated}
-        <PageContext filter={{ 'sections.formTemplateId': id }} />
+        <ItemContext filter={{ 'sections.formTemplateId': id }} />
       </main>
     );
   }

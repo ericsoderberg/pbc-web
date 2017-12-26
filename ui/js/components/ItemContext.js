@@ -2,10 +2,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { loadCategory, unloadCategory } from '../../actions';
-import PageItem from './PageItem';
+import { loadCategory, unloadCategory } from '../actions';
+import PageItem from '../pages/page/PageItem';
+import EventItem from '../pages/event/EventItem';
 
-class PageContext extends Component {
+class ItemContext extends Component {
 
   componentDidMount() {
     const { filter } = this.props;
@@ -25,6 +26,7 @@ class PageContext extends Component {
   componentWillUnmount() {
     const { dispatch } = this.props;
     dispatch(unloadCategory('pages'));
+    dispatch(unloadCategory('events'));
   }
 
   _load(props) {
@@ -33,42 +35,51 @@ class PageContext extends Component {
       filter: { public: true, ...filter },
       select: 'name path',
     }));
+    dispatch(loadCategory('events', {
+      filter: { public: true, ...filter },
+      select: 'name path start stop allDay dates',
+    }));
   }
 
   render() {
-    const { align, pages } = this.props;
-    let result = null;
-    if (pages && pages.length > 0) {
-      const pageItems = pages.map(page => (
-        <li key={page._id}>
-          <PageItem align={align} item={page} />
-        </li>
-      ));
-      result = (
-        <ul className="page-context list">
-          {pageItems}
-        </ul>
-      );
-    }
-    return result;
+    const { align, events, pages } = this.props;
+    const pageItems = (pages || []).map(page => (
+      <li key={page._id}>
+        <PageItem align={align} item={page} />
+      </li>
+    ));
+    const eventItems = (events || []).map(event => (
+      <li key={event._id}>
+        <EventItem align={align} item={event} />
+      </li>
+    ));
+    return (
+      <ul className="page-context list">
+        {pageItems}
+        {eventItems}
+      </ul>
+    );
   }
 }
 
-PageContext.propTypes = {
+ItemContext.propTypes = {
   align: PropTypes.oneOf(['start', 'center', 'end']),
   dispatch: PropTypes.func.isRequired,
+  events: PropTypes.array,
   filter: PropTypes.object,
   pages: PropTypes.array,
 };
 
-PageContext.defaultProps = {
+ItemContext.defaultProps = {
   align: 'center',
+  events: undefined,
   filter: undefined,
   pages: undefined,
 };
 
 const select = state => ({
+  events: (state.events || {}).items,
   pages: (state.pages || {}).items,
 });
 
-export default connect(select)(PageContext);
+export default connect(select)(ItemContext);

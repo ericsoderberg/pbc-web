@@ -59,6 +59,13 @@
   }
 }
 
+@keyframes colorWander {
+  0%, 50% { background-color: $nav-background-color; }
+  70% { background-color: #577; }
+  90% { background-color: #775; }
+  100% { background-color: #757; }
+}
+
 .main-nav {
   font-family: 'Lucide Grande', sans-serif;
   display: flex;
@@ -68,6 +75,7 @@
 
   @media all and (min-width: 700px) {
     flex: 0 0 $sidebar-width;
+    animation: colorWander 120s infinite alternate;
   }
 
   @media all and (max-width: 699px) {
