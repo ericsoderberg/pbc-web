@@ -34,13 +34,17 @@ export default class Section extends Component {
   }
 
   _layout() {
-    const { active } = this.state;
+    const { active, leaving } = this.state;
     const component = this._componentRef;
     if (component) {
       const rect = this._componentRef.getBoundingClientRect();
       const nextActive = (rect.top + 48) < window.innerHeight;
       if (nextActive !== active) {
         this.setState({ active: nextActive });
+      }
+      const nextLeaving = rect.bottom < 240;
+      if (nextLeaving !== leaving) {
+        this.setState({ leaving: nextLeaving });
       }
     }
   }
@@ -50,7 +54,7 @@ export default class Section extends Component {
       align, backgroundColor, backgroundImage, className, footer, full, plain,
     } = this.props;
     let { style } = this.props;
-    const { active } = this.state;
+    const { active, leaving } = this.state;
     let child = Children.only(this.props.children);
 
     let result;
@@ -66,6 +70,9 @@ export default class Section extends Component {
       }
       if (active) {
         classNames.push('section__container--active');
+      }
+      if (leaving) {
+        classNames.push('section__container--leaving');
       }
       if (backgroundImage) {
         if (backgroundImage.dark) {
