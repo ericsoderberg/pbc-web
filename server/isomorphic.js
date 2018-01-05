@@ -95,7 +95,9 @@ router.get('/', (req, res, next) => {
         .then(removeImageData)
         .then((page) => {
           store.dispatch({
-            type: ITEM_LOAD, payload: { category: 'pages', id, item: page } });
+            type: ITEM_LOAD,
+            payload: { category: 'pages', id, item: page },
+          });
         });
     })
     .then(() => renderAndRespond(req, res, context, store, title))
@@ -114,7 +116,7 @@ router.get('/events/:id', (req, res, next) => {
   loadSite(store)
     .then(() => {
       const Event = mongoose.model('Event');
-      const id = req.params.id;
+      const { params: { id } } = req;
       const criteria = (ID_REGEXP.test(id) ? { _id: id } : { path: id });
       const query = Event.findOne(criteria);
       eventPopulations.forEach(p => query.populate(p));
@@ -124,7 +126,9 @@ router.get('/events/:id', (req, res, next) => {
         .then((event) => {
           title = event.name;
           store.dispatch({
-            type: ITEM_LOAD, payload: { category: 'events', id, item: event } });
+            type: ITEM_LOAD,
+            payload: { category: 'events', id, item: event },
+          });
         });
     })
     .then(() => renderAndRespond(req, res, context, store, title))
@@ -143,7 +147,7 @@ router.get('/libraries/:id', (req, res, next) => {
   loadSite(store)
     .then(() => {
       const Library = mongoose.model('Library');
-      const id = req.params.id;
+      const { params: { id } } = req;
       const criteria = (ID_REGEXP.test(id) ? { _id: id } : { path: id });
       const query = Library.findOne(criteria);
       return query.exec()
@@ -151,7 +155,9 @@ router.get('/libraries/:id', (req, res, next) => {
         .then((library) => {
           title = library.name;
           store.dispatch({
-            type: ITEM_LOAD, payload: { category: 'libraries', id, item: library } });
+            type: ITEM_LOAD,
+            payload: { category: 'libraries', id, item: library },
+          });
           return library;
         });
     })
@@ -164,7 +170,19 @@ router.get('/libraries/:id', (req, res, next) => {
         .exec()
         .then((messages) => {
           store.dispatch({
-            type: CATEGORY_LOAD, payload: { category: 'messages', items: messages } });
+            type: CATEGORY_LOAD,
+            payload: { category: 'messages', items: messages },
+          });
+        });
+    })
+    .then((library) => {
+      const Message = mongoose.model('Message');
+      const criteria = { libraryId: library._id };
+      const query = Message.distinct('author', criteria);
+      return query.exec()
+        .then((authors) => {
+          library.authors = authors.sort();
+          return library;
         });
     })
     .then(() => renderAndRespond(req, res, context, store, title))
@@ -183,7 +201,7 @@ router.get('/messages/:id', (req, res, next) => {
   loadSite(store)
     .then(() => {
       const Message = mongoose.model('Message');
-      const id = req.params.id;
+      const { params: { id } } = req;
       const criteria = (ID_REGEXP.test(id) ? { _id: id } : { path: id });
       const query = Message.findOne(criteria);
       messagePopulations.forEach(p => query.populate(p));
@@ -193,7 +211,9 @@ router.get('/messages/:id', (req, res, next) => {
         .then((message) => {
           title = message.name;
           store.dispatch({
-            type: ITEM_LOAD, payload: { category: 'messages', id, item: message } });
+            type: ITEM_LOAD,
+            payload: { category: 'messages', id, item: message },
+          });
         });
     })
     .then(() => renderAndRespond(req, res, context, store, title))
@@ -212,7 +232,7 @@ router.get(['/:id', '/pages/:id'], (req, res, next) => {
   loadSite(store)
     .then(() => {
       const Page = mongoose.model('Page');
-      const id = req.params.id;
+      const { params: { id } } = req;
       const criteria = (ID_REGEXP.test(id) ? { _id: id } :
         { $or: [{ path: id }, { pathAlias: id }] });
       const query = Page.findOne(criteria);
@@ -225,7 +245,9 @@ router.get(['/:id', '/pages/:id'], (req, res, next) => {
         .then((page) => {
           title = page.name;
           store.dispatch({
-            type: ITEM_LOAD, payload: { category: 'pages', id, item: page } });
+            type: ITEM_LOAD,
+            payload: { category: 'pages', id, item: page },
+          });
         });
       // return Promise.reject(`No isomorphic for ${req.path}`);
     })

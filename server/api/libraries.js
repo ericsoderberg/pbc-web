@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import register from './register';
 import {
-  authorizedForDomain, allowAnyone, requireAdministrator,
+  authorizedForDomain, allowAnyone,
   requireSomeAdministrator,
 } from './auth';
 import { unsetDomainIfNeeded } from './domains';
@@ -38,7 +38,7 @@ const populateLibrary = (data) => {
 export default function (router) {
   // podcast image
   router.get('/libraries/:id/:imageName', (req, res) => {
-    const id = req.params.id;
+    const { params: { id } } = req;
     const Library = mongoose.model('Library');
     Library.findOne({ _id: id }).populate('userId', 'name email').exec()
       .then((library) => {
@@ -77,8 +77,11 @@ export default function (router) {
       transformOut: (library) => {
         // update all Messages in this library to have the same domain
         const Message = mongoose.model('Message');
-        return Message.update({ libraryId: library._id },
-          { $set: { domainId: library.domainId } }, { multi: true }).exec()
+        return Message.update(
+          { libraryId: library._id },
+          { $set: { domainId: library.domainId } },
+          { multi: true },
+        ).exec()
           .then(() => library);
       },
     },
