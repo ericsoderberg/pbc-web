@@ -43,14 +43,18 @@ class Messages extends Component {
   }
 
   render() {
-    const { history, location } = this.props;
+    const { history, location, session } = this.props;
     const { filterOptions } = this.state;
 
-    const filter = {
-      property: 'libraryId',
-      options: filterOptions,
-      allLabel: 'All libraries',
-    };
+    let filters;
+    if (session &&
+      (session.userId.administrator || session.userId.domainIds.length > 0)) {
+      filters = [{
+        property: 'libraryId',
+        options: filterOptions,
+        allLabel: 'All libraries',
+      }];
+    }
 
     return (
       <List location={location}
@@ -58,7 +62,7 @@ class Messages extends Component {
         category="messages"
         title="Messages"
         path="/messages"
-        filters={[filter]}
+        filters={filters}
         select="name path verses date author"
         sort="-date"
         Item={MessagesMessageItem}
@@ -72,10 +76,17 @@ Messages.propTypes = {
   history: PropTypes.any.isRequired,
   libraries: PropTypes.array,
   location: PropTypes.object.isRequired,
+  session: PropTypes.shape({
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
+    }),
+  }),
 };
 
 Messages.defaultProps = {
   libraries: [],
+  session: undefined,
 };
 
 const select = state => ({

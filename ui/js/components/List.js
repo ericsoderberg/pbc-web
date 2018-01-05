@@ -76,11 +76,14 @@ class List extends Component {
   }
 
   _load() {
-    const { adminable, category, dispatch, populate, select, sort } = this.props;
+    const {
+      adminable, category, dispatch, populate, select, sort,
+    } = this.props;
     const { filter, searchText } = this.state;
     this.setState({ loading: true }, () =>
-      dispatch(loadCategory(category,
-        { sort, filter, search: searchText, select, populate, adminable })));
+      dispatch(loadCategory(category, {
+        sort, filter, search: searchText, select, populate, adminable,
+      })));
   }
 
   _setLocation(options) {
@@ -201,7 +204,9 @@ class List extends Component {
       sort, session, filters, search, homer,
     } = this.props;
     let { actions } = this.props;
-    const { searchText, filter, filterNames, loading, loadingMore } = this.state;
+    const {
+      searchText, filter, filterNames, loading, loadingMore,
+    } = this.state;
 
     const admin = (session &&
       (session.userId.administrator || session.userId.domainIds.length > 0));
@@ -225,32 +230,34 @@ class List extends Component {
     });
 
     if (markerIndex !== -1) {
-      contents.splice(markerIndex, 0, (
-        <li key="marker">
-          <div className="list__marker">
-            {marker.label}
-          </div>
-        </li>
-      ));
+      contents.splice(
+        markerIndex, 0, (
+          <li key="marker">
+            <div className="list__marker">
+              {marker.label}
+            </div>
+          </li>
+        ),
+      );
     }
 
     const filterItems = [];
-    if (filters && admin) {
+    if (filters) {
       filters.forEach((aFilter) => {
         let value = (filter || {})[aFilter.property] || '';
         if (aFilter.options) {
-          filterItems.push(
+          filterItems.push((
             <Filter key={aFilter.property}
               options={aFilter.options}
               allLabel={aFilter.allLabel}
               value={value}
-              onChange={this._filter(aFilter.property)} />,
-          );
+              onChange={this._filter(aFilter.property)} />
+          ));
         } else {
           if (value) {
             value = filterNames[value] || value;
           }
-          filterItems.push(
+          filterItems.push((
             <SelectSearch key={aFilter.property}
               category={aFilter.category}
               options={{ select: (aFilter.select || 'name'), sort: 'name' }}
@@ -258,8 +265,8 @@ class List extends Component {
               placeholder={aFilter.allLabel}
               Suggestion={aFilter.Suggestion}
               value={value}
-              onChange={this._select(aFilter.property)} />,
-          );
+              onChange={this._select(aFilter.property)} />
+          ));
         }
       });
     }

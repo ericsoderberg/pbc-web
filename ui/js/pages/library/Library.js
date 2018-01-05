@@ -72,7 +72,9 @@ class Library extends Component {
   }
 
   render() {
-    const { history, library, location, notFound, pages, session } = this.props;
+    const {
+      history, library, location, notFound, pages, session,
+    } = this.props;
 
     let result;
     if (library) {
@@ -83,11 +85,11 @@ class Library extends Component {
       ));
       if (session && (session.userId.administrator ||
         session.userId.domainIds.some(id => id === library.domainId))) {
-        controls.push(
+        controls.push((
           <Link key="edit" to={`/libraries/${library._id}/edit`}>
             Edit
-          </Link>,
-        );
+          </Link>
+        ));
       }
 
       const filters = [

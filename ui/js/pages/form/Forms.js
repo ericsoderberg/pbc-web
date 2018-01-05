@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import moment from 'moment-timezone';
 import List from '../../components/List';
 
@@ -46,11 +47,23 @@ Item.defaultProps = {
 };
 
 const Forms = (props) => {
-  const { history, location } = props;
+  const { history, location, session } = props;
   const populate = [
     { path: 'formTemplateId', select: 'name' },
     { path: 'userId', select: 'name' },
   ];
+
+  let filters;
+  if (session &&
+    (session.userId.administrator || session.userId.domainIds.length > 0)) {
+    filters = [{
+      property: 'formTemplateId',
+      category: 'form-templates',
+      allLabel: 'All templates',
+    }, {
+      property: 'userId', category: 'users', allLabel: 'Anyone',
+    }];
+  }
 
   return (
     <List history={history}
@@ -58,13 +71,7 @@ const Forms = (props) => {
       category="forms"
       title="Forms"
       path="/forms"
-      filters={[{
-        property: 'formTemplateId',
-        category: 'form-templates',
-        allLabel: 'All templates',
-      }, {
-        property: 'userId', category: 'users', allLabel: 'Anyone',
-      }]}
+      filters={filters}
       sort="-modified"
       populate={populate}
       addIfFilter="formTemplateId"
@@ -75,6 +82,20 @@ const Forms = (props) => {
 Forms.propTypes = {
   history: PropTypes.any.isRequired,
   location: PropTypes.object.isRequired,
+  session: PropTypes.shape({
+    userId: PropTypes.shape({
+      administrator: PropTypes.bool,
+      domainIds: PropTypes.arrayOf(PropTypes.string),
+    }),
+  }),
 };
 
-export default Forms;
+Forms.defaultProps = {
+  session: undefined,
+};
+
+const select = state => ({
+  session: state.session,
+});
+
+export default connect(select)(Forms);
