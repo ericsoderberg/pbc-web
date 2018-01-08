@@ -537,8 +537,8 @@ const emailListSchema = Schema({
     required: true,
     unique: true,
     validate: {
-      validator: v => (!v || /^[a-z0-9-]+$/.test(v)),
-      message: 'a-z, 0-9, or -',
+      validator: v => (!v || /^[a-z0-9-_]+$/.test(v)),
+      message: 'a-z, 0-9, -, or _',
     },
   },
   path: PATH_TYPE,
