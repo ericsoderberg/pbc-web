@@ -389,6 +389,8 @@ const formSchema = Schema({
   paymentIds: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
   version: Number,
+}, {
+  usePushEach: true,
 });
 
 mongoose.model('Form', formSchema);
@@ -543,6 +545,8 @@ const emailListSchema = Schema({
   public: Boolean,
   text: String,
   userId: { type: Schema.Types.ObjectId, ref: 'User' },
+}, {
+  usePushEach: true,
 });
 
 mongoose.model('EmailList', emailListSchema);
