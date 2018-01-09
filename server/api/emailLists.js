@@ -46,7 +46,7 @@ const updateList = (listName, moderateSenders) => (
   new Promise((resolve, reject) => {
     execFile(
       'withlist',
-      ['-r', 'set_mod', (moderateSenders ? '-s' : '-u'), '-a'],
+      ['-r', 'set_mod', listName, (moderateSenders ? '-s' : '-u'), '-a'],
       (error, stdout, stderr) => {
         if (error) {
           console.error('!!! set moderation error', error, stderr);
