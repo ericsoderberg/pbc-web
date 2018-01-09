@@ -157,7 +157,7 @@ class FormSection extends Component {
       if (!formTemplate) {
         dispatch(loadItem(
           'form-templates', formTemplateId,
-          { full: true, forSession: true, new: true },
+          { full: true, forSession: true, new: true, preFill: true },
         ));
       } else {
         this._resetState(props);

@@ -207,6 +207,10 @@ export const loadItem = (category, id, options = {}) =>
       // includes a new form
       params.push(`new=${encodeURIComponent(options.new)}`);
     }
+    if (options.preFill) {
+      // when adding a new form, are we adding it as an administrator
+      params.push(`preFill=${encodeURIComponent(options.preFill)}`);
+    }
     if (options.linkedFormId) {
       params.push(`linkedFormId=${encodeURIComponent(options.linkedFormId)}`);
     }

@@ -48,10 +48,10 @@ class FormAdd extends Component {
 
   _load(props) {
     const {
-      dispatch, form, formTemplate, formTemplateId, linkedForm,
+      dispatch, form, formTemplate, formTemplateId, inline, linkedForm,
     } = props;
     if (!formTemplate) {
-      const options = { new: true };
+      const options = { new: true, preFill: inline };
       if (linkedForm) {
         options.linkedFormId = linkedForm._id;
       }

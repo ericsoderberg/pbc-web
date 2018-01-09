@@ -45,7 +45,7 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
   return value;
 };
 
-const fieldContents = (field, templateField, optionMap, value=false) => {
+const fieldContents = (field, templateField, optionMap, value = false) => {
   let contents = field.value;
   if (templateField.type === 'count' || templateField.type === 'number') {
     // let prefix = '';
@@ -64,9 +64,8 @@ const fieldContents = (field, templateField, optionMap, value=false) => {
     });
     if (value) {
       return `$${contents.reduce((t, v) => (t + parseFloat(v, 10)), 0)}`;
-    } else {
-      return contents.join(', ');
     }
+    return contents.join(', ');
   } else if (templateField.type === 'date') {
     const date = moment(contents);
     if (date.isValid()) {
@@ -78,16 +77,16 @@ const fieldContents = (field, templateField, optionMap, value=false) => {
   return contents;
 };
 
-export const addNewForm = (data, session, linkedFormId) => {
+export const addNewForm = (data, session, options = {}) => {
   const formTemplate = data.toObject ? data.toObject() : data;
   const form = {
     fields: [],
     formTemplateId: formTemplate._id,
-    linkedFormId,
+    linkedFormId: options.linkedFormId,
   };
   formTemplate.sections.forEach((section) => {
     section.fields.forEach((field) => {
-      if (session && field.linkToUserProperty) {
+      if (session && options.preFill && field.linkToUserProperty) {
         // pre-fill out fields from session user
         form.fields.push({
           templateFieldId: field._id,
@@ -405,8 +404,8 @@ export default function (router, transporter) {
             // look for linked fields
             Object.keys(linkedTemplateFieldIdMap).forEach((templateFieldId) => {
               linkedForm.fields.some((linkedField) => {
-                if (linkedField.templateFieldId.equals(
-                  linkedTemplateFieldIdMap[templateFieldId])) {
+                if (linkedField.templateFieldId
+                  .equals(linkedTemplateFieldIdMap[templateFieldId])) {
                   const templateField =
                     templateFieldMap[linkedField.templateFieldId];
                   if (templateField) {
@@ -523,7 +522,10 @@ export default function (router, transporter) {
         if (req.query.new) {
           // reset modified time to now to avoid caching issues with sessions
           formTemplate.modified = moment.utc();
-          formTemplate = addNewForm(formTemplate, session, req.query.linkedFormId);
+          formTemplate = addNewForm(formTemplate, session, {
+            preFill: req.query.preFill,
+            linkedFormId: req.query.linkedFormId,
+          });
         }
         const admin = (session && (session.userId.administrator ||
           (session.userId.domainIds &&
