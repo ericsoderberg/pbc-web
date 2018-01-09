@@ -11,6 +11,13 @@ import { searchToObject } from '../../utils/Params';
 import FormContents from './FormContents';
 import { setFormError, clearFormError, finalizeForm } from './FormUtils';
 
+const MESSAGE = {
+  Register: 'Registered',
+  'Sign Up': 'Signed up',
+  Submit: 'Submitted',
+  Subscribe: 'Subscribed',
+};
+
 class FormAdd extends Component {
 
   constructor(props) {
@@ -68,7 +75,7 @@ class FormAdd extends Component {
     const {
       dispatch, formTemplate, history, linkedForm, onDone, onSignIn,
     } = this.props;
-    const { form } = this.state;
+    const { form, kiosk } = this.state;
     const error = setFormError(formTemplate, form);
 
     if (error) {
@@ -85,7 +92,15 @@ class FormAdd extends Component {
           }
           return response.form;
         })
-        .then(formSaved => (onDone ? onDone(formSaved) : history.goBack()))
+        .then((formSaved) => {
+          if (kiosk) {
+            this.setState({ submitted: true });
+          } else if (onDone) {
+            onDone(formSaved);
+          } else {
+            history.goBack();
+          }
+        })
         .catch((error2) => {
           if (error2.code === 'userExists' && onSignIn) {
             // The form had an email address tied to the session but
@@ -112,35 +127,81 @@ class FormAdd extends Component {
       className, onCancel, formTemplate, formTemplateId, full, history, inline,
       linkedForm, linkedFormTemplate, onLinkedForm, signInControl,
     } = this.props;
-    const { error, form, showSignIn } = this.state;
+    const {
+      error, form, kiosk, showSignIn, submitted,
+    } = this.state;
     const classNames = ['form'];
+    if (kiosk) {
+      classNames.push('form--kiosk');
+    }
     if (className) {
       classNames.push(className);
     }
 
     let result;
-    if (formTemplate && form) {
+    if (kiosk && submitted) {
+      result = (
+        <div className="form form--kiosk">
+          <PageHeader title={formTemplate.name} />
+          <div className="form__text">
+            <h2>{MESSAGE[formTemplate.submitLabel] || MESSAGE.Submit}!</h2>
+            {formTemplate.postSubmitMessage}
+          </div>
+          <footer className="form__footer">
+            <button type="button"
+              className="button"
+              onClick={() => {
+                this.setState({
+                  form: formTemplate.newForm,
+                  submitted: false,
+                });
+              }}>
+              Done
+            </button>
+          </footer>
+        </div>
+      );
+    } else if (formTemplate && form) {
       let cancelControl;
-      let headerCancelControl;
-      if (onCancel || (formTemplateId && !inline)) {
-        const cancelFunc = onCancel || (() => history.goBack());
-        cancelControl = (
-          <Button secondary={true} label="Cancel" onClick={cancelFunc} />
-        );
-        headerCancelControl = [
-          <button key="cancel"
+      const actions = [];
+      if (kiosk) {
+        actions.push((
+          <button key="close"
             type="button"
             className="button"
-            onClick={cancelFunc}>
-            Cancel
-          </button>,
-        ];
+            onClick={() => history.goBack()}>
+            Close
+          </button>
+        ));
+      } else {
+        actions.push((
+          <button key="kiosk"
+            type="button"
+            className="button"
+            onClick={() => this.setState({ kiosk: true })}>
+            Kiosk
+          </button>
+        ));
+        if (onCancel || (formTemplateId && !inline)) {
+          const cancelFunc = onCancel || (() => history.goBack());
+          cancelControl = (
+            <Button secondary={true} label="Cancel" onClick={cancelFunc} />
+          );
+          actions.push((
+            <button key="cancel"
+              type="button"
+              className="button"
+              onClick={cancelFunc}>
+              Cancel
+            </button>
+          ));
+        }
       }
 
       let header;
       if (!inline) {
         header = (
-          <PageHeader title={formTemplate.name} actions={headerCancelControl} />
+          <PageHeader title={formTemplate.name} actions={actions} />
         );
       }
 
@@ -181,6 +242,7 @@ class FormAdd extends Component {
             linkedForm={linkedForm}
             linkedFormControl={linkedFormControl}
             full={full}
+            kiosk={kiosk}
             onChange={this._onChange}
             error={error} />
           <footer className="form__footer">

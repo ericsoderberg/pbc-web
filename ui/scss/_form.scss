@@ -64,6 +64,14 @@
   // }
 }
 
+.form--kiosk {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
 .form__contents {
   padding: 0 $unit;
 

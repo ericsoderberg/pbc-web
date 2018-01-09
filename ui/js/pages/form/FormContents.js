@@ -91,7 +91,7 @@ class FormContents extends Component {
 
   render() {
     const {
-      form, formTemplate, full, error, linkedForm, linkedFormControl, session,
+      form, formTemplate, full, error, kiosk, linkedForm, linkedFormControl, session,
     } = this.props;
     const { administrator, fields, options } = this.state;
 
@@ -118,7 +118,7 @@ class FormContents extends Component {
       ));
 
     let admin;
-    if (full && administrator) {
+    if (full && administrator && !kiosk) {
       let added;
       if (form.created) {
         added = (
@@ -220,6 +220,7 @@ FormContents.propTypes = {
     sections: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
   full: PropTypes.bool.isRequired,
+  kiosk: PropTypes.bool,
   linkedForm: PropTypes.object,
   linkedFormControl: PropTypes.element,
   onChange: PropTypes.func.isRequired,
@@ -234,6 +235,7 @@ FormContents.propTypes = {
 
 FormContents.defaultProps = {
   error: undefined,
+  kiosk: false,
   linkedForm: undefined,
   linkedFormControl: undefined,
   session: undefined,
