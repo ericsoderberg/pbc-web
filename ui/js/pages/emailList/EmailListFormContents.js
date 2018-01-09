@@ -42,6 +42,14 @@ const EmailListFormContents = (props) => {
             onChange={formState.toggle('public')} />
           <label htmlFor="public">Allow self subscription</label>
         </FormField>
+        <FormField>
+          <input id="membersCanSend"
+            name="public"
+            type="checkbox"
+            checked={emailList.membersCanSend !== false}
+            onChange={formState.toggle('membersCanSend')} />
+          <label htmlFor="membersCanSend">Members can send</label>
+        </FormField>
         <DomainIdField formState={formState} session={session} />
       </fieldset>
     </div>

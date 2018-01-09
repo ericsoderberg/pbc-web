@@ -531,6 +531,7 @@ const emailListSchema = Schema({
   }],
   created: Date,
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
+  membersCanSend: { type: Boolean, default: true },
   modified: Date,
   name: {
     type: String,

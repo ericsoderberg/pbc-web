@@ -42,6 +42,22 @@ const removeList = name => (
   })
 );
 
+const updateList = (listName, moderateSenders) => (
+  new Promise((resolve, reject) => {
+    execFile(
+      'withlist',
+      ['-r', 'set_mod', (moderateSenders ? '-s' : '-u'), '-a'],
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error('!!! set moderation error', error, stderr);
+          return reject(error);
+        }
+        return resolve();
+      },
+    );
+  })
+);
+
 const addAddresses = (listName, addresses) => (
   new Promise((resolve, reject) => {
     const cmd = spawn('add_members', ['-r', '-', listName]);
@@ -233,6 +249,10 @@ export default function (router) {
     put: {
       authorization: requireSomeAdministrator,
       transformIn: prepareEmailList,
+      transformOut: emailList => (
+        updateList(emailList.name, emailList.membersCanSend === false)
+          .then(() => emailList)
+      ),
     },
     delete: {
       authorization: requireSomeAdministrator,
