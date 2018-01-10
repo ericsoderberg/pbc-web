@@ -80,8 +80,10 @@ export default function (router, transporter) {
       .catch((error) => {
         console.error('!!!', error);
         error = error.toJSON();
-        delete error.op.encryptedPassword;
-        if (error.errmsg.match(/^E11000/)) {
+        if (error.op) {
+          delete error.op.encryptedPassword;
+        }
+        if (error.errmsg && error.errmsg.match(/^E11000/)) {
           error.errmsg = 'An account with that email address already exists.';
         }
         return res.status(400).json(error);

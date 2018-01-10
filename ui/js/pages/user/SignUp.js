@@ -58,14 +58,23 @@ export default class SignUp extends Component {
   _onSignUp(event) {
     const { history, inline } = this.props;
     event.preventDefault();
-    postSignUp(this.state.formState.object)
-      .then(() => {
-        if (!inline) {
-          history.push('/');
-        }
-      })
-      .catch(error => this.setState(this._errorToState(error)))
-      .catch(error => console.error('!!! SignUp catch', error));
+    const { formState: { object } } = this.state;
+    if (!object.email || !object.name || !object.password) {
+      const errors = {};
+      if (!object.email) errors.email = 'required';
+      if (!object.name) errors.name = 'required';
+      if (!object.password) errors.password = 'required';
+      this.setState({ errors });
+    } else {
+      postSignUp(this.state.formState.object)
+        .then(() => {
+          if (!inline) {
+            history.push('/');
+          }
+        })
+        .catch(error => this.setState(this._errorToState(error)))
+        .catch(error => console.error('!!! SignUp catch', error));
+    }
   }
 
   _setUser(user) {

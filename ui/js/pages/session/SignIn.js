@@ -19,7 +19,10 @@ class SignIn extends Component {
     this._onSignIn = this._onSignIn.bind(this);
     this._setSession = this._setSession.bind(this);
     const session = { email: props.email, password: '' };
-    this.state = { formState: new FormState(session, this._setSession) };
+    this.state = {
+      formState: new FormState(session, this._setSession),
+      errors: {},
+    };
   }
 
   componentDidMount() {
@@ -42,14 +45,22 @@ class SignIn extends Component {
   _onSignIn(event) {
     const { dispatch, history, inline } = this.props;
     event.preventDefault();
-    postSession(this.state.formState.object)
-      .then((session) => {
-        dispatch(setSession(session));
-        if (!inline) {
-          history.push('/');
-        }
-      })
-      .catch(error => this.setState({ error }));
+    const { formState: { object } } = this.state;
+    if (!object.email || !object.password) {
+      const errors = {};
+      if (!object.email) errors.email = 'required';
+      if (!object.password) errors.password = 'required';
+      this.setState({ errors });
+    } else {
+      postSession(object)
+        .then((session) => {
+          dispatch(setSession(session));
+          if (!inline) {
+            history.push('/');
+          }
+        })
+        .catch(error => this.setState({ error }));
+    }
   }
 
   _setSession(session) {
@@ -57,8 +68,10 @@ class SignIn extends Component {
   }
 
   render() {
-    const { inline, onCancel, onSignUp, onVerifyEmail } = this.props;
-    const { formState, error } = this.state;
+    const {
+      inline, onCancel, onSignUp, onVerifyEmail,
+    } = this.props;
+    const { formState, error, errors } = this.state;
     const session = formState.object;
     const classNames = ['form__container'];
     if (inline) {
@@ -115,14 +128,14 @@ class SignIn extends Component {
           <FormError message={error} />
           <div className="form__contents">
             <fieldset className="form__fields">
-              <FormField name="email" label="Email">
+              <FormField name="email" label="Email" error={errors.email}>
                 <input ref={(ref) => { this._emailRef = ref; }}
                   name="email"
                   type="email"
                   value={session.email || ''}
                   onChange={formState.change('email')} />
               </FormField>
-              <FormField name="password" label="Password">
+              <FormField name="password" label="Password" error={errors.password}>
                 <input ref={(ref) => { this._passwordRef = ref; }}
                   name="password"
                   type="password"
