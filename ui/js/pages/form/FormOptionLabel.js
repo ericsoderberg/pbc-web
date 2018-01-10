@@ -28,7 +28,9 @@ export default class FormOptionLabel extends Component {
   }
 
   render() {
-    const { htmlFor, option, formTemplateField, remaining, selected } = this.props;
+    const {
+      htmlFor, option, formTemplateField, remaining, selected,
+    } = this.props;
     const { helpActive } = this.state;
 
     const labels = [<span key="name">{option.name}</span>];
@@ -39,16 +41,16 @@ export default class FormOptionLabel extends Component {
       } else {
         classNames.push('tertiary');
       }
-      labels.push(
+      labels.push((
         <span key="amount" className={classNames.join(' ')}>
           $ {option.value}
-        </span>,
-      );
+        </span>
+      ));
     }
 
     let help = option.help || '';
     if (remaining !== undefined) {
-      help += `${Math.max(0, remaining)} remaining`;
+      help += `${help ? ', ' : ''}${Math.max(0, remaining)} remaining`;
     }
 
     if (help) {
