@@ -538,7 +538,7 @@ export default function (router, transporter) {
             .then(data => addFormTemplateTotals(data))
             .then(data => addLinkedFormTemplate(data, forSession));
         }
-        if (req.query.totals && admin) {
+        if (req.query.totals) {
           // reset modified time to now to avoid caching issues when deleting forms
           formTemplate.modified = moment.utc();
           return addFormTemplateTotals(formTemplate);
