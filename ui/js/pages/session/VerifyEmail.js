@@ -150,7 +150,7 @@ class VerifyEmail extends Component {
           })
           .catch((error) => {
             console.error('!!! Reset catch', error);
-            this.setState({ state: 'prompt', errorMessage: error });
+            this.setState({ state: 'prompt', errorMessage: error.error });
           });
       } else {
         this._emailRef.focus();

@@ -58,7 +58,7 @@ export default function (router) {
       })
       .then(user => createSession(user))
       .then(session => res.status(200).json(session))
-      .catch(() => res.status(400).json({}));
+      .catch(() => res.status(400).json({ error: 'Unable to verify token.' }));
   });
 
   router.delete('/sessions/:id', (req, res) => {
