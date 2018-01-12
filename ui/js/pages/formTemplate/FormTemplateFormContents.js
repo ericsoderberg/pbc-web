@@ -189,6 +189,7 @@ class FormTemplateFormContents extends Component {
       let edit;
       if (!header || expandedSections[section._id] ||
         expandedSections[section.id]) {
+        sectionClassName += ' form-section--active';
         edit = (
           <FormTemplateSectionEdit section={section}
             formTemplate={formTemplate}
@@ -210,19 +211,21 @@ class FormTemplateFormContents extends Component {
       <button key="control"
         type="button"
         className="form__more-control button button-plain"
-        onClick={() => this.setState({ detailsActive: !detailsActive })}>Details</button>,
+        onClick={() => this.setState({ detailsActive: !detailsActive })}>
+        Details
+      </button>,
     ];
     if (detailsActive) {
-      details.push(
+      details.push((
         <FormField key="submit"
           label="Submit button label"
           error={errors.submitLabel}>
           <input name="submitLabel"
             value={formTemplate.submitLabel || 'Submit'}
             onChange={formState.change('submitLabel')} />
-        </FormField>,
-      );
-      details.push(
+        </FormField>
+      ));
+      details.push((
         <FormField key="message"
           label="Post submit message"
           help={<TextHelp />}
@@ -231,9 +234,9 @@ class FormTemplateFormContents extends Component {
             rows={2}
             value={formTemplate.postSubmitMessage || ''}
             onChange={formState.change('postSubmitMessage')} />
-        </FormField>,
-      );
-      details.push(
+        </FormField>
+      ));
+      details.push((
         <FormField key="another"
           label="Another button label"
           help="if multiple are expected per user"
@@ -241,9 +244,9 @@ class FormTemplateFormContents extends Component {
           <input name="anotherLabel"
             value={formTemplate.anotherLabel || ''}
             onChange={formState.change('anotherLabel')} />
-        </FormField>,
-      );
-      details.push(
+        </FormField>
+      ));
+      details.push((
         <FormField key="ack"
           error={errors.acknowledge}
           help={`After a form is submitted, the submitter will be sent a
@@ -254,10 +257,10 @@ class FormTemplateFormContents extends Component {
             checked={formTemplate.acknowledge || false}
             onChange={formState.toggle('acknowledge')} />
           <label htmlFor="acknowledge">acknowledge via email</label>
-        </FormField>,
-      );
+        </FormField>
+      ));
       if (formTemplate.acknowledge) {
-        details.push(
+        details.push((
           <FormField key="ackMessage"
             label="Acknowledgement message"
             help={<TextHelp />}
@@ -265,10 +268,10 @@ class FormTemplateFormContents extends Component {
             <textarea name="acknowledgeMessage"
               value={formTemplate.acknowledgeMessage || ''}
               onChange={formState.change('acknowledgeMessage')} />
-          </FormField>,
-        );
+          </FormField>
+        ));
       }
-      details.push(
+      details.push((
         <FormField key="auth" error={errors.authenticate}>
           <input id="authenticate"
             name="authenticate"
@@ -276,9 +279,9 @@ class FormTemplateFormContents extends Component {
             checked={formTemplate.authenticate || false}
             onChange={formState.toggle('authenticate')} />
           <label htmlFor="authenticate">authenticate</label>
-        </FormField>,
-      );
-      details.push(
+        </FormField>
+      ));
+      details.push((
         <FormField key="pay" error={errors.payable}>
           <input id="payable"
             name="payable"
@@ -286,11 +289,11 @@ class FormTemplateFormContents extends Component {
             checked={formTemplate.payable || false}
             onChange={formState.toggle('payable')} />
           <label htmlFor="payable">accept payment</label>
-        </FormField>,
-      );
+        </FormField>
+      ));
 
       if (formTemplate.payable) {
-        details.push(
+        details.push((
           <FormField key="check"
             label="Check instructions"
             help="Leave blank to not allow checks"
@@ -298,12 +301,12 @@ class FormTemplateFormContents extends Component {
             <textarea name="payByCheckInstructions"
               value={formTemplate.payByCheckInstructions || ''}
               onChange={formState.change('payByCheckInstructions')} />
-          </FormField>,
-        );
+          </FormField>
+        ));
       }
 
       if (formTemplate.authenticate) {
-        details.push(
+        details.push((
           <FormField key="linkedTo"
             label="Linked to"
             help={`Another form that must be filled out first.
@@ -314,15 +317,15 @@ class FormTemplateFormContents extends Component {
               options={{ filter: { authenticate: true } }}
               value={(formTemplate.linkedFormTemplateId || {}).name || ''}
               onChange={this._changeLinkedFormTemplateId} />
-          </FormField>,
-        );
+          </FormField>
+        ));
       }
 
       const options2 = emailLists.map(emailList => (
         <option key={emailList._id} label={emailList.name} value={emailList._id} />
       ));
       options2.unshift(<option key={0} />);
-      details.push(
+      details.push((
         <FormField key="emailList"
           label="Email list"
           help={`Email addresses will be added and removed from this email list
@@ -334,10 +337,10 @@ class FormTemplateFormContents extends Component {
             onChange={formState.change('emailListId')}>
             {options2}
           </select>
-        </FormField>,
-      );
+        </FormField>
+      ));
 
-      details.push(
+      details.push((
         <FormField key="notify"
           label="Notify email addresses"
           help={`Whom to notify when people submit filled out forms.
@@ -346,11 +349,11 @@ class FormTemplateFormContents extends Component {
           <input name="notify"
             value={formTemplate.notify || ''}
             onChange={formState.change('notify')} />
-        </FormField>,
-      );
-      details.push(
-        <DomainIdField key="domain"formState={formState} session={session} />,
-      );
+        </FormField>
+      ));
+      details.push((
+        <DomainIdField key="domain"formState={formState} session={session} />
+      ));
     }
 
     return (

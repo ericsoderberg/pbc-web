@@ -133,6 +133,14 @@
   }
 }
 
+.form-section--active {
+  margin-left: -$unit;
+  margin-right: -$unit;
+  padding-left: $unit;
+  padding-right: $unit;
+  background-color: #fff8e8;
+}
+
 .form-section__item-button {
   display: flex;
   flex-direction: row;

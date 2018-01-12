@@ -84,7 +84,8 @@ export default class FormTemplateSectionEdit extends Component {
             </select>
           </FormField>,
           <FormField key="administrative">
-            <input name="administrative"
+            <input id="administrative"
+              name="administrative"
               type="checkbox"
               checked={section.administrative || false}
               onChange={formState.toggle('administrative')} />
@@ -94,7 +95,9 @@ export default class FormTemplateSectionEdit extends Component {
       } else {
         details = (
           <button className="form__more-control button button-plain"
-            onClick={() => this.setState({ detailsActive: true })}>details</button>
+            onClick={() => this.setState({ detailsActive: true })}>
+            details
+          </button>
         );
       }
 
