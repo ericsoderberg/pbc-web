@@ -23,7 +23,7 @@ class PaymentAdd extends Component {
   componentWillUnmount() {
     const { dispatch, formId } = this.props;
     if (formId) {
-      dispatch(unloadItem(formId));
+      dispatch(unloadItem('forms', formId));
     }
   }
 

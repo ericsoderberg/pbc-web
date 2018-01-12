@@ -38,7 +38,7 @@ class FormEdit extends Component {
       dispatch, form, formTemplate, formTemplateNotFound, id,
       linkedForm, linkedFormNotFound, linkedFormTemplate,
     } = nextProps;
-    if (id && id !== this.props.id && !form) {
+    if (id && (id !== this.props.id || this.state.form) && !form) {
       this.setState({ form: undefined });
       this._load(nextProps);
     } else if (form && (!this.state.form || form._id !== this.props.form._id)) {
