@@ -26,9 +26,6 @@ const fieldValue = (field, templateFieldMap, optionMap) => {
   } else if (templateField.type === 'choice' && field.optionId) {
     const option = optionMap[field.optionId] || {}; // in case removed
     value = option.value || option.name || '';
-    if (templateField.monetary) {
-      value = `$${parseFloat(value, 10)}`;
-    }
   } else if (templateField.type === 'choices' && field.optionIds.length > 0) {
     value = field.optionIds.map((optionId) => {
       const option = optionMap[optionId] || {}; // in case removed
