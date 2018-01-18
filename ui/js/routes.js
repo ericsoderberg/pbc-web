@@ -12,6 +12,7 @@ import EmailLists from './pages/emailList/EmailLists';
 import EmailListAdd from './pages/emailList/EmailListAdd';
 import EmailList from './pages/emailList/EmailList';
 import EmailListEdit from './pages/emailList/EmailListEdit';
+import EmailListModerate from './pages/emailList/EmailListModerate';
 import EmailListSubscribe from './pages/emailList/EmailListSubscribe';
 import EmailListUnsubscribe from './pages/emailList/EmailListUnsubscribe';
 import Events from './pages/event/Events';
@@ -121,6 +122,7 @@ export default [
   { path: '/email-lists/add', component: EmailListAdd, private: true },
   { path: '/email-lists/:id', component: EmailList, exact: true, private: true },
   { path: '/email-lists/:id/edit', component: EmailListEdit, private: true },
+  { path: '/email-lists/:id/moderate', component: EmailListModerate },
   { path: '/email-lists/:name/subscribe', component: EmailListSubscribe },
   { path: '/email-lists/:name/unsubscribe', component: EmailListUnsubscribe },
 

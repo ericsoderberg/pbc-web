@@ -96,6 +96,13 @@ class EmailList extends Component {
       const actions = [];
       if (session && (session.userId.administrator ||
         session.userId.domainIds.some(id => id === emailList.domainId))) {
+        if (emailList.heldMessages.length > 0) {
+          actions.push((
+            <Link key="moderate" to={`/email-lists/${emailList._id}/moderate`}>
+              Moderate
+            </Link>
+          ));
+        }
         actions.push(
           <Link key="add" to={`/email-lists/${emailList.name}/subscribe`}>
             Subscribe

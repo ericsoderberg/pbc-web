@@ -148,6 +148,30 @@ const getHeldMessages = listName => (
   })
 );
 
+const acceptMessage = (name, messageId) => (
+  new Promise((resolve, reject) => {
+    execFile('held', ['--accept', `heldmsg-${name}-${messageId}.pck`], (error, stdout, stderr) => {
+      if (error) {
+        console.error('!!! accept error', error, stderr);
+        return reject(error);
+      }
+      return resolve();
+    });
+  })
+);
+
+const discardMessage = (name, messageId) => (
+  new Promise((resolve, reject) => {
+    execFile('held', ['--discard', `heldmsg-${name}-${messageId}.pck`], (error, stdout, stderr) => {
+      if (error) {
+        console.error('!!! discard error', error, stderr);
+        return reject(error);
+      }
+      return resolve();
+    });
+  })
+);
+
 const prepareEmailList = (data) => {
   data = unsetDomainIfNeeded(data);
   if (!data.path) {
@@ -344,6 +368,28 @@ export default function (router) {
       .then(() => {
         const { params: { id } } = req;
         return unsubscribe(id, req.body);
+      })
+      .then(() => res.status(200).send())
+      .catch(error => catcher(error, res));
+  });
+
+  router.put('/email-lists/:name/:messageId', (req, res) => {
+    getSession(req)
+      .then(requireSomeAdministrator)
+      .then(() => {
+        const { params: { name, messageId } } = req;
+        return acceptMessage(name, messageId);
+      })
+      .then(() => res.status(200).send())
+      .catch(error => catcher(error, res));
+  });
+
+  router.delete('/email-lists/:name/:messageId', (req, res) => {
+    getSession(req)
+      .then(requireSomeAdministrator)
+      .then(() => {
+        const { params: { name, messageId } } = req;
+        return discardMessage(name, messageId);
       })
       .then(() => res.status(200).send())
       .catch(error => catcher(error, res));

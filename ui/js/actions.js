@@ -489,6 +489,16 @@ export function getEmailListDownload(emailList) {
     });
 }
 
+export function putMessage(url) {
+  return fetch(url, { method: 'PUT', headers: _headers })
+    .then(processStatus);
+}
+
+export function deleteMessage(url) {
+  return fetch(url, { method: 'DELETE', headers: _headers })
+    .then(processStatus);
+}
+
 // Search
 
 export const loadSearch = searchText =>
