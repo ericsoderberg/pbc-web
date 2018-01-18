@@ -100,6 +100,54 @@ const checkAddresses = listName => (
   })
 );
 
+const getModerators = listName => (
+  new Promise((resolve) => {
+    execFile('list_owners', ['-m', listName], (error, stdout, stderr) => {
+      if (error) {
+        console.error('!!! get moderators error', error, stderr);
+        return resolve([]);
+      }
+      return resolve(stdout.split('\n').filter(a => a));
+    });
+  })
+);
+
+const getHeldMessages = listName => (
+  new Promise((resolve) => {
+    execFile('list_requests', [`--list=${listName}`, '--verbose'], (error, stdout, stderr) => {
+      if (error) {
+        console.error('!!! get held error', error, stderr);
+        return resolve([]);
+      }
+      const heldMessages = [];
+      let message;
+      stdout.split('\n').forEach((line) => {
+        let match = line.match(/^From: (\S+) on (.+)$/);
+        if (match) {
+          message = { from: match[1], date: match[2] };
+          return;
+        }
+        match = line.match(/^Subject: (.+)$/);
+        if (match) {
+          message.subject = match[1];
+          return;
+        }
+        match = line.match(/^Cause: (.+)$/);
+        if (match) {
+          message.cause = match[1];
+          return;
+        }
+        if (message) {
+          message.uri = `/api/email-lists/${listName}/${line.trim()}`;
+          heldMessages.push(message);
+          message = undefined;
+        }
+      });
+      return resolve(heldMessages);
+    });
+  })
+);
+
 const prepareEmailList = (data) => {
   data = unsetDomainIfNeeded(data);
   if (!data.path) {
@@ -148,6 +196,22 @@ const populateEmailList = (emailList) => {
             state: (disabledAddresses.indexOf(address.address) === -1 ?
               'ok' : 'disabled'),
           }));
+          return emailListPopulated;
+        })
+    ))
+    .then(emailListPopulated => (
+      // get moderators
+      getModerators(emailListPopulated.name)
+        .then((moderators) => {
+          emailListPopulated.moderators = moderators;
+          return emailListPopulated;
+        })
+    ))
+    .then(emailListPopulated => (
+      // get moderators
+      getHeldMessages(emailListPopulated.name)
+        .then((heldMessages) => {
+          emailListPopulated.heldMessages = heldMessages;
           return emailListPopulated;
         })
     ));
