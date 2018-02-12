@@ -19,34 +19,34 @@ export default class PeopleSection extends Component {
       const user = person.id;
       return { person, user };
     })
-    .filter(context => typeof context.user === 'object')
-    .map((context) => {
-      const { person, user } = context;
-      let image;
-      if (person.image || user.image) {
-        image = (
-          <Image className="person-summary__image"
-            plain={true}
-            image={person.image || user.image} />
-        );
-      } else {
-        image = <UserIcon className="person-summary__image" />;
-      }
+      .filter(context => typeof context.user === 'object')
+      .map((context) => {
+        const { person, user } = context;
+        let image;
+        if ((person && person.image) || (user && user.image)) {
+          image = (
+            <Image className="person-summary__image"
+              plain={true}
+              image={(person && person.image) || (user && user.image)} />
+          );
+        } else {
+          image = <UserIcon className="person-summary__image" />;
+        }
 
-      return (
-        <Link key={user._id}
-          to={`/users/${user._id}`}
-          className="person-summary">
-          {image}
-          <div className="person-summary__summary">
-            <h2>{user.name}</h2>
-            <Markdown>
-              {person.text || ''}
-            </Markdown>
-          </div>
-        </Link>
-      );
-    });
+        return (
+          <Link key={user._id}
+            to={`/users/${user._id}`}
+            className="person-summary">
+            {image}
+            <div className="person-summary__summary">
+              <h2>{user.name}</h2>
+              <Markdown>
+                {person.text || ''}
+              </Markdown>
+            </div>
+          </Link>
+        );
+      });
 
     return (
       <div className={classes.join(' ')}>

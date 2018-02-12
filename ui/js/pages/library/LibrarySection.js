@@ -10,14 +10,6 @@ import MessageItem from '../message/MessageItem';
 
 class LibrarySection extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      library: (typeof props.id === 'string' ? props.id : {}),
-      message: props.message,
-    };
-  }
-
   componentDidMount() {
     this._load(this.props);
   }
@@ -36,7 +28,9 @@ class LibrarySection extends Component {
   }
 
   _load(props) {
-    const { dispatch, id, library, message } = props;
+    const {
+      dispatch, id, library, message,
+    } = props;
     if (id) {
       if (!library) {
         dispatch(loadItem('libraries', props.id));
@@ -113,7 +107,7 @@ const select = (state, props) => {
   let id;
   let library;
   let notFound;
-  let message = props.message;
+  let { message } = props;
   if (props.id) {
     if (typeof props.id === 'object') {
       id = props.id._id;
