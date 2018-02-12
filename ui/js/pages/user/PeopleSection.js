@@ -19,15 +19,15 @@ export default class PeopleSection extends Component {
       const user = person.id;
       return { person, user };
     })
-      .filter(context => typeof context.user === 'object')
+      .filter(({ user }) => (user && typeof user === 'object'))
       .map((context) => {
         const { person, user } = context;
         let image;
-        if ((person && person.image) || (user && user.image)) {
+        if (person.image || user.image) {
           image = (
             <Image className="person-summary__image"
               plain={true}
-              image={(person && person.image) || (user && user.image)} />
+              image={person.image || user.image} />
           );
         } else {
           image = <UserIcon className="person-summary__image" />;
