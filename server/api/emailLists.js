@@ -128,12 +128,12 @@ const getHeldMessages = listName => (
           return;
         }
         match = line.match(/^Subject: (.+)$/);
-        if (match) {
+        if (message && match) {
           message.subject = match[1];
           return;
         }
         match = line.match(/^Cause: (.+)$/);
-        if (match) {
+        if (message && match) {
           message.cause = match[1];
           return;
         }
