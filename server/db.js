@@ -211,7 +211,7 @@ const eventSchema = Schema({
   created: Date,
   dates: [Date],
   domainId: { type: Schema.Types.ObjectId, ref: 'Domain' },
-  end: Date,
+  end: { type: Date, index: true },
   // formTemplateId: { type: Schema.Types.ObjectId, ref: 'FormTemplate' },
   image,
   location: String, // room, house owner's name, etc.
@@ -226,7 +226,7 @@ const eventSchema = Schema({
   sections: [eventSectionSchema],
   // sections: [Schema(sectionDef, { discriminatorKey: 'type', _id: false })],
   setup: Number,
-  start: Date,
+  start: { type: Date, index: true },
   teardown: Number,
   text: String, // deprecated but leave for now while upgrading to sections
   times: [{
@@ -459,7 +459,6 @@ messageSchema.index(
 
 const Message = mongoose.model('Message', messageSchema);
 Message.on('index', () => console.log('Message index ready'));
-
 
 const oldFileSchema = Schema({
   oldId: { type: String, required: true, unique: true },
