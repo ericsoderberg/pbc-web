@@ -74,22 +74,28 @@ export function loadSession() {
 }
 
 export function postSession(session) {
-  return fetch('/api/sessions', {
-    method: 'POST', headers: _headers, body: JSON.stringify(session) })
+  return fetch(
+    '/api/sessions',
+    { method: 'POST', headers: _headers, body: JSON.stringify(session) },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
 
 export function postSessionViaToken(session) {
-  return fetch('/api/sessions/token', {
-    method: 'POST', headers: _headers, body: JSON.stringify(session) })
+  return fetch(
+    '/api/sessions/token',
+    { method: 'POST', headers: _headers, body: JSON.stringify(session) },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
 
 export function deleteSession() {
-  return fetch(`/api/sessions/${_sessionId}`, {
-    method: 'DELETE', headers: _headers })
+  return fetch(
+    `/api/sessions/${_sessionId}`,
+    { method: 'DELETE', headers: _headers },
+  )
     .then(processStatus)
     .then(clearSession)
     .catch(clearSession);
@@ -129,6 +135,12 @@ export function deleteSession() {
 //   });
 // }
 
+// categoryLoadSequence is used to discard older responses. When the user
+// is entering search text, short strings like "s" might take longer to
+// process than later strings like "steve". If the response sequence is
+// too old, we ignore it.
+const categoryLoadSequence = {};
+
 export const loadCategory = (category, options = {}, context) =>
   (dispatch) => {
     const params = [];
@@ -151,9 +163,7 @@ export const loadCategory = (category, options = {}, context) =>
       params.push(`distinct=${encodeURIComponent(options.distinct)}`);
     }
     if (options.populate) {
-      params.push(
-        `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
-      );
+      params.push(`populate=${encodeURIComponent(JSON.stringify(options.populate))}`);
     }
     if (options.limit) {
       params.push(`limit=${encodeURIComponent(options.limit)}`);
@@ -162,13 +172,27 @@ export const loadCategory = (category, options = {}, context) =>
       params.push(`skip=${encodeURIComponent(options.skip)}`);
     }
     const q = params.length > 0 ? `?${params.join('&')}` : '';
-    return fetch(`/api/${category}${q}`, {
-      method: 'GET', headers: _headers })
+
+    if (!categoryLoadSequence[category]) categoryLoadSequence[category] = 1;
+    const sequence = categoryLoadSequence[category] + 1;
+    categoryLoadSequence[category] = sequence;
+
+    return fetch(
+      `/api/${category}${q}`,
+      { method: 'GET', headers: _headers },
+    )
       .then(processStatus)
       .then(response => response.json())
-      .then(items => dispatch({
-        type: CATEGORY_LOAD, payload: { category, items, ...options, context },
-      }))
+      .then((items) => {
+        if (categoryLoadSequence[category] === sequence) {
+          dispatch({
+            type: CATEGORY_LOAD,
+            payload: {
+              category, items, ...options, context,
+            },
+          });
+        }
+      })
       .catch(payload => dispatch({
         type: CATEGORY_LOAD, error: true, payload,
       }));
@@ -178,8 +202,10 @@ export const unloadCategory = category =>
   ({ type: CATEGORY_UNLOAD, payload: { category } });
 
 export function postItem(category, item) {
-  return fetch(`/api/${category}`, {
-    method: 'POST', headers: _headers, body: JSON.stringify(item) })
+  return fetch(
+    `/api/${category}`,
+    { method: 'POST', headers: _headers, body: JSON.stringify(item) },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
@@ -191,9 +217,7 @@ export const loadItem = (category, id, options = {}) =>
       params.push(`select=${encodeURIComponent(options.select)}`);
     }
     if (options.populate) {
-      params.push(
-        `populate=${encodeURIComponent(JSON.stringify(options.populate))}`,
-      );
+      params.push(`populate=${encodeURIComponent(JSON.stringify(options.populate))}`);
     }
     if (options.full) {
       // loads all forms for form template
@@ -219,41 +243,60 @@ export const loadItem = (category, id, options = {}) =>
       params.push(`forSession=${encodeURIComponent(options.forSession)}`);
     }
     const q = params.length > 0 ? `?${params.join('&')}` : '';
-    return fetch(`/api/${category}/${encodeURIComponent(id)}${q}`, {
-      method: 'GET', headers: _headers })
+    return fetch(
+      `/api/${category}/${encodeURIComponent(id)}${q}`,
+      { method: 'GET', headers: _headers },
+    )
       .then(processStatus)
       .then(response => response.json())
       .then(item => dispatch({
-        type: ITEM_LOAD, payload: { category, id, item, ...options } }))
+        type: ITEM_LOAD,
+        payload: {
+          category, id, item, ...options,
+        },
+      }))
       .catch(error => dispatch({
-        type: ITEM_LOAD, error: true, payload: { id, error } }));
+        type: ITEM_LOAD,
+        error: true,
+        payload: { id, error },
+      }));
   };
 
 export const unloadItem = (category, id) =>
   ({ type: ITEM_UNLOAD, payload: { category, id } });
 
 export function putItem(category, item) {
-  return fetch(`/api/${category}/${encodeURIComponent(item._id)}`, {
-    method: 'PUT', headers: _headers, body: JSON.stringify(item) })
+  return fetch(
+    `/api/${category}/${encodeURIComponent(item._id)}`,
+    { method: 'PUT', headers: _headers, body: JSON.stringify(item) },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
 
 export function deleteItem(category, id) {
-  return fetch(`/api/${category}/${encodeURIComponent(id)}`, {
-    method: 'DELETE', headers: _headers })
+  return fetch(
+    `/api/${category}/${encodeURIComponent(id)}`,
+    { method: 'DELETE', headers: _headers },
+  )
     .then(processStatus);
 }
 
 // Page
 
 export function getPageMap(id) {
-  return fetch(`/api/pages/${id}/map`, { method: 'GET', headers: _headers })
+  return fetch(
+    `/api/pages/${id}/map`,
+    { method: 'GET', headers: _headers },
+  )
     .then(response => response.json());
 }
 
 export function postPublicize() {
-  return fetch('/api/pages/publicize', { method: 'POST', headers: _headers })
+  return fetch(
+    '/api/pages/publicize',
+    { method: 'POST', headers: _headers },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
@@ -261,19 +304,24 @@ export function postPublicize() {
 // User
 
 export function postSignUp(user) {
-  return fetch('/api/users/sign-up', {
-    method: 'POST', headers: _headers, body: JSON.stringify(user) })
+  return fetch(
+    '/api/users/sign-up',
+    { method: 'POST', headers: _headers, body: JSON.stringify(user) },
+  )
     .then(processStatus)
     .then(response => response.json())
     .then(setSession);
 }
 
 export function postVerifyEmail(email, returnPath) {
-  return fetch('/api/users/verify-email', {
-    method: 'POST',
-    headers: _headers,
-    body: JSON.stringify({ email, returnPath }),
-  })
+  return fetch(
+    '/api/users/verify-email',
+    {
+      method: 'POST',
+      headers: _headers,
+      body: JSON.stringify({ email, returnPath }),
+    },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
@@ -282,7 +330,10 @@ export function postVerifyEmail(email, returnPath) {
 
 export function loadSite() {
   return dispatch =>
-    fetch('/api/site', { method: 'GET', headers: _headers })
+    fetch(
+      '/api/site',
+      { method: 'GET', headers: _headers },
+    )
       .then(response => response.json())
       .then((site) => {
         setTimezone(site.timezone);
@@ -296,8 +347,10 @@ export function loadSite() {
 
 export function postSite(site) {
   return dispatch =>
-    fetch('/api/site', {
-      method: 'POST', headers: _headers, body: JSON.stringify(site) })
+    fetch(
+      '/api/site',
+      { method: 'POST', headers: _headers, body: JSON.stringify(site) },
+    )
       .then(processStatus)
       .then(response => response.json())
       .then(payload => dispatch({ type: SITE_LOAD, payload }))
@@ -329,8 +382,10 @@ export const loadCalendar = (options = {}) =>
       });
     }
     const q = params.length > 0 ? `?${params.join('&')}` : '';
-    return fetch(`/api/calendar${q}`, {
-      method: 'GET', headers: _headers })
+    return fetch(
+      `/api/calendar${q}`,
+      { method: 'GET', headers: _headers },
+    )
       .then(response => response.json())
       .then(payload => dispatch({ type: CALENDAR_LOAD, payload }));
   };
@@ -342,40 +397,52 @@ export function unloadCalendar() {
 // Events
 
 export function getResources(event) {
-  return fetch('/api/events/resources', {
-    method: 'POST', headers: _headers, body: JSON.stringify(event) })
+  return fetch(
+    '/api/events/resources',
+    { method: 'POST', headers: _headers, body: JSON.stringify(event) },
+  )
     .then(response => response.json());
 }
 
 export function getUnavailableDates(event) {
-  return fetch('/api/events/unavailable-dates', {
-    method: 'POST', headers: _headers, body: JSON.stringify(event) })
+  return fetch(
+    '/api/events/unavailable-dates',
+    { method: 'POST', headers: _headers, body: JSON.stringify(event) },
+  )
     .then(response => response.json());
 }
 
 // Resources
 
 export function getResourceCalendar(resource) {
-  return fetch(`/api/resources/${resource._id}/calendar`, {
-    method: 'GET', headers: _headers })
+  return fetch(
+    `/api/resources/${resource._id}/calendar`,
+    { method: 'GET', headers: _headers },
+  )
     .then(response => response.json());
 }
 
 export function getResourceEvents(resource) {
-  return fetch(`/api/resources/${resource._id}/events`, {
-    method: 'GET', headers: _headers })
+  return fetch(
+    `/api/resources/${resource._id}/events`,
+    { method: 'GET', headers: _headers },
+  )
     .then(response => response.json());
 }
 
 export function getResourcesCalendar() {
-  return fetch('/api/resources/calendar', {
-    method: 'GET', headers: _headers })
+  return fetch(
+    '/api/resources/calendar',
+    { method: 'GET', headers: _headers },
+  )
     .then(response => response.json());
 }
 
 export function getResourcesEvents() {
-  return fetch('/api/resources/events', {
-    method: 'GET', headers: _headers })
+  return fetch(
+    '/api/resources/events',
+    { method: 'GET', headers: _headers },
+  )
     .then(response => response.json());
 }
 
@@ -393,8 +460,10 @@ export function getFormTemplateDownload(id, options) {
     params.push(`sort=${encodeURIComponent(options.sort)}`);
   }
   const q = params.length > 0 ? `?${params.join('&')}` : '';
-  return fetch(`/api/form-templates/${id}.csv${q}`, {
-    method: 'GET', headers: _headers })
+  return fetch(
+    `/api/form-templates/${id}.csv${q}`,
+    { method: 'GET', headers: _headers },
+  )
     .then((response) => {
       const cd = response.headers.get('Content-Disposition');
       const name = cd && cd.match(/filename="([^"]+)"/)[1];
@@ -408,15 +477,19 @@ export function getFormTemplateDownload(id, options) {
 }
 
 export function postFormTemplateEmailRender(email) {
-  return fetch('/api/email/render', {
-    method: 'POST', headers: _headers, body: JSON.stringify(email) })
+  return fetch(
+    '/api/email/render',
+    { method: 'POST', headers: _headers, body: JSON.stringify(email) },
+  )
     .then(processStatus)
     .then(response => response.text());
 }
 
 export function postFormTemplateEmailSend(id, email) {
-  return fetch(`/api/form-templates/${id}/email`, {
-    method: 'POST', headers: _headers, body: JSON.stringify(email) })
+  return fetch(
+    `/api/form-templates/${id}/email`,
+    { method: 'POST', headers: _headers, body: JSON.stringify(email) },
+  )
     .then(processStatus)
     .then(response => response.text());
 }
@@ -424,15 +497,19 @@ export function postFormTemplateEmailSend(id, email) {
 // Newsletter
 
 export function postNewsletterRender(newsletter) {
-  return fetch('/api/newsletters/render', {
-    method: 'POST', headers: _headers, body: JSON.stringify(newsletter) })
+  return fetch(
+    '/api/newsletters/render',
+    { method: 'POST', headers: _headers, body: JSON.stringify(newsletter) },
+  )
     .then(processStatus)
     .then(response => response.text());
 }
 
 export function postNewsletterSend(id, address) {
-  return fetch(`/api/newsletters/${id}/send`, {
-    method: 'POST', headers: _headers, body: JSON.stringify({ address }) })
+  return fetch(
+    `/api/newsletters/${id}/send`,
+    { method: 'POST', headers: _headers, body: JSON.stringify({ address }) },
+  )
     .then(processStatus)
     .then(response => response.text());
 }
@@ -443,8 +520,10 @@ export function getGeocode(address) {
   const query = `?q=${encodeURIComponent(address)}&format=json`;
   const url =
     `${window.location.protocol}//nominatim.openstreetmap.org/search${query}`;
-  return fetch(url, {
-    method: 'GET', headers: { ..._headers, Authorization: undefined } })
+  return fetch(
+    url,
+    { method: 'GET', headers: { ..._headers, Authorization: undefined } },
+  )
     .then(response => response.json());
 }
 
@@ -453,34 +532,45 @@ export function getGeocode(address) {
 export function postFile(data) {
   const headers = { ..._headers };
   delete headers['Content-Type'];
-  return fetch('/api/files', { method: 'POST', headers, body: data })
+  return fetch(
+    '/api/files',
+    { method: 'POST', headers, body: data },
+  )
     .then(processStatus)
     .then(response => response.json());
 }
 
 export function deleteFile(id) {
-  return fetch(`/api/files/${id}`, {
-    method: 'DELETE', headers: _headers })
+  return fetch(
+    `/api/files/${id}`,
+    { method: 'DELETE', headers: _headers },
+  )
     .then(processStatus);
 }
 
 // Email lists
 
 export function postSubscribe(emailList, addresses) {
-  return fetch(`/api/email-lists/${emailList._id}/subscribe`, {
-    method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
-  . then(processStatus);
+  return fetch(
+    `/api/email-lists/${emailList._id}/subscribe`,
+    { method: 'POST', headers: _headers, body: JSON.stringify(addresses) },
+  )
+    .then(processStatus);
 }
 
 export function postUnsubscribe(emailList, addresses) {
-  return fetch(`/api/email-lists/${emailList._id}/unsubscribe`, {
-    method: 'POST', headers: _headers, body: JSON.stringify(addresses) })
+  return fetch(
+    `/api/email-lists/${emailList._id}/unsubscribe`,
+    { method: 'POST', headers: _headers, body: JSON.stringify(addresses) },
+  )
     .then(processStatus);
 }
 
 export function getEmailListDownload(emailList) {
-  return fetch(`/api/email-lists/${emailList._id}.txt`, {
-    method: 'GET', headers: _headers })
+  return fetch(
+    `/api/email-lists/${emailList._id}.txt`,
+    { method: 'GET', headers: _headers },
+  )
     .then((response) => {
       const cd = response.headers.get('Content-Disposition');
       const name = cd && cd.match(/filename="([^"]+)"/)[1];
@@ -490,12 +580,18 @@ export function getEmailListDownload(emailList) {
 }
 
 export function putMessage(url) {
-  return fetch(url, { method: 'PUT', headers: _headers })
+  return fetch(
+    url,
+    { method: 'PUT', headers: _headers },
+  )
     .then(processStatus);
 }
 
 export function deleteMessage(url) {
-  return fetch(url, { method: 'DELETE', headers: _headers })
+  return fetch(
+    url,
+    { method: 'DELETE', headers: _headers },
+  )
     .then(processStatus);
 }
 
@@ -507,8 +603,10 @@ export const loadSearch = searchText =>
       const params = [];
       params.push(`search=${encodeURIComponent(searchText)}`);
       const q = params.length > 0 ? `?${params.join('&')}` : '';
-      return fetch(`/api/search${q}`, {
-        method: 'GET', headers: _headers })
+      return fetch(
+        `/api/search${q}`,
+        { method: 'GET', headers: _headers },
+      )
         .then(processStatus)
         .then(response => response.json())
         .then(payload => dispatch({ type: SEARCH_LOAD, payload }))
@@ -533,8 +631,10 @@ export const loadAuditLog = (options = {}) =>
       params.push(`skip=${encodeURIComponent(options.skip)}`);
     }
     const q = params.length > 0 ? `?${params.join('&')}` : '';
-    fetch(`/api/audit-log${q}`, {
-      method: 'GET', headers: _headers })
+    fetch(
+      `/api/audit-log${q}`,
+      { method: 'GET', headers: _headers },
+    )
       .then(processStatus)
       .then(response => response.json())
       .then(items => dispatch({
