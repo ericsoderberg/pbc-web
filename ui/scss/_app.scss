@@ -22,10 +22,10 @@
     top: $half-unit;
     left: - ($unit + $half-unit);
     height: $double-unit;
-    border: dashed ($unit / 6) $nav-background-color;
+    border: dashed ($unit / 12) $nav-background-color;
     border-radius: $half-unit;
     z-index: 200;
-    opacity: 0.2;
+    opacity: 0.5;
   }
 
   @media print {
@@ -214,6 +214,7 @@
     @media screen and (max-width: 699px) {
       position: absolute;
       z-index: 100;
+      top: $half-unit;
       right: 0;
       width: 100vw;
       background-color: $secondary-background-color;
