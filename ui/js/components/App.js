@@ -102,9 +102,7 @@ class App extends Component {
         classNames.push('app--nav');
       } else {
         navControl = (
-          <Button className="app__nav-control" onClick={this._onToggle}>
-            admin
-          </Button>
+          <Button className="button-icon app__nav-control" onClick={this._onToggle} />
         );
       }
     }

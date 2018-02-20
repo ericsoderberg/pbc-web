@@ -18,9 +18,14 @@
   }
 
   @media all and (max-width: 699px) {
-    position: relative;
+    position: absolute;
+    top: $half-unit;
+    left: - ($unit + $half-unit);
+    height: $double-unit;
+    border: dashed ($unit / 6) $nav-background-color;
+    border-radius: $half-unit;
     z-index: 200;
-    width: 100%;
+    opacity: 0.2;
   }
 
   @media print {
@@ -65,6 +70,7 @@
   flex-direction: column;
   background-color: $nav-background-color;
   color: $active-color;
+  padding-top: $half-unit;
 
   @media all and (min-width: 700px) {
     flex: 0 0 $sidebar-width;
