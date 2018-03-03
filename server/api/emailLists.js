@@ -11,6 +11,7 @@ import { catcher } from './utils';
 mongoose.Promise = global.Promise;
 
 // const MAILMAN_DIR = process.env.MAILMAN_DIR || '/usr/lib/mailman/bin';
+const MAILMAN_DATA_DIR = process.env.MAILMAN_DATA_DIR || '/var/lib/mailman/data';
 const MAILMAN_ADMIN = process.env.MAILMAN_ADMIN || 'eric_soderberg@pbc.org';
 const MAILMAN_ADMIN_PASSWORD = process.env.MAILMAN_ADMIN_PASSWORD || '12345678';
 
@@ -138,12 +139,59 @@ const getHeldMessages = listName => (
           return;
         }
         if (message) {
-          message.uri = `/api/email-lists/${listName}/${line.trim()}`;
+          message.id = line.trim();
+          message.uri = `/api/email-lists/${listName}/${message.id}`;
           heldMessages.push(message);
           message = undefined;
         }
       });
       return resolve(heldMessages);
+    });
+  })
+);
+
+const getHeldMessageContent = (listName, messageId) => (
+  // Content returned is limited to a prefix of headers and body
+  // with lines possibly truncated, to give enough text for message review
+  // for moderation while preventing load of large messages (such as with
+  // very large file attachments).
+  new Promise((resolve) => {
+    execFile('dumpdb', [MAILMAN_DATA_DIR + '/' + `heldmsg-${listName}-${messageId}.pck`], (error, stdout, stderr) => {
+      if (error) {
+        console.error('!!! get held content error', error, stderr);
+        return resolve([]);
+      }
+      let headers = undefined;
+      let partLines = undefined;
+      stdout.split('\n').forEach((line) => {
+        line = line.substr(0, 200);
+        let match = line.match(/^<----- start object 1 ----->$/);
+        if (match) {
+          partLines = [];
+          return;
+        }
+        match = line.match(/^$/);
+        if (!headers && partLines && match) {
+          // this is division between headers and body
+          headers = partLines.join('\n');
+          partLines = [];
+          return;
+        }
+        match = line.match(/^\[----- end pickle file -----\]$/);
+        if (match) {
+          return;
+        }
+        if (partLines && partLines.length <= 120) {
+          partLines.push(line);
+        }
+      });
+      if (partLines) {
+        let content = { headers: headers, body: partLines.join('\n') };
+       	return resolve(content);
+      } else {
+        console.error('!!! get held content format error');
+        return resolve([]);
+       }
     });
   })
 );
@@ -232,10 +280,25 @@ const populateEmailList = (emailList) => {
         })
     ))
     .then(emailListPopulated => (
-      // get moderators
+      // get held messages
       getHeldMessages(emailListPopulated.name)
         .then((heldMessages) => {
           emailListPopulated.heldMessages = heldMessages;
+          return heldMessages;
+        })
+        .then((heldMessages) => {
+          const heldpromises = [Promise.resolve(heldMessages)];
+          heldMessages.forEach((held) => {
+            heldpromises.push(getHeldMessageContent(emailListPopulated.name, held.id))
+          })
+          return Promise.all(heldpromises);
+        })
+        .then((heldcontents) => {
+          const heldMessages = heldcontents[0];
+          heldMessages.forEach((message, index) => {
+            const content = heldcontents[1 + index];
+            message.content = content;
+          });
           return emailListPopulated;
         })
     ));

@@ -8,11 +8,14 @@ import Loading from '../../components/Loading';
 import NotFound from '../../components/NotFound';
 import SendIcon from '../../icons/Send';
 import TrashIcon from '../../icons/Trash';
+import DownArrow from '../../icons/DownArrow';
+import UpArrow from '../../icons/UpArrow';
 
 class EmailList extends Component {
   constructor() {
     super();
     this._onCancel = this._onCancel.bind(this);
+    this.state = { collapsed: {} } // messageUri -> true/false
   }
 
   componentDidMount() {
@@ -41,6 +44,11 @@ class EmailList extends Component {
     history.goBack();
   }
 
+  _isCollapsed(messageUri) {
+    const collapsed = this.state.collapsed[messageUri];
+    return collapsed === undefined ? true : collapsed;
+  }
+
   _accept(messageUri) {
     return () => {
       putMessage(messageUri)
@@ -54,6 +62,14 @@ class EmailList extends Component {
       deleteMessage(messageUri)
         .then(() => this._load())
         .catch(error => this.setState({ error }));
+    };
+  }
+
+  _toggleContent(messageUri) {
+    return () => {
+      const { collapsed }  = this.state;
+      collapsed[messageUri] = !this._isCollapsed(messageUri);
+      this.setState({ collapsed });
     };
   }
 
@@ -85,7 +101,25 @@ class EmailList extends Component {
             <div className="item">
               <span>{message.subject}</span>
               <span>{message.date}</span>
+              <button type="button"
+                className="button-icon"
+                onClick={this._toggleContent(message.uri)}>
+                { this._isCollapsed(message.uri) ?
+                  <DownArrow />
+                  :
+                  <UpArrow />
+                }
+              </button>
             </div>
+            { this._isCollapsed(message.uri) ?
+              <span></span>
+              :
+              <div className="item">
+                <textarea className="textarea-wide" rows="10" readOnly="true">
+                  {message.content.body}
+                </textarea>
+              </div>
+            }
           </div>
         );
       });
