@@ -155,11 +155,11 @@ const getHeldMessageContent = (listName, messageId) => (
   // with lines possibly truncated, to give enough text for message review
   // for moderation while preventing load of large messages (such as with
   // very large file attachments).
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     execFile('dumpdb', [MAILMAN_DATA_DIR + '/' + `heldmsg-${listName}-${messageId}.pck`], (error, stdout, stderr) => {
       if (error) {
         console.error('!!! get held content error', error, stderr);
-        return resolve([]);
+        return reject(error);
       }
       let headers = undefined;
       let partLines = undefined;
@@ -187,10 +187,10 @@ const getHeldMessageContent = (listName, messageId) => (
       });
       if (partLines) {
         let content = { headers: headers, body: partLines.join('\n') };
-       	return resolve(content);
+        return resolve(content);
       } else {
         console.error('!!! get held content format error');
-        return resolve([]);
+        return reject(new Error('held content format error'));
        }
     });
   })

@@ -67,7 +67,7 @@ class EmailList extends Component {
 
   _toggleContent(messageUri) {
     return () => {
-      const { collapsed }  = this.state;
+      const collapsed = { ...this.state.collapsed };
       collapsed[messageUri] = !this._isCollapsed(messageUri);
       this.setState({ collapsed });
     };
