@@ -3,7 +3,9 @@
   "description": "PBC web site",
   "version": "1.0.0",
   "authors": [
-    "Eric Soderberg"
+    "Eric Soderberg",
+    "Jim Thornton",
+    "Google LLC"
   ],
   "bugs": "https://github.com/ericsoderberg/pbc-web/issues",
   "license": "Apache-2.0",
